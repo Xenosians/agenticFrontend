@@ -1,50 +1,15 @@
-import std/strutils
+include karax/prelude
 
 import ../app/types
+import ../app/state
 
 
-proc escapeHtml(value: string): string =
-  result = value
-    .replace("&", "&amp;")
-    .replace("<", "&lt;")
-    .replace(">", "&gt;")
-    .replace("\"", "&quot;")
-    .replace("'", "&#39;")
-
-
-proc displayValue(
-  value: string,
-  fallback: string
+proc statusTitle(
+  status: string
 ): string =
-  if value.len == 0:
-    fallback
-  else:
-    escapeHtml(value)
 
-
-proc statusClass(status: string): string =
   case status
-  of "pending":
-    "pending"
 
-  of "processing":
-    "processing"
-
-  of "completed":
-    "completed"
-
-  of "failed":
-    "failed"
-
-  of "waiting_approval":
-    "waiting-approval"
-
-  else:
-    "pending"
-
-
-proc statusTitle(status: string): string =
-  case status
   of "pending":
     "Pending"
 
@@ -61,11 +26,15 @@ proc statusTitle(status: string): string =
     "Waiting approval"
 
   else:
-    "Unknown"
+    "Idle"
 
 
-proc statusDescription(status: string): string =
+proc statusDescription(
+  status: string
+): string =
+
   case status
+
   of "pending":
     "Waiting for backend dispatch"
 
@@ -73,7 +42,7 @@ proc statusDescription(status: string): string =
     "Agent is processing the request"
 
   of "completed":
-    "Run completed"
+    "Run completed successfully"
 
   of "failed":
     "Run failed"
@@ -82,142 +51,432 @@ proc statusDescription(status: string): string =
     "User approval is required"
 
   else:
-    "Unknown run state"
+    "No active run"
 
 
-proc renderInspector*(state: AppState): string =
-  if not state.run.active:
-    return """
-      <div class="run-empty">
+proc indicatorClass(
+  status: string
+): cstring =
 
-        <div class="run-empty-icon">
-          ◌
-        </div>
+  case status
 
-        <h3>
-          No active run
-        </h3>
+  of "processing":
+    cstring"status-indicator processing"
 
-        <p>
-          Submit a request to inspect job state,
-          routing, tool usage, and execution events.
-        </p>
+  of "completed":
+    cstring"status-indicator completed"
 
-      </div>
-    """
+  of "failed":
+    cstring"status-indicator failed"
 
-  let
-    run = state.run
+  of "waiting_approval":
+    cstring"status-indicator waiting-approval"
 
-    currentStatusClass =
-      statusClass(run.status)
+  else:
+    cstring"status-indicator pending"
 
-    currentStatusTitle =
-      statusTitle(run.status)
 
-    currentStatusDescription =
-      statusDescription(run.status)
+proc tabClass(
+  current: InspectorTab,
+  target: InspectorTab
+): cstring =
 
-    request =
-      displayValue(
-        run.request,
-        "No request"
+  if current == target:
+    cstring"active"
+  else:
+    cstring""
+
+
+proc displayValue(
+  value: string,
+  fallback: string
+): string =
+
+  if value.len == 0:
+    fallback
+  else:
+    value
+
+
+proc renderRunTab(
+  state: AppState
+): VNode =
+
+  result = buildHtml(
+    tdiv(class = "inspector-panel")
+  ):
+
+    if not state.run.active:
+
+      tdiv(class = "run-empty"):
+
+        tdiv(class = "run-empty-icon"):
+          text "◌"
+
+        h3:
+          text "No active run"
+
+        p:
+          text """
+Send a request to inspect routing,
+tool usage and execution state.
+"""
+
+
+    else:
+
+      tdiv(class = "run-details"):
+
+        tdiv(class = "run-status"):
+
+          span(
+            class =
+              indicatorClass(
+                state.run.status
+              )
+          )
+
+          tdiv:
+
+            strong:
+              text statusTitle(
+                state.run.status
+              )
+
+            span:
+              text statusDescription(
+                state.run.status
+              )
+
+
+        tdiv(class = "run-section"):
+
+          span(class = "run-label"):
+            text "Job"
+
+          tdiv(class = "run-value mono"):
+            text displayValue(
+              state.run.jobId,
+              "Not assigned"
+            )
+
+
+        tdiv(class = "run-section"):
+
+          span(class = "run-label"):
+            text "Request"
+
+          tdiv(class = "run-value"):
+            text state.run.request
+
+
+        tdiv(class = "run-section"):
+
+          span(class = "run-label"):
+            text "Agent"
+
+          tdiv(class = "run-value"):
+            text displayValue(
+              state.run.agent,
+              "Not selected"
+            )
+
+
+        tdiv(class = "run-section"):
+
+          span(class = "run-label"):
+            text "Tool"
+
+          tdiv(class = "run-value"):
+            text displayValue(
+              state.run.tool,
+              "Not selected"
+            )
+
+
+proc renderInspectorTool(
+  state: AppState,
+  tool: ToolItem
+): VNode =
+
+  result = buildHtml(
+    button(class = "tool-inspector-row")
+  ):
+
+    tdiv:
+
+      strong:
+        text tool.name
+
+      span:
+        text tool.id
+
+
+    if tool.enabled:
+
+      span(class = "capability-badge enabled"):
+        text "Enabled"
+
+    else:
+
+      span(class = "capability-badge disabled"):
+        text "Preview"
+
+
+    proc onclick(
+      event: Event,
+      node: VNode
+    ) =
+      openToolView(
+        state,
+        tool.id
       )
 
-    job =
-      displayValue(
-        run.jobId,
-        "Local preview"
+
+proc renderToolsTab(
+  state: AppState
+): VNode =
+
+  result = buildHtml(
+    tdiv(class = "inspector-panel")
+  ):
+
+    tdiv(class = "inspector-section-heading"):
+
+      strong:
+        text "Capabilities"
+
+      span:
+        text "Select a tool to inspect it."
+
+
+    for tool in state.tools:
+      renderInspectorTool(
+        state,
+        tool
       )
 
-    agent =
-      displayValue(
-        run.agent,
-        "Not selected"
-      )
 
-    tool =
-      displayValue(
-        run.tool,
-        "Not selected"
-      )
+proc renderEventsTab(
+  state: AppState
+): VNode =
 
-  result = """
-    <div class="run-details">
+  result = buildHtml(
+    tdiv(class = "inspector-panel")
+  ):
 
-      <div class="run-status">
+    if state.runEvents.len == 0:
 
-        <span
-          class="status-indicator """ &
-          currentStatusClass &
-        """"
-        ></span>
+      tdiv(class = "run-empty"):
 
-        <div>
+        tdiv(class = "run-empty-icon"):
+          text "≡"
 
-          <strong>""" &
-            currentStatusTitle &
-          """</strong>
+        h3:
+          text "No events"
 
-          <span>""" &
-            currentStatusDescription &
-          """</span>
-
-        </div>
-
-      </div>
+        p:
+          text "Runtime events will appear here."
 
 
-      <div class="run-section">
+    else:
 
-        <span class="run-label">
-          Request
-        </span>
+      tdiv(class = "event-list"):
 
-        <div class="run-value">""" &
-          request &
-        """</div>
+        for runEvent in state.runEvents:
 
-      </div>
+          tdiv(class = "event-row"):
 
+            tdiv(class = "event-marker")
 
-      <div class="run-section">
+            tdiv:
 
-        <span class="run-label">
-          Job
-        </span>
+              span(class = "event-kind"):
+                text runEvent.kind
 
-        <div class="run-value">""" &
-          job &
-        """</div>
-
-      </div>
+              p:
+                text runEvent.message
 
 
-      <div class="run-section">
+proc renderRawTab(
+  state: AppState
+): VNode =
 
-        <span class="run-label">
-          Agent
-        </span>
+  result = buildHtml(
+    tdiv(class = "inspector-panel")
+  ):
 
-        <div class="run-value">""" &
-          agent &
-        """</div>
+    pre(class = "raw-state"):
 
-      </div>
+      if not state.run.active:
+
+        text """
+{
+  "active": false
+}
+"""
+
+      else:
+
+        text (
+          "{\n" &
+          "  \"active\": true,\n" &
+          "  \"job_id\": \"" &
+          state.run.jobId &
+          "\",\n" &
+          "  \"status\": \"" &
+          state.run.status &
+          "\",\n" &
+          "  \"agent\": \"" &
+          state.run.agent &
+          "\",\n" &
+          "  \"tool\": \"" &
+          state.run.tool &
+          "\",\n" &
+          "  \"events\": " &
+          $state.runEvents.len &
+          "\n" &
+          "}"
+        )
 
 
-      <div class="run-section">
+proc renderInspector*(
+  state: AppState
+): VNode =
 
-        <span class="run-label">
-          Tool
-        </span>
+  result = buildHtml(
+    aside(class = "inspector")
+  ):
 
-        <div class="run-value">""" &
-          tool &
-        """</div>
+    header(class = "inspector-header"):
 
-      </div>
+      tdiv:
 
-    </div>
-  """
+        strong:
+          text "Run Inspector"
+
+        span:
+          text "Execution context"
+
+
+      button(
+        class = "inspector-close",
+        title = "Hide inspector"
+      ):
+
+        text "×"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+          toggleInspector(
+            state
+          )
+
+
+    tdiv(class = "inspector-tabs"):
+
+      button(
+        class =
+          tabClass(
+            state.inspectorTab,
+            tabRun
+          )
+      ):
+
+        text "Run"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+          setInspectorTab(
+            state,
+            tabRun
+          )
+
+
+      button(
+        class =
+          tabClass(
+            state.inspectorTab,
+            tabTools
+          )
+      ):
+
+        text "Tools"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+          setInspectorTab(
+            state,
+            tabTools
+          )
+
+
+      button(
+        class =
+          tabClass(
+            state.inspectorTab,
+            tabEvents
+          )
+      ):
+
+        text "Events"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+          setInspectorTab(
+            state,
+            tabEvents
+          )
+
+
+      button(
+        class =
+          tabClass(
+            state.inspectorTab,
+            tabRaw
+          )
+      ):
+
+        text "Raw"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+          setInspectorTab(
+            state,
+            tabRaw
+          )
+
+
+    section(class = "inspector-content"):
+
+      case state.inspectorTab
+
+      of tabRun:
+        renderRunTab(
+          state
+        )
+
+      of tabTools:
+        renderToolsTab(
+          state
+        )
+
+      of tabEvents:
+        renderEventsTab(
+          state
+        )
+
+      of tabRaw:
+        renderRawTab(
+          state
+        )

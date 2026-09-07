@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect x="2" y="2" width="60" height="60" rx="16" fill="#ECECEC"></rect>
+
+  <!-- body -->
+  <path d="M24 47C24 42.6 27.6 39 32 39C36.4 39 40 42.6 40 47V50H24V47Z" fill="#111111"></path>
+
+  <!-- left neck -->
+  <path d="M29 43C25 38 21 34 18 28C16.5 25 16 22 17 19" stroke="#111111" stroke-width="5" stroke-linecap="round"></path>
+
+  <!-- center neck -->
+  <path d="M32 42V18" stroke="#111111" stroke-width="5" stroke-linecap="round"></path>
+
+  <!-- right neck -->
+  <path d="M35 43C39 38 43 34 46 28C47.5 25 48 22 47 19" stroke="#111111" stroke-width="5" stroke-linecap="round"></path>
+
+  <!-- left head -->
+  <path d="M12 16C12 11.6 15.6 8 20 8H26L23 12L27 15L23 18H20C15.6 18 12 20.4 12 16Z" fill="#111111"></path>
+
+  <!-- center head -->
+  <path d="M24 13C24 8.6 27.6 5 32 5H38L35 9L39 12L35 15H32C27.6 15 24 17.4 24 13Z" fill="#111111"></path>
+
+  <!-- right head -->
+  <path d="M38 16C38 11.6 41.6 8 46 8H52L49 12L53 15L49 18H46C41.6 18 38 20.4 38 16Z" fill="#111111"></path>
+
+  <!-- eyes -->
+  <circle cx="20" cy="13" r="1.4" fill="#ECECEC"></circle>
+  <circle cx="32" cy="10" r="1.4" fill="#ECECEC"></circle>
+  <circle cx="46" cy="13" r="1.4" fill="#ECECEC"></circle>
+</svg>

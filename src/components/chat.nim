@@ -1,69 +1,90 @@
-import std/strutils
+include karax/prelude
 
 import ../app/types
 
 
-proc escapeHtml(value: string): string =
-  result = value
-    .replace("&", "&amp;")
-    .replace("<", "&lt;")
-    .replace(">", "&gt;")
-    .replace("\"", "&quot;")
-    .replace("'", "&#39;")
-
-
-proc renderMessage(message: ChatMessage): string =
-  let content = escapeHtml(message.content)
+proc renderMessage(
+  message: ChatMessage
+): VNode =
 
   case message.role
+
   of mrUser:
-    result = """
-      <div class="message-row user">
-        <div class="message-bubble user">
-    """ &
-    content &
-    """
-        </div>
-      </div>
-    """
+
+    result = buildHtml(
+      tdiv(class = "message-row user")
+    ):
+
+      tdiv(class = "message-column user"):
+
+        span(class = "message-author"):
+          text "You"
+
+        tdiv(class = "message-bubble user"):
+          text message.content
+
 
   of mrAssistant:
-    result = """
-      <div class="message-row assistant">
-        <div class="assistant-avatar">A</div>
 
-        <div class="message-bubble assistant">
-    """ &
-    content &
-    """
-        </div>
-      </div>
-    """
+    result = buildHtml(
+      tdiv(class = "message-row assistant")
+    ):
+
+      tdiv(class = "assistant-avatar"):
+        text "A"
+
+      tdiv(class = "message-column assistant"):
+
+        span(class = "message-author"):
+          text "Agentic"
+
+        tdiv(class = "message-bubble assistant"):
+          text message.content
 
 
-proc renderChat*(state: AppState): string =
-  if state.messages.len == 0:
-    return """
-      <div class="welcome">
+proc renderChat*(
+  state: AppState
+): VNode =
 
-        <div class="welcome-icon">
-          A
-        </div>
+  result = buildHtml(
+    section(class = "conversation")
+  ):
 
-        <h2>What do you want to work on?</h2>
+    if state.messages.len == 0:
 
-        <p>
-          Ask Agentic to inspect systems, understand commands,
-          check accounts and access, analyze code, or work with
-          connected developer tools.
-        </p>
+      tdiv(class = "welcome"):
 
-      </div>
-    """
+        tdiv(class = "welcome-icon"):
+          text "A"
 
-  var html = ""
+        h2:
+          text "What do you want to work on?"
 
-  for message in state.messages:
-    html.add(renderMessage(message))
+        p:
+          text """
+Inspect systems, check accounts and access,
+analyze developer operations, or work with
+connected tools and plugins.
+"""
 
-  result = html
+        tdiv(class = "welcome-hints"):
+
+          span:
+            text "Account status"
+
+          span:
+            text "Access checks"
+
+          span:
+            text "Shell operations"
+
+          span:
+            text "Git workflows"
+
+
+    else:
+
+      for message in state.messages:
+        renderMessage(
+          message
+        )

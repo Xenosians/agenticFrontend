@@ -1,82 +1,135 @@
-import dom
-import strutils
+include karax/prelude
+
+import karax/kdom
+
+import std/strutils
+
+import ../app/types
+import ../app/state
 
 
-const
-  ComposerMinHeight* = 24
-  ComposerMaxHeight* = 180
+type
+  SubmitHandler* =
+    proc(message: string) {.closure.}
 
 
-proc messageInput*(): Element =
-  document.getElementById("messageInput")
+proc submitDraft(
+  state: AppState,
+  onSubmit: SubmitHandler,
+  textareaNode: VNode = nil
+) =
+  let message =
+    state.composerDraft.strip()
+
+  if message.len == 0:
+    return
+
+  onSubmit(message)
+
+  setComposerDraft(
+    state,
+    ""
+  )
+
+  if textareaNode != nil:
+    textareaNode.value = cstring""
 
 
-proc sendButton*(): Element =
-  document.getElementById("sendButton")
+proc renderComposer*(
+  state: AppState,
+  onSubmit: SubmitHandler
+): VNode =
 
-
-proc getComposerValue*(): string =
-  let input = messageInput()
-
-  if input == nil:
-    return ""
-
-  result = ($input.value).strip()
-
-
-proc updateSendButton*() =
   let
-    input = messageInput()
-    button = sendButton()
+    sendDisabled =
+      state.composerDraft.strip().len == 0
 
-  if input == nil or button == nil:
-    return
-
-  let hasContent =
-    ($input.value).strip().len > 0
-
-  button.disabled = not hasContent
-
-  if hasContent:
-    button.classList.add("active")
-  else:
-    button.classList.remove("active")
+    sendClass =
+      if sendDisabled:
+        cstring"send-button"
+      else:
+        cstring"send-button active"
 
 
-proc resizeComposer*() =
-  let input = messageInput()
+  result = buildHtml(
+    section(class = "composer-container")
+  ):
 
-  if input == nil:
-    return
+    tdiv(class = "composer"):
 
-  # Reset first so shrinking works too.
-  input.style.height = "auto"
+      textarea(
+        id = "messageInput",
+        class = "composer-input",
+        placeholder = "Ask Agentic...",
+        rows = "1",
+        value = cstring(state.composerDraft)
+      ):
 
-  let wantedHeight =
-    min(
-      input.scrollHeight,
-      ComposerMaxHeight
-    )
-
-  input.style.height =
-    $wantedHeight & "px"
-
-  if input.scrollHeight > ComposerMaxHeight:
-    input.style.overflowY = "auto"
-  else:
-    input.style.overflowY = "hidden"
+        proc oninput(
+          event: Event,
+          node: VNode
+        ) =
+          setComposerDraft(
+            state,
+            $node.value
+          )
 
 
-proc resetComposer*() =
-  let input = messageInput()
+        proc onkeydown(
+          event: Event,
+          node: VNode
+        ) =
+          let keyboardEvent =
+            cast[KeyboardEvent](event)
 
-  if input == nil:
-    return
+          setComposerDraft(
+            state,
+            $node.value
+          )
 
-  input.value = ""
-  input.style.height = "auto"
-  input.style.overflowY = "hidden"
+          if keyboardEvent.key == "Enter" and
+             not keyboardEvent.shiftKey:
 
-  updateSendButton()
+            event.preventDefault()
 
-  input.focus()
+            submitDraft(
+              state,
+              onSubmit,
+              node
+            )
+
+
+      tdiv(class = "composer-footer"):
+
+        tdiv(class = "composer-tools"):
+
+          button(
+            class = "composer-tool-button"
+          ):
+            text "+"
+
+          button(
+            class = "composer-tool-button"
+          ):
+            text "Tools"
+
+
+        button(
+          class = sendClass,
+          disabled = sendDisabled
+        ):
+
+          text "↑"
+
+          proc onclick(
+            event: Event,
+            node: VNode
+          ) =
+            submitDraft(
+              state,
+              onSubmit
+            )
+
+
+    span(class = "composer-hint"):
+      text "Enter to send · Shift+Enter for a new line"

@@ -1,140 +1,350 @@
+include karax/prelude
+
 import ../app/types
+import ../app/state
 
 
-proc renderTool(tool: ToolItem): string =
+proc viewNavClass(
+  state: AppState,
+  target: AppView
+): cstring =
+
+  if state.activeView == target:
+    cstring"nav-item active"
+  else:
+    cstring"nav-item"
+
+
+proc toolNavClass(
+  state: AppState,
+  tool: ToolItem
+): cstring =
+
+  var value =
+    "nav-item capability-nav-item"
+
+  if not tool.enabled:
+    value.add(
+      " unavailable"
+    )
+
+  if state.activeView == viewTool and
+     state.selectedToolId == tool.id:
+
+    value.add(
+      " active"
+    )
+
+  result =
+    cstring(value)
+
+
+proc pluginNavClass(
+  state: AppState,
+  plugin: PluginItem
+): cstring =
+
+  var value =
+    "nav-item capability-nav-item"
+
+  if not plugin.connected:
+    value.add(
+      " unavailable"
+    )
+
+  if state.activeView == viewPlugin and
+     state.selectedPluginId == plugin.id:
+
+    value.add(
+      " active"
+    )
+
+  result =
+    cstring(value)
+
+
+proc renderViewButton(
+  state: AppState,
+  icon: string,
+  label: string,
+  target: AppView
+): VNode =
+
+  result = buildHtml(
+    button(
+      class =
+        viewNavClass(
+          state,
+          target
+        )
+    )
+  ):
+
+    span(class = "nav-icon"):
+      text icon
+
+    span:
+      text label
+
+    proc onclick(
+      event: Event,
+      node: VNode
+    ) =
+      setActiveView(
+        state,
+        target
+      )
+
+
+proc renderToolButton(
+  state: AppState,
+  tool: ToolItem
+): VNode =
+
   let
-    itemClass =
-      if tool.enabled:
-        "nav-item"
-      else:
-        "nav-item disabled"
-
     dotClass =
       if tool.enabled:
-        "status-dot online"
+        cstring"status-dot online"
       else:
-        "status-dot offline"
+        cstring"status-dot offline"
 
     displayName =
       if tool.id == "shell":
-        "&gt;_ " & tool.name
+        ">_ " & tool.name
       else:
         tool.name
 
-  result =
-    "<button class=\"" & itemClass & "\">" &
-      "<span class=\"" & dotClass & "\"></span>" &
-      "<span>" & displayName & "</span>" &
-    "</button>"
+
+  result = buildHtml(
+    button(
+      class =
+        toolNavClass(
+          state,
+          tool
+        )
+    )
+  ):
+
+    span(class = dotClass)
+
+    span:
+      text displayName
+
+    span(class = "nav-tail"):
+      text "›"
+
+    proc onclick(
+      event: Event,
+      node: VNode
+    ) =
+      openToolView(
+        state,
+        tool.id
+      )
 
 
-proc renderPlugin(plugin: PluginItem): string =
-  let
-    itemClass =
-      if plugin.connected:
-        "nav-item"
-      else:
-        "nav-item disabled"
+proc renderPluginButton(
+  state: AppState,
+  plugin: PluginItem
+): VNode =
 
-    dotClass =
-      if plugin.connected:
-        "status-dot online"
-      else:
-        "status-dot offline"
-
-  result =
-    "<button class=\"" & itemClass & "\">" &
-      "<span class=\"" & dotClass & "\"></span>" &
-      "<span>" & plugin.name & "</span>" &
-    "</button>"
+  let dotClass =
+    if plugin.connected:
+      cstring"status-dot online"
+    else:
+      cstring"status-dot offline"
 
 
-proc renderSidebar*(state: AppState): string =
-  var toolsHtml = ""
+  result = buildHtml(
+    button(
+      class =
+        pluginNavClass(
+          state,
+          plugin
+        )
+    )
+  ):
 
-  for tool in state.tools:
-    toolsHtml.add(renderTool(tool))
+    span(class = dotClass)
 
-  var pluginsHtml = ""
+    span:
+      text plugin.name
 
-  for plugin in state.plugins:
-    pluginsHtml.add(renderPlugin(plugin))
+    span(class = "nav-tail"):
+      text "›"
 
-  result = """
-    <div class="brand">
-      <span class="brand-mark">A</span>
-      <span class="brand-name">Agentic</span>
-    </div>
+    proc onclick(
+      event: Event,
+      node: VNode
+    ) =
+      openPluginView(
+        state,
+        plugin.id
+      )
 
-    <button
-        id="newSessionButton"
-        class="new-session"
-    >
-        + New Session
-    </button>
 
-    <nav class="nav-section">
-      <span class="section-label">Workspace</span>
+proc renderSidebar*(
+  state: AppState
+): VNode =
 
-      <button class="nav-item active">
-        <span>◈</span>
-        <span>Chat</span>
-      </button>
+  result = buildHtml(
+    aside(class = "sidebar")
+  ):
 
-      <button class="nav-item">
-        <span>⌕</span>
-        <span>Search</span>
-      </button>
-    </nav>
+    tdiv(class = "brand"):
 
-    <nav class="nav-section">
-      <span class="section-label">Tools</span>
-  """ &
-  toolsHtml &
-  """
-    </nav>
+      img(
+        class = "brand-logo",
+        src = "./assets/hydra.svg",
+        alt = "Agentic Hydra"
+      )
 
-    <nav class="nav-section">
-      <span class="section-label">Plugins</span>
-  """ &
-  pluginsHtml &
-  """
-      <button class="nav-item add-plugin">
-        <span>+</span>
-        <span>Add plugin</span>
-      </button>
-    </nav>
+      tdiv(class = "brand-copy"):
 
-    <nav class="nav-section">
-      <span class="section-label">Developer</span>
+        strong:
+          text "Agentic"
 
-      <button class="nav-item">
-        <span>▣</span>
-        <span>Jobs</span>
-      </button>
+        span:
+          text "Developer Hub"
 
-      <button class="nav-item">
-        <span>◌</span>
-        <span>Runs</span>
-      </button>
 
-      <button class="nav-item">
-        <span>≡</span>
-        <span>Logs</span>
-      </button>
+    button(class = "new-session"):
 
-      <button class="nav-item">
-        <span>⚙</span>
-        <span>System</span>
-      </button>
-    </nav>
+      span:
+        text "+"
 
-    <div class="sidebar-footer">
-      <div class="avatar">X</div>
+      text "New Session"
 
-      <div class="user-info">
-        <strong>xenos</strong>
-        <span>Developer</span>
-      </div>
-    </div>
-  """
+      proc onclick(
+        event: Event,
+        node: VNode
+      ) =
+        resetConversation(
+          state
+        )
+
+
+    nav(class = "nav-section"):
+
+      span(class = "section-label"):
+        text "Workspace"
+
+      renderViewButton(
+        state,
+        "◈",
+        "Chat",
+        viewChat
+      )
+
+      renderViewButton(
+        state,
+        "⌕",
+        "Search",
+        viewSearch
+      )
+
+
+    nav(class = "nav-section"):
+
+      span(class = "section-label"):
+        text "Tools"
+
+      for tool in state.tools:
+        renderToolButton(
+          state,
+          tool
+        )
+
+
+    nav(class = "nav-section"):
+
+      span(class = "section-label"):
+        text "Plugins"
+
+      for plugin in state.plugins:
+        renderPluginButton(
+          state,
+          plugin
+        )
+
+      button(
+        class =
+          viewNavClass(
+            state,
+            viewPlugin
+          )
+      ):
+
+        span(class = "nav-icon"):
+          text "+"
+
+        span:
+          text "Add plugin"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+          openPluginCatalog(
+            state
+          )
+
+
+    nav(class = "nav-section"):
+
+      span(class = "section-label"):
+        text "Developer"
+
+      renderViewButton(
+        state,
+        "▣",
+        "Jobs",
+        viewJobs
+      )
+
+      renderViewButton(
+        state,
+        "◌",
+        "Runs",
+        viewRuns
+      )
+
+      renderViewButton(
+        state,
+        "≡",
+        "Logs",
+        viewLogs
+      )
+
+      renderViewButton(
+        state,
+        "⚙",
+        "System",
+        viewSystem
+      )
+
+
+    button(class = "sidebar-footer"):
+
+      tdiv(class = "avatar"):
+        text "X"
+
+      tdiv(class = "user-info"):
+
+        strong:
+          text "xenos"
+
+        span:
+          text "Developer · local preview"
+
+      span(class = "nav-tail"):
+        text "›"
+
+      proc onclick(
+        event: Event,
+        node: VNode
+      ) =
+        setActiveView(
+          state,
+          viewSystem
+        )

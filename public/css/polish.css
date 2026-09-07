@@ -1,0 +1,229 @@
+/*
+ * Final small UI refinements layered on top of app.css.
+ */
+
+
+/* =========================================================
+   COMPOSER FOCUS
+   ========================================================= */
+
+/*
+ * The textarea itself should never draw the browser's
+ * bright focus rectangle.
+ */
+
+.composer-input,
+.composer-input:focus,
+.composer-input:focus-visible,
+.composer-input:active {
+  outline: none !important;
+
+  box-shadow: none !important;
+
+  border: none;
+}
+
+
+/*
+ * Keep composer focus extremely subtle.
+ *
+ * No bright outline or "white box" when clicking inside.
+ */
+
+.composer,
+.composer:focus,
+.composer:focus-within {
+  outline: none;
+
+  box-shadow:
+    0 4px 18px
+    rgba(0, 0, 0, 0.12);
+
+  border-color: #303030;
+
+  background: #1b1b1b;
+}
+
+
+/* =========================================================
+   HYDRA BRAND MARK
+   ========================================================= */
+
+.hydra-mark {
+  position: relative;
+
+  width: 30px;
+  height: 30px;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  border-radius: 9px;
+
+  background: #ededed;
+}
+
+
+/*
+ * Lower body / root of the Hydra.
+ */
+
+.hydra-body {
+  position: absolute;
+
+  left: 50%;
+  bottom: 6px;
+
+  width: 10px;
+  height: 5px;
+
+  transform: translateX(-50%);
+
+  border-radius:
+    2px
+    2px
+    5px
+    5px;
+
+  background: #111;
+}
+
+
+/*
+ * Each neck is a small dark stroke.
+ */
+
+.hydra-neck {
+  position: absolute;
+
+  left: 50%;
+  bottom: 9px;
+
+  width: 3px;
+  height: 11px;
+
+  transform-origin:
+    50%
+    100%;
+
+  border-radius: 999px;
+
+  background: #111;
+}
+
+
+/*
+ * Left head.
+ */
+
+.hydra-neck-left {
+  transform:
+    translateX(-50%)
+    rotate(-32deg);
+}
+
+
+/*
+ * Center head.
+ */
+
+.hydra-neck-center {
+  height: 13px;
+
+  transform:
+    translateX(-50%);
+}
+
+
+/*
+ * Right head.
+ */
+
+.hydra-neck-right {
+  transform:
+    translateX(-50%)
+    rotate(32deg);
+}
+
+
+/*
+ * Three small snake/dragon heads.
+ */
+
+.hydra-head {
+  position: absolute;
+
+  top: -3px;
+  left: 50%;
+
+  width: 6px;
+  height: 5px;
+
+  transform:
+    translateX(-50%);
+
+  border-radius:
+    4px
+    4px
+    3px
+    3px;
+
+  background: #111;
+}
+
+
+/*
+ * Small eye cutout.
+ */
+
+.hydra-head::after {
+  content: "";
+
+  position: absolute;
+
+  top: 1px;
+  right: 1px;
+
+  width: 1px;
+  height: 1px;
+
+  border-radius: 50%;
+
+  background: #ededed;
+}
+
+
+/*
+ * Preserve the same visual footprint the old "A" mark had.
+ */
+
+.brand-hydra {
+  width: 30px;
+  height: 30px;
+}
+
+
+/* =========================================================
+   BUTTON FOCUS
+   ========================================================= */
+
+/*
+ * Keyboard users still get a focus indication,
+ * but it's restrained instead of a bright white box.
+ */
+
+button:focus-visible {
+  outline: 1px solid #444;
+
+  outline-offset: 1px;
+}
+
+
+/*
+ * The send/composer controls stay clean even while active.
+ */
+
+.composer button:focus-visible {
+  outline-color: #3a3a3a;
+}
