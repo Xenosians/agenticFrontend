@@ -1,8 +1,16 @@
-import std/[asyncjs, jsfetch, jsheaders, json]
+import std/[
+  asyncjs,
+  jsfetch,
+  jsheaders,
+  json
+]
+
 from std/httpcore import HttpPost
 
+
 const
-  BackendBaseUrl* = "http://127.0.0.1:4000"
+  BackendBaseUrl* =
+    "http://127.0.0.1:4000"
 
 
 type
@@ -17,32 +25,61 @@ proc createJob*(
   message: string
 ): Future[JobCreateResponse] {.async.} =
 
-  let headers = newHeaders()
+  let headers =
+    newHeaders()
 
-  headers["Content-Type"] = "application/json"
+  headers["Content-Type"] =
+    "application/json"
 
-  let payload = %*{
+
+  #
+  # conversation_id is optional.
+  #
+  # Phoenix rejects an explicitly supplied
+  # empty string, so only include it when
+  # we actually have one.
+  #
+
+  var payload = %*{
     "user_id": userId,
-    "conversation_id": conversationId,
     "message": message
   }
 
-  let options = newFetchOptions(
-    metod = HttpPost,
-    body = ($payload).cstring,
-    mode = fmCors,
-    credentials = fcOmit,
-    headers = headers
-  )
 
-  let response = await fetch(
-    (BackendBaseUrl & "/api/v1/jobs").cstring,
-    options
-  )
+  if conversationId.len > 0:
 
-  let responseBody = $(await response.text())
+    payload["conversation_id"] =
+      %conversationId
+
+
+  let options =
+    newFetchOptions(
+      metod = HttpPost,
+      body = ($payload).cstring,
+      mode = fmCors,
+      credentials = fcOmit,
+      headers = headers
+    )
+
+
+  let response =
+    await fetch(
+      (
+        BackendBaseUrl &
+        "/api/v1/jobs"
+      ).cstring,
+      options
+    )
+
+
+  let responseBody =
+    $(
+      await response.text()
+    )
+
 
   if not response.ok:
+
     raise newException(
       ValueError,
       "Backend returned HTTP " &
@@ -51,9 +88,22 @@ proc createJob*(
       responseBody
     )
 
-  let data = parseJson(responseBody)
 
-  result = JobCreateResponse(
-    jobId: data["job_id"].getStr(),
-    status: data["status"].getStr()
-  )
+  let data =
+    parseJson(
+      responseBody
+    )
+
+
+  result =
+    JobCreateResponse(
+      jobId:
+        data[
+          "job_id"
+        ].getStr(),
+
+      status:
+        data[
+          "status"
+        ].getStr()
+    )

@@ -6,11 +6,14 @@ import std/strutils
 
 import ../app/types
 import ../app/state
+import ../app/backend_bridge
 
 
 type
   SubmitHandler* =
-    proc(message: string) {.closure.}
+    proc(
+      message: string
+    ) {.closure.}
 
 
 proc submitDraft(
@@ -24,15 +27,43 @@ proc submitDraft(
   if message.len == 0:
     return
 
-  onSubmit(message)
+
+  #
+  # Existing local frontend behavior.
+  #
+  # Keep this temporarily while we prove
+  # the real Phoenix job creation path.
+  #
+
+  onSubmit(
+    message
+  )
+
+
+  #
+  # Real durable Phoenix job.
+  #
+  # submitBackendJob is an async JavaScript proc.
+  # Calling it starts the async operation; we do
+  # not need asyncCheck on the JS backend.
+  #
+
+  discard submitBackendJob(
+    state,
+    message
+  )
+
 
   setComposerDraft(
     state,
     ""
   )
 
+
   if textareaNode != nil:
-    textareaNode.value = cstring""
+
+    textareaNode.value =
+      cstring""
 
 
 proc renderComposer*(
@@ -42,7 +73,9 @@ proc renderComposer*(
 
   let
     sendDisabled =
-      state.composerDraft.strip().len == 0
+      state.composerDraft
+        .strip()
+        .len == 0
 
     sendClass =
       if sendDisabled:
@@ -52,23 +85,41 @@ proc renderComposer*(
 
 
   result = buildHtml(
-    section(class = "composer-container")
+    section(
+      class =
+        "composer-container"
+    )
   ):
 
-    tdiv(class = "composer"):
+    tdiv(
+      class =
+        "composer"
+    ):
 
       textarea(
-        id = "messageInput",
-        class = "composer-input",
-        placeholder = "Ask Agentic...",
-        rows = "1",
-        value = cstring(state.composerDraft)
+        id =
+          "messageInput",
+
+        class =
+          "composer-input",
+
+        placeholder =
+          "Ask Agentic...",
+
+        rows =
+          "1",
+
+        value =
+          cstring(
+            state.composerDraft
+          )
       ):
 
         proc oninput(
           event: Event,
           node: VNode
         ) =
+
           setComposerDraft(
             state,
             $node.value
@@ -79,18 +130,29 @@ proc renderComposer*(
           event: Event,
           node: VNode
         ) =
+
           let keyboardEvent =
-            cast[KeyboardEvent](event)
+            cast[
+              KeyboardEvent
+            ](
+              event
+            )
+
 
           setComposerDraft(
             state,
             $node.value
           )
 
-          if keyboardEvent.key == "Enter" and
+
+          if (
+            keyboardEvent.key ==
+            "Enter"
+          ) and
              not keyboardEvent.shiftKey:
 
             event.preventDefault()
+
 
             submitDraft(
               state,
@@ -99,37 +161,60 @@ proc renderComposer*(
             )
 
 
-      tdiv(class = "composer-footer"):
+      tdiv(
+        class =
+          "composer-footer"
+      ):
 
-        tdiv(class = "composer-tools"):
+        tdiv(
+          class =
+            "composer-tools"
+        ):
 
           button(
-            class = "composer-tool-button"
+            class =
+              "composer-tool-button"
           ):
+
             text "+"
 
+
           button(
-            class = "composer-tool-button"
+            class =
+              "composer-tool-button"
           ):
+
             text "Tools"
 
 
         button(
-          class = sendClass,
-          disabled = sendDisabled
+          class =
+            sendClass,
+
+          disabled =
+            sendDisabled
         ):
 
           text "↑"
+
 
           proc onclick(
             event: Event,
             node: VNode
           ) =
+
             submitDraft(
               state,
               onSubmit
             )
 
 
-    span(class = "composer-hint"):
-      text "Enter to send · Shift+Enter for a new line"
+    span(
+      class =
+        "composer-hint"
+    ):
+
+      text (
+        "Enter to send · " &
+        "Shift+Enter for a new line"
+      )
