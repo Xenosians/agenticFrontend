@@ -16,37 +16,41 @@ type
     ) {.closure.}
 
 
+proc backendJobBusy(
+  state: AppState
+): bool =
+
+  return state.run.active and (
+    state.run.status == "submitting" or
+    state.run.status == "pending" or
+    state.run.status == "processing"
+  )
+
+
 proc submitDraft(
   state: AppState,
-  onSubmit: SubmitHandler,
   textareaNode: VNode = nil
 ) =
+
   let message =
     state.composerDraft.strip()
+
 
   if message.len == 0:
     return
 
 
-  #
-  # Existing local frontend behavior.
-  #
-  # Keep this temporarily while we prove
-  # the real Phoenix job creation path.
-  #
+  if backendJobBusy(
+    state
+  ):
 
-  onSubmit(
-    message
-  )
+    showToast(
+      state,
+      "Wait for the current job to finish."
+    )
 
+    return
 
-  #
-  # Real durable Phoenix job.
-  #
-  # submitBackendJob is an async JavaScript proc.
-  # Calling it starts the async operation; we do
-  # not need asyncCheck on the JS backend.
-  #
 
   discard submitBackendJob(
     state,
@@ -72,10 +76,16 @@ proc renderComposer*(
 ): VNode =
 
   let
+    jobBusy =
+      backendJobBusy(
+        state
+      )
+
     sendDisabled =
       state.composerDraft
         .strip()
-        .len == 0
+        .len == 0 or
+      jobBusy
 
     sendClass =
       if sendDisabled:
@@ -156,7 +166,6 @@ proc renderComposer*(
 
             submitDraft(
               state,
-              onSubmit,
               node
             )
 
@@ -204,8 +213,7 @@ proc renderComposer*(
           ) =
 
             submitDraft(
-              state,
-              onSubmit
+              state
             )
 
 
@@ -214,7 +222,13 @@ proc renderComposer*(
         "composer-hint"
     ):
 
-      text (
-        "Enter to send · " &
-        "Shift+Enter for a new line"
-      )
+      if jobBusy:
+
+        text "Waiting for the current backend job..."
+
+      else:
+
+        text (
+          "Enter to send · " &
+          "Shift+Enter for a new line"
+        )
