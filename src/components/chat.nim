@@ -1,6 +1,7 @@
 include karax/prelude
 
 import ../app/types
+import ../app/backend_bridge
 
 
 proc renderMessage(
@@ -40,6 +41,47 @@ proc renderMessage(
 
         tdiv(class = "message-bubble assistant"):
           text message.content
+
+
+proc renderApprovalAction(
+  state: AppState
+): VNode =
+
+  result = buildHtml(
+    tdiv(class = "message-row assistant")
+  ):
+
+    tdiv(class = "assistant-avatar"):
+      text "A"
+
+    tdiv(class = "message-column assistant"):
+
+      span(class = "message-author"):
+        text "Approval required"
+
+      tdiv(class = "message-bubble assistant"):
+
+        p:
+          text (
+            "This action is ready to execute. " &
+            "Approve it to continue."
+          )
+
+        button(
+          class = "inspector-toggle",
+          title = "Approve and execute this governed action"
+        ):
+
+          text "Approve action"
+
+          proc onclick(
+            event: Event,
+            node: VNode
+          ) =
+
+            discard approvePendingJob(
+              state
+            )
 
 
 proc renderChat*(
@@ -85,6 +127,16 @@ connected tools and plugins.
     else:
 
       for message in state.messages:
+
         renderMessage(
           message
+        )
+
+
+      if state.run.active and
+         state.run.status ==
+         "waiting_approval":
+
+        renderApprovalAction(
+          state
         )

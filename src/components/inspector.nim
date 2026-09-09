@@ -16,6 +16,9 @@ proc statusTitle(
   of "processing":
     "Processing"
 
+  of "approving":
+    "Approving"
+
   of "completed":
     "Completed"
 
@@ -41,6 +44,9 @@ proc statusDescription(
   of "processing":
     "Agent is processing the request"
 
+  of "approving":
+    "Submitting explicit approval"
+
   of "completed":
     "Run completed successfully"
 
@@ -60,7 +66,8 @@ proc indicatorClass(
 
   case status
 
-  of "processing":
+  of "processing",
+     "approving":
     cstring"status-indicator processing"
 
   of "completed":

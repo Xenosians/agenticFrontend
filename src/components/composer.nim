@@ -23,7 +23,9 @@ proc backendJobBusy(
   return state.run.active and (
     state.run.status == "submitting" or
     state.run.status == "pending" or
-    state.run.status == "processing"
+    state.run.status == "processing" or
+    state.run.status == "waiting_approval" or
+    state.run.status == "approving"
   )
 
 
@@ -46,7 +48,7 @@ proc submitDraft(
 
     showToast(
       state,
-      "Wait for the current job to finish."
+      "Finish the current job before starting another."
     )
 
     return
@@ -222,7 +224,17 @@ proc renderComposer*(
         "composer-hint"
     ):
 
-      if jobBusy:
+      if state.run.status ==
+         "waiting_approval":
+
+        text "Current job is waiting for your approval."
+
+      elif state.run.status ==
+           "approving":
+
+        text "Executing approved action..."
+
+      elif jobBusy:
 
         text "Waiting for the current backend job..."
 

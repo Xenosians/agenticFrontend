@@ -53,11 +53,6 @@ proc submitBackendJob*(
   message: string
 ) {.async.} =
 
-  #
-  # The browser now starts with the real
-  # backend path instead of the local mock.
-  #
-
   addUserMessage(
     state,
     message
@@ -104,10 +99,6 @@ proc submitBackendJob*(
 
   try:
 
-    #
-    # Create durable Phoenix job.
-    #
-
     let response =
       await createJob(
         userId =
@@ -148,12 +139,6 @@ proc submitBackendJob*(
       kxi
     )
 
-
-    #
-    # Poll Phoenix.
-    #
-    # Phoenix remains the source of truth.
-    #
 
     var pollCount =
       0
@@ -316,10 +301,6 @@ proc submitBackendJob*(
       )
 
 
-    #
-    # Poll timeout.
-    #
-
     addRunEvent(
       state,
       "timeout",
@@ -342,11 +323,6 @@ proc submitBackendJob*(
     )
 
 
-    #
-    # If Phoenix never gave us a job ID,
-    # creation itself failed.
-    #
-
     if state.run.jobId.len == 0:
 
       state.run.status =
@@ -363,6 +339,173 @@ proc submitBackendJob*(
     showToast(
       state,
       "Backend request failed: " &
+      exc.msg
+    )
+
+
+  redraw(
+    kxi
+  )
+
+
+proc approvePendingJob*(
+  state: AppState
+) {.async.} =
+
+  if not state.run.active or
+     state.run.jobId.len == 0:
+
+    showToast(
+      state,
+      "There is no backend job to approve."
+    )
+
+    return
+
+
+  if state.run.status !=
+     "waiting_approval":
+
+    showToast(
+      state,
+      "The current job is not waiting for approval."
+    )
+
+    return
+
+
+  let jobId =
+    state.run.jobId
+
+
+  state.run.status =
+    "approving"
+
+
+  addRunEvent(
+    state,
+    "approval",
+    "Submitting explicit approval to Phoenix."
+  )
+
+
+  showToast(
+    state,
+    "Approving governed action..."
+  )
+
+
+  redraw(
+    kxi
+  )
+
+
+  try:
+
+    let job =
+      await approveJob(
+        jobId
+      )
+
+
+    applyJobState(
+      state,
+      job
+    )
+
+
+    case job.status
+
+    of "completed":
+
+      let answer =
+        if job.answer.len > 0:
+          job.answer
+        else:
+          "Approved action completed successfully."
+
+
+      addAssistantMessage(
+        state,
+        answer
+      )
+
+
+      addRunEvent(
+        state,
+        "approval_executed",
+        "Phoenix executed the approved action and completed the job."
+      )
+
+
+      showToast(
+        state,
+        "Approved action completed."
+      )
+
+
+    of "failed":
+
+      let failureMessage =
+        if job.error.len > 0:
+          "Approved action failed: " &
+          job.error
+        else:
+          "The approved action failed."
+
+
+      addAssistantMessage(
+        state,
+        failureMessage
+      )
+
+
+      addRunEvent(
+        state,
+        "approval_failure",
+        failureMessage
+      )
+
+
+      showToast(
+        state,
+        "Approved action failed."
+      )
+
+
+    else:
+
+      addRunEvent(
+        state,
+        "approval_unexpected",
+        "Phoenix returned unexpected job status: " &
+        job.status
+      )
+
+
+      showToast(
+        state,
+        "Approval returned unexpected job state: " &
+        job.status
+      )
+
+
+  except CatchableError as exc:
+
+    state.run.status =
+      "waiting_approval"
+
+
+    addRunEvent(
+      state,
+      "approval_error",
+      exc.msg
+    )
+
+
+    showToast(
+      state,
+      "Approval request failed: " &
       exc.msg
     )
 

@@ -113,6 +113,48 @@ proc extractProposedTool(
   )
 
 
+proc parseJobResponse(
+  data: JsonNode
+): JobResponse =
+
+  result =
+    JobResponse(
+      jobId:
+        jsonValueText(
+          data,
+          "job_id"
+        ),
+
+      status:
+        jsonValueText(
+          data,
+          "status"
+        ),
+
+      selectedAgent:
+        jsonValueText(
+          data,
+          "selected_agent"
+        ),
+
+      proposedTool:
+        extractProposedTool(
+          data
+        ),
+
+      answer:
+        extractAnswer(
+          data
+        ),
+
+      error:
+        jsonValueText(
+          data,
+          "error"
+        )
+    )
+
+
 proc createJob*(
   userId: string,
   conversationId: string,
@@ -242,38 +284,59 @@ proc getJob*(
 
 
   result =
-    JobResponse(
-      jobId:
-        jsonValueText(
-          data,
-          "job_id"
-        ),
+    parseJobResponse(
+      data
+    )
 
-      status:
-        jsonValueText(
-          data,
-          "status"
-        ),
 
-      selectedAgent:
-        jsonValueText(
-          data,
-          "selected_agent"
-        ),
+proc approveJob*(
+  jobId: string
+): Future[JobResponse] {.async.} =
 
-      proposedTool:
-        extractProposedTool(
-          data
-        ),
+  let options =
+    newFetchOptions(
+      metod = HttpPost,
+      mode = fmCors,
+      credentials = fcOmit
+    )
 
-      answer:
-        extractAnswer(
-          data
-        ),
 
-      error:
-        jsonValueText(
-          data,
-          "error"
-        )
+  let response =
+    await fetch(
+      (
+        BackendBaseUrl &
+        "/api/v1/jobs/" &
+        jobId &
+        "/approve"
+      ).cstring,
+      options
+    )
+
+
+  let responseBody =
+    $(
+      await response.text()
+    )
+
+
+  if not response.ok:
+
+    raise newException(
+      ValueError,
+      "Backend returned HTTP " &
+      $response.status &
+      ": " &
+      responseBody
+    )
+
+
+  let data =
+    parseJson(
+      responseBody
+    )
+
+
+  result =
+    parseJobResponse(
+      data
     )
