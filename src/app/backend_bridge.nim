@@ -3,20 +3,10 @@ include karax/prelude
 import std/asyncjs
 
 import ../api/client
+import ../config/runtime_config
 
 import types
 import state
-
-
-const
-  DevelopmentUserId =
-    "xenos"
-
-  PollIntervalMs =
-    1_000
-
-  MaxPollAttempts =
-    300
 
 
 proc sleepMs(
@@ -61,19 +51,30 @@ proc submitBackendJob*(
 
   state.run =
     RunState(
-      active: true,
+      active:
+        true,
 
-      request: message,
+      request:
+        message,
 
-      jobId: "",
-      status: "submitting",
+      jobId:
+        "",
 
-      agent: "",
-      tool: ""
+      status:
+        "submitting",
+
+      agent:
+        "",
+
+      tool:
+        ""
     )
 
 
-  state.runEvents.setLen(0)
+  state.runEvents.setLen(
+    0
+  )
+
 
   state.inspectorTab =
     tabRun
@@ -102,7 +103,8 @@ proc submitBackendJob*(
     let response =
       await createJob(
         userId =
-          DevelopmentUserId,
+          frontendConfig
+          .userId,
 
         conversationId =
           "",
@@ -140,12 +142,17 @@ proc submitBackendJob*(
     )
 
 
-    var pollCount =
-      0
+    # --------------------------------------------------------
+    # Durable job polling
+    #
+    # Phoenix owns durable job state.
+    #
+    # There is intentionally no frontend-owned maximum runtime.
+    # Long-running AI execution is kept alive through the
+    # AI -> Phoenix heartbeat/lease protocol.
+    # --------------------------------------------------------
 
-
-    while pollCount <
-          MaxPollAttempts:
+    while true:
 
       let previousStatus =
         state.run.status
@@ -187,8 +194,11 @@ proc submitBackendJob*(
 
         let answer =
           if job.answer.len > 0:
+
             job.answer
+
           else:
+
             "Job completed without an assistant message."
 
 
@@ -222,9 +232,12 @@ proc submitBackendJob*(
 
         let failureMessage =
           if job.error.len > 0:
+
             "Job failed: " &
             job.error
+
           else:
+
             "The backend job failed."
 
 
@@ -258,8 +271,11 @@ proc submitBackendJob*(
 
         let approvalMessage =
           if job.answer.len > 0:
+
             job.answer
+
           else:
+
             "This job requires approval before it can continue."
 
 
@@ -290,28 +306,14 @@ proc submitBackendJob*(
 
 
       else:
+
         discard
 
 
-      inc pollCount
-
-
       await sleepMs(
-        PollIntervalMs
+        frontendConfig
+        .pollIntervalMs
       )
-
-
-    addRunEvent(
-      state,
-      "timeout",
-      "Stopped polling after five minutes."
-    )
-
-
-    showToast(
-      state,
-      "Job is still running. Polling timed out."
-    )
 
 
   except CatchableError as exc:
@@ -420,8 +422,11 @@ proc approvePendingJob*(
 
       let answer =
         if job.answer.len > 0:
+
           job.answer
+
         else:
+
           "Approved action completed successfully."
 
 
@@ -448,9 +453,12 @@ proc approvePendingJob*(
 
       let failureMessage =
         if job.error.len > 0:
+
           "Approved action failed: " &
           job.error
+
         else:
+
           "The approved action failed."
 
 
@@ -508,6 +516,80 @@ proc approvePendingJob*(
       "Approval request failed: " &
       exc.msg
     )
+
+
+  redraw(
+    kxi
+  )
+
+
+proc refreshSystemStatus*(
+  state: AppState
+) {.async.} =
+
+  if state.system.checking:
+    return
+
+
+  state.system.checking =
+    true
+
+  state.system.error =
+    ""
+
+
+  redraw(
+    kxi
+  )
+
+
+  try:
+
+    let health =
+      await getSystemHealth()
+
+
+    state.system.checked =
+      true
+
+    state.system.backendConnected =
+      health.backendConnected
+
+    state.system.aiReachable =
+      health.aiReachable
+
+    state.system.aiHealthy =
+      health.aiHealthy
+
+    state.system.aiReady =
+      health.aiReady
+
+
+  except CatchableError as exc:
+
+    state.system.checked =
+      true
+
+    state.system.backendConnected =
+      false
+
+    state.system.aiReachable =
+      false
+
+    state.system.aiHealthy =
+      false
+
+    state.system.aiReady =
+      false
+
+    state.system.error =
+      exc.msg
+
+
+  finally:
+
+    state.system.checking =
+      false
 
 
   redraw(

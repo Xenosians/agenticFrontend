@@ -2,96 +2,200 @@ import types
 
 
 proc emptyRunState(): RunState =
+
   RunState(
-    active: false,
+    active:
+      false,
 
-    request: "",
+    request:
+      "",
 
-    jobId: "",
-    status: "",
+    jobId:
+      "",
 
-    agent: "",
-    tool: ""
+    status:
+      "",
+
+    agent:
+      "",
+
+    tool:
+      ""
+  )
+
+
+proc emptySystemState():
+  SystemState =
+
+  SystemState(
+    checked:
+      false,
+
+    checking:
+      false,
+
+    backendConnected:
+      false,
+
+    aiReachable:
+      false,
+
+    aiHealthy:
+      false,
+
+    aiReady:
+      false,
+
+    error:
+      ""
   )
 
 
 proc initAppState*(): AppState =
+
   AppState(
-    activeView: viewChat,
-    inspectorTab: tabRun,
-    composerPanel: cpNone,
+    activeView:
+      viewChat,
 
-    inspectorOpen: true,
-    headerMenuOpen: false,
+    inspectorTab:
+      tabRun,
 
-    composerDraft: "",
-    searchDraft: "",
+    composerPanel:
+      cpNone,
 
-    composerSelectedToolId: "",
-    selectedToolId: "",
-    selectedPluginId: "",
+    inspectorOpen:
+      true,
 
-    toastMessage: "",
+    headerMenuOpen:
+      false,
 
-    messages: @[],
+    composerDraft:
+      "",
 
-    run: emptyRunState(),
-    runEvents: @[],
+    searchDraft:
+      "",
+
+    composerSelectedToolId:
+      "",
+
+    selectedToolId:
+      "",
+
+    selectedPluginId:
+      "",
+
+    toastMessage:
+      "",
+
+    messages:
+      @[],
+
+    run:
+      emptyRunState(),
+
+    runEvents:
+      @[],
+
+    system:
+      emptySystemState(),
 
     tools: @[
       ToolItem(
-        id: "shell",
-        name: "Shell",
-        enabled: true
+        id:
+          "shell",
+
+        name:
+          "Shell",
+
+        enabled:
+          true
       ),
 
       ToolItem(
-        id: "account",
-        name: "Account",
-        enabled: true
+        id:
+          "account",
+
+        name:
+          "Account",
+
+        enabled:
+          true
       ),
 
       ToolItem(
-        id: "access",
-        name: "Access",
-        enabled: true
+        id:
+          "access",
+
+        name:
+          "Access",
+
+        enabled:
+          true
       ),
 
       ToolItem(
-        id: "files",
-        name: "Files",
-        enabled: false
+        id:
+          "files",
+
+        name:
+          "Files",
+
+        enabled:
+          false
       ),
 
       ToolItem(
-        id: "git",
-        name: "Git",
-        enabled: false
+        id:
+          "git",
+
+        name:
+          "Git",
+
+        enabled:
+          false
       )
     ],
 
     plugins: @[
       PluginItem(
-        id: "github",
-        name: "GitHub",
-        connected: false
+        id:
+          "github",
+
+        name:
+          "GitHub",
+
+        connected:
+          false
       ),
 
       PluginItem(
-        id: "jira",
-        name: "Jira",
-        connected: false
+        id:
+          "jira",
+
+        name:
+          "Jira",
+
+        connected:
+          false
       ),
 
       PluginItem(
-        id: "slack",
-        name: "Slack",
-        connected: false
+        id:
+          "slack",
+
+        name:
+          "Slack",
+
+        connected:
+          false
       )
     ],
 
-    nextMessageId: 1,
-    nextEventId: 1
+    nextMessageId:
+      1,
+
+    nextEventId:
+      1
   )
 
 
@@ -99,42 +203,55 @@ proc showToast*(
   state: AppState,
   message: string
 ) =
-  state.toastMessage = message
+
+  state.toastMessage =
+    message
 
 
 proc clearToast*(
   state: AppState
 ) =
-  state.toastMessage = ""
+
+  state.toastMessage =
+    ""
 
 
 proc setActiveView*(
   state: AppState,
   view: AppView
 ) =
-  state.activeView = view
-  state.headerMenuOpen = false
+
+  state.activeView =
+    view
+
+  state.headerMenuOpen =
+    false
 
 
 proc setInspectorTab*(
   state: AppState,
   tab: InspectorTab
 ) =
-  state.inspectorTab = tab
+
+  state.inspectorTab =
+    tab
 
 
 proc toggleInspector*(
   state: AppState
 ) =
+
   state.inspectorOpen =
     not state.inspectorOpen
 
-  state.headerMenuOpen = false
+  state.headerMenuOpen =
+    false
 
 
 proc toggleHeaderMenu*(
   state: AppState
 ) =
+
   state.headerMenuOpen =
     not state.headerMenuOpen
 
@@ -143,36 +260,51 @@ proc setComposerDraft*(
   state: AppState,
   value: string
 ) =
-  state.composerDraft = value
+
+  state.composerDraft =
+    value
 
 
 proc setSearchDraft*(
   state: AppState,
   value: string
 ) =
-  state.searchDraft = value
+
+  state.searchDraft =
+    value
 
 
 proc setComposerPanel*(
   state: AppState,
   panel: ComposerPanel
 ) =
-  if state.composerPanel == panel:
-    state.composerPanel = cpNone
+
+  if state.composerPanel ==
+     panel:
+
+    state.composerPanel =
+      cpNone
+
   else:
-    state.composerPanel = panel
+
+    state.composerPanel =
+      panel
 
 
 proc closeComposerPanel*(
   state: AppState
 ) =
-  state.composerPanel = cpNone
+
+  state.composerPanel =
+    cpNone
 
 
 proc clearComposerTool*(
   state: AppState
 ) =
-  state.composerSelectedToolId = ""
+
+  state.composerSelectedToolId =
+    ""
 
   showToast(
     state,
@@ -184,23 +316,38 @@ proc selectComposerTool*(
   state: AppState,
   toolId: string
 ) =
+
   state.composerSelectedToolId =
     toolId
 
   state.composerPanel =
     cpNone
 
+
   var
-    toolName = toolId
-    enabled = false
+    toolName =
+      toolId
+
+    enabled =
+      false
+
 
   for tool in state.tools:
-    if tool.id == toolId:
-      toolName = tool.name
-      enabled = tool.enabled
+
+    if tool.id ==
+       toolId:
+
+      toolName =
+        tool.name
+
+      enabled =
+        tool.enabled
+
       break
 
+
   if enabled:
+
     showToast(
       state,
       toolName &
@@ -208,6 +355,7 @@ proc selectComposerTool*(
     )
 
   else:
+
     showToast(
       state,
       toolName &
@@ -220,50 +368,76 @@ proc openToolView*(
   state: AppState,
   toolId: string
 ) =
-  state.selectedToolId = toolId
-  state.activeView = viewTool
-  state.headerMenuOpen = false
+
+  state.selectedToolId =
+    toolId
+
+  state.activeView =
+    viewTool
+
+  state.headerMenuOpen =
+    false
 
 
 proc openPluginView*(
   state: AppState,
   pluginId: string
 ) =
-  state.selectedPluginId = pluginId
-  state.activeView = viewPlugin
-  state.headerMenuOpen = false
+
+  state.selectedPluginId =
+    pluginId
+
+  state.activeView =
+    viewPlugin
+
+  state.headerMenuOpen =
+    false
 
 
 proc openPluginCatalog*(
   state: AppState
 ) =
-  state.selectedPluginId = ""
-  state.activeView = viewPlugin
-  state.headerMenuOpen = false
+
+  state.selectedPluginId =
+    ""
+
+  state.activeView =
+    viewPlugin
+
+  state.headerMenuOpen =
+    false
 
 
 proc togglePluginConnection*(
   state: AppState,
   pluginId: string
 ) =
+
   for i in 0 ..< state.plugins.len:
-    if state.plugins[i].id == pluginId:
+
+    if state.plugins[i].id ==
+       pluginId:
 
       state.plugins[i].connected =
         not state.plugins[i].connected
 
+
       if state.plugins[i].connected:
+
         showToast(
           state,
           state.plugins[i].name &
           " connected in frontend preview mode."
         )
+
       else:
+
         showToast(
           state,
           state.plugins[i].name &
           " disconnected."
         )
+
 
       return
 
@@ -271,11 +445,16 @@ proc togglePluginConnection*(
 proc addPreviewPlugin*(
   state: AppState
 ) =
+
   let previewId =
     "custom-preview"
 
+
   for plugin in state.plugins:
-    if plugin.id == previewId:
+
+    if plugin.id ==
+       previewId:
+
       openPluginView(
         state,
         previewId
@@ -288,19 +467,27 @@ proc addPreviewPlugin*(
 
       return
 
+
   state.plugins.add(
     PluginItem(
-      id: previewId,
-      name: "Custom Plugin",
-      connected: false
+      id:
+        previewId,
+
+      name:
+        "Custom Plugin",
+
+      connected:
+        false
     )
   )
+
 
   state.selectedPluginId =
     previewId
 
   state.activeView =
     viewPlugin
+
 
   showToast(
     state,
@@ -313,11 +500,17 @@ proc addRunEvent*(
   kind: string,
   message: string
 ) =
+
   state.runEvents.add(
     RunEvent(
-      id: state.nextEventId,
-      kind: kind,
-      message: message
+      id:
+        state.nextEventId,
+
+      kind:
+        kind,
+
+      message:
+        message
     )
   )
 
@@ -328,11 +521,17 @@ proc addUserMessage*(
   state: AppState,
   content: string
 ) =
+
   state.messages.add(
     ChatMessage(
-      id: state.nextMessageId,
-      role: mrUser,
-      content: content
+      id:
+        state.nextMessageId,
+
+      role:
+        mrUser,
+
+      content:
+        content
     )
   )
 
@@ -343,11 +542,17 @@ proc addAssistantMessage*(
   state: AppState,
   content: string
 ) =
+
   state.messages.add(
     ChatMessage(
-      id: state.nextMessageId,
-      role: mrAssistant,
-      content: content
+      id:
+        state.nextMessageId,
+
+      role:
+        mrAssistant,
+
+      content:
+        content
     )
   )
 
@@ -358,28 +563,43 @@ proc startLocalRun*(
   state: AppState,
   request: string
 ) =
-  state.run = RunState(
-    active: true,
 
-    request: request,
+  state.run =
+    RunState(
+      active:
+        true,
 
-    jobId: "local-preview",
-    status: "processing",
+      request:
+        request,
 
-    agent: "",
-    tool: ""
+      jobId:
+        "local-preview",
+
+      status:
+        "processing",
+
+      agent:
+        "",
+
+      tool:
+        ""
+    )
+
+
+  state.runEvents.setLen(
+    0
   )
-
-  state.runEvents.setLen(0)
 
   state.inspectorTab =
     tabRun
+
 
   addRunEvent(
     state,
     "request",
     "Request accepted by frontend runtime."
   )
+
 
   addRunEvent(
     state,
@@ -393,26 +613,33 @@ proc completeLocalRun*(
   agent: string,
   tool: string
 ) =
+
   state.run.agent =
     agent
 
   state.run.tool =
     tool
 
+
   addRunEvent(
     state,
     "routing",
-    "Selected agent: " & agent
+    "Selected agent: " &
+    agent
   )
+
 
   addRunEvent(
     state,
     "tool",
-    "Selected tool: " & tool
+    "Selected tool: " &
+    tool
   )
+
 
   state.run.status =
     "completed"
+
 
   addRunEvent(
     state,
@@ -424,16 +651,20 @@ proc completeLocalRun*(
 proc clearRun*(
   state: AppState
 ) =
+
   state.run =
     emptyRunState()
 
-  state.runEvents.setLen(0)
+  state.runEvents.setLen(
+    0
+  )
 
   state.inspectorTab =
     tabRun
 
   state.headerMenuOpen =
     false
+
 
   showToast(
     state,
@@ -444,8 +675,14 @@ proc clearRun*(
 proc resetConversation*(
   state: AppState
 ) =
-  state.messages.setLen(0)
-  state.runEvents.setLen(0)
+
+  state.messages.setLen(
+    0
+  )
+
+  state.runEvents.setLen(
+    0
+  )
 
   state.run =
     emptyRunState()
@@ -473,6 +710,7 @@ proc resetConversation*(
 
   state.headerMenuOpen =
     false
+
 
   showToast(
     state,

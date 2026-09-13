@@ -52,6 +52,19 @@ type
     tool*: string
 
 
+  SystemState* = object
+    checked*: bool
+    checking*: bool
+
+    backendConnected*: bool
+
+    aiReachable*: bool
+    aiHealthy*: bool
+    aiReady*: bool
+
+    error*: string
+
+
   ToolItem* = object
     id*: string
     name*: string
@@ -85,6 +98,8 @@ type
 
     run*: RunState
     runEvents*: seq[RunEvent]
+
+    system*: SystemState
 
     tools*: seq[ToolItem]
     plugins*: seq[PluginItem]

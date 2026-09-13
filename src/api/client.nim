@@ -9,10 +9,7 @@ from std/httpcore import
   HttpGet,
   HttpPost
 
-
-const
-  BackendBaseUrl* =
-    "http://127.0.0.1:4000"
+import ../config/runtime_config
 
 
 type
@@ -32,6 +29,14 @@ type
     error*: string
 
 
+  SystemHealthResponse* = object
+    backendConnected*: bool
+
+    aiReachable*: bool
+    aiHealthy*: bool
+    aiReady*: bool
+
+
 proc jsonValueText(
   node: JsonNode,
   key: string
@@ -40,11 +45,17 @@ proc jsonValueText(
   if node.kind != JObject:
     return ""
 
-  if not node.hasKey(key):
+  if not node.hasKey(
+    key
+  ):
     return ""
 
+
   let value =
-    node[key]
+    node[
+      key
+    ]
+
 
   case value.kind
 
@@ -58,6 +69,35 @@ proc jsonValueText(
     return $value
 
 
+proc jsonValueBool(
+  node: JsonNode,
+  key: string
+): bool =
+
+  if node.kind != JObject:
+    return false
+
+  if not node.hasKey(
+    key
+  ):
+    return false
+
+
+  let value =
+    node[
+      key
+    ]
+
+
+  if value.kind ==
+     JBool:
+
+    return value.getBool()
+
+
+  return false
+
+
 proc extractAnswer(
   data: JsonNode
 ): string =
@@ -65,14 +105,21 @@ proc extractAnswer(
   if data.kind != JObject:
     return ""
 
-  if not data.hasKey("result"):
+  if not data.hasKey(
+    "result"
+  ):
     return ""
 
+
   let jobResult =
-    data["result"]
+    data[
+      "result"
+    ]
+
 
   if jobResult.kind != JObject:
     return ""
+
 
   let answer =
     jsonValueText(
@@ -80,8 +127,10 @@ proc extractAnswer(
       "answer"
     )
 
+
   if answer.len > 0:
     return answer
+
 
   return jsonValueText(
     jobResult,
@@ -101,11 +150,16 @@ proc extractProposedTool(
   ):
     return ""
 
+
   let proposedTool =
-    data["proposed_tool"]
+    data[
+      "proposed_tool"
+    ]
+
 
   if proposedTool.kind != JObject:
     return ""
+
 
   return jsonValueText(
     proposedTool,
@@ -155,6 +209,136 @@ proc parseJobResponse(
     )
 
 
+proc getSystemHealth*():
+  Future[SystemHealthResponse] {.async.} =
+
+  let options =
+    newFetchOptions(
+      metod =
+        HttpGet,
+
+      mode =
+        fmCors,
+
+      credentials =
+        fcOmit
+    )
+
+
+  let response =
+    await fetch(
+      (
+        frontendConfig
+        .backendBaseUrl &
+        "/api/health"
+      ).cstring,
+
+      options
+    )
+
+
+  let responseBody =
+    $(
+      await response.text()
+    )
+
+
+  if not response.ok:
+
+    raise newException(
+      ValueError,
+      "Backend health returned HTTP " &
+      $response.status &
+      ": " &
+      responseBody
+    )
+
+
+  let data =
+    parseJson(
+      responseBody
+    )
+
+
+  if data.kind != JObject:
+
+    raise newException(
+      ValueError,
+      "Backend health response must be a JSON object."
+    )
+
+
+  if jsonValueText(
+       data,
+       "status"
+     ) !=
+       "ok":
+
+    raise newException(
+      ValueError,
+      "Backend health response is not healthy."
+    )
+
+
+  var
+    aiReachable =
+      false
+
+    aiHealthy =
+      false
+
+    aiReady =
+      false
+
+
+  if data.hasKey(
+    "ai_service"
+  ):
+
+    let aiService =
+      data[
+        "ai_service"
+      ]
+
+
+    if aiService.kind ==
+       JObject:
+
+      aiReachable =
+        jsonValueBool(
+          aiService,
+          "reachable"
+        )
+
+      aiHealthy =
+        jsonValueBool(
+          aiService,
+          "healthy"
+        )
+
+      aiReady =
+        jsonValueBool(
+          aiService,
+          "ready"
+        )
+
+
+  result =
+    SystemHealthResponse(
+      backendConnected:
+        true,
+
+      aiReachable:
+        aiReachable,
+
+      aiHealthy:
+        aiHealthy,
+
+      aiReady:
+        aiReady
+    )
+
+
 proc createJob*(
   userId: string,
   conversationId: string,
@@ -164,38 +348,57 @@ proc createJob*(
   let headers =
     newHeaders()
 
-  headers["Content-Type"] =
+
+  headers[
+    "Content-Type"
+  ] =
     "application/json"
 
 
   var payload = %*{
-    "user_id": userId,
-    "message": message
+    "user_id":
+      userId,
+
+    "message":
+      message
   }
 
 
   if conversationId.len > 0:
 
-    payload["conversation_id"] =
+    payload[
+      "conversation_id"
+    ] =
       %conversationId
 
 
   let options =
     newFetchOptions(
-      metod = HttpPost,
-      body = ($payload).cstring,
-      mode = fmCors,
-      credentials = fcOmit,
-      headers = headers
+      metod =
+        HttpPost,
+
+      body =
+        ($payload).cstring,
+
+      mode =
+        fmCors,
+
+      credentials =
+        fcOmit,
+
+      headers =
+        headers
     )
 
 
   let response =
     await fetch(
       (
-        BackendBaseUrl &
+        frontendConfig
+        .backendBaseUrl &
         "/api/v1/jobs"
       ).cstring,
+
       options
     )
 
@@ -243,19 +446,26 @@ proc getJob*(
 
   let options =
     newFetchOptions(
-      metod = HttpGet,
-      mode = fmCors,
-      credentials = fcOmit
+      metod =
+        HttpGet,
+
+      mode =
+        fmCors,
+
+      credentials =
+        fcOmit
     )
 
 
   let response =
     await fetch(
       (
-        BackendBaseUrl &
+        frontendConfig
+        .backendBaseUrl &
         "/api/v1/jobs/" &
         jobId
       ).cstring,
+
       options
     )
 
@@ -295,20 +505,27 @@ proc approveJob*(
 
   let options =
     newFetchOptions(
-      metod = HttpPost,
-      mode = fmCors,
-      credentials = fcOmit
+      metod =
+        HttpPost,
+
+      mode =
+        fmCors,
+
+      credentials =
+        fcOmit
     )
 
 
   let response =
     await fetch(
       (
-        BackendBaseUrl &
+        frontendConfig
+        .backendBaseUrl &
         "/api/v1/jobs/" &
         jobId &
         "/approve"
       ).cstring,
+
       options
     )
 
