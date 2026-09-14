@@ -11,14 +11,23 @@ type
 # ============================================================
 # JavaScript runtime configuration access
 #
-# importjs routines require a substitution pattern (#).
-# Using the property name as the argument keeps the bridge
-# explicit and avoids zero-argument importjs expressions.
+# IMPORTANT:
+#
+# Values crossing the importjs boundary use cstring rather than
+# Nim string.
+#
+# Nim strings on the JavaScript backend are represented using
+# Nim's own runtime structure. Injecting a Nim string directly
+# into importjs can therefore produce an array of character
+# codes instead of a native JavaScript string.
+#
+# cstring maps to a native JavaScript string and is appropriate
+# for property lookup against AGENTIC_CONFIG.
 # ============================================================
 
 
 proc hasConfigKey(
-  key: string
+  key: cstring
 ): bool {.
   importjs:
     "(typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && # in globalThis.AGENTIC_CONFIG)"
@@ -26,15 +35,15 @@ proc hasConfigKey(
 
 
 proc configString(
-  key: string
-): string {.
+  key: cstring
+): cstring {.
   importjs:
     "String(globalThis.AGENTIC_CONFIG[#])"
 .}
 
 
 proc configInteger(
-  key: string
+  key: cstring
 ): int {.
   importjs:
     "Number(globalThis.AGENTIC_CONFIG[#])"
@@ -71,7 +80,7 @@ proc loadFrontendRuntimeConfig*():
   FrontendRuntimeConfig =
 
   if not hasConfigKey(
-    "backendBaseUrl"
+    cstring"backendBaseUrl"
   ):
 
     raise newException(
@@ -82,7 +91,7 @@ proc loadFrontendRuntimeConfig*():
 
 
   if not hasConfigKey(
-    "userId"
+    cstring"userId"
   ):
 
     raise newException(
@@ -92,7 +101,7 @@ proc loadFrontendRuntimeConfig*():
 
 
   if not hasConfigKey(
-    "pollIntervalMs"
+    cstring"pollIntervalMs"
   ):
 
     raise newException(
@@ -104,19 +113,21 @@ proc loadFrontendRuntimeConfig*():
   let
     backendBaseUrl =
       normalizeBaseUrl(
-        configString(
-          "backendBaseUrl"
+        $configString(
+          cstring"backendBaseUrl"
         )
       )
 
     userId =
-      configString(
-        "userId"
+      (
+        $configString(
+          cstring"userId"
+        )
       ).strip()
 
     pollIntervalMs =
       configInteger(
-        "pollIntervalMs"
+        cstring"pollIntervalMs"
       )
 
 

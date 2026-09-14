@@ -1825,7 +1825,6 @@ function chckRange(i_p0, a_p1, b_p2) {
 
 }
 var ConstSet2 = setConstr(32, 9, 11, 13, 10, 12);
-var ConstSet3 = setConstr(32, 9, 11, 13, 10, 12);
 
 function cstrToNimstr(c_p0) {
       var ln = c_p0.length;
@@ -1865,6 +1864,7 @@ function cstrToNimstr(c_p0) {
 
   
 }
+var ConstSet3 = setConstr(32, 9, 11, 13, 10, 12);
 
 function cmpClosures(a_p0, b_p1) {
         if (a_p0 !== null && a_p0.ClP_0 !== undefined &&
@@ -2351,21 +2351,21 @@ function nsuStartsWith(s_p0, prefix_p1) {
 function loadFrontendRuntimeConfig__configZruntime95config_u15() {
   var result_1811939344 = ({backendBaseUrl: [], userId: [], pollIntervalMs: 0});
 
-    if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && [98,97,99,107,101,110,100,66,97,115,101,85,114,108] in globalThis.AGENTIC_CONFIG))) {
+    if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && "backendBaseUrl" in globalThis.AGENTIC_CONFIG))) {
     raiseException({message: makeNimstrLit("Frontend runtime configuration is missing. Load public/config.js before app.js."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && [117,115,101,114,73,100] in globalThis.AGENTIC_CONFIG))) {
+    if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && "userId" in globalThis.AGENTIC_CONFIG))) {
     raiseException({message: [65,71,69,78,84,73,67,95,67,79,78,70,73,71,46,117,115,101,114,73,100,32,105,115,32,109,105,115,115,105,110,103,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && [112,111,108,108,73,110,116,101,114,118,97,108,77,115] in globalThis.AGENTIC_CONFIG))) {
+    if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && "pollIntervalMs" in globalThis.AGENTIC_CONFIG))) {
     raiseException({message: [65,71,69,78,84,73,67,95,67,79,78,70,73,71,46,112,111,108,108,73,110,116,101,114,118,97,108,77,115,32,105,115,32,109,105,115,115,105,110,103,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var backendBaseUrl_1811939348 = normalizeBaseUrl__configZruntime95config_u12(String(globalThis.AGENTIC_CONFIG[[98,97,99,107,101,110,100,66,97,115,101,85,114,108]]));
-    var userId_1811939349 = nsuStrip(String(globalThis.AGENTIC_CONFIG[[117,115,101,114,73,100]]), true, true, ConstSet3);
-    var pollIntervalMs_1811939350 = Number(globalThis.AGENTIC_CONFIG[[112,111,108,108,73,110,116,101,114,118,97,108,77,115]]);
+    var backendBaseUrl_1811939348 = normalizeBaseUrl__configZruntime95config_u12(cstrToNimstr(String(globalThis.AGENTIC_CONFIG["backendBaseUrl"])));
+    var userId_1811939349 = nsuStrip(cstrToNimstr(String(globalThis.AGENTIC_CONFIG["userId"])), true, true, ConstSet3);
+    var pollIntervalMs_1811939350 = Number(globalThis.AGENTIC_CONFIG["pollIntervalMs"]);
     if (((backendBaseUrl_1811939348).length == 0)) {
     raiseException({message: [65,71,69,78,84,73,67,95,67,79,78,70,73,71,46,98,97,99,107,101,110,100,66,97,115,101,85,114,108,32,109,117,115,116,32,110,111,116,32,98,101,32,101,109,112,116,121,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
