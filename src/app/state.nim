@@ -1,5 +1,5 @@
 import types
-
+import std/strutils
 
 proc emptyRunState():
   RunState =
@@ -567,6 +567,16 @@ proc addAssistantMessage*(
   ] = @[]
 ) =
 
+  var cleanContent =
+    content
+
+  cleanContent =
+    cleanContent.replace(
+      "**",
+      ""
+    )
+
+
   state.messages.add(
     ChatMessage(
       id:
@@ -576,7 +586,7 @@ proc addAssistantMessage*(
         mrAssistant,
 
       content:
-        content,
+        cleanContent,
 
       cards:
         cards
