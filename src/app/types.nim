@@ -28,14 +28,50 @@ type
     mrAssistant
 
 
+  ResultCardField* = object
+    label*: string
+    value*: string
+
+
+  ResultCardSection* = object
+    kind*: string
+    title*: string
+
+    content*: string
+    items*: seq[string]
+
+
+  ResultCard* = object
+    schema*: string
+
+    kind*: string
+    title*: string
+    status*: string
+
+    fields*: seq[
+      ResultCardField
+    ]
+
+    sections*: seq[
+      ResultCardSection
+    ]
+
+
   ChatMessage* = object
     id*: int
+
     role*: MessageRole
+
     content*: string
+
+    cards*: seq[
+      ResultCard
+    ]
 
 
   RunEvent* = object
     id*: int
+
     kind*: string
     message*: string
 
@@ -50,6 +86,10 @@ type
 
     agent*: string
     tool*: string
+
+    presentations*: seq[
+      ResultCard
+    ]
 
 
   SystemState* = object
@@ -94,15 +134,25 @@ type
 
     toastMessage*: string
 
-    messages*: seq[ChatMessage]
+    messages*: seq[
+      ChatMessage
+    ]
 
     run*: RunState
-    runEvents*: seq[RunEvent]
+
+    runEvents*: seq[
+      RunEvent
+    ]
 
     system*: SystemState
 
-    tools*: seq[ToolItem]
-    plugins*: seq[PluginItem]
+    tools*: seq[
+      ToolItem
+    ]
+
+    plugins*: seq[
+      PluginItem
+    ]
 
     nextMessageId*: int
     nextEventId*: int

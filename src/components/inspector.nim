@@ -3,6 +3,8 @@ include karax/prelude
 import ../app/types
 import ../app/state
 
+import result_card
+
 
 proc statusTitle(
   status: string
@@ -68,18 +70,23 @@ proc indicatorClass(
 
   of "processing",
      "approving":
+
     cstring"status-indicator processing"
 
   of "completed":
+
     cstring"status-indicator completed"
 
   of "failed":
+
     cstring"status-indicator failed"
 
   of "waiting_approval":
+
     cstring"status-indicator waiting-approval"
 
   else:
+
     cstring"status-indicator pending"
 
 
@@ -201,6 +208,23 @@ tool usage and execution state.
             )
 
 
+        if state.run.presentations.len > 0:
+
+          tdiv(class = "run-section"):
+
+            span(class = "run-label"):
+              text "Structured result"
+
+            tdiv(class = "run-result-cards"):
+
+              for card in
+                  state.run.presentations:
+
+                renderResultCard(
+                  card
+                )
+
+
 proc renderInspectorTool(
   state: AppState,
   tool: ToolItem
@@ -234,6 +258,7 @@ proc renderInspectorTool(
       event: Event,
       node: VNode
     ) =
+
       openToolView(
         state,
         tool.id
@@ -258,6 +283,7 @@ proc renderToolsTab(
 
 
     for tool in state.tools:
+
       renderInspectorTool(
         state,
         tool
@@ -290,7 +316,8 @@ proc renderEventsTab(
 
       tdiv(class = "event-list"):
 
-        for runEvent in state.runEvents:
+        for runEvent in
+            state.runEvents:
 
           tdiv(class = "event-row"):
 
@@ -340,6 +367,9 @@ proc renderRawTab(
           "  \"tool\": \"" &
           state.run.tool &
           "\",\n" &
+          "  \"presentations\": " &
+          $state.run.presentations.len &
+          ",\n" &
           "  \"events\": " &
           $state.runEvents.len &
           "\n" &
@@ -377,6 +407,7 @@ proc renderInspector*(
           event: Event,
           node: VNode
         ) =
+
           toggleInspector(
             state
           )
@@ -398,6 +429,7 @@ proc renderInspector*(
           event: Event,
           node: VNode
         ) =
+
           setInspectorTab(
             state,
             tabRun
@@ -418,6 +450,7 @@ proc renderInspector*(
           event: Event,
           node: VNode
         ) =
+
           setInspectorTab(
             state,
             tabTools
@@ -438,6 +471,7 @@ proc renderInspector*(
           event: Event,
           node: VNode
         ) =
+
           setInspectorTab(
             state,
             tabEvents
@@ -458,6 +492,7 @@ proc renderInspector*(
           event: Event,
           node: VNode
         ) =
+
           setInspectorTab(
             state,
             tabRaw
@@ -469,21 +504,25 @@ proc renderInspector*(
       case state.inspectorTab
 
       of tabRun:
+
         renderRunTab(
           state
         )
 
       of tabTools:
+
         renderToolsTab(
           state
         )
 
       of tabEvents:
+
         renderEventsTab(
           state
         )
 
       of tabRaw:
+
         renderRawTab(
           state
         )

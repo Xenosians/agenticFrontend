@@ -1,7 +1,8 @@
 import types
 
 
-proc emptyRunState(): RunState =
+proc emptyRunState():
+  RunState =
 
   RunState(
     active:
@@ -20,7 +21,10 @@ proc emptyRunState(): RunState =
       "",
 
     tool:
-      ""
+      "",
+
+    presentations:
+      @[]
   )
 
 
@@ -51,7 +55,8 @@ proc emptySystemState():
   )
 
 
-proc initAppState*(): AppState =
+proc initAppState*():
+  AppState =
 
   AppState(
     activeView:
@@ -413,20 +418,31 @@ proc togglePluginConnection*(
   pluginId: string
 ) =
 
-  for i in 0 ..< state.plugins.len:
+  for i in 0 ..<
+      state.plugins.len:
 
-    if state.plugins[i].id ==
+    if state.plugins[
+         i
+       ].id ==
        pluginId:
 
-      state.plugins[i].connected =
-        not state.plugins[i].connected
+      state.plugins[
+        i
+      ].connected =
+        not state.plugins[
+          i
+        ].connected
 
 
-      if state.plugins[i].connected:
+      if state.plugins[
+           i
+         ].connected:
 
         showToast(
           state,
-          state.plugins[i].name &
+          state.plugins[
+            i
+          ].name &
           " connected in frontend preview mode."
         )
 
@@ -434,7 +450,9 @@ proc togglePluginConnection*(
 
         showToast(
           state,
-          state.plugins[i].name &
+          state.plugins[
+            i
+          ].name &
           " disconnected."
         )
 
@@ -531,7 +549,10 @@ proc addUserMessage*(
         mrUser,
 
       content:
-        content
+        content,
+
+      cards:
+        @[]
     )
   )
 
@@ -540,7 +561,10 @@ proc addUserMessage*(
 
 proc addAssistantMessage*(
   state: AppState,
-  content: string
+  content: string,
+  cards: seq[
+    ResultCard
+  ] = @[]
 ) =
 
   state.messages.add(
@@ -552,7 +576,10 @@ proc addAssistantMessage*(
         mrAssistant,
 
       content:
-        content
+        content,
+
+      cards:
+        cards
     )
   )
 
@@ -582,7 +609,10 @@ proc startLocalRun*(
         "",
 
       tool:
-        ""
+        "",
+
+      presentations:
+        @[]
     )
 
 

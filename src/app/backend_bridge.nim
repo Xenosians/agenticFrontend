@@ -37,6 +37,9 @@ proc applyJobState(
   state.run.tool =
     job.proposedTool
 
+  state.run.presentations =
+    job.presentations
+
 
 proc submitBackendJob*(
   state: AppState,
@@ -67,7 +70,10 @@ proc submitBackendJob*(
         "",
 
       tool:
-        ""
+        "",
+
+      presentations:
+        @[]
     )
 
 
@@ -142,16 +148,6 @@ proc submitBackendJob*(
     )
 
 
-    # --------------------------------------------------------
-    # Durable job polling
-    #
-    # Phoenix owns durable job state.
-    #
-    # There is intentionally no frontend-owned maximum runtime.
-    # Long-running AI execution is kept alive through the
-    # AI -> Phoenix heartbeat/lease protocol.
-    # --------------------------------------------------------
-
     while true:
 
       let previousStatus =
@@ -204,8 +200,22 @@ proc submitBackendJob*(
 
         addAssistantMessage(
           state,
-          answer
+          answer,
+          job.presentations
         )
+
+
+        if job.presentations.len > 0:
+
+          addRunEvent(
+            state,
+            "result",
+            (
+              "Received " &
+              $job.presentations.len &
+              " structured result card(s)."
+            )
+          )
 
 
         addRunEvent(
@@ -281,7 +291,8 @@ proc submitBackendJob*(
 
         addAssistantMessage(
           state,
-          approvalMessage
+          approvalMessage,
+          job.presentations
         )
 
 
@@ -432,7 +443,8 @@ proc approvePendingJob*(
 
       addAssistantMessage(
         state,
-        answer
+        answer,
+        job.presentations
       )
 
 

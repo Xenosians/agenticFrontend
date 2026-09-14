@@ -3,6 +3,8 @@ include karax/prelude
 import ../app/types
 import ../app/backend_bridge
 
+import result_card
+
 
 proc renderMessage(
   message: ChatMessage
@@ -39,8 +41,21 @@ proc renderMessage(
         span(class = "message-author"):
           text "Agentic"
 
-        tdiv(class = "message-bubble assistant"):
-          text message.content
+        if message.content.len > 0:
+
+          tdiv(class = "message-bubble assistant"):
+            text message.content
+
+
+        if message.cards.len > 0:
+
+          tdiv(class = "message-result-cards"):
+
+            for card in message.cards:
+
+              renderResultCard(
+                card
+              )
 
 
 proc renderApprovalAction(
@@ -118,7 +133,7 @@ connected tools and plugins.
             text "Access checks"
 
           span:
-            text "Shell operations"
+            text "Developer operations"
 
           span:
             text "Git workflows"
