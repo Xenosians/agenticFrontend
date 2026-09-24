@@ -4,10 +4,8 @@ import std/strutils
 
 import app/types
 import app/state
-import app/auth_bridge
 import app/mock_agent
 
-import components/auth
 import components/sidebar
 import components/chat
 import components/composer
@@ -541,44 +539,6 @@ proc renderSystemView(): VNode =
             text "Preview"
 
 
-      if appState.auth.authenticated:
-        tdiv(class = "developer-card wide auth-session-panel"):
-          tdiv(class = "developer-view-header"):
-            tdiv:
-              h3:
-                text "Authenticated sessions"
-              p:
-                text "Server-side sessions owned by the signed-in application user."
-            button(class = "secondary-action"):
-              text "Refresh"
-              proc onclick(event: Event, node: VNode) =
-                discard loadAuthSessions(appState)
-
-          if not appState.sessionsLoaded:
-            p:
-              text "Open this view from the profile control or refresh to load sessions."
-          elif appState.sessions.len == 0:
-            p:
-              text "No sessions found."
-          else:
-            for authSession in appState.sessions:
-              let currentSession = authSession
-              tdiv(class = "system-row"):
-                tdiv:
-                  strong:
-                    text (if currentSession.current: "Current session" else: "Session")
-                  span:
-                    text currentSession.userAgent & " · expires " & currentSession.expiresAt
-                if currentSession.revokedAt.len == 0:
-                  button(class = "secondary-action"):
-                    text "Revoke"
-                    proc onclick(event: Event, node: VNode) =
-                      discard revokeAuthSession(appState, currentSession.sessionId)
-                else:
-                  span(class = "capability-badge disabled"):
-                    text "Revoked"
-
-
 proc renderToolView(): VNode =
 
   var
@@ -949,7 +909,9 @@ proc renderHeaderMenu(): VNode =
         event: Event,
         node: VNode
       ) =
-        discard createNewChat(appState)
+        resetConversation(
+          appState
+        )
 
 
     button:
@@ -979,20 +941,6 @@ proc renderHeaderMenu(): VNode =
         clearRun(
           appState
         )
-
-
-    button:
-      text "Sessions"
-      proc onclick(event: Event, node: VNode) =
-        appState.headerMenuOpen = false
-        setActiveView(appState, viewSystem)
-        discard loadAuthSessions(appState)
-
-    button:
-      text "Sign out"
-      proc onclick(event: Event, node: VNode) =
-        appState.headerMenuOpen = false
-        discard logoutApplication(appState)
 
 
     button:
@@ -1096,9 +1044,6 @@ proc renderWorkspace(): VNode =
 
 proc renderApp(): VNode =
 
-  if not appState.auth.checked or not appState.auth.authenticated:
-    return renderAuthScreen(appState)
-
   let shellClass =
     if appState.inspectorOpen:
       cstring"app-shell"
@@ -1129,6 +1074,3 @@ setRenderer(
   renderApp,
   "app"
 )
-
-
-discard bootstrapApplication(appState)

@@ -4,26 +4,7 @@ import std/strutils
 type
   FrontendRuntimeConfig* = object
     backendBaseUrl*: string
-    userId*: string
     pollIntervalMs*: int
-
-
-# ============================================================
-# JavaScript runtime configuration access
-#
-# IMPORTANT:
-#
-# Values crossing the importjs boundary use cstring rather than
-# Nim string.
-#
-# Nim strings on the JavaScript backend are represented using
-# Nim's own runtime structure. Injecting a Nim string directly
-# into importjs can therefore produce an array of character
-# codes instead of a native JavaScript string.
-#
-# cstring maps to a native JavaScript string and is appropriate
-# for property lookup against AGENTIC_CONFIG.
-# ============================================================
 
 
 proc hasConfigKey(
@@ -50,158 +31,56 @@ proc configInteger(
 .}
 
 
-# ============================================================
-# Normalization
-# ============================================================
-
-
 proc normalizeBaseUrl(
   value: string
 ): string =
+  result = value.strip()
 
-  result =
-    value.strip()
-
-
-  while result.len > 0 and
-        result[^1] == '/':
-
-    result.setLen(
-      result.len - 1
-    )
+  while result.len > 0 and result[^1] == '/':
+    result.setLen(result.len - 1)
 
 
-# ============================================================
-# Runtime configuration loading
-# ============================================================
-
-
-proc loadFrontendRuntimeConfig*():
-  FrontendRuntimeConfig =
-
-  if not hasConfigKey(
-    cstring"backendBaseUrl"
-  ):
-
+proc loadFrontendRuntimeConfig*(): FrontendRuntimeConfig =
+  if not hasConfigKey(cstring"backendBaseUrl"):
     raise newException(
       ValueError,
-      "Frontend runtime configuration is missing. " &
-      "Load public/config.js before app.js."
+      "Frontend runtime configuration is missing. Load public/config.js before app.js."
     )
 
-
-  if not hasConfigKey(
-    cstring"userId"
-  ):
-
-    raise newException(
-      ValueError,
-      "AGENTIC_CONFIG.userId is missing."
-    )
-
-
-  if not hasConfigKey(
-    cstring"pollIntervalMs"
-  ):
-
+  if not hasConfigKey(cstring"pollIntervalMs"):
     raise newException(
       ValueError,
       "AGENTIC_CONFIG.pollIntervalMs is missing."
     )
 
+  let backendBaseUrl = normalizeBaseUrl(
+    $configString(cstring"backendBaseUrl")
+  )
 
-  let
-    backendBaseUrl =
-      normalizeBaseUrl(
-        $configString(
-          cstring"backendBaseUrl"
-        )
-      )
-
-    userId =
-      (
-        $configString(
-          cstring"userId"
-        )
-      ).strip()
-
-    pollIntervalMs =
-      configInteger(
-        cstring"pollIntervalMs"
-      )
-
-
-  # ----------------------------------------------------------
-  # Backend URL
-  # ----------------------------------------------------------
+  let pollIntervalMs = configInteger(cstring"pollIntervalMs")
 
   if backendBaseUrl.len == 0:
-
-    raise newException(
-      ValueError,
-      "AGENTIC_CONFIG.backendBaseUrl must not be empty."
-    )
-
+    raise newException(ValueError, "AGENTIC_CONFIG.backendBaseUrl must not be empty.")
 
   if not (
-    backendBaseUrl.startsWith(
-      "http://"
-    ) or
-    backendBaseUrl.startsWith(
-      "https://"
-    )
+    backendBaseUrl.startsWith("http://") or
+    backendBaseUrl.startsWith("https://")
   ):
-
     raise newException(
       ValueError,
       "AGENTIC_CONFIG.backendBaseUrl must use http:// or https://."
     )
 
-
-  # ----------------------------------------------------------
-  # User identity
-  # ----------------------------------------------------------
-
-  if userId.len == 0:
-
-    raise newException(
-      ValueError,
-      "AGENTIC_CONFIG.userId must not be empty."
-    )
-
-
-  # ----------------------------------------------------------
-  # Poll interval
-  # ----------------------------------------------------------
-
   if pollIntervalMs <= 0:
-
     raise newException(
       ValueError,
       "AGENTIC_CONFIG.pollIntervalMs must be greater than zero."
     )
 
-
-  result =
-    FrontendRuntimeConfig(
-      backendBaseUrl:
-        backendBaseUrl,
-
-      userId:
-        userId,
-
-      pollIntervalMs:
-        pollIntervalMs
-    )
+  result = FrontendRuntimeConfig(
+    backendBaseUrl: backendBaseUrl,
+    pollIntervalMs: pollIntervalMs
+  )
 
 
-# ============================================================
-# Application runtime configuration
-#
-# Loaded once when the compiled browser application starts.
-# ============================================================
-
-
-let
-  frontendConfig* =
-    loadFrontendRuntimeConfig()
+let frontendConfig* = loadFrontendRuntimeConfig()

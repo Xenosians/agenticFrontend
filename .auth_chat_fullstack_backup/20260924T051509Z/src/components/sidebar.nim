@@ -1,10 +1,7 @@
-import std/strutils
-
 include karax/prelude
 
 import ../app/types
 import ../app/state
-import ../app/auth_bridge
 
 
 proc viewNavClass(
@@ -222,35 +219,9 @@ proc renderSidebar*(
         event: Event,
         node: VNode
       ) =
-        discard createNewChat(
+        resetConversation(
           state
         )
-
-
-    nav(class = "nav-section"):
-
-      span(class = "section-label"):
-        text "Chats"
-
-      if state.chats.len == 0:
-        span(class = "sidebar-empty"):
-          text "No chats yet"
-      else:
-        for chat in state.chats:
-          let currentChat = chat
-          button(
-            class =
-              if currentChat.chatId == state.currentChatId:
-                cstring"nav-item active"
-              else:
-                cstring"nav-item"
-          ):
-            span(class = "nav-icon"):
-              text "◇"
-            span(class = "chat-nav-title"):
-              text currentChat.title
-            proc onclick(event: Event, node: VNode) =
-              discard selectChat(state, currentChat.chatId)
 
 
     nav(class = "nav-section"):
@@ -356,25 +327,15 @@ proc renderSidebar*(
     button(class = "sidebar-footer"):
 
       tdiv(class = "avatar"):
-        text (
-          if state.auth.displayName.len > 0:
-            state.auth.displayName[0 .. 0].toUpperAscii()
-          else:
-            "U"
-        )
+        text "X"
 
       tdiv(class = "user-info"):
 
         strong:
-          text (
-            if state.auth.displayName.len > 0:
-              state.auth.displayName
-            else:
-              state.auth.email
-          )
+          text "xenos"
 
         span:
-          text state.auth.role & " · authenticated"
+          text "Developer · local preview"
 
       span(class = "nav-tail"):
         text "›"

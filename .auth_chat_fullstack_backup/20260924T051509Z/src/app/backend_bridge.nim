@@ -46,14 +46,6 @@ proc submitBackendJob*(
   message: string
 ) {.async.} =
 
-  if not state.auth.authenticated:
-    showToast(state, "Sign in before submitting a request.")
-    return
-
-  if state.currentChatId.len == 0:
-    showToast(state, "Create or select a chat before submitting a request.")
-    return
-
   addUserMessage(
     state,
     message
@@ -116,14 +108,15 @@ proc submitBackendJob*(
 
     let response =
       await createJob(
-        chatId =
-          state.currentChatId,
+        userId =
+          frontendConfig
+          .userId,
+
+        conversationId =
+          "",
 
         message =
-          message,
-
-        csrfToken =
-          state.auth.csrfToken
+          message
       )
 
 
@@ -424,8 +417,7 @@ proc approvePendingJob*(
 
     let job =
       await approveJob(
-        jobId,
-        state.auth.csrfToken
+        jobId
       )
 
 

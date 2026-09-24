@@ -740,9 +740,9 @@ proc getSystemHealth*():
 
 
 proc createJob*(
-  chatId: string,
-  message: string,
-  csrfToken: string
+  userId: string,
+  conversationId: string,
+  message: string
 ): Future[
   JobCreateResponse
 ] {.async.} =
@@ -757,19 +757,21 @@ proc createJob*(
     "application/json"
 
 
-  let payload = %*{
-    "chat_id":
-      chatId,
+  var payload = %*{
+    "user_id":
+      userId,
 
     "message":
       message
   }
 
 
-  headers[
-    "X-CSRF-Token"
-  ] =
-    csrfToken
+  if conversationId.len > 0:
+
+    payload[
+      "conversation_id"
+    ] =
+      %conversationId
 
 
   let options =
@@ -784,7 +786,7 @@ proc createJob*(
         fmCors,
 
       credentials =
-        fcInclude,
+        fcOmit,
 
       headers =
         headers
@@ -855,7 +857,7 @@ proc getJob*(
         fmCors,
 
       credentials =
-        fcInclude
+        fcOmit
     )
 
 
@@ -902,34 +904,21 @@ proc getJob*(
 
 
 proc approveJob*(
-  jobId: string,
-  csrfToken: string
+  jobId: string
 ): Future[
   JobResponse
 ] {.async.} =
-
-  let headers =
-    newHeaders()
-
-  headers["Content-Type"] = "application/json"
-  headers["X-CSRF-Token"] = csrfToken
 
   let options =
     newFetchOptions(
       metod =
         HttpPost,
 
-      body =
-        cstring"{}",
-
       mode =
         fmCors,
 
       credentials =
-        fcInclude,
-
-      headers =
-        headers
+        fcOmit
     )
 
 
