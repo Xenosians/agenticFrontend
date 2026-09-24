@@ -1,0 +1,21 @@
+# Nim build/cache
+nimcache/
+.nimble/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Local editor / backup artifacts
+*.bak
+*.bak-*
+**/.auth_caret_backup/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
