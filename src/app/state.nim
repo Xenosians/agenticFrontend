@@ -69,7 +69,7 @@ proc initAppState*():
       cpNone,
 
     inspectorOpen:
-      true,
+      false,
 
     headerMenuOpen:
       false,
@@ -87,6 +87,9 @@ proc initAppState*():
       "",
 
     selectedPluginId:
+      "",
+
+    pendingDeleteChatId:
       "",
 
     toastMessage:
@@ -164,6 +167,17 @@ proc initAppState*():
     plugins: @[
       PluginItem(
         id:
+          "jira",
+
+        name:
+          "Jira / Atlassian",
+
+        connected:
+          false
+      ),
+
+      PluginItem(
+        id:
           "github",
 
         name:
@@ -175,10 +189,10 @@ proc initAppState*():
 
       PluginItem(
         id:
-          "jira",
+          "directory",
 
         name:
-          "Jira",
+          "Directory & Access",
 
         connected:
           false
@@ -186,10 +200,10 @@ proc initAppState*():
 
       PluginItem(
         id:
-          "slack",
+          "knowledge",
 
         name:
-          "Slack",
+          "Knowledge",
 
         connected:
           false

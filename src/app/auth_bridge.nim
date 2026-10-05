@@ -9,6 +9,7 @@ import ../api/auth_client
 
 import types
 import state
+import backend_bridge
 
 
 proc browserQueryParam(
@@ -107,7 +108,15 @@ proc applyHistory(
   if history.len > 0:
     let latest = history[^1]
 
-    if latest.status == "waiting_approval" and latest.jobId.len > 0:
+    if (
+      latest.status in [
+        "pending",
+        "processing",
+        "waiting_approval",
+        "approving"
+      ] and
+      latest.jobId.len > 0
+    ):
       state.run = RunState(
         active: true,
         request: "",
@@ -133,8 +142,22 @@ proc loadChatHistory*(
   try:
     let history = await getChatHistory(chatId)
     applyHistory(state, chatId, history)
-  except CatchableError as exc:
-    state.auth.error = exc.msg
+
+    if (
+      state.run.active and
+      state.run.jobId.len > 0 and
+      state.run.status in [
+        "pending",
+        "processing",
+        "approving"
+      ]
+    ):
+      discard resumeBackendJob(
+        state
+      )
+
+  except CatchableError:
+    state.auth.error = "Could not load this chat right now."
   finally:
     state.auth.loading = false
 
@@ -378,23 +401,176 @@ proc createNewChat*(
   if not state.auth.authenticated:
     return
 
+  # Do not generate endless empty "New chat" rows.
+  if (
+    state.currentChatId.len > 0 and
+    state.messages.len == 0 and
+    not state.run.active
+  ):
+    state.activeView =
+      viewChat
+
+    redraw(kxi)
+    return
+
+  # A single foreground durable job is still the current
+  # frontend contract. Don't detach its UI from its chat.
+  if (
+    state.run.active and
+    state.run.status in [
+      "submitting",
+      "pending",
+      "processing",
+      "waiting_approval",
+      "approving"
+    ]
+  ):
+    showToast(
+      state,
+      "Finish the current job before creating another chat."
+    )
+
+    redraw(kxi)
+    return
+
   try:
-    let created = await createChat(state.auth.csrfToken)
+    let created =
+      await createChat(
+        state.auth.csrfToken
+      )
 
     state.chats.insert(
       ChatItem(
-        chatId: created.chatId,
-        title: created.title,
-        updatedAt: created.updatedAt
+        chatId:
+          created.chatId,
+
+        title:
+          created.title,
+
+        updatedAt:
+          created.updatedAt
       ),
       0
     )
 
-    applyHistory(state, created.chatId, @[])
-    state.activeView = viewChat
-    showToast(state, "New chat created.")
-  except CatchableError as exc:
-    showToast(state, "Could not create chat: " & exc.msg)
+    applyHistory(
+      state,
+      created.chatId,
+      @[]
+    )
+
+    state.activeView =
+      viewChat
+
+    showToast(
+      state,
+      "New chat created."
+    )
+
+  except CatchableError:
+    showToast(
+      state,
+      "Could not create a new chat right now."
+    )
+
+  redraw(kxi)
+
+
+
+proc deleteChatApplication*(
+  state: AppState,
+  chatId: string
+) {.async.} =
+  if (
+    not state.auth.authenticated or
+    chatId.len == 0
+  ):
+    return
+
+  if (
+    chatId == state.currentChatId and
+    state.run.active and
+    state.run.status in [
+      "submitting",
+      "pending",
+      "processing",
+      "waiting_approval",
+      "approving"
+    ]
+  ):
+    showToast(
+      state,
+      "Finish the current job before deleting this chat."
+    )
+
+    redraw(kxi)
+    return
+
+  try:
+    await deleteChat(
+      chatId,
+      state.auth.csrfToken
+    )
+
+    let wasCurrent =
+      chatId ==
+      state.currentChatId
+
+    var remaining:
+      seq[ChatItem] =
+        @[]
+
+    for chat in state.chats:
+      if chat.chatId != chatId:
+        remaining.add(
+          chat
+        )
+
+    state.chats =
+      remaining
+
+    if wasCurrent:
+      if state.chats.len > 0:
+        await loadChatHistory(
+          state,
+          state.chats[0].chatId
+        )
+
+      else:
+        let created =
+          await createChat(
+            state.auth.csrfToken
+          )
+
+        state.chats.add(
+          ChatItem(
+            chatId:
+              created.chatId,
+
+            title:
+              created.title,
+
+            updatedAt:
+              created.updatedAt
+          )
+        )
+
+        applyHistory(
+          state,
+          created.chatId,
+          @[]
+        )
+
+    showToast(
+      state,
+      "Chat deleted."
+    )
+
+  except CatchableError:
+    showToast(
+      state,
+      "Could not delete this chat right now."
+    )
 
   redraw(kxi)
 
@@ -405,6 +581,23 @@ proc selectChat*(
 ) {.async.} =
   if chatId == state.currentChatId:
     state.activeView = viewChat
+    redraw(kxi)
+    return
+
+  if (
+    state.run.active and
+    state.run.status in [
+      "submitting",
+      "pending",
+      "processing",
+      "waiting_approval",
+      "approving"
+    ]
+  ):
+    showToast(
+      state,
+      "Finish the current job before switching chats."
+    )
     redraw(kxi)
     return
 

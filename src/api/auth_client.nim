@@ -6,6 +6,7 @@ import std/[
 ]
 
 from std/httpcore import
+  HttpDelete,
   HttpGet,
   HttpPost
 
@@ -121,20 +122,39 @@ proc apiError(
   responseStatus: string,
   responseBody: string
 ): ref ValueError =
-  var message = responseBody
+  var
+    code = "request_failed"
+    message = "The request could not be completed."
 
   try:
     let data = parseJson(responseBody)
-    let code = jsonText(data, "error")
 
-    if code.len > 0:
-      message = code
+    let parsedCode =
+      jsonText(
+        data,
+        "error"
+      )
+
+    let parsedMessage =
+      jsonText(
+        data,
+        "message"
+      )
+
+    if parsedCode.len > 0:
+      code = parsedCode
+
+    if parsedMessage.len > 0:
+      message = parsedMessage
+
   except CatchableError:
     discard
 
   newException(
     ValueError,
-    "Backend returned HTTP " & responseStatus & ": " & message
+    "HTTP " & responseStatus &
+    " · " & code &
+    " · " & message
   )
 
 
@@ -419,6 +439,47 @@ proc createChat*(
     createdAt: jsonText(node, "created_at"),
     updatedAt: jsonText(node, "updated_at")
   )
+
+
+
+proc deleteChat*(
+  chatId: string,
+  csrfToken: string
+): Future[void] {.async.} =
+  if chatId.len == 0:
+    raise newException(
+      ValueError,
+      "A chat ID is required."
+    )
+
+  let options =
+    newFetchOptions(
+      metod = HttpDelete,
+      mode = fmCors,
+      credentials = fcInclude,
+      headers = jsonHeaders(
+        csrfToken
+      )
+    )
+
+  let response =
+    await fetch(
+      (
+        frontendConfig.backendBaseUrl &
+        "/api/v1/chats/" &
+        chatId
+      ).cstring,
+      options
+    )
+
+  let responseBody =
+    $(await response.text())
+
+  if not response.ok:
+    raise apiError(
+      $response.status,
+      responseBody
+    )
 
 
 proc getChatHistory*(

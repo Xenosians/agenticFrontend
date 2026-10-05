@@ -18,68 +18,20 @@ proc viewNavClass(
     cstring"nav-item"
 
 
-proc toolNavClass(
-  state: AppState,
-  tool: ToolItem
-): cstring =
-
-  var value =
-    "nav-item capability-nav-item"
-
-  if not tool.enabled:
-    value.add(
-      " unavailable"
-    )
-
-  if state.activeView == viewTool and
-     state.selectedToolId == tool.id:
-
-    value.add(
-      " active"
-    )
-
-  result =
-    cstring(value)
-
-
-proc pluginNavClass(
-  state: AppState,
-  plugin: PluginItem
-): cstring =
-
-  var value =
-    "nav-item capability-nav-item"
-
-  if not plugin.connected:
-    value.add(
-      " unavailable"
-    )
-
-  if state.activeView == viewPlugin and
-     state.selectedPluginId == plugin.id:
-
-    value.add(
-      " active"
-    )
-
-  result =
-    cstring(value)
-
-
 proc renderViewButton(
   state: AppState,
   icon: string,
   label: string,
-  target: AppView
+  target: AppView,
+  tail: string = ""
 ): VNode =
 
   result = buildHtml(
     button(
-      class =
-        viewNavClass(
-          state,
-          target
-        )
+      class = viewNavClass(
+        state,
+        target
+      )
     )
   ):
 
@@ -89,6 +41,10 @@ proc renderViewButton(
     span:
       text label
 
+    if tail.len > 0:
+      span(class = "nav-preview"):
+        text tail
+
     proc onclick(
       event: Event,
       node: VNode
@@ -96,93 +52,6 @@ proc renderViewButton(
       setActiveView(
         state,
         target
-      )
-
-
-proc renderToolButton(
-  state: AppState,
-  tool: ToolItem
-): VNode =
-
-  let
-    dotClass =
-      if tool.enabled:
-        cstring"status-dot online"
-      else:
-        cstring"status-dot offline"
-
-    displayName =
-      if tool.id == "shell":
-        ">_ " & tool.name
-      else:
-        tool.name
-
-
-  result = buildHtml(
-    button(
-      class =
-        toolNavClass(
-          state,
-          tool
-        )
-    )
-  ):
-
-    span(class = dotClass)
-
-    span:
-      text displayName
-
-    span(class = "nav-tail"):
-      text "›"
-
-    proc onclick(
-      event: Event,
-      node: VNode
-    ) =
-      openToolView(
-        state,
-        tool.id
-      )
-
-
-proc renderPluginButton(
-  state: AppState,
-  plugin: PluginItem
-): VNode =
-
-  let dotClass =
-    if plugin.connected:
-      cstring"status-dot online"
-    else:
-      cstring"status-dot offline"
-
-
-  result = buildHtml(
-    button(
-      class =
-        pluginNavClass(
-          state,
-          plugin
-        )
-    )
-  ):
-
-    span(class = dotClass)
-
-    span:
-      text plugin.name
-
-    span(class = "nav-tail"):
-      text "›"
-
-    proc onclick(
-      event: Event,
-      node: VNode
-    ) =
-      openPluginView(
-        state,
-        plugin.id
       )
 
 
@@ -195,7 +64,6 @@ proc renderSidebar*(
   ):
 
     tdiv(class = "brand"):
-
       img(
         class = "brand-logo",
         src = "./assets/hydra.svg",
@@ -203,20 +71,16 @@ proc renderSidebar*(
       )
 
       tdiv(class = "brand-copy"):
-
         strong:
           text "Agentic"
-
         span:
-          text "Developer Hub"
+          text "ITSM workspace"
 
 
     button(class = "new-session"):
-
       span:
         text "+"
-
-      text "New Session"
+      text "New chat"
 
       proc onclick(
         event: Event,
@@ -227,34 +91,86 @@ proc renderSidebar*(
         )
 
 
-    nav(class = "nav-section"):
-
+    nav(class = "nav-section chat-nav-section"):
       span(class = "section-label"):
         text "Chats"
 
       if state.chats.len == 0:
         span(class = "sidebar-empty"):
-          text "No chats yet"
+          text "No chats"
       else:
         for chat in state.chats:
           let currentChat = chat
-          button(
-            class =
-              if currentChat.chatId == state.currentChatId:
-                cstring"nav-item active"
-              else:
-                cstring"nav-item"
-          ):
-            span(class = "nav-icon"):
-              text "◇"
-            span(class = "chat-nav-title"):
-              text currentChat.title
-            proc onclick(event: Event, node: VNode) =
-              discard selectChat(state, currentChat.chatId)
+
+          tdiv(class = "chat-nav-row"):
+            button(
+              class =
+                if currentChat.chatId == state.currentChatId:
+                  cstring"chat-nav-main active"
+                else:
+                  cstring"chat-nav-main"
+            ):
+              span(class = "nav-icon"):
+                text "◇"
+
+              span(class = "chat-nav-title"):
+                text currentChat.title
+
+              proc onclick(
+                event: Event,
+                node: VNode
+              ) =
+                discard selectChat(
+                  state,
+                  currentChat.chatId
+                )
+
+            if state.pendingDeleteChatId == currentChat.chatId:
+              tdiv(class = "chat-delete-confirm"):
+                button(
+                  class = "chat-delete-confirm-yes",
+                  title = "Delete chat"
+                ):
+                  text "Delete"
+
+                  proc onclick(
+                    event: Event,
+                    node: VNode
+                  ) =
+                    state.pendingDeleteChatId = ""
+                    discard deleteChatApplication(
+                      state,
+                      currentChat.chatId
+                    )
+
+                button(
+                  class = "chat-delete-confirm-no",
+                  title = "Cancel"
+                ):
+                  text "Cancel"
+
+                  proc onclick(
+                    event: Event,
+                    node: VNode
+                  ) =
+                    state.pendingDeleteChatId = ""
+                    redraw(kxi)
+            else:
+              button(
+                class = "chat-delete",
+                title = "Delete chat"
+              ):
+                text "×"
+
+                proc onclick(
+                  event: Event,
+                  node: VNode
+                ) =
+                  state.pendingDeleteChatId = currentChat.chatId
+                  redraw(kxi)
 
 
     nav(class = "nav-section"):
-
       span(class = "section-label"):
         text "Workspace"
 
@@ -272,77 +188,18 @@ proc renderSidebar*(
         viewSearch
       )
 
-
-    nav(class = "nav-section"):
-
-      span(class = "section-label"):
-        text "Tools"
-
-      for tool in state.tools:
-        renderToolButton(
-          state,
-          tool
-        )
-
-
-    nav(class = "nav-section"):
-
-      span(class = "section-label"):
-        text "Plugins"
-
-      for plugin in state.plugins:
-        renderPluginButton(
-          state,
-          plugin
-        )
-
-      button(
-        class =
-          viewNavClass(
-            state,
-            viewPlugin
-          )
-      ):
-
-        span(class = "nav-icon"):
-          text "+"
-
-        span:
-          text "Add plugin"
-
-        proc onclick(
-          event: Event,
-          node: VNode
-        ) =
-          openPluginCatalog(
-            state
-          )
-
-
-    nav(class = "nav-section"):
-
-      span(class = "section-label"):
-        text "Developer"
-
       renderViewButton(
         state,
-        "▣",
-        "Jobs",
-        viewJobs
+        "◇",
+        "Plugins",
+        viewPlugin
       )
 
       renderViewButton(
         state,
         "◌",
-        "Runs",
-        viewRuns
-      )
-
-      renderViewButton(
-        state,
-        "≡",
-        "Logs",
-        viewLogs
+        "Activity",
+        viewJobs
       )
 
       renderViewButton(
@@ -353,18 +210,39 @@ proc renderSidebar*(
       )
 
 
-    button(class = "sidebar-footer"):
+    nav(class = "nav-section"):
+      span(class = "section-label"):
+        text "Build"
 
+      renderViewButton(
+        state,
+        "⌘",
+        "AI Node Builder",
+        viewNodeBuilder,
+        "Preview"
+      )
+
+      renderViewButton(
+        state,
+        "▦",
+        "PCB / Infra Simulator",
+        viewSimulator,
+        "Preview"
+      )
+
+
+    button(class = "sidebar-footer"):
       tdiv(class = "avatar"):
         text (
           if state.auth.displayName.len > 0:
             state.auth.displayName[0 .. 0].toUpperAscii()
+          elif state.auth.email.len > 0:
+            state.auth.email[0 .. 0].toUpperAscii()
           else:
             "U"
         )
 
       tdiv(class = "user-info"):
-
         strong:
           text (
             if state.auth.displayName.len > 0:
@@ -374,7 +252,12 @@ proc renderSidebar*(
           )
 
         span:
-          text state.auth.role & " · authenticated"
+          text (
+            if state.auth.role.len > 0:
+              state.auth.role
+            else:
+              "authenticated"
+          )
 
       span(class = "nav-tail"):
         text "›"
@@ -385,5 +268,9 @@ proc renderSidebar*(
       ) =
         setActiveView(
           state,
-          viewSystem
+          viewAccount
+        )
+
+        discard loadAuthSessions(
+          state
         )

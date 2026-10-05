@@ -103,6 +103,66 @@ proc jsonValueBool(
   return false
 
 
+proc publicApiError(
+  responseStatus: string,
+  responseBody: string
+): ref ValueError =
+
+  var
+    code =
+      "request_failed"
+
+    message =
+      "The request could not be completed."
+
+
+  try:
+
+    let data =
+      parseJson(
+        responseBody
+      )
+
+
+    let parsedCode =
+      jsonValueText(
+        data,
+        "error"
+      )
+
+
+    let parsedMessage =
+      jsonValueText(
+        data,
+        "message"
+      )
+
+
+    if parsedCode.len > 0:
+      code =
+        parsedCode
+
+
+    if parsedMessage.len > 0:
+      message =
+        parsedMessage
+
+
+  except CatchableError:
+    discard
+
+
+  newException(
+    ValueError,
+    "HTTP " &
+    responseStatus &
+    " · " &
+    code &
+    " · " &
+    message
+  )
+
+
 proc parseResultField(
   node: JsonNode,
   field: var ResultCardField
@@ -811,11 +871,8 @@ proc createJob*(
 
   if not response.ok:
 
-    raise newException(
-      ValueError,
-      "Backend returned HTTP " &
-      $response.status &
-      ": " &
+    raise publicApiError(
+      $response.status,
       responseBody
     )
 
@@ -880,11 +937,8 @@ proc getJob*(
 
   if not response.ok:
 
-    raise newException(
-      ValueError,
-      "Backend returned HTTP " &
-      $response.status &
-      ": " &
+    raise publicApiError(
+      $response.status,
       responseBody
     )
 
@@ -955,11 +1009,8 @@ proc approveJob*(
 
   if not response.ok:
 
-    raise newException(
-      ValueError,
-      "Backend returned HTTP " &
-      $response.status &
-      ": " &
+    raise publicApiError(
+      $response.status,
       responseBody
     )
 

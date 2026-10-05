@@ -7,7 +7,10 @@ type
     viewLogs,
     viewSystem,
     viewTool,
-    viewPlugin
+    viewPlugin,
+    viewNodeBuilder,
+    viewSimulator,
+    viewAccount
 
   InspectorTab* = enum
     tabRun,
@@ -132,6 +135,7 @@ type
     composerSelectedToolId*: string
     selectedToolId*: string
     selectedPluginId*: string
+    pendingDeleteChatId*: string
     toastMessage*: string
     messages*: seq[ChatMessage]
     run*: RunState
