@@ -42,6 +42,12 @@ type
     aiReady*: bool
 
 
+  IntegrationStatusResponse* = object
+    paloAltoConfigured*: bool
+    paloAltoHost*: string
+    paloAltoMode*: string
+
+
 proc jsonValueText(
   node: JsonNode,
   key: string
@@ -797,6 +803,54 @@ proc getSystemHealth*():
       aiReady:
         aiReady
     )
+
+
+proc getIntegrationStatus*():
+  Future[
+    IntegrationStatusResponse
+  ] {.async.} =
+
+  let options =
+    newFetchOptions(
+      metod = HttpGet,
+      mode = fmCors,
+      credentials = fcInclude
+    )
+
+  let response =
+    await fetch(
+      (frontendConfig.backendBaseUrl & "/api/v1/integrations").cstring,
+      options
+    )
+
+  let responseBody = $(await response.text())
+
+  if not response.ok:
+    raise newException(
+      ValueError,
+      "Integration status returned HTTP " & $response.status & ": " & responseBody
+    )
+
+  let data = parseJson(responseBody)
+  var configured = false
+  var host = ""
+  var mode = ""
+
+  if data.kind == JObject and data.hasKey("integrations"):
+    let integrations = data["integrations"]
+    if integrations.kind == JArray:
+      for integration in integrations.items:
+        if integration.kind == JObject and
+           jsonValueText(integration, "id") == "palo_alto":
+          configured = jsonValueBool(integration, "configured")
+          host = jsonValueText(integration, "host")
+          mode = jsonValueText(integration, "mode")
+
+  result = IntegrationStatusResponse(
+    paloAltoConfigured: configured,
+    paloAltoHost: host,
+    paloAltoMode: mode
+  )
 
 
 proc createJob*(

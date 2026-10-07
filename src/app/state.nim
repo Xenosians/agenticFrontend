@@ -50,6 +50,18 @@ proc emptySystemState():
     aiReady:
       false,
 
+    paloAltoConfigured:
+      false,
+
+    paloAltoHost:
+      "",
+
+    paloAltoMode:
+      "",
+
+    integrationsError:
+      "",
+
     error:
       ""
   )
@@ -165,6 +177,17 @@ proc initAppState*():
     ],
 
     plugins: @[
+      PluginItem(
+        id:
+          "palo-alto",
+
+        name:
+          "Palo Alto PAN-OS",
+
+        connected:
+          false
+      ),
+
       PluginItem(
         id:
           "jira",
@@ -431,6 +454,14 @@ proc togglePluginConnection*(
   state: AppState,
   pluginId: string
 ) =
+
+  if pluginId == "palo-alto":
+    showToast(
+      state,
+      "Palo Alto connection state is managed by the backend runtime."
+    )
+    return
+
 
   for i in 0 ..<
       state.plugins.len:

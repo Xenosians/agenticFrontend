@@ -78,6 +78,10 @@ type
     aiReachable*: bool
     aiHealthy*: bool
     aiReady*: bool
+    paloAltoConfigured*: bool
+    paloAltoHost*: string
+    paloAltoMode*: string
+    integrationsError*: string
     error*: string
 
   ToolItem* = object

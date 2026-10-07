@@ -482,7 +482,39 @@ proc approvePendingJob*(
   redraw(kxi)
 
 
-proc refreshSystemStatus*(
+
+
+proc refreshIntegrationStatus(
+  state: AppState
+) {.async.} =
+
+  try:
+    let integrations =
+      await getIntegrationStatus()
+
+    state.system.paloAltoConfigured =
+      integrations.paloAltoConfigured
+
+    state.system.paloAltoHost =
+      integrations.paloAltoHost
+
+    state.system.paloAltoMode =
+      integrations.paloAltoMode
+
+    state.system.integrationsError =
+      ""
+
+    for i in 0 ..< state.plugins.len:
+      if state.plugins[i].id == "palo-alto":
+        state.plugins[i].connected =
+          integrations.paloAltoConfigured
+        break
+
+  except CatchableError as exc:
+    state.system.integrationsError =
+      exc.msg
+
+proc refreshSystemStatusBase(
   state: AppState
 ) {.async.} =
 
@@ -516,3 +548,20 @@ proc refreshSystemStatus*(
     state.system.checking = false
 
   redraw(kxi)
+
+
+# SRS18_PALO_ALTO_REFRESH_WRAPPER_V1
+proc refreshSystemStatus*(
+  state: AppState
+) {.async.} =
+  await refreshSystemStatusBase(
+    state
+  )
+
+  await refreshIntegrationStatus(
+    state
+  )
+
+  redraw(
+    kxi
+  )

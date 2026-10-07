@@ -3,27 +3,27 @@ var framePtr = null;
 var excHandler = 0;
 var lastJSError = null;
 var NTI1509949683 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
-var NTI570427212 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI570427150 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI1795162385 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
-var NTI570427123 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI570427070 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI570426863 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
+var NTI570427213 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
+var NTI570427151 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
+var NTI1795162443 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
+var NTI570427124 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
+var NTI570427071 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
+var NTI570426864 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
 var NTI956301382 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI570426780 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI1459618188 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI1459618179 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI570426731 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
 var NTI1509949785 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI1509949754 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI1509949630 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI1509949723 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI1509949942 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
-var NTI1442840925 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
-var NTI1795162118 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI1442840927 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI1795162119 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI1795162116 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
-var NTI1795162193 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
-var NTI1795162184 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
-var NTI1795162149 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI1795162194 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI1795162185 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI1795162150 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI1442840587 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI1509949446 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI1509949444 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
@@ -229,10 +229,10 @@ var NNI33555185 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI33555185.node = NNI33555185;
 NTI33555186.base = NTI33555183;
 NTI33555187.base = NTI33555183;
-var NNI33555183 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "parent", len: 0, typ: NTI33555186, name: "parent", sons: null}, 
-{kind: 1, offset: "name", len: 0, typ: NTI33554450, name: "name", sons: null}, 
-{kind: 1, offset: "message", len: 0, typ: NTI33554449, name: "msg", sons: null}, 
-{kind: 1, offset: "trace", len: 0, typ: NTI33554449, name: "trace", sons: null}, 
+var NNI33555183 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "parent", len: 0, typ: NTI33555186, name: "parent", sons: null},
+{kind: 1, offset: "name", len: 0, typ: NTI33554450, name: "name", sons: null},
+{kind: 1, offset: "message", len: 0, typ: NTI33554449, name: "msg", sons: null},
+{kind: 1, offset: "trace", len: 0, typ: NTI33554449, name: "trace", sons: null},
 {kind: 1, offset: "up", len: 0, typ: NTI33555187, name: "up", sons: null}]};
 NTI33555183.node = NNI33555183;
 var NNI33555179 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
@@ -255,328 +255,332 @@ NTI134217749.base = NTI33555184;
 var NNI134217751 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI134217751.node = NNI134217751;
 NTI134217751.base = NTI33555184;
-var NNI1761607683 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "backendBaseUrl", len: 0, typ: NTI33554449, name: "backendBaseUrl", sons: null}, 
+var NNI1761607683 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "backendBaseUrl", len: 0, typ: NTI33554449, name: "backendBaseUrl", sons: null},
 {kind: 1, offset: "pollIntervalMs", len: 0, typ: NTI33554435, name: "pollIntervalMs", sons: null}]};
 NTI1761607683.node = NNI1761607683;
-var NNI1426063368 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "label", len: 0, typ: NTI33554449, name: "label", sons: null}, 
+var NNI1426063368 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "label", len: 0, typ: NTI33554449, name: "label", sons: null},
 {kind: 1, offset: "value", len: 0, typ: NTI33554449, name: "value", sons: null}]};
 NTI1426063368.node = NNI1426063368;
 NTI1426063387.base = NTI1426063368;
 NTI1426063386.base = NTI33554449;
-var NNI1426063369 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "kind", len: 0, typ: NTI33554449, name: "kind", sons: null}, 
-{kind: 1, offset: "title", len: 0, typ: NTI33554449, name: "title", sons: null}, 
-{kind: 1, offset: "content", len: 0, typ: NTI33554449, name: "content", sons: null}, 
+var NNI1426063369 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "kind", len: 0, typ: NTI33554449, name: "kind", sons: null},
+{kind: 1, offset: "title", len: 0, typ: NTI33554449, name: "title", sons: null},
+{kind: 1, offset: "content", len: 0, typ: NTI33554449, name: "content", sons: null},
 {kind: 1, offset: "items", len: 0, typ: NTI1426063386, name: "items", sons: null}]};
 NTI1426063369.node = NNI1426063369;
 NTI1426063388.base = NTI1426063369;
-var NNI1426063370 = {kind: 2, len: 6, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "schema", len: 0, typ: NTI33554449, name: "schema", sons: null}, 
-{kind: 1, offset: "kind", len: 0, typ: NTI33554449, name: "kind", sons: null}, 
-{kind: 1, offset: "title", len: 0, typ: NTI33554449, name: "title", sons: null}, 
-{kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null}, 
-{kind: 1, offset: "fields", len: 0, typ: NTI1426063387, name: "fields", sons: null}, 
+var NNI1426063370 = {kind: 2, len: 6, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "schema", len: 0, typ: NTI33554449, name: "schema", sons: null},
+{kind: 1, offset: "kind", len: 0, typ: NTI33554449, name: "kind", sons: null},
+{kind: 1, offset: "title", len: 0, typ: NTI33554449, name: "title", sons: null},
+{kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null},
+{kind: 1, offset: "fields", len: 0, typ: NTI1426063387, name: "fields", sons: null},
 {kind: 1, offset: "sections", len: 0, typ: NTI1426063388, name: "sections", sons: null}]};
 NTI1426063370.node = NNI1426063370;
 NTI1426063390.base = NTI1426063370;
-var NNI1426063373 = {kind: 2, len: 7, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "active", len: 0, typ: NTI33554466, name: "active", sons: null}, 
-{kind: 1, offset: "request", len: 0, typ: NTI33554449, name: "request", sons: null}, 
-{kind: 1, offset: "jobId", len: 0, typ: NTI33554449, name: "jobId", sons: null}, 
-{kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null}, 
-{kind: 1, offset: "agent", len: 0, typ: NTI33554449, name: "agent", sons: null}, 
-{kind: 1, offset: "tool", len: 0, typ: NTI33554449, name: "tool", sons: null}, 
+var NNI1426063373 = {kind: 2, len: 7, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "active", len: 0, typ: NTI33554466, name: "active", sons: null},
+{kind: 1, offset: "request", len: 0, typ: NTI33554449, name: "request", sons: null},
+{kind: 1, offset: "jobId", len: 0, typ: NTI33554449, name: "jobId", sons: null},
+{kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null},
+{kind: 1, offset: "agent", len: 0, typ: NTI33554449, name: "agent", sons: null},
+{kind: 1, offset: "tool", len: 0, typ: NTI33554449, name: "tool", sons: null},
 {kind: 1, offset: "presentations", len: 0, typ: NTI1426063390, name: "presentations", sons: null}]};
 NTI1426063373.node = NNI1426063373;
-var NNI1426063374 = {kind: 2, len: 7, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "checked", len: 0, typ: NTI33554466, name: "checked", sons: null}, 
-{kind: 1, offset: "checking", len: 0, typ: NTI33554466, name: "checking", sons: null}, 
-{kind: 1, offset: "backendConnected", len: 0, typ: NTI33554466, name: "backendConnected", sons: null}, 
-{kind: 1, offset: "aiReachable", len: 0, typ: NTI33554466, name: "aiReachable", sons: null}, 
-{kind: 1, offset: "aiHealthy", len: 0, typ: NTI33554466, name: "aiHealthy", sons: null}, 
-{kind: 1, offset: "aiReady", len: 0, typ: NTI33554466, name: "aiReady", sons: null}, 
+var NNI1426063374 = {kind: 2, len: 11, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "checked", len: 0, typ: NTI33554466, name: "checked", sons: null},
+{kind: 1, offset: "checking", len: 0, typ: NTI33554466, name: "checking", sons: null},
+{kind: 1, offset: "backendConnected", len: 0, typ: NTI33554466, name: "backendConnected", sons: null},
+{kind: 1, offset: "aiReachable", len: 0, typ: NTI33554466, name: "aiReachable", sons: null},
+{kind: 1, offset: "aiHealthy", len: 0, typ: NTI33554466, name: "aiHealthy", sons: null},
+{kind: 1, offset: "aiReady", len: 0, typ: NTI33554466, name: "aiReady", sons: null},
+{kind: 1, offset: "paloAltoConfigured", len: 0, typ: NTI33554466, name: "paloAltoConfigured", sons: null},
+{kind: 1, offset: "paloAltoHost", len: 0, typ: NTI33554449, name: "paloAltoHost", sons: null},
+{kind: 1, offset: "paloAltoMode", len: 0, typ: NTI33554449, name: "paloAltoMode", sons: null},
+{kind: 1, offset: "integrationsError", len: 0, typ: NTI33554449, name: "integrationsError", sons: null},
 {kind: 1, offset: "error", len: 0, typ: NTI33554449, name: "error", sons: null}]};
 NTI1426063374.node = NNI1426063374;
-var NNI570426392 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "renderer0", len: 0, typ: NTI738198339, name: "renderer0", sons: null}, 
+var NNI570426392 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "renderer0", len: 0, typ: NTI738198339, name: "renderer0", sons: null},
 {kind: 1, offset: "clientPostRenderCallback1", len: 0, typ: NTI738198340, name: "clientPostRenderCallback1", sons: null}]};
 NTI570426392.node = NNI570426392;
 NTI570426392.base = NTI33555179;
-var NNI771751939 = {kind: 2, offset: 0, typ: null, name: null, len: 213, sons: {"0": {kind: 1, offset: 0, typ: NTI771751939, name: "#text", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI771751939, name: "#int", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI771751939, name: "#bool", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI771751939, name: "#vthunk", len: 0, sons: null}, 
-"4": {kind: 1, offset: 4, typ: NTI771751939, name: "#dthunk", len: 0, sons: null}, 
-"5": {kind: 1, offset: 5, typ: NTI771751939, name: "#component", len: 0, sons: null}, 
-"6": {kind: 1, offset: 6, typ: NTI771751939, name: "#verbatim", len: 0, sons: null}, 
-"7": {kind: 1, offset: 7, typ: NTI771751939, name: "html", len: 0, sons: null}, 
-"8": {kind: 1, offset: 8, typ: NTI771751939, name: "head", len: 0, sons: null}, 
-"9": {kind: 1, offset: 9, typ: NTI771751939, name: "title", len: 0, sons: null}, 
-"10": {kind: 1, offset: 10, typ: NTI771751939, name: "base", len: 0, sons: null}, 
-"11": {kind: 1, offset: 11, typ: NTI771751939, name: "link", len: 0, sons: null}, 
-"12": {kind: 1, offset: 12, typ: NTI771751939, name: "meta", len: 0, sons: null}, 
-"13": {kind: 1, offset: 13, typ: NTI771751939, name: "style", len: 0, sons: null}, 
-"14": {kind: 1, offset: 14, typ: NTI771751939, name: "script", len: 0, sons: null}, 
-"15": {kind: 1, offset: 15, typ: NTI771751939, name: "noscript", len: 0, sons: null}, 
-"16": {kind: 1, offset: 16, typ: NTI771751939, name: "body", len: 0, sons: null}, 
-"17": {kind: 1, offset: 17, typ: NTI771751939, name: "section", len: 0, sons: null}, 
-"18": {kind: 1, offset: 18, typ: NTI771751939, name: "nav", len: 0, sons: null}, 
-"19": {kind: 1, offset: 19, typ: NTI771751939, name: "article", len: 0, sons: null}, 
-"20": {kind: 1, offset: 20, typ: NTI771751939, name: "aside", len: 0, sons: null}, 
-"21": {kind: 1, offset: 21, typ: NTI771751939, name: "h1", len: 0, sons: null}, 
-"22": {kind: 1, offset: 22, typ: NTI771751939, name: "h2", len: 0, sons: null}, 
-"23": {kind: 1, offset: 23, typ: NTI771751939, name: "h3", len: 0, sons: null}, 
-"24": {kind: 1, offset: 24, typ: NTI771751939, name: "h4", len: 0, sons: null}, 
-"25": {kind: 1, offset: 25, typ: NTI771751939, name: "h5", len: 0, sons: null}, 
-"26": {kind: 1, offset: 26, typ: NTI771751939, name: "h6", len: 0, sons: null}, 
-"27": {kind: 1, offset: 27, typ: NTI771751939, name: "hgroup", len: 0, sons: null}, 
-"28": {kind: 1, offset: 28, typ: NTI771751939, name: "header", len: 0, sons: null}, 
-"29": {kind: 1, offset: 29, typ: NTI771751939, name: "footer", len: 0, sons: null}, 
-"30": {kind: 1, offset: 30, typ: NTI771751939, name: "address", len: 0, sons: null}, 
-"31": {kind: 1, offset: 31, typ: NTI771751939, name: "main", len: 0, sons: null}, 
-"32": {kind: 1, offset: 32, typ: NTI771751939, name: "p", len: 0, sons: null}, 
-"33": {kind: 1, offset: 33, typ: NTI771751939, name: "hr", len: 0, sons: null}, 
-"34": {kind: 1, offset: 34, typ: NTI771751939, name: "pre", len: 0, sons: null}, 
-"35": {kind: 1, offset: 35, typ: NTI771751939, name: "blockquote", len: 0, sons: null}, 
-"36": {kind: 1, offset: 36, typ: NTI771751939, name: "ol", len: 0, sons: null}, 
-"37": {kind: 1, offset: 37, typ: NTI771751939, name: "ul", len: 0, sons: null}, 
-"38": {kind: 1, offset: 38, typ: NTI771751939, name: "li", len: 0, sons: null}, 
-"39": {kind: 1, offset: 39, typ: NTI771751939, name: "dl", len: 0, sons: null}, 
-"40": {kind: 1, offset: 40, typ: NTI771751939, name: "dt", len: 0, sons: null}, 
-"41": {kind: 1, offset: 41, typ: NTI771751939, name: "dd", len: 0, sons: null}, 
-"42": {kind: 1, offset: 42, typ: NTI771751939, name: "figure", len: 0, sons: null}, 
-"43": {kind: 1, offset: 43, typ: NTI771751939, name: "figcaption", len: 0, sons: null}, 
-"44": {kind: 1, offset: 44, typ: NTI771751939, name: "div", len: 0, sons: null}, 
-"45": {kind: 1, offset: 45, typ: NTI771751939, name: "a", len: 0, sons: null}, 
-"46": {kind: 1, offset: 46, typ: NTI771751939, name: "em", len: 0, sons: null}, 
-"47": {kind: 1, offset: 47, typ: NTI771751939, name: "strong", len: 0, sons: null}, 
-"48": {kind: 1, offset: 48, typ: NTI771751939, name: "small", len: 0, sons: null}, 
-"49": {kind: 1, offset: 49, typ: NTI771751939, name: "s", len: 0, sons: null}, 
-"50": {kind: 1, offset: 50, typ: NTI771751939, name: "cite", len: 0, sons: null}, 
-"51": {kind: 1, offset: 51, typ: NTI771751939, name: "quote", len: 0, sons: null}, 
-"52": {kind: 1, offset: 52, typ: NTI771751939, name: "dfn", len: 0, sons: null}, 
-"53": {kind: 1, offset: 53, typ: NTI771751939, name: "abbr", len: 0, sons: null}, 
-"54": {kind: 1, offset: 54, typ: NTI771751939, name: "data", len: 0, sons: null}, 
-"55": {kind: 1, offset: 55, typ: NTI771751939, name: "time", len: 0, sons: null}, 
-"56": {kind: 1, offset: 56, typ: NTI771751939, name: "code", len: 0, sons: null}, 
-"57": {kind: 1, offset: 57, typ: NTI771751939, name: "var", len: 0, sons: null}, 
-"58": {kind: 1, offset: 58, typ: NTI771751939, name: "samp", len: 0, sons: null}, 
-"59": {kind: 1, offset: 59, typ: NTI771751939, name: "kbd", len: 0, sons: null}, 
-"60": {kind: 1, offset: 60, typ: NTI771751939, name: "sub", len: 0, sons: null}, 
-"61": {kind: 1, offset: 61, typ: NTI771751939, name: "sup", len: 0, sons: null}, 
-"62": {kind: 1, offset: 62, typ: NTI771751939, name: "i", len: 0, sons: null}, 
-"63": {kind: 1, offset: 63, typ: NTI771751939, name: "b", len: 0, sons: null}, 
-"64": {kind: 1, offset: 64, typ: NTI771751939, name: "u", len: 0, sons: null}, 
-"65": {kind: 1, offset: 65, typ: NTI771751939, name: "mark", len: 0, sons: null}, 
-"66": {kind: 1, offset: 66, typ: NTI771751939, name: "ruby", len: 0, sons: null}, 
-"67": {kind: 1, offset: 67, typ: NTI771751939, name: "rt", len: 0, sons: null}, 
-"68": {kind: 1, offset: 68, typ: NTI771751939, name: "rp", len: 0, sons: null}, 
-"69": {kind: 1, offset: 69, typ: NTI771751939, name: "bdi", len: 0, sons: null}, 
-"70": {kind: 1, offset: 70, typ: NTI771751939, name: "dbo", len: 0, sons: null}, 
-"71": {kind: 1, offset: 71, typ: NTI771751939, name: "span", len: 0, sons: null}, 
-"72": {kind: 1, offset: 72, typ: NTI771751939, name: "br", len: 0, sons: null}, 
-"73": {kind: 1, offset: 73, typ: NTI771751939, name: "wbr", len: 0, sons: null}, 
-"74": {kind: 1, offset: 74, typ: NTI771751939, name: "ins", len: 0, sons: null}, 
-"75": {kind: 1, offset: 75, typ: NTI771751939, name: "del", len: 0, sons: null}, 
-"76": {kind: 1, offset: 76, typ: NTI771751939, name: "img", len: 0, sons: null}, 
-"77": {kind: 1, offset: 77, typ: NTI771751939, name: "iframe", len: 0, sons: null}, 
-"78": {kind: 1, offset: 78, typ: NTI771751939, name: "embed", len: 0, sons: null}, 
-"79": {kind: 1, offset: 79, typ: NTI771751939, name: "object", len: 0, sons: null}, 
-"80": {kind: 1, offset: 80, typ: NTI771751939, name: "param", len: 0, sons: null}, 
-"81": {kind: 1, offset: 81, typ: NTI771751939, name: "video", len: 0, sons: null}, 
-"82": {kind: 1, offset: 82, typ: NTI771751939, name: "audio", len: 0, sons: null}, 
-"83": {kind: 1, offset: 83, typ: NTI771751939, name: "source", len: 0, sons: null}, 
-"84": {kind: 1, offset: 84, typ: NTI771751939, name: "track", len: 0, sons: null}, 
-"85": {kind: 1, offset: 85, typ: NTI771751939, name: "canvas", len: 0, sons: null}, 
-"86": {kind: 1, offset: 86, typ: NTI771751939, name: "map", len: 0, sons: null}, 
-"87": {kind: 1, offset: 87, typ: NTI771751939, name: "area", len: 0, sons: null}, 
-"88": {kind: 1, offset: 88, typ: NTI771751939, name: "animate", len: 0, sons: null}, 
-"89": {kind: 1, offset: 89, typ: NTI771751939, name: "animateMotion", len: 0, sons: null}, 
-"90": {kind: 1, offset: 90, typ: NTI771751939, name: "animateTransform", len: 0, sons: null}, 
-"91": {kind: 1, offset: 91, typ: NTI771751939, name: "circle", len: 0, sons: null}, 
-"92": {kind: 1, offset: 92, typ: NTI771751939, name: "clipPath", len: 0, sons: null}, 
-"93": {kind: 1, offset: 93, typ: NTI771751939, name: "defs", len: 0, sons: null}, 
-"94": {kind: 1, offset: 94, typ: NTI771751939, name: "desc", len: 0, sons: null}, 
-"95": {kind: 1, offset: 95, typ: NTI771751939, name: "discard", len: 0, sons: null}, 
-"96": {kind: 1, offset: 96, typ: NTI771751939, name: "ellipse", len: 0, sons: null}, 
-"97": {kind: 1, offset: 97, typ: NTI771751939, name: "feBlend", len: 0, sons: null}, 
-"98": {kind: 1, offset: 98, typ: NTI771751939, name: "feColorMatrix", len: 0, sons: null}, 
-"99": {kind: 1, offset: 99, typ: NTI771751939, name: "feComponentTransfer", len: 0, sons: null}, 
-"100": {kind: 1, offset: 100, typ: NTI771751939, name: "feComposite", len: 0, sons: null}, 
-"101": {kind: 1, offset: 101, typ: NTI771751939, name: "feConvolveMatrix", len: 0, sons: null}, 
-"102": {kind: 1, offset: 102, typ: NTI771751939, name: "feDiffuseLighting", len: 0, sons: null}, 
-"103": {kind: 1, offset: 103, typ: NTI771751939, name: "feDisplacementMap", len: 0, sons: null}, 
-"104": {kind: 1, offset: 104, typ: NTI771751939, name: "feDistantLight", len: 0, sons: null}, 
-"105": {kind: 1, offset: 105, typ: NTI771751939, name: "feDropShadow", len: 0, sons: null}, 
-"106": {kind: 1, offset: 106, typ: NTI771751939, name: "feFlood", len: 0, sons: null}, 
-"107": {kind: 1, offset: 107, typ: NTI771751939, name: "feFuncA", len: 0, sons: null}, 
-"108": {kind: 1, offset: 108, typ: NTI771751939, name: "feFuncB", len: 0, sons: null}, 
-"109": {kind: 1, offset: 109, typ: NTI771751939, name: "feFuncG", len: 0, sons: null}, 
-"110": {kind: 1, offset: 110, typ: NTI771751939, name: "feFuncR", len: 0, sons: null}, 
-"111": {kind: 1, offset: 111, typ: NTI771751939, name: "feGaussianBlur", len: 0, sons: null}, 
-"112": {kind: 1, offset: 112, typ: NTI771751939, name: "feImage", len: 0, sons: null}, 
-"113": {kind: 1, offset: 113, typ: NTI771751939, name: "feMerge", len: 0, sons: null}, 
-"114": {kind: 1, offset: 114, typ: NTI771751939, name: "feMergeNode", len: 0, sons: null}, 
-"115": {kind: 1, offset: 115, typ: NTI771751939, name: "feMorphology", len: 0, sons: null}, 
-"116": {kind: 1, offset: 116, typ: NTI771751939, name: "feOffset", len: 0, sons: null}, 
-"117": {kind: 1, offset: 117, typ: NTI771751939, name: "fePointLight", len: 0, sons: null}, 
-"118": {kind: 1, offset: 118, typ: NTI771751939, name: "feSpecularLighting", len: 0, sons: null}, 
-"119": {kind: 1, offset: 119, typ: NTI771751939, name: "feSpotLight", len: 0, sons: null}, 
-"120": {kind: 1, offset: 120, typ: NTI771751939, name: "feTile", len: 0, sons: null}, 
-"121": {kind: 1, offset: 121, typ: NTI771751939, name: "feTurbulence", len: 0, sons: null}, 
-"122": {kind: 1, offset: 122, typ: NTI771751939, name: "filter", len: 0, sons: null}, 
-"123": {kind: 1, offset: 123, typ: NTI771751939, name: "foreignObject", len: 0, sons: null}, 
-"124": {kind: 1, offset: 124, typ: NTI771751939, name: "g", len: 0, sons: null}, 
-"125": {kind: 1, offset: 125, typ: NTI771751939, name: "image", len: 0, sons: null}, 
-"126": {kind: 1, offset: 126, typ: NTI771751939, name: "line", len: 0, sons: null}, 
-"127": {kind: 1, offset: 127, typ: NTI771751939, name: "linearGradient", len: 0, sons: null}, 
-"128": {kind: 1, offset: 128, typ: NTI771751939, name: "marker", len: 0, sons: null}, 
-"129": {kind: 1, offset: 129, typ: NTI771751939, name: "mask", len: 0, sons: null}, 
-"130": {kind: 1, offset: 130, typ: NTI771751939, name: "metadata", len: 0, sons: null}, 
-"131": {kind: 1, offset: 131, typ: NTI771751939, name: "mpath", len: 0, sons: null}, 
-"132": {kind: 1, offset: 132, typ: NTI771751939, name: "path", len: 0, sons: null}, 
-"133": {kind: 1, offset: 133, typ: NTI771751939, name: "pattern", len: 0, sons: null}, 
-"134": {kind: 1, offset: 134, typ: NTI771751939, name: "polygon", len: 0, sons: null}, 
-"135": {kind: 1, offset: 135, typ: NTI771751939, name: "polyline", len: 0, sons: null}, 
-"136": {kind: 1, offset: 136, typ: NTI771751939, name: "radialGradient", len: 0, sons: null}, 
-"137": {kind: 1, offset: 137, typ: NTI771751939, name: "rect", len: 0, sons: null}, 
-"138": {kind: 1, offset: 138, typ: NTI771751939, name: "set", len: 0, sons: null}, 
-"139": {kind: 1, offset: 139, typ: NTI771751939, name: "stop", len: 0, sons: null}, 
-"140": {kind: 1, offset: 140, typ: NTI771751939, name: "svg", len: 0, sons: null}, 
-"141": {kind: 1, offset: 141, typ: NTI771751939, name: "switch", len: 0, sons: null}, 
-"142": {kind: 1, offset: 142, typ: NTI771751939, name: "symbol", len: 0, sons: null}, 
-"143": {kind: 1, offset: 143, typ: NTI771751939, name: "text", len: 0, sons: null}, 
-"144": {kind: 1, offset: 144, typ: NTI771751939, name: "textPath", len: 0, sons: null}, 
-"145": {kind: 1, offset: 145, typ: NTI771751939, name: "tspan", len: 0, sons: null}, 
-"146": {kind: 1, offset: 146, typ: NTI771751939, name: "unknown", len: 0, sons: null}, 
-"147": {kind: 1, offset: 147, typ: NTI771751939, name: "use", len: 0, sons: null}, 
-"148": {kind: 1, offset: 148, typ: NTI771751939, name: "view", len: 0, sons: null}, 
-"149": {kind: 1, offset: 149, typ: NTI771751939, name: "maction", len: 0, sons: null}, 
-"150": {kind: 1, offset: 150, typ: NTI771751939, name: "math", len: 0, sons: null}, 
-"151": {kind: 1, offset: 151, typ: NTI771751939, name: "menclose", len: 0, sons: null}, 
-"152": {kind: 1, offset: 152, typ: NTI771751939, name: "merror", len: 0, sons: null}, 
-"153": {kind: 1, offset: 153, typ: NTI771751939, name: "mfenced", len: 0, sons: null}, 
-"154": {kind: 1, offset: 154, typ: NTI771751939, name: "mfrac", len: 0, sons: null}, 
-"155": {kind: 1, offset: 155, typ: NTI771751939, name: "mglyph", len: 0, sons: null}, 
-"156": {kind: 1, offset: 156, typ: NTI771751939, name: "mi", len: 0, sons: null}, 
-"157": {kind: 1, offset: 157, typ: NTI771751939, name: "mlabeledtr", len: 0, sons: null}, 
-"158": {kind: 1, offset: 158, typ: NTI771751939, name: "mmultiscripts", len: 0, sons: null}, 
-"159": {kind: 1, offset: 159, typ: NTI771751939, name: "mn", len: 0, sons: null}, 
-"160": {kind: 1, offset: 160, typ: NTI771751939, name: "mo", len: 0, sons: null}, 
-"161": {kind: 1, offset: 161, typ: NTI771751939, name: "mover", len: 0, sons: null}, 
-"162": {kind: 1, offset: 162, typ: NTI771751939, name: "mpadded", len: 0, sons: null}, 
-"163": {kind: 1, offset: 163, typ: NTI771751939, name: "mphantom", len: 0, sons: null}, 
-"164": {kind: 1, offset: 164, typ: NTI771751939, name: "mroot", len: 0, sons: null}, 
-"165": {kind: 1, offset: 165, typ: NTI771751939, name: "mrow", len: 0, sons: null}, 
-"166": {kind: 1, offset: 166, typ: NTI771751939, name: "ms", len: 0, sons: null}, 
-"167": {kind: 1, offset: 167, typ: NTI771751939, name: "mspace", len: 0, sons: null}, 
-"168": {kind: 1, offset: 168, typ: NTI771751939, name: "msqrt", len: 0, sons: null}, 
-"169": {kind: 1, offset: 169, typ: NTI771751939, name: "mstyle", len: 0, sons: null}, 
-"170": {kind: 1, offset: 170, typ: NTI771751939, name: "msub", len: 0, sons: null}, 
-"171": {kind: 1, offset: 171, typ: NTI771751939, name: "msubsup", len: 0, sons: null}, 
-"172": {kind: 1, offset: 172, typ: NTI771751939, name: "msup", len: 0, sons: null}, 
-"173": {kind: 1, offset: 173, typ: NTI771751939, name: "mtable", len: 0, sons: null}, 
-"174": {kind: 1, offset: 174, typ: NTI771751939, name: "mtd", len: 0, sons: null}, 
-"175": {kind: 1, offset: 175, typ: NTI771751939, name: "mtext", len: 0, sons: null}, 
-"176": {kind: 1, offset: 176, typ: NTI771751939, name: "mtr", len: 0, sons: null}, 
-"177": {kind: 1, offset: 177, typ: NTI771751939, name: "munder", len: 0, sons: null}, 
-"178": {kind: 1, offset: 178, typ: NTI771751939, name: "munderover", len: 0, sons: null}, 
-"179": {kind: 1, offset: 179, typ: NTI771751939, name: "semantics", len: 0, sons: null}, 
-"180": {kind: 1, offset: 180, typ: NTI771751939, name: "table", len: 0, sons: null}, 
-"181": {kind: 1, offset: 181, typ: NTI771751939, name: "caption", len: 0, sons: null}, 
-"182": {kind: 1, offset: 182, typ: NTI771751939, name: "colgroup", len: 0, sons: null}, 
-"183": {kind: 1, offset: 183, typ: NTI771751939, name: "col", len: 0, sons: null}, 
-"184": {kind: 1, offset: 184, typ: NTI771751939, name: "tbody", len: 0, sons: null}, 
-"185": {kind: 1, offset: 185, typ: NTI771751939, name: "thead", len: 0, sons: null}, 
-"186": {kind: 1, offset: 186, typ: NTI771751939, name: "tfoot", len: 0, sons: null}, 
-"187": {kind: 1, offset: 187, typ: NTI771751939, name: "tr", len: 0, sons: null}, 
-"188": {kind: 1, offset: 188, typ: NTI771751939, name: "td", len: 0, sons: null}, 
-"189": {kind: 1, offset: 189, typ: NTI771751939, name: "th", len: 0, sons: null}, 
-"190": {kind: 1, offset: 190, typ: NTI771751939, name: "form", len: 0, sons: null}, 
-"191": {kind: 1, offset: 191, typ: NTI771751939, name: "fieldset", len: 0, sons: null}, 
-"192": {kind: 1, offset: 192, typ: NTI771751939, name: "legend", len: 0, sons: null}, 
-"193": {kind: 1, offset: 193, typ: NTI771751939, name: "label", len: 0, sons: null}, 
-"194": {kind: 1, offset: 194, typ: NTI771751939, name: "input", len: 0, sons: null}, 
-"195": {kind: 1, offset: 195, typ: NTI771751939, name: "button", len: 0, sons: null}, 
-"196": {kind: 1, offset: 196, typ: NTI771751939, name: "select", len: 0, sons: null}, 
-"197": {kind: 1, offset: 197, typ: NTI771751939, name: "datalist", len: 0, sons: null}, 
-"198": {kind: 1, offset: 198, typ: NTI771751939, name: "optgroup", len: 0, sons: null}, 
-"199": {kind: 1, offset: 199, typ: NTI771751939, name: "option", len: 0, sons: null}, 
-"200": {kind: 1, offset: 200, typ: NTI771751939, name: "textarea", len: 0, sons: null}, 
-"201": {kind: 1, offset: 201, typ: NTI771751939, name: "keygen", len: 0, sons: null}, 
-"202": {kind: 1, offset: 202, typ: NTI771751939, name: "output", len: 0, sons: null}, 
-"203": {kind: 1, offset: 203, typ: NTI771751939, name: "progress", len: 0, sons: null}, 
-"204": {kind: 1, offset: 204, typ: NTI771751939, name: "meter", len: 0, sons: null}, 
-"205": {kind: 1, offset: 205, typ: NTI771751939, name: "details", len: 0, sons: null}, 
-"206": {kind: 1, offset: 206, typ: NTI771751939, name: "summary", len: 0, sons: null}, 
-"207": {kind: 1, offset: 207, typ: NTI771751939, name: "command", len: 0, sons: null}, 
-"208": {kind: 1, offset: 208, typ: NTI771751939, name: "menu", len: 0, sons: null}, 
-"209": {kind: 1, offset: 209, typ: NTI771751939, name: "bdo", len: 0, sons: null}, 
-"210": {kind: 1, offset: 210, typ: NTI771751939, name: "dialog", len: 0, sons: null}, 
-"211": {kind: 1, offset: 211, typ: NTI771751939, name: "slot", len: 0, sons: null}, 
+var NNI771751939 = {kind: 2, offset: 0, typ: null, name: null, len: 213, sons: {"0": {kind: 1, offset: 0, typ: NTI771751939, name: "#text", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI771751939, name: "#int", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI771751939, name: "#bool", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI771751939, name: "#vthunk", len: 0, sons: null},
+"4": {kind: 1, offset: 4, typ: NTI771751939, name: "#dthunk", len: 0, sons: null},
+"5": {kind: 1, offset: 5, typ: NTI771751939, name: "#component", len: 0, sons: null},
+"6": {kind: 1, offset: 6, typ: NTI771751939, name: "#verbatim", len: 0, sons: null},
+"7": {kind: 1, offset: 7, typ: NTI771751939, name: "html", len: 0, sons: null},
+"8": {kind: 1, offset: 8, typ: NTI771751939, name: "head", len: 0, sons: null},
+"9": {kind: 1, offset: 9, typ: NTI771751939, name: "title", len: 0, sons: null},
+"10": {kind: 1, offset: 10, typ: NTI771751939, name: "base", len: 0, sons: null},
+"11": {kind: 1, offset: 11, typ: NTI771751939, name: "link", len: 0, sons: null},
+"12": {kind: 1, offset: 12, typ: NTI771751939, name: "meta", len: 0, sons: null},
+"13": {kind: 1, offset: 13, typ: NTI771751939, name: "style", len: 0, sons: null},
+"14": {kind: 1, offset: 14, typ: NTI771751939, name: "script", len: 0, sons: null},
+"15": {kind: 1, offset: 15, typ: NTI771751939, name: "noscript", len: 0, sons: null},
+"16": {kind: 1, offset: 16, typ: NTI771751939, name: "body", len: 0, sons: null},
+"17": {kind: 1, offset: 17, typ: NTI771751939, name: "section", len: 0, sons: null},
+"18": {kind: 1, offset: 18, typ: NTI771751939, name: "nav", len: 0, sons: null},
+"19": {kind: 1, offset: 19, typ: NTI771751939, name: "article", len: 0, sons: null},
+"20": {kind: 1, offset: 20, typ: NTI771751939, name: "aside", len: 0, sons: null},
+"21": {kind: 1, offset: 21, typ: NTI771751939, name: "h1", len: 0, sons: null},
+"22": {kind: 1, offset: 22, typ: NTI771751939, name: "h2", len: 0, sons: null},
+"23": {kind: 1, offset: 23, typ: NTI771751939, name: "h3", len: 0, sons: null},
+"24": {kind: 1, offset: 24, typ: NTI771751939, name: "h4", len: 0, sons: null},
+"25": {kind: 1, offset: 25, typ: NTI771751939, name: "h5", len: 0, sons: null},
+"26": {kind: 1, offset: 26, typ: NTI771751939, name: "h6", len: 0, sons: null},
+"27": {kind: 1, offset: 27, typ: NTI771751939, name: "hgroup", len: 0, sons: null},
+"28": {kind: 1, offset: 28, typ: NTI771751939, name: "header", len: 0, sons: null},
+"29": {kind: 1, offset: 29, typ: NTI771751939, name: "footer", len: 0, sons: null},
+"30": {kind: 1, offset: 30, typ: NTI771751939, name: "address", len: 0, sons: null},
+"31": {kind: 1, offset: 31, typ: NTI771751939, name: "main", len: 0, sons: null},
+"32": {kind: 1, offset: 32, typ: NTI771751939, name: "p", len: 0, sons: null},
+"33": {kind: 1, offset: 33, typ: NTI771751939, name: "hr", len: 0, sons: null},
+"34": {kind: 1, offset: 34, typ: NTI771751939, name: "pre", len: 0, sons: null},
+"35": {kind: 1, offset: 35, typ: NTI771751939, name: "blockquote", len: 0, sons: null},
+"36": {kind: 1, offset: 36, typ: NTI771751939, name: "ol", len: 0, sons: null},
+"37": {kind: 1, offset: 37, typ: NTI771751939, name: "ul", len: 0, sons: null},
+"38": {kind: 1, offset: 38, typ: NTI771751939, name: "li", len: 0, sons: null},
+"39": {kind: 1, offset: 39, typ: NTI771751939, name: "dl", len: 0, sons: null},
+"40": {kind: 1, offset: 40, typ: NTI771751939, name: "dt", len: 0, sons: null},
+"41": {kind: 1, offset: 41, typ: NTI771751939, name: "dd", len: 0, sons: null},
+"42": {kind: 1, offset: 42, typ: NTI771751939, name: "figure", len: 0, sons: null},
+"43": {kind: 1, offset: 43, typ: NTI771751939, name: "figcaption", len: 0, sons: null},
+"44": {kind: 1, offset: 44, typ: NTI771751939, name: "div", len: 0, sons: null},
+"45": {kind: 1, offset: 45, typ: NTI771751939, name: "a", len: 0, sons: null},
+"46": {kind: 1, offset: 46, typ: NTI771751939, name: "em", len: 0, sons: null},
+"47": {kind: 1, offset: 47, typ: NTI771751939, name: "strong", len: 0, sons: null},
+"48": {kind: 1, offset: 48, typ: NTI771751939, name: "small", len: 0, sons: null},
+"49": {kind: 1, offset: 49, typ: NTI771751939, name: "s", len: 0, sons: null},
+"50": {kind: 1, offset: 50, typ: NTI771751939, name: "cite", len: 0, sons: null},
+"51": {kind: 1, offset: 51, typ: NTI771751939, name: "quote", len: 0, sons: null},
+"52": {kind: 1, offset: 52, typ: NTI771751939, name: "dfn", len: 0, sons: null},
+"53": {kind: 1, offset: 53, typ: NTI771751939, name: "abbr", len: 0, sons: null},
+"54": {kind: 1, offset: 54, typ: NTI771751939, name: "data", len: 0, sons: null},
+"55": {kind: 1, offset: 55, typ: NTI771751939, name: "time", len: 0, sons: null},
+"56": {kind: 1, offset: 56, typ: NTI771751939, name: "code", len: 0, sons: null},
+"57": {kind: 1, offset: 57, typ: NTI771751939, name: "var", len: 0, sons: null},
+"58": {kind: 1, offset: 58, typ: NTI771751939, name: "samp", len: 0, sons: null},
+"59": {kind: 1, offset: 59, typ: NTI771751939, name: "kbd", len: 0, sons: null},
+"60": {kind: 1, offset: 60, typ: NTI771751939, name: "sub", len: 0, sons: null},
+"61": {kind: 1, offset: 61, typ: NTI771751939, name: "sup", len: 0, sons: null},
+"62": {kind: 1, offset: 62, typ: NTI771751939, name: "i", len: 0, sons: null},
+"63": {kind: 1, offset: 63, typ: NTI771751939, name: "b", len: 0, sons: null},
+"64": {kind: 1, offset: 64, typ: NTI771751939, name: "u", len: 0, sons: null},
+"65": {kind: 1, offset: 65, typ: NTI771751939, name: "mark", len: 0, sons: null},
+"66": {kind: 1, offset: 66, typ: NTI771751939, name: "ruby", len: 0, sons: null},
+"67": {kind: 1, offset: 67, typ: NTI771751939, name: "rt", len: 0, sons: null},
+"68": {kind: 1, offset: 68, typ: NTI771751939, name: "rp", len: 0, sons: null},
+"69": {kind: 1, offset: 69, typ: NTI771751939, name: "bdi", len: 0, sons: null},
+"70": {kind: 1, offset: 70, typ: NTI771751939, name: "dbo", len: 0, sons: null},
+"71": {kind: 1, offset: 71, typ: NTI771751939, name: "span", len: 0, sons: null},
+"72": {kind: 1, offset: 72, typ: NTI771751939, name: "br", len: 0, sons: null},
+"73": {kind: 1, offset: 73, typ: NTI771751939, name: "wbr", len: 0, sons: null},
+"74": {kind: 1, offset: 74, typ: NTI771751939, name: "ins", len: 0, sons: null},
+"75": {kind: 1, offset: 75, typ: NTI771751939, name: "del", len: 0, sons: null},
+"76": {kind: 1, offset: 76, typ: NTI771751939, name: "img", len: 0, sons: null},
+"77": {kind: 1, offset: 77, typ: NTI771751939, name: "iframe", len: 0, sons: null},
+"78": {kind: 1, offset: 78, typ: NTI771751939, name: "embed", len: 0, sons: null},
+"79": {kind: 1, offset: 79, typ: NTI771751939, name: "object", len: 0, sons: null},
+"80": {kind: 1, offset: 80, typ: NTI771751939, name: "param", len: 0, sons: null},
+"81": {kind: 1, offset: 81, typ: NTI771751939, name: "video", len: 0, sons: null},
+"82": {kind: 1, offset: 82, typ: NTI771751939, name: "audio", len: 0, sons: null},
+"83": {kind: 1, offset: 83, typ: NTI771751939, name: "source", len: 0, sons: null},
+"84": {kind: 1, offset: 84, typ: NTI771751939, name: "track", len: 0, sons: null},
+"85": {kind: 1, offset: 85, typ: NTI771751939, name: "canvas", len: 0, sons: null},
+"86": {kind: 1, offset: 86, typ: NTI771751939, name: "map", len: 0, sons: null},
+"87": {kind: 1, offset: 87, typ: NTI771751939, name: "area", len: 0, sons: null},
+"88": {kind: 1, offset: 88, typ: NTI771751939, name: "animate", len: 0, sons: null},
+"89": {kind: 1, offset: 89, typ: NTI771751939, name: "animateMotion", len: 0, sons: null},
+"90": {kind: 1, offset: 90, typ: NTI771751939, name: "animateTransform", len: 0, sons: null},
+"91": {kind: 1, offset: 91, typ: NTI771751939, name: "circle", len: 0, sons: null},
+"92": {kind: 1, offset: 92, typ: NTI771751939, name: "clipPath", len: 0, sons: null},
+"93": {kind: 1, offset: 93, typ: NTI771751939, name: "defs", len: 0, sons: null},
+"94": {kind: 1, offset: 94, typ: NTI771751939, name: "desc", len: 0, sons: null},
+"95": {kind: 1, offset: 95, typ: NTI771751939, name: "discard", len: 0, sons: null},
+"96": {kind: 1, offset: 96, typ: NTI771751939, name: "ellipse", len: 0, sons: null},
+"97": {kind: 1, offset: 97, typ: NTI771751939, name: "feBlend", len: 0, sons: null},
+"98": {kind: 1, offset: 98, typ: NTI771751939, name: "feColorMatrix", len: 0, sons: null},
+"99": {kind: 1, offset: 99, typ: NTI771751939, name: "feComponentTransfer", len: 0, sons: null},
+"100": {kind: 1, offset: 100, typ: NTI771751939, name: "feComposite", len: 0, sons: null},
+"101": {kind: 1, offset: 101, typ: NTI771751939, name: "feConvolveMatrix", len: 0, sons: null},
+"102": {kind: 1, offset: 102, typ: NTI771751939, name: "feDiffuseLighting", len: 0, sons: null},
+"103": {kind: 1, offset: 103, typ: NTI771751939, name: "feDisplacementMap", len: 0, sons: null},
+"104": {kind: 1, offset: 104, typ: NTI771751939, name: "feDistantLight", len: 0, sons: null},
+"105": {kind: 1, offset: 105, typ: NTI771751939, name: "feDropShadow", len: 0, sons: null},
+"106": {kind: 1, offset: 106, typ: NTI771751939, name: "feFlood", len: 0, sons: null},
+"107": {kind: 1, offset: 107, typ: NTI771751939, name: "feFuncA", len: 0, sons: null},
+"108": {kind: 1, offset: 108, typ: NTI771751939, name: "feFuncB", len: 0, sons: null},
+"109": {kind: 1, offset: 109, typ: NTI771751939, name: "feFuncG", len: 0, sons: null},
+"110": {kind: 1, offset: 110, typ: NTI771751939, name: "feFuncR", len: 0, sons: null},
+"111": {kind: 1, offset: 111, typ: NTI771751939, name: "feGaussianBlur", len: 0, sons: null},
+"112": {kind: 1, offset: 112, typ: NTI771751939, name: "feImage", len: 0, sons: null},
+"113": {kind: 1, offset: 113, typ: NTI771751939, name: "feMerge", len: 0, sons: null},
+"114": {kind: 1, offset: 114, typ: NTI771751939, name: "feMergeNode", len: 0, sons: null},
+"115": {kind: 1, offset: 115, typ: NTI771751939, name: "feMorphology", len: 0, sons: null},
+"116": {kind: 1, offset: 116, typ: NTI771751939, name: "feOffset", len: 0, sons: null},
+"117": {kind: 1, offset: 117, typ: NTI771751939, name: "fePointLight", len: 0, sons: null},
+"118": {kind: 1, offset: 118, typ: NTI771751939, name: "feSpecularLighting", len: 0, sons: null},
+"119": {kind: 1, offset: 119, typ: NTI771751939, name: "feSpotLight", len: 0, sons: null},
+"120": {kind: 1, offset: 120, typ: NTI771751939, name: "feTile", len: 0, sons: null},
+"121": {kind: 1, offset: 121, typ: NTI771751939, name: "feTurbulence", len: 0, sons: null},
+"122": {kind: 1, offset: 122, typ: NTI771751939, name: "filter", len: 0, sons: null},
+"123": {kind: 1, offset: 123, typ: NTI771751939, name: "foreignObject", len: 0, sons: null},
+"124": {kind: 1, offset: 124, typ: NTI771751939, name: "g", len: 0, sons: null},
+"125": {kind: 1, offset: 125, typ: NTI771751939, name: "image", len: 0, sons: null},
+"126": {kind: 1, offset: 126, typ: NTI771751939, name: "line", len: 0, sons: null},
+"127": {kind: 1, offset: 127, typ: NTI771751939, name: "linearGradient", len: 0, sons: null},
+"128": {kind: 1, offset: 128, typ: NTI771751939, name: "marker", len: 0, sons: null},
+"129": {kind: 1, offset: 129, typ: NTI771751939, name: "mask", len: 0, sons: null},
+"130": {kind: 1, offset: 130, typ: NTI771751939, name: "metadata", len: 0, sons: null},
+"131": {kind: 1, offset: 131, typ: NTI771751939, name: "mpath", len: 0, sons: null},
+"132": {kind: 1, offset: 132, typ: NTI771751939, name: "path", len: 0, sons: null},
+"133": {kind: 1, offset: 133, typ: NTI771751939, name: "pattern", len: 0, sons: null},
+"134": {kind: 1, offset: 134, typ: NTI771751939, name: "polygon", len: 0, sons: null},
+"135": {kind: 1, offset: 135, typ: NTI771751939, name: "polyline", len: 0, sons: null},
+"136": {kind: 1, offset: 136, typ: NTI771751939, name: "radialGradient", len: 0, sons: null},
+"137": {kind: 1, offset: 137, typ: NTI771751939, name: "rect", len: 0, sons: null},
+"138": {kind: 1, offset: 138, typ: NTI771751939, name: "set", len: 0, sons: null},
+"139": {kind: 1, offset: 139, typ: NTI771751939, name: "stop", len: 0, sons: null},
+"140": {kind: 1, offset: 140, typ: NTI771751939, name: "svg", len: 0, sons: null},
+"141": {kind: 1, offset: 141, typ: NTI771751939, name: "switch", len: 0, sons: null},
+"142": {kind: 1, offset: 142, typ: NTI771751939, name: "symbol", len: 0, sons: null},
+"143": {kind: 1, offset: 143, typ: NTI771751939, name: "text", len: 0, sons: null},
+"144": {kind: 1, offset: 144, typ: NTI771751939, name: "textPath", len: 0, sons: null},
+"145": {kind: 1, offset: 145, typ: NTI771751939, name: "tspan", len: 0, sons: null},
+"146": {kind: 1, offset: 146, typ: NTI771751939, name: "unknown", len: 0, sons: null},
+"147": {kind: 1, offset: 147, typ: NTI771751939, name: "use", len: 0, sons: null},
+"148": {kind: 1, offset: 148, typ: NTI771751939, name: "view", len: 0, sons: null},
+"149": {kind: 1, offset: 149, typ: NTI771751939, name: "maction", len: 0, sons: null},
+"150": {kind: 1, offset: 150, typ: NTI771751939, name: "math", len: 0, sons: null},
+"151": {kind: 1, offset: 151, typ: NTI771751939, name: "menclose", len: 0, sons: null},
+"152": {kind: 1, offset: 152, typ: NTI771751939, name: "merror", len: 0, sons: null},
+"153": {kind: 1, offset: 153, typ: NTI771751939, name: "mfenced", len: 0, sons: null},
+"154": {kind: 1, offset: 154, typ: NTI771751939, name: "mfrac", len: 0, sons: null},
+"155": {kind: 1, offset: 155, typ: NTI771751939, name: "mglyph", len: 0, sons: null},
+"156": {kind: 1, offset: 156, typ: NTI771751939, name: "mi", len: 0, sons: null},
+"157": {kind: 1, offset: 157, typ: NTI771751939, name: "mlabeledtr", len: 0, sons: null},
+"158": {kind: 1, offset: 158, typ: NTI771751939, name: "mmultiscripts", len: 0, sons: null},
+"159": {kind: 1, offset: 159, typ: NTI771751939, name: "mn", len: 0, sons: null},
+"160": {kind: 1, offset: 160, typ: NTI771751939, name: "mo", len: 0, sons: null},
+"161": {kind: 1, offset: 161, typ: NTI771751939, name: "mover", len: 0, sons: null},
+"162": {kind: 1, offset: 162, typ: NTI771751939, name: "mpadded", len: 0, sons: null},
+"163": {kind: 1, offset: 163, typ: NTI771751939, name: "mphantom", len: 0, sons: null},
+"164": {kind: 1, offset: 164, typ: NTI771751939, name: "mroot", len: 0, sons: null},
+"165": {kind: 1, offset: 165, typ: NTI771751939, name: "mrow", len: 0, sons: null},
+"166": {kind: 1, offset: 166, typ: NTI771751939, name: "ms", len: 0, sons: null},
+"167": {kind: 1, offset: 167, typ: NTI771751939, name: "mspace", len: 0, sons: null},
+"168": {kind: 1, offset: 168, typ: NTI771751939, name: "msqrt", len: 0, sons: null},
+"169": {kind: 1, offset: 169, typ: NTI771751939, name: "mstyle", len: 0, sons: null},
+"170": {kind: 1, offset: 170, typ: NTI771751939, name: "msub", len: 0, sons: null},
+"171": {kind: 1, offset: 171, typ: NTI771751939, name: "msubsup", len: 0, sons: null},
+"172": {kind: 1, offset: 172, typ: NTI771751939, name: "msup", len: 0, sons: null},
+"173": {kind: 1, offset: 173, typ: NTI771751939, name: "mtable", len: 0, sons: null},
+"174": {kind: 1, offset: 174, typ: NTI771751939, name: "mtd", len: 0, sons: null},
+"175": {kind: 1, offset: 175, typ: NTI771751939, name: "mtext", len: 0, sons: null},
+"176": {kind: 1, offset: 176, typ: NTI771751939, name: "mtr", len: 0, sons: null},
+"177": {kind: 1, offset: 177, typ: NTI771751939, name: "munder", len: 0, sons: null},
+"178": {kind: 1, offset: 178, typ: NTI771751939, name: "munderover", len: 0, sons: null},
+"179": {kind: 1, offset: 179, typ: NTI771751939, name: "semantics", len: 0, sons: null},
+"180": {kind: 1, offset: 180, typ: NTI771751939, name: "table", len: 0, sons: null},
+"181": {kind: 1, offset: 181, typ: NTI771751939, name: "caption", len: 0, sons: null},
+"182": {kind: 1, offset: 182, typ: NTI771751939, name: "colgroup", len: 0, sons: null},
+"183": {kind: 1, offset: 183, typ: NTI771751939, name: "col", len: 0, sons: null},
+"184": {kind: 1, offset: 184, typ: NTI771751939, name: "tbody", len: 0, sons: null},
+"185": {kind: 1, offset: 185, typ: NTI771751939, name: "thead", len: 0, sons: null},
+"186": {kind: 1, offset: 186, typ: NTI771751939, name: "tfoot", len: 0, sons: null},
+"187": {kind: 1, offset: 187, typ: NTI771751939, name: "tr", len: 0, sons: null},
+"188": {kind: 1, offset: 188, typ: NTI771751939, name: "td", len: 0, sons: null},
+"189": {kind: 1, offset: 189, typ: NTI771751939, name: "th", len: 0, sons: null},
+"190": {kind: 1, offset: 190, typ: NTI771751939, name: "form", len: 0, sons: null},
+"191": {kind: 1, offset: 191, typ: NTI771751939, name: "fieldset", len: 0, sons: null},
+"192": {kind: 1, offset: 192, typ: NTI771751939, name: "legend", len: 0, sons: null},
+"193": {kind: 1, offset: 193, typ: NTI771751939, name: "label", len: 0, sons: null},
+"194": {kind: 1, offset: 194, typ: NTI771751939, name: "input", len: 0, sons: null},
+"195": {kind: 1, offset: 195, typ: NTI771751939, name: "button", len: 0, sons: null},
+"196": {kind: 1, offset: 196, typ: NTI771751939, name: "select", len: 0, sons: null},
+"197": {kind: 1, offset: 197, typ: NTI771751939, name: "datalist", len: 0, sons: null},
+"198": {kind: 1, offset: 198, typ: NTI771751939, name: "optgroup", len: 0, sons: null},
+"199": {kind: 1, offset: 199, typ: NTI771751939, name: "option", len: 0, sons: null},
+"200": {kind: 1, offset: 200, typ: NTI771751939, name: "textarea", len: 0, sons: null},
+"201": {kind: 1, offset: 201, typ: NTI771751939, name: "keygen", len: 0, sons: null},
+"202": {kind: 1, offset: 202, typ: NTI771751939, name: "output", len: 0, sons: null},
+"203": {kind: 1, offset: 203, typ: NTI771751939, name: "progress", len: 0, sons: null},
+"204": {kind: 1, offset: 204, typ: NTI771751939, name: "meter", len: 0, sons: null},
+"205": {kind: 1, offset: 205, typ: NTI771751939, name: "details", len: 0, sons: null},
+"206": {kind: 1, offset: 206, typ: NTI771751939, name: "summary", len: 0, sons: null},
+"207": {kind: 1, offset: 207, typ: NTI771751939, name: "command", len: 0, sons: null},
+"208": {kind: 1, offset: 208, typ: NTI771751939, name: "menu", len: 0, sons: null},
+"209": {kind: 1, offset: 209, typ: NTI771751939, name: "bdo", len: 0, sons: null},
+"210": {kind: 1, offset: 210, typ: NTI771751939, name: "dialog", len: 0, sons: null},
+"211": {kind: 1, offset: 211, typ: NTI771751939, name: "slot", len: 0, sons: null},
 "212": {kind: 1, offset: 212, typ: NTI771751939, name: "template", len: 0, sons: null}}};
 NTI771751939.node = NNI771751939;
 NTI771752031.base = NTI771752027;
 NTI771752032.base = NTI33554450;
-var NNI771751944 = {kind: 2, offset: 0, typ: null, name: null, len: 61, sons: {"0": {kind: 1, offset: 0, typ: NTI771751944, name: "onclick", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI771751944, name: "oncontextmenu", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI771751944, name: "ondblclick", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI771751944, name: "onkeyup", len: 0, sons: null}, 
-"4": {kind: 1, offset: 4, typ: NTI771751944, name: "onkeydown", len: 0, sons: null}, 
-"5": {kind: 1, offset: 5, typ: NTI771751944, name: "onkeypressed", len: 0, sons: null}, 
-"6": {kind: 1, offset: 6, typ: NTI771751944, name: "onfocus", len: 0, sons: null}, 
-"7": {kind: 1, offset: 7, typ: NTI771751944, name: "onblur", len: 0, sons: null}, 
-"8": {kind: 1, offset: 8, typ: NTI771751944, name: "onchange", len: 0, sons: null}, 
-"9": {kind: 1, offset: 9, typ: NTI771751944, name: "onscroll", len: 0, sons: null}, 
-"10": {kind: 1, offset: 10, typ: NTI771751944, name: "onmousedown", len: 0, sons: null}, 
-"11": {kind: 1, offset: 11, typ: NTI771751944, name: "onmouseenter", len: 0, sons: null}, 
-"12": {kind: 1, offset: 12, typ: NTI771751944, name: "onmouseleave", len: 0, sons: null}, 
-"13": {kind: 1, offset: 13, typ: NTI771751944, name: "onmousemove", len: 0, sons: null}, 
-"14": {kind: 1, offset: 14, typ: NTI771751944, name: "onmouseout", len: 0, sons: null}, 
-"15": {kind: 1, offset: 15, typ: NTI771751944, name: "onmouseover", len: 0, sons: null}, 
-"16": {kind: 1, offset: 16, typ: NTI771751944, name: "onmouseup", len: 0, sons: null}, 
-"17": {kind: 1, offset: 17, typ: NTI771751944, name: "ondrag", len: 0, sons: null}, 
-"18": {kind: 1, offset: 18, typ: NTI771751944, name: "ondragend", len: 0, sons: null}, 
-"19": {kind: 1, offset: 19, typ: NTI771751944, name: "ondragenter", len: 0, sons: null}, 
-"20": {kind: 1, offset: 20, typ: NTI771751944, name: "ondragleave", len: 0, sons: null}, 
-"21": {kind: 1, offset: 21, typ: NTI771751944, name: "ondragover", len: 0, sons: null}, 
-"22": {kind: 1, offset: 22, typ: NTI771751944, name: "ondragstart", len: 0, sons: null}, 
-"23": {kind: 1, offset: 23, typ: NTI771751944, name: "ondrop", len: 0, sons: null}, 
-"24": {kind: 1, offset: 24, typ: NTI771751944, name: "onsubmit", len: 0, sons: null}, 
-"25": {kind: 1, offset: 25, typ: NTI771751944, name: "oninput", len: 0, sons: null}, 
-"26": {kind: 1, offset: 26, typ: NTI771751944, name: "onanimationstart", len: 0, sons: null}, 
-"27": {kind: 1, offset: 27, typ: NTI771751944, name: "onanimationend", len: 0, sons: null}, 
-"28": {kind: 1, offset: 28, typ: NTI771751944, name: "onanimationiteration", len: 0, sons: null}, 
-"29": {kind: 1, offset: 29, typ: NTI771751944, name: "onkeyupenter", len: 0, sons: null}, 
-"30": {kind: 1, offset: 30, typ: NTI771751944, name: "onkeyuplater", len: 0, sons: null}, 
-"31": {kind: 1, offset: 31, typ: NTI771751944, name: "onload", len: 0, sons: null}, 
-"32": {kind: 1, offset: 32, typ: NTI771751944, name: "ontransitioncancel", len: 0, sons: null}, 
-"33": {kind: 1, offset: 33, typ: NTI771751944, name: "ontransitionend", len: 0, sons: null}, 
-"34": {kind: 1, offset: 34, typ: NTI771751944, name: "ontransitionrun", len: 0, sons: null}, 
-"35": {kind: 1, offset: 35, typ: NTI771751944, name: "ontransitionstart", len: 0, sons: null}, 
-"36": {kind: 1, offset: 36, typ: NTI771751944, name: "onpaste", len: 0, sons: null}, 
-"37": {kind: 1, offset: 37, typ: NTI771751944, name: "onwheel", len: 0, sons: null}, 
-"38": {kind: 1, offset: 38, typ: NTI771751944, name: "onaudioprocess", len: 0, sons: null}, 
-"39": {kind: 1, offset: 39, typ: NTI771751944, name: "oncanplay", len: 0, sons: null}, 
-"40": {kind: 1, offset: 40, typ: NTI771751944, name: "oncanplaythrough", len: 0, sons: null}, 
-"41": {kind: 1, offset: 41, typ: NTI771751944, name: "oncomplete", len: 0, sons: null}, 
-"42": {kind: 1, offset: 42, typ: NTI771751944, name: "ondurationchange", len: 0, sons: null}, 
-"43": {kind: 1, offset: 43, typ: NTI771751944, name: "onemptied", len: 0, sons: null}, 
-"44": {kind: 1, offset: 44, typ: NTI771751944, name: "onended", len: 0, sons: null}, 
-"45": {kind: 1, offset: 45, typ: NTI771751944, name: "onerror", len: 0, sons: null}, 
-"46": {kind: 1, offset: 46, typ: NTI771751944, name: "onloadeddata", len: 0, sons: null}, 
-"47": {kind: 1, offset: 47, typ: NTI771751944, name: "onloadedmetadata", len: 0, sons: null}, 
-"48": {kind: 1, offset: 48, typ: NTI771751944, name: "onloadstart", len: 0, sons: null}, 
-"49": {kind: 1, offset: 49, typ: NTI771751944, name: "onpause", len: 0, sons: null}, 
-"50": {kind: 1, offset: 50, typ: NTI771751944, name: "onplay", len: 0, sons: null}, 
-"51": {kind: 1, offset: 51, typ: NTI771751944, name: "onplaying", len: 0, sons: null}, 
-"52": {kind: 1, offset: 52, typ: NTI771751944, name: "onprogress", len: 0, sons: null}, 
-"53": {kind: 1, offset: 53, typ: NTI771751944, name: "onratechange", len: 0, sons: null}, 
-"54": {kind: 1, offset: 54, typ: NTI771751944, name: "onseeked", len: 0, sons: null}, 
-"55": {kind: 1, offset: 55, typ: NTI771751944, name: "onseeking", len: 0, sons: null}, 
-"56": {kind: 1, offset: 56, typ: NTI771751944, name: "onstalled", len: 0, sons: null}, 
-"57": {kind: 1, offset: 57, typ: NTI771751944, name: "onsuspend", len: 0, sons: null}, 
-"58": {kind: 1, offset: 58, typ: NTI771751944, name: "ontimeupdate", len: 0, sons: null}, 
-"59": {kind: 1, offset: 59, typ: NTI771751944, name: "onvolumechange", len: 0, sons: null}, 
+var NNI771751944 = {kind: 2, offset: 0, typ: null, name: null, len: 61, sons: {"0": {kind: 1, offset: 0, typ: NTI771751944, name: "onclick", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI771751944, name: "oncontextmenu", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI771751944, name: "ondblclick", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI771751944, name: "onkeyup", len: 0, sons: null},
+"4": {kind: 1, offset: 4, typ: NTI771751944, name: "onkeydown", len: 0, sons: null},
+"5": {kind: 1, offset: 5, typ: NTI771751944, name: "onkeypressed", len: 0, sons: null},
+"6": {kind: 1, offset: 6, typ: NTI771751944, name: "onfocus", len: 0, sons: null},
+"7": {kind: 1, offset: 7, typ: NTI771751944, name: "onblur", len: 0, sons: null},
+"8": {kind: 1, offset: 8, typ: NTI771751944, name: "onchange", len: 0, sons: null},
+"9": {kind: 1, offset: 9, typ: NTI771751944, name: "onscroll", len: 0, sons: null},
+"10": {kind: 1, offset: 10, typ: NTI771751944, name: "onmousedown", len: 0, sons: null},
+"11": {kind: 1, offset: 11, typ: NTI771751944, name: "onmouseenter", len: 0, sons: null},
+"12": {kind: 1, offset: 12, typ: NTI771751944, name: "onmouseleave", len: 0, sons: null},
+"13": {kind: 1, offset: 13, typ: NTI771751944, name: "onmousemove", len: 0, sons: null},
+"14": {kind: 1, offset: 14, typ: NTI771751944, name: "onmouseout", len: 0, sons: null},
+"15": {kind: 1, offset: 15, typ: NTI771751944, name: "onmouseover", len: 0, sons: null},
+"16": {kind: 1, offset: 16, typ: NTI771751944, name: "onmouseup", len: 0, sons: null},
+"17": {kind: 1, offset: 17, typ: NTI771751944, name: "ondrag", len: 0, sons: null},
+"18": {kind: 1, offset: 18, typ: NTI771751944, name: "ondragend", len: 0, sons: null},
+"19": {kind: 1, offset: 19, typ: NTI771751944, name: "ondragenter", len: 0, sons: null},
+"20": {kind: 1, offset: 20, typ: NTI771751944, name: "ondragleave", len: 0, sons: null},
+"21": {kind: 1, offset: 21, typ: NTI771751944, name: "ondragover", len: 0, sons: null},
+"22": {kind: 1, offset: 22, typ: NTI771751944, name: "ondragstart", len: 0, sons: null},
+"23": {kind: 1, offset: 23, typ: NTI771751944, name: "ondrop", len: 0, sons: null},
+"24": {kind: 1, offset: 24, typ: NTI771751944, name: "onsubmit", len: 0, sons: null},
+"25": {kind: 1, offset: 25, typ: NTI771751944, name: "oninput", len: 0, sons: null},
+"26": {kind: 1, offset: 26, typ: NTI771751944, name: "onanimationstart", len: 0, sons: null},
+"27": {kind: 1, offset: 27, typ: NTI771751944, name: "onanimationend", len: 0, sons: null},
+"28": {kind: 1, offset: 28, typ: NTI771751944, name: "onanimationiteration", len: 0, sons: null},
+"29": {kind: 1, offset: 29, typ: NTI771751944, name: "onkeyupenter", len: 0, sons: null},
+"30": {kind: 1, offset: 30, typ: NTI771751944, name: "onkeyuplater", len: 0, sons: null},
+"31": {kind: 1, offset: 31, typ: NTI771751944, name: "onload", len: 0, sons: null},
+"32": {kind: 1, offset: 32, typ: NTI771751944, name: "ontransitioncancel", len: 0, sons: null},
+"33": {kind: 1, offset: 33, typ: NTI771751944, name: "ontransitionend", len: 0, sons: null},
+"34": {kind: 1, offset: 34, typ: NTI771751944, name: "ontransitionrun", len: 0, sons: null},
+"35": {kind: 1, offset: 35, typ: NTI771751944, name: "ontransitionstart", len: 0, sons: null},
+"36": {kind: 1, offset: 36, typ: NTI771751944, name: "onpaste", len: 0, sons: null},
+"37": {kind: 1, offset: 37, typ: NTI771751944, name: "onwheel", len: 0, sons: null},
+"38": {kind: 1, offset: 38, typ: NTI771751944, name: "onaudioprocess", len: 0, sons: null},
+"39": {kind: 1, offset: 39, typ: NTI771751944, name: "oncanplay", len: 0, sons: null},
+"40": {kind: 1, offset: 40, typ: NTI771751944, name: "oncanplaythrough", len: 0, sons: null},
+"41": {kind: 1, offset: 41, typ: NTI771751944, name: "oncomplete", len: 0, sons: null},
+"42": {kind: 1, offset: 42, typ: NTI771751944, name: "ondurationchange", len: 0, sons: null},
+"43": {kind: 1, offset: 43, typ: NTI771751944, name: "onemptied", len: 0, sons: null},
+"44": {kind: 1, offset: 44, typ: NTI771751944, name: "onended", len: 0, sons: null},
+"45": {kind: 1, offset: 45, typ: NTI771751944, name: "onerror", len: 0, sons: null},
+"46": {kind: 1, offset: 46, typ: NTI771751944, name: "onloadeddata", len: 0, sons: null},
+"47": {kind: 1, offset: 47, typ: NTI771751944, name: "onloadedmetadata", len: 0, sons: null},
+"48": {kind: 1, offset: 48, typ: NTI771751944, name: "onloadstart", len: 0, sons: null},
+"49": {kind: 1, offset: 49, typ: NTI771751944, name: "onpause", len: 0, sons: null},
+"50": {kind: 1, offset: 50, typ: NTI771751944, name: "onplay", len: 0, sons: null},
+"51": {kind: 1, offset: 51, typ: NTI771751944, name: "onplaying", len: 0, sons: null},
+"52": {kind: 1, offset: 52, typ: NTI771751944, name: "onprogress", len: 0, sons: null},
+"53": {kind: 1, offset: 53, typ: NTI771751944, name: "onratechange", len: 0, sons: null},
+"54": {kind: 1, offset: 54, typ: NTI771751944, name: "onseeked", len: 0, sons: null},
+"55": {kind: 1, offset: 55, typ: NTI771751944, name: "onseeking", len: 0, sons: null},
+"56": {kind: 1, offset: 56, typ: NTI771751944, name: "onstalled", len: 0, sons: null},
+"57": {kind: 1, offset: 57, typ: NTI771751944, name: "onsuspend", len: 0, sons: null},
+"58": {kind: 1, offset: 58, typ: NTI771751944, name: "ontimeupdate", len: 0, sons: null},
+"59": {kind: 1, offset: 59, typ: NTI771751944, name: "onvolumechange", len: 0, sons: null},
 "60": {kind: 1, offset: 60, typ: NTI771751944, name: "onwaiting", len: 0, sons: null}}};
 NTI771751944.node = NNI771751944;
-var NNI771752029 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI771751944, name: "Field0", sons: null}, 
-{kind: 1, offset: "Field1", len: 0, typ: NTI771752039, name: "Field1", sons: null}, 
+var NNI771752029 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI771751944, name: "Field0", sons: null},
+{kind: 1, offset: "Field1", len: 0, typ: NTI771752039, name: "Field1", sons: null},
 {kind: 1, offset: "Field2", len: 0, typ: NTI771752040, name: "Field2", sons: null}]};
 NTI771752029.node = NNI771752029;
 NTI771752025.base = NTI771752029;
@@ -586,17 +590,17 @@ NTI838860852.base = NTI838860853;
 NTI855638131.base = NTI855638032;
 NTI855638132.base = NTI855638032;
 NTI855638133.base = NTI855638032;
-var NNI855638031 = {kind: 2, offset: 0, typ: null, name: null, len: 12, sons: {"1": {kind: 1, offset: 1, typ: NTI855638031, name: "ElementNode", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI855638031, name: "AttributeNode", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI855638031, name: "TextNode", len: 0, sons: null}, 
-"4": {kind: 1, offset: 4, typ: NTI855638031, name: "CDATANode", len: 0, sons: null}, 
-"5": {kind: 1, offset: 5, typ: NTI855638031, name: "EntityRefNode", len: 0, sons: null}, 
-"6": {kind: 1, offset: 6, typ: NTI855638031, name: "EntityNode", len: 0, sons: null}, 
-"7": {kind: 1, offset: 7, typ: NTI855638031, name: "ProcessingInstructionNode", len: 0, sons: null}, 
-"8": {kind: 1, offset: 8, typ: NTI855638031, name: "CommentNode", len: 0, sons: null}, 
-"9": {kind: 1, offset: 9, typ: NTI855638031, name: "DocumentNode", len: 0, sons: null}, 
-"10": {kind: 1, offset: 10, typ: NTI855638031, name: "DocumentTypeNode", len: 0, sons: null}, 
-"11": {kind: 1, offset: 11, typ: NTI855638031, name: "DocumentFragmentNode", len: 0, sons: null}, 
+var NNI855638031 = {kind: 2, offset: 0, typ: null, name: null, len: 12, sons: {"1": {kind: 1, offset: 1, typ: NTI855638031, name: "ElementNode", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI855638031, name: "AttributeNode", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI855638031, name: "TextNode", len: 0, sons: null},
+"4": {kind: 1, offset: 4, typ: NTI855638031, name: "CDATANode", len: 0, sons: null},
+"5": {kind: 1, offset: 5, typ: NTI855638031, name: "EntityRefNode", len: 0, sons: null},
+"6": {kind: 1, offset: 6, typ: NTI855638031, name: "EntityNode", len: 0, sons: null},
+"7": {kind: 1, offset: 7, typ: NTI855638031, name: "ProcessingInstructionNode", len: 0, sons: null},
+"8": {kind: 1, offset: 8, typ: NTI855638031, name: "CommentNode", len: 0, sons: null},
+"9": {kind: 1, offset: 9, typ: NTI855638031, name: "DocumentNode", len: 0, sons: null},
+"10": {kind: 1, offset: 10, typ: NTI855638031, name: "DocumentTypeNode", len: 0, sons: null},
+"11": {kind: 1, offset: 11, typ: NTI855638031, name: "DocumentFragmentNode", len: 0, sons: null},
 "12": {kind: 1, offset: 12, typ: NTI855638031, name: "NotationNode", len: 0, sons: null}}};
 NTI855638031.node = NNI855638031;
 var NNI855638127 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
@@ -604,86 +608,86 @@ NTI855638127.node = NNI855638127;
 NTI855638127.base = NTI33555179;
 NTI855638030.base = NTI855638127;
 NTI855638156.base = NTI855638034;
-var NNI855638155 = {kind: 2, len: 10, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "acceptCharset", len: 0, typ: NTI33554450, name: "acceptCharset", sons: null}, 
-{kind: 1, offset: "action", len: 0, typ: NTI33554450, name: "action", sons: null}, 
-{kind: 1, offset: "autocomplete", len: 0, typ: NTI33554450, name: "autocomplete", sons: null}, 
-{kind: 1, offset: "elements", len: 0, typ: NTI855638156, name: "elements", sons: null}, 
-{kind: 1, offset: "encoding", len: 0, typ: NTI33554450, name: "encoding", sons: null}, 
-{kind: 1, offset: "enctype", len: 0, typ: NTI33554450, name: "enctype", sons: null}, 
-{kind: 1, offset: "length", len: 0, typ: NTI33554435, name: "length", sons: null}, 
-{kind: 1, offset: "method", len: 0, typ: NTI33554450, name: "method", sons: null}, 
-{kind: 1, offset: "noValidate", len: 0, typ: NTI33554466, name: "noValidate", sons: null}, 
+var NNI855638155 = {kind: 2, len: 10, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "acceptCharset", len: 0, typ: NTI33554450, name: "acceptCharset", sons: null},
+{kind: 1, offset: "action", len: 0, typ: NTI33554450, name: "action", sons: null},
+{kind: 1, offset: "autocomplete", len: 0, typ: NTI33554450, name: "autocomplete", sons: null},
+{kind: 1, offset: "elements", len: 0, typ: NTI855638156, name: "elements", sons: null},
+{kind: 1, offset: "encoding", len: 0, typ: NTI33554450, name: "encoding", sons: null},
+{kind: 1, offset: "enctype", len: 0, typ: NTI33554450, name: "enctype", sons: null},
+{kind: 1, offset: "length", len: 0, typ: NTI33554435, name: "length", sons: null},
+{kind: 1, offset: "method", len: 0, typ: NTI33554450, name: "method", sons: null},
+{kind: 1, offset: "noValidate", len: 0, typ: NTI33554466, name: "noValidate", sons: null},
 {kind: 1, offset: "target", len: 0, typ: NTI33554450, name: "target", sons: null}]};
 NTI855638155.node = NNI855638155;
 NTI855638155.base = NTI855638141;
 NTI855638044.base = NTI855638155;
-var NNI855638154 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "defaultSelected", len: 0, typ: NTI33554466, name: "defaultSelected", sons: null}, 
-{kind: 1, offset: "selected", len: 0, typ: NTI33554466, name: "selected", sons: null}, 
-{kind: 1, offset: "selectedIndex", len: 0, typ: NTI33554435, name: "selectedIndex", sons: null}, 
-{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null}, 
+var NNI855638154 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "defaultSelected", len: 0, typ: NTI33554466, name: "defaultSelected", sons: null},
+{kind: 1, offset: "selected", len: 0, typ: NTI33554466, name: "selected", sons: null},
+{kind: 1, offset: "selectedIndex", len: 0, typ: NTI33554435, name: "selectedIndex", sons: null},
+{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null},
 {kind: 1, offset: "value", len: 0, typ: NTI33554450, name: "value", sons: null}]};
 NTI855638154.node = NNI855638154;
 NTI855638154.base = NTI855638141;
 NTI855638043.base = NTI855638154;
 NTI855638142.base = NTI855638043;
 NTI855638143.base = NTI855638043;
-var NNI855638141 = {kind: 2, len: 20, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "className", len: 0, typ: NTI33554450, name: "className", sons: null}, 
-{kind: 1, offset: "classList", len: 0, typ: NTI855638030, name: "classList", sons: null}, 
-{kind: 1, offset: "checked", len: 0, typ: NTI33554466, name: "checked", sons: null}, 
-{kind: 1, offset: "defaultChecked", len: 0, typ: NTI33554466, name: "defaultChecked", sons: null}, 
-{kind: 1, offset: "defaultValue", len: 0, typ: NTI33554450, name: "defaultValue", sons: null}, 
-{kind: 1, offset: "disabled", len: 0, typ: NTI33554466, name: "disabled", sons: null}, 
-{kind: 1, offset: "form", len: 0, typ: NTI855638044, name: "form", sons: null}, 
-{kind: 1, offset: "name", len: 0, typ: NTI33554450, name: "name", sons: null}, 
-{kind: 1, offset: "readOnly", len: 0, typ: NTI33554466, name: "readOnly", sons: null}, 
-{kind: 1, offset: "options", len: 0, typ: NTI855638142, name: "options", sons: null}, 
-{kind: 1, offset: "selectedOptions", len: 0, typ: NTI855638143, name: "selectedOptions", sons: null}, 
-{kind: 1, offset: "clientWidth", len: 0, typ: NTI33554435, name: "clientWidth", sons: null}, 
-{kind: 1, offset: "clientHeight", len: 0, typ: NTI33554435, name: "clientHeight", sons: null}, 
-{kind: 1, offset: "contentEditable", len: 0, typ: NTI33554450, name: "contentEditable", sons: null}, 
-{kind: 1, offset: "isContentEditable", len: 0, typ: NTI33554466, name: "isContentEditable", sons: null}, 
-{kind: 1, offset: "dir", len: 0, typ: NTI33554450, name: "dir", sons: null}, 
-{kind: 1, offset: "offsetHeight", len: 0, typ: NTI33554435, name: "offsetHeight", sons: null}, 
-{kind: 1, offset: "offsetWidth", len: 0, typ: NTI33554435, name: "offsetWidth", sons: null}, 
-{kind: 1, offset: "offsetLeft", len: 0, typ: NTI33554435, name: "offsetLeft", sons: null}, 
+var NNI855638141 = {kind: 2, len: 20, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "className", len: 0, typ: NTI33554450, name: "className", sons: null},
+{kind: 1, offset: "classList", len: 0, typ: NTI855638030, name: "classList", sons: null},
+{kind: 1, offset: "checked", len: 0, typ: NTI33554466, name: "checked", sons: null},
+{kind: 1, offset: "defaultChecked", len: 0, typ: NTI33554466, name: "defaultChecked", sons: null},
+{kind: 1, offset: "defaultValue", len: 0, typ: NTI33554450, name: "defaultValue", sons: null},
+{kind: 1, offset: "disabled", len: 0, typ: NTI33554466, name: "disabled", sons: null},
+{kind: 1, offset: "form", len: 0, typ: NTI855638044, name: "form", sons: null},
+{kind: 1, offset: "name", len: 0, typ: NTI33554450, name: "name", sons: null},
+{kind: 1, offset: "readOnly", len: 0, typ: NTI33554466, name: "readOnly", sons: null},
+{kind: 1, offset: "options", len: 0, typ: NTI855638142, name: "options", sons: null},
+{kind: 1, offset: "selectedOptions", len: 0, typ: NTI855638143, name: "selectedOptions", sons: null},
+{kind: 1, offset: "clientWidth", len: 0, typ: NTI33554435, name: "clientWidth", sons: null},
+{kind: 1, offset: "clientHeight", len: 0, typ: NTI33554435, name: "clientHeight", sons: null},
+{kind: 1, offset: "contentEditable", len: 0, typ: NTI33554450, name: "contentEditable", sons: null},
+{kind: 1, offset: "isContentEditable", len: 0, typ: NTI33554466, name: "isContentEditable", sons: null},
+{kind: 1, offset: "dir", len: 0, typ: NTI33554450, name: "dir", sons: null},
+{kind: 1, offset: "offsetHeight", len: 0, typ: NTI33554435, name: "offsetHeight", sons: null},
+{kind: 1, offset: "offsetWidth", len: 0, typ: NTI33554435, name: "offsetWidth", sons: null},
+{kind: 1, offset: "offsetLeft", len: 0, typ: NTI33554435, name: "offsetLeft", sons: null},
 {kind: 1, offset: "offsetTop", len: 0, typ: NTI33554435, name: "offsetTop", sons: null}]};
 NTI855638141.node = NNI855638141;
 NTI855638141.base = NTI855638130;
 NTI855638034.base = NTI855638141;
-var NNI855638153 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null}, 
-{kind: 1, offset: "x", len: 0, typ: NTI33554435, name: "x", sons: null}, 
+var NNI855638153 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null},
+{kind: 1, offset: "x", len: 0, typ: NTI33554435, name: "x", sons: null},
 {kind: 1, offset: "y", len: 0, typ: NTI33554435, name: "y", sons: null}]};
 NTI855638153.node = NNI855638153;
 NTI855638153.base = NTI855638141;
 NTI855638042.base = NTI855638153;
 NTI855638135.base = NTI855638042;
 NTI855638136.base = NTI855638044;
-var NNI855638157 = {kind: 2, len: 8, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "border", len: 0, typ: NTI33554435, name: "border", sons: null}, 
-{kind: 1, offset: "complete", len: 0, typ: NTI33554466, name: "complete", sons: null}, 
-{kind: 1, offset: "height", len: 0, typ: NTI33554435, name: "height", sons: null}, 
-{kind: 1, offset: "hspace", len: 0, typ: NTI33554435, name: "hspace", sons: null}, 
-{kind: 1, offset: "lowsrc", len: 0, typ: NTI33554450, name: "lowsrc", sons: null}, 
-{kind: 1, offset: "src", len: 0, typ: NTI33554450, name: "src", sons: null}, 
-{kind: 1, offset: "vspace", len: 0, typ: NTI33554435, name: "vspace", sons: null}, 
+var NNI855638157 = {kind: 2, len: 8, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "border", len: 0, typ: NTI33554435, name: "border", sons: null},
+{kind: 1, offset: "complete", len: 0, typ: NTI33554466, name: "complete", sons: null},
+{kind: 1, offset: "height", len: 0, typ: NTI33554435, name: "height", sons: null},
+{kind: 1, offset: "hspace", len: 0, typ: NTI33554435, name: "hspace", sons: null},
+{kind: 1, offset: "lowsrc", len: 0, typ: NTI33554450, name: "lowsrc", sons: null},
+{kind: 1, offset: "src", len: 0, typ: NTI33554450, name: "src", sons: null},
+{kind: 1, offset: "vspace", len: 0, typ: NTI33554435, name: "vspace", sons: null},
 {kind: 1, offset: "width", len: 0, typ: NTI33554435, name: "width", sons: null}]};
 NTI855638157.node = NNI855638157;
 NTI855638157.base = NTI855638141;
 NTI855638045.base = NTI855638157;
 NTI855638137.base = NTI855638045;
 NTI855638138.base = NTI855638034;
-var NNI855638152 = {kind: 2, len: 6, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "height", len: 0, typ: NTI33554435, name: "height", sons: null}, 
-{kind: 1, offset: "hspace", len: 0, typ: NTI33554435, name: "hspace", sons: null}, 
-{kind: 1, offset: "src", len: 0, typ: NTI33554450, name: "src", sons: null}, 
-{kind: 1, offset: "width", len: 0, typ: NTI33554435, name: "width", sons: null}, 
-{kind: 1, offset: "type", len: 0, typ: NTI33554450, name: "type", sons: null}, 
+var NNI855638152 = {kind: 2, len: 6, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "height", len: 0, typ: NTI33554435, name: "height", sons: null},
+{kind: 1, offset: "hspace", len: 0, typ: NTI33554435, name: "hspace", sons: null},
+{kind: 1, offset: "src", len: 0, typ: NTI33554450, name: "src", sons: null},
+{kind: 1, offset: "width", len: 0, typ: NTI33554435, name: "width", sons: null},
+{kind: 1, offset: "type", len: 0, typ: NTI33554450, name: "type", sons: null},
 {kind: 1, offset: "vspace", len: 0, typ: NTI33554435, name: "vspace", sons: null}]};
 NTI855638152.node = NNI855638152;
 NTI855638152.base = NTI855638141;
 NTI855638041.base = NTI855638152;
 NTI855638139.base = NTI855638041;
-var NNI855638151 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "target", len: 0, typ: NTI33554450, name: "target", sons: null}, 
-{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null}, 
-{kind: 1, offset: "x", len: 0, typ: NTI33554435, name: "x", sons: null}, 
+var NNI855638151 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "target", len: 0, typ: NTI33554450, name: "target", sons: null},
+{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null},
+{kind: 1, offset: "x", len: 0, typ: NTI33554435, name: "x", sons: null},
 {kind: 1, offset: "y", len: 0, typ: NTI33554435, name: "y", sons: null}]};
 NTI855638151.node = NNI855638151;
 NTI855638151.base = NTI855638141;
@@ -692,509 +696,509 @@ NTI855638140.base = NTI855638040;
 var NNI855638201 = {kind: 1, offset: "then", len: 0, typ: NTI855638202, name: "then", sons: null};
 NTI855638201.node = NNI855638201;
 NTI855638081.base = NTI855638201;
-var NNI855638204 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "ready", len: 0, typ: NTI855638081, name: "ready", sons: null}, 
+var NNI855638204 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "ready", len: 0, typ: NTI855638081, name: "ready", sons: null},
 {kind: 1, offset: "onloadingdone", len: 0, typ: NTI855638205, name: "onloadingdone", sons: null}]};
 NTI855638204.node = NNI855638204;
 NTI855638082.base = NTI855638204;
-var NNI855638134 = {kind: 2, len: 25, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "activeElement", len: 0, typ: NTI855638034, name: "activeElement", sons: null}, 
-{kind: 1, offset: "documentElement", len: 0, typ: NTI855638034, name: "documentElement", sons: null}, 
-{kind: 1, offset: "alinkColor", len: 0, typ: NTI33554450, name: "alinkColor", sons: null}, 
-{kind: 1, offset: "bgColor", len: 0, typ: NTI33554450, name: "bgColor", sons: null}, 
-{kind: 1, offset: "body", len: 0, typ: NTI855638034, name: "body", sons: null}, 
-{kind: 1, offset: "charset", len: 0, typ: NTI33554450, name: "charset", sons: null}, 
-{kind: 1, offset: "cookie", len: 0, typ: NTI33554450, name: "cookie", sons: null}, 
-{kind: 1, offset: "defaultCharset", len: 0, typ: NTI33554450, name: "defaultCharset", sons: null}, 
-{kind: 1, offset: "fgColor", len: 0, typ: NTI33554450, name: "fgColor", sons: null}, 
-{kind: 1, offset: "head", len: 0, typ: NTI855638034, name: "head", sons: null}, 
-{kind: 1, offset: "hidden", len: 0, typ: NTI33554466, name: "hidden", sons: null}, 
-{kind: 1, offset: "lastModified", len: 0, typ: NTI33554450, name: "lastModified", sons: null}, 
-{kind: 1, offset: "linkColor", len: 0, typ: NTI33554450, name: "linkColor", sons: null}, 
-{kind: 1, offset: "referrer", len: 0, typ: NTI33554450, name: "referrer", sons: null}, 
-{kind: 1, offset: "title", len: 0, typ: NTI33554450, name: "title", sons: null}, 
-{kind: 1, offset: "URL", len: 0, typ: NTI33554450, name: "URL", sons: null}, 
-{kind: 1, offset: "visibilityState", len: 0, typ: NTI33554450, name: "visibilityState", sons: null}, 
-{kind: 1, offset: "vlinkColor", len: 0, typ: NTI33554450, name: "vlinkColor", sons: null}, 
-{kind: 1, offset: "anchors", len: 0, typ: NTI855638135, name: "anchors", sons: null}, 
-{kind: 1, offset: "forms", len: 0, typ: NTI855638136, name: "forms", sons: null}, 
-{kind: 1, offset: "images", len: 0, typ: NTI855638137, name: "images", sons: null}, 
-{kind: 1, offset: "applets", len: 0, typ: NTI855638138, name: "applets", sons: null}, 
-{kind: 1, offset: "embeds", len: 0, typ: NTI855638139, name: "embeds", sons: null}, 
-{kind: 1, offset: "links", len: 0, typ: NTI855638140, name: "links", sons: null}, 
+var NNI855638134 = {kind: 2, len: 25, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "activeElement", len: 0, typ: NTI855638034, name: "activeElement", sons: null},
+{kind: 1, offset: "documentElement", len: 0, typ: NTI855638034, name: "documentElement", sons: null},
+{kind: 1, offset: "alinkColor", len: 0, typ: NTI33554450, name: "alinkColor", sons: null},
+{kind: 1, offset: "bgColor", len: 0, typ: NTI33554450, name: "bgColor", sons: null},
+{kind: 1, offset: "body", len: 0, typ: NTI855638034, name: "body", sons: null},
+{kind: 1, offset: "charset", len: 0, typ: NTI33554450, name: "charset", sons: null},
+{kind: 1, offset: "cookie", len: 0, typ: NTI33554450, name: "cookie", sons: null},
+{kind: 1, offset: "defaultCharset", len: 0, typ: NTI33554450, name: "defaultCharset", sons: null},
+{kind: 1, offset: "fgColor", len: 0, typ: NTI33554450, name: "fgColor", sons: null},
+{kind: 1, offset: "head", len: 0, typ: NTI855638034, name: "head", sons: null},
+{kind: 1, offset: "hidden", len: 0, typ: NTI33554466, name: "hidden", sons: null},
+{kind: 1, offset: "lastModified", len: 0, typ: NTI33554450, name: "lastModified", sons: null},
+{kind: 1, offset: "linkColor", len: 0, typ: NTI33554450, name: "linkColor", sons: null},
+{kind: 1, offset: "referrer", len: 0, typ: NTI33554450, name: "referrer", sons: null},
+{kind: 1, offset: "title", len: 0, typ: NTI33554450, name: "title", sons: null},
+{kind: 1, offset: "URL", len: 0, typ: NTI33554450, name: "URL", sons: null},
+{kind: 1, offset: "visibilityState", len: 0, typ: NTI33554450, name: "visibilityState", sons: null},
+{kind: 1, offset: "vlinkColor", len: 0, typ: NTI33554450, name: "vlinkColor", sons: null},
+{kind: 1, offset: "anchors", len: 0, typ: NTI855638135, name: "anchors", sons: null},
+{kind: 1, offset: "forms", len: 0, typ: NTI855638136, name: "forms", sons: null},
+{kind: 1, offset: "images", len: 0, typ: NTI855638137, name: "images", sons: null},
+{kind: 1, offset: "applets", len: 0, typ: NTI855638138, name: "applets", sons: null},
+{kind: 1, offset: "embeds", len: 0, typ: NTI855638139, name: "embeds", sons: null},
+{kind: 1, offset: "links", len: 0, typ: NTI855638140, name: "links", sons: null},
 {kind: 1, offset: "fonts", len: 0, typ: NTI855638082, name: "fonts", sons: null}]};
 NTI855638134.node = NNI855638134;
 NTI855638134.base = NTI855638130;
 NTI855638033.base = NTI855638134;
-var NNI855638158 = {kind: 2, len: 368, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "alignContent", len: 0, typ: NTI33554450, name: "alignContent", sons: null}, 
-{kind: 1, offset: "alignItems", len: 0, typ: NTI33554450, name: "alignItems", sons: null}, 
-{kind: 1, offset: "alignSelf", len: 0, typ: NTI33554450, name: "alignSelf", sons: null}, 
-{kind: 1, offset: "all", len: 0, typ: NTI33554450, name: "all", sons: null}, 
-{kind: 1, offset: "animation", len: 0, typ: NTI33554450, name: "animation", sons: null}, 
-{kind: 1, offset: "animationDelay", len: 0, typ: NTI33554450, name: "animationDelay", sons: null}, 
-{kind: 1, offset: "animationDirection", len: 0, typ: NTI33554450, name: "animationDirection", sons: null}, 
-{kind: 1, offset: "animationDuration", len: 0, typ: NTI33554450, name: "animationDuration", sons: null}, 
-{kind: 1, offset: "animationFillMode", len: 0, typ: NTI33554450, name: "animationFillMode", sons: null}, 
-{kind: 1, offset: "animationIterationCount", len: 0, typ: NTI33554450, name: "animationIterationCount", sons: null}, 
-{kind: 1, offset: "animationName", len: 0, typ: NTI33554450, name: "animationName", sons: null}, 
-{kind: 1, offset: "animationPlayState", len: 0, typ: NTI33554450, name: "animationPlayState", sons: null}, 
-{kind: 1, offset: "animationTimingFunction", len: 0, typ: NTI33554450, name: "animationTimingFunction", sons: null}, 
-{kind: 1, offset: "backdropFilter", len: 0, typ: NTI33554450, name: "backdropFilter", sons: null}, 
-{kind: 1, offset: "backfaceVisibility", len: 0, typ: NTI33554450, name: "backfaceVisibility", sons: null}, 
-{kind: 1, offset: "background", len: 0, typ: NTI33554450, name: "background", sons: null}, 
-{kind: 1, offset: "backgroundAttachment", len: 0, typ: NTI33554450, name: "backgroundAttachment", sons: null}, 
-{kind: 1, offset: "backgroundBlendMode", len: 0, typ: NTI33554450, name: "backgroundBlendMode", sons: null}, 
-{kind: 1, offset: "backgroundClip", len: 0, typ: NTI33554450, name: "backgroundClip", sons: null}, 
-{kind: 1, offset: "backgroundColor", len: 0, typ: NTI33554450, name: "backgroundColor", sons: null}, 
-{kind: 1, offset: "backgroundImage", len: 0, typ: NTI33554450, name: "backgroundImage", sons: null}, 
-{kind: 1, offset: "backgroundOrigin", len: 0, typ: NTI33554450, name: "backgroundOrigin", sons: null}, 
-{kind: 1, offset: "backgroundPosition", len: 0, typ: NTI33554450, name: "backgroundPosition", sons: null}, 
-{kind: 1, offset: "backgroundRepeat", len: 0, typ: NTI33554450, name: "backgroundRepeat", sons: null}, 
-{kind: 1, offset: "backgroundSize", len: 0, typ: NTI33554450, name: "backgroundSize", sons: null}, 
-{kind: 1, offset: "blockSize", len: 0, typ: NTI33554450, name: "blockSize", sons: null}, 
-{kind: 1, offset: "border", len: 0, typ: NTI33554450, name: "border", sons: null}, 
-{kind: 1, offset: "borderBlock", len: 0, typ: NTI33554450, name: "borderBlock", sons: null}, 
-{kind: 1, offset: "borderBlockColor", len: 0, typ: NTI33554450, name: "borderBlockColor", sons: null}, 
-{kind: 1, offset: "borderBlockEnd", len: 0, typ: NTI33554450, name: "borderBlockEnd", sons: null}, 
-{kind: 1, offset: "borderBlockEndColor", len: 0, typ: NTI33554450, name: "borderBlockEndColor", sons: null}, 
-{kind: 1, offset: "borderBlockEndStyle", len: 0, typ: NTI33554450, name: "borderBlockEndStyle", sons: null}, 
-{kind: 1, offset: "borderBlockEndWidth", len: 0, typ: NTI33554450, name: "borderBlockEndWidth", sons: null}, 
-{kind: 1, offset: "borderBlockStart", len: 0, typ: NTI33554450, name: "borderBlockStart", sons: null}, 
-{kind: 1, offset: "borderBlockStartColor", len: 0, typ: NTI33554450, name: "borderBlockStartColor", sons: null}, 
-{kind: 1, offset: "borderBlockStartStyle", len: 0, typ: NTI33554450, name: "borderBlockStartStyle", sons: null}, 
-{kind: 1, offset: "borderBlockStartWidth", len: 0, typ: NTI33554450, name: "borderBlockStartWidth", sons: null}, 
-{kind: 1, offset: "borderBlockStyle", len: 0, typ: NTI33554450, name: "borderBlockStyle", sons: null}, 
-{kind: 1, offset: "borderBlockWidth", len: 0, typ: NTI33554450, name: "borderBlockWidth", sons: null}, 
-{kind: 1, offset: "borderBottom", len: 0, typ: NTI33554450, name: "borderBottom", sons: null}, 
-{kind: 1, offset: "borderBottomColor", len: 0, typ: NTI33554450, name: "borderBottomColor", sons: null}, 
-{kind: 1, offset: "borderBottomLeftRadius", len: 0, typ: NTI33554450, name: "borderBottomLeftRadius", sons: null}, 
-{kind: 1, offset: "borderBottomRightRadius", len: 0, typ: NTI33554450, name: "borderBottomRightRadius", sons: null}, 
-{kind: 1, offset: "borderBottomStyle", len: 0, typ: NTI33554450, name: "borderBottomStyle", sons: null}, 
-{kind: 1, offset: "borderBottomWidth", len: 0, typ: NTI33554450, name: "borderBottomWidth", sons: null}, 
-{kind: 1, offset: "borderCollapse", len: 0, typ: NTI33554450, name: "borderCollapse", sons: null}, 
-{kind: 1, offset: "borderColor", len: 0, typ: NTI33554450, name: "borderColor", sons: null}, 
-{kind: 1, offset: "borderEndEndRadius", len: 0, typ: NTI33554450, name: "borderEndEndRadius", sons: null}, 
-{kind: 1, offset: "borderEndStartRadius", len: 0, typ: NTI33554450, name: "borderEndStartRadius", sons: null}, 
-{kind: 1, offset: "borderImage", len: 0, typ: NTI33554450, name: "borderImage", sons: null}, 
-{kind: 1, offset: "borderImageOutset", len: 0, typ: NTI33554450, name: "borderImageOutset", sons: null}, 
-{kind: 1, offset: "borderImageRepeat", len: 0, typ: NTI33554450, name: "borderImageRepeat", sons: null}, 
-{kind: 1, offset: "borderImageSlice", len: 0, typ: NTI33554450, name: "borderImageSlice", sons: null}, 
-{kind: 1, offset: "borderImageSource", len: 0, typ: NTI33554450, name: "borderImageSource", sons: null}, 
-{kind: 1, offset: "borderImageWidth", len: 0, typ: NTI33554450, name: "borderImageWidth", sons: null}, 
-{kind: 1, offset: "borderInline", len: 0, typ: NTI33554450, name: "borderInline", sons: null}, 
-{kind: 1, offset: "borderInlineColor", len: 0, typ: NTI33554450, name: "borderInlineColor", sons: null}, 
-{kind: 1, offset: "borderInlineEnd", len: 0, typ: NTI33554450, name: "borderInlineEnd", sons: null}, 
-{kind: 1, offset: "borderInlineEndColor", len: 0, typ: NTI33554450, name: "borderInlineEndColor", sons: null}, 
-{kind: 1, offset: "borderInlineEndStyle", len: 0, typ: NTI33554450, name: "borderInlineEndStyle", sons: null}, 
-{kind: 1, offset: "borderInlineEndWidth", len: 0, typ: NTI33554450, name: "borderInlineEndWidth", sons: null}, 
-{kind: 1, offset: "borderInlineStart", len: 0, typ: NTI33554450, name: "borderInlineStart", sons: null}, 
-{kind: 1, offset: "borderInlineStartColor", len: 0, typ: NTI33554450, name: "borderInlineStartColor", sons: null}, 
-{kind: 1, offset: "borderInlineStartStyle", len: 0, typ: NTI33554450, name: "borderInlineStartStyle", sons: null}, 
-{kind: 1, offset: "borderInlineStartWidth", len: 0, typ: NTI33554450, name: "borderInlineStartWidth", sons: null}, 
-{kind: 1, offset: "borderInlineStyle", len: 0, typ: NTI33554450, name: "borderInlineStyle", sons: null}, 
-{kind: 1, offset: "borderInlineWidth", len: 0, typ: NTI33554450, name: "borderInlineWidth", sons: null}, 
-{kind: 1, offset: "borderLeft", len: 0, typ: NTI33554450, name: "borderLeft", sons: null}, 
-{kind: 1, offset: "borderLeftColor", len: 0, typ: NTI33554450, name: "borderLeftColor", sons: null}, 
-{kind: 1, offset: "borderLeftStyle", len: 0, typ: NTI33554450, name: "borderLeftStyle", sons: null}, 
-{kind: 1, offset: "borderLeftWidth", len: 0, typ: NTI33554450, name: "borderLeftWidth", sons: null}, 
-{kind: 1, offset: "borderRadius", len: 0, typ: NTI33554450, name: "borderRadius", sons: null}, 
-{kind: 1, offset: "borderRight", len: 0, typ: NTI33554450, name: "borderRight", sons: null}, 
-{kind: 1, offset: "borderRightColor", len: 0, typ: NTI33554450, name: "borderRightColor", sons: null}, 
-{kind: 1, offset: "borderRightStyle", len: 0, typ: NTI33554450, name: "borderRightStyle", sons: null}, 
-{kind: 1, offset: "borderRightWidth", len: 0, typ: NTI33554450, name: "borderRightWidth", sons: null}, 
-{kind: 1, offset: "borderSpacing", len: 0, typ: NTI33554450, name: "borderSpacing", sons: null}, 
-{kind: 1, offset: "borderStartEndRadius", len: 0, typ: NTI33554450, name: "borderStartEndRadius", sons: null}, 
-{kind: 1, offset: "borderStartStartRadius", len: 0, typ: NTI33554450, name: "borderStartStartRadius", sons: null}, 
-{kind: 1, offset: "borderStyle", len: 0, typ: NTI33554450, name: "borderStyle", sons: null}, 
-{kind: 1, offset: "borderTop", len: 0, typ: NTI33554450, name: "borderTop", sons: null}, 
-{kind: 1, offset: "borderTopColor", len: 0, typ: NTI33554450, name: "borderTopColor", sons: null}, 
-{kind: 1, offset: "borderTopLeftRadius", len: 0, typ: NTI33554450, name: "borderTopLeftRadius", sons: null}, 
-{kind: 1, offset: "borderTopRightRadius", len: 0, typ: NTI33554450, name: "borderTopRightRadius", sons: null}, 
-{kind: 1, offset: "borderTopStyle", len: 0, typ: NTI33554450, name: "borderTopStyle", sons: null}, 
-{kind: 1, offset: "borderTopWidth", len: 0, typ: NTI33554450, name: "borderTopWidth", sons: null}, 
-{kind: 1, offset: "borderWidth", len: 0, typ: NTI33554450, name: "borderWidth", sons: null}, 
-{kind: 1, offset: "bottom", len: 0, typ: NTI33554450, name: "bottom", sons: null}, 
-{kind: 1, offset: "boxDecorationBreak", len: 0, typ: NTI33554450, name: "boxDecorationBreak", sons: null}, 
-{kind: 1, offset: "boxShadow", len: 0, typ: NTI33554450, name: "boxShadow", sons: null}, 
-{kind: 1, offset: "boxSizing", len: 0, typ: NTI33554450, name: "boxSizing", sons: null}, 
-{kind: 1, offset: "breakAfter", len: 0, typ: NTI33554450, name: "breakAfter", sons: null}, 
-{kind: 1, offset: "breakBefore", len: 0, typ: NTI33554450, name: "breakBefore", sons: null}, 
-{kind: 1, offset: "breakInside", len: 0, typ: NTI33554450, name: "breakInside", sons: null}, 
-{kind: 1, offset: "captionSide", len: 0, typ: NTI33554450, name: "captionSide", sons: null}, 
-{kind: 1, offset: "caretColor", len: 0, typ: NTI33554450, name: "caretColor", sons: null}, 
-{kind: 1, offset: "clear", len: 0, typ: NTI33554450, name: "clear", sons: null}, 
-{kind: 1, offset: "clip", len: 0, typ: NTI33554450, name: "clip", sons: null}, 
-{kind: 1, offset: "clipPath", len: 0, typ: NTI33554450, name: "clipPath", sons: null}, 
-{kind: 1, offset: "color", len: 0, typ: NTI33554450, name: "color", sons: null}, 
-{kind: 1, offset: "colorAdjust", len: 0, typ: NTI33554450, name: "colorAdjust", sons: null}, 
-{kind: 1, offset: "columnCount", len: 0, typ: NTI33554450, name: "columnCount", sons: null}, 
-{kind: 1, offset: "columnFill", len: 0, typ: NTI33554450, name: "columnFill", sons: null}, 
-{kind: 1, offset: "columnGap", len: 0, typ: NTI33554450, name: "columnGap", sons: null}, 
-{kind: 1, offset: "columnRule", len: 0, typ: NTI33554450, name: "columnRule", sons: null}, 
-{kind: 1, offset: "columnRuleColor", len: 0, typ: NTI33554450, name: "columnRuleColor", sons: null}, 
-{kind: 1, offset: "columnRuleStyle", len: 0, typ: NTI33554450, name: "columnRuleStyle", sons: null}, 
-{kind: 1, offset: "columnRuleWidth", len: 0, typ: NTI33554450, name: "columnRuleWidth", sons: null}, 
-{kind: 1, offset: "columnSpan", len: 0, typ: NTI33554450, name: "columnSpan", sons: null}, 
-{kind: 1, offset: "columnWidth", len: 0, typ: NTI33554450, name: "columnWidth", sons: null}, 
-{kind: 1, offset: "columns", len: 0, typ: NTI33554450, name: "columns", sons: null}, 
-{kind: 1, offset: "contain", len: 0, typ: NTI33554450, name: "contain", sons: null}, 
-{kind: 1, offset: "content", len: 0, typ: NTI33554450, name: "content", sons: null}, 
-{kind: 1, offset: "counterIncrement", len: 0, typ: NTI33554450, name: "counterIncrement", sons: null}, 
-{kind: 1, offset: "counterReset", len: 0, typ: NTI33554450, name: "counterReset", sons: null}, 
-{kind: 1, offset: "counterSet", len: 0, typ: NTI33554450, name: "counterSet", sons: null}, 
-{kind: 1, offset: "cursor", len: 0, typ: NTI33554450, name: "cursor", sons: null}, 
-{kind: 1, offset: "direction", len: 0, typ: NTI33554450, name: "direction", sons: null}, 
-{kind: 1, offset: "display", len: 0, typ: NTI33554450, name: "display", sons: null}, 
-{kind: 1, offset: "emptyCells", len: 0, typ: NTI33554450, name: "emptyCells", sons: null}, 
-{kind: 1, offset: "filter", len: 0, typ: NTI33554450, name: "filter", sons: null}, 
-{kind: 1, offset: "flex", len: 0, typ: NTI33554450, name: "flex", sons: null}, 
-{kind: 1, offset: "flexBasis", len: 0, typ: NTI33554450, name: "flexBasis", sons: null}, 
-{kind: 1, offset: "flexDirection", len: 0, typ: NTI33554450, name: "flexDirection", sons: null}, 
-{kind: 1, offset: "flexFlow", len: 0, typ: NTI33554450, name: "flexFlow", sons: null}, 
-{kind: 1, offset: "flexGrow", len: 0, typ: NTI33554450, name: "flexGrow", sons: null}, 
-{kind: 1, offset: "flexShrink", len: 0, typ: NTI33554450, name: "flexShrink", sons: null}, 
-{kind: 1, offset: "flexWrap", len: 0, typ: NTI33554450, name: "flexWrap", sons: null}, 
-{kind: 1, offset: "cssFloat", len: 0, typ: NTI33554450, name: "cssFloat", sons: null}, 
-{kind: 1, offset: "font", len: 0, typ: NTI33554450, name: "font", sons: null}, 
-{kind: 1, offset: "fontFamily", len: 0, typ: NTI33554450, name: "fontFamily", sons: null}, 
-{kind: 1, offset: "fontFeatureSettings", len: 0, typ: NTI33554450, name: "fontFeatureSettings", sons: null}, 
-{kind: 1, offset: "fontKerning", len: 0, typ: NTI33554450, name: "fontKerning", sons: null}, 
-{kind: 1, offset: "fontLanguageOverride", len: 0, typ: NTI33554450, name: "fontLanguageOverride", sons: null}, 
-{kind: 1, offset: "fontOpticalSizing", len: 0, typ: NTI33554450, name: "fontOpticalSizing", sons: null}, 
-{kind: 1, offset: "fontSize", len: 0, typ: NTI33554450, name: "fontSize", sons: null}, 
-{kind: 1, offset: "fontSizeAdjust", len: 0, typ: NTI33554450, name: "fontSizeAdjust", sons: null}, 
-{kind: 1, offset: "fontStretch", len: 0, typ: NTI33554450, name: "fontStretch", sons: null}, 
-{kind: 1, offset: "fontStyle", len: 0, typ: NTI33554450, name: "fontStyle", sons: null}, 
-{kind: 1, offset: "fontSynthesis", len: 0, typ: NTI33554450, name: "fontSynthesis", sons: null}, 
-{kind: 1, offset: "fontVariant", len: 0, typ: NTI33554450, name: "fontVariant", sons: null}, 
-{kind: 1, offset: "fontVariantAlternates", len: 0, typ: NTI33554450, name: "fontVariantAlternates", sons: null}, 
-{kind: 1, offset: "fontVariantCaps", len: 0, typ: NTI33554450, name: "fontVariantCaps", sons: null}, 
-{kind: 1, offset: "fontVariantEastAsian", len: 0, typ: NTI33554450, name: "fontVariantEastAsian", sons: null}, 
-{kind: 1, offset: "fontVariantLigatures", len: 0, typ: NTI33554450, name: "fontVariantLigatures", sons: null}, 
-{kind: 1, offset: "fontVariantNumeric", len: 0, typ: NTI33554450, name: "fontVariantNumeric", sons: null}, 
-{kind: 1, offset: "fontVariantPosition", len: 0, typ: NTI33554450, name: "fontVariantPosition", sons: null}, 
-{kind: 1, offset: "fontVariationSettings", len: 0, typ: NTI33554450, name: "fontVariationSettings", sons: null}, 
-{kind: 1, offset: "fontWeight", len: 0, typ: NTI33554450, name: "fontWeight", sons: null}, 
-{kind: 1, offset: "gap", len: 0, typ: NTI33554450, name: "gap", sons: null}, 
-{kind: 1, offset: "grid", len: 0, typ: NTI33554450, name: "grid", sons: null}, 
-{kind: 1, offset: "gridArea", len: 0, typ: NTI33554450, name: "gridArea", sons: null}, 
-{kind: 1, offset: "gridAutoColumns", len: 0, typ: NTI33554450, name: "gridAutoColumns", sons: null}, 
-{kind: 1, offset: "gridAutoFlow", len: 0, typ: NTI33554450, name: "gridAutoFlow", sons: null}, 
-{kind: 1, offset: "gridAutoRows", len: 0, typ: NTI33554450, name: "gridAutoRows", sons: null}, 
-{kind: 1, offset: "gridColumn", len: 0, typ: NTI33554450, name: "gridColumn", sons: null}, 
-{kind: 1, offset: "gridColumnEnd", len: 0, typ: NTI33554450, name: "gridColumnEnd", sons: null}, 
-{kind: 1, offset: "gridColumnStart", len: 0, typ: NTI33554450, name: "gridColumnStart", sons: null}, 
-{kind: 1, offset: "gridRow", len: 0, typ: NTI33554450, name: "gridRow", sons: null}, 
-{kind: 1, offset: "gridRowEnd", len: 0, typ: NTI33554450, name: "gridRowEnd", sons: null}, 
-{kind: 1, offset: "gridRowStart", len: 0, typ: NTI33554450, name: "gridRowStart", sons: null}, 
-{kind: 1, offset: "gridTemplate", len: 0, typ: NTI33554450, name: "gridTemplate", sons: null}, 
-{kind: 1, offset: "gridTemplateAreas", len: 0, typ: NTI33554450, name: "gridTemplateAreas", sons: null}, 
-{kind: 1, offset: "gridTemplateColumns", len: 0, typ: NTI33554450, name: "gridTemplateColumns", sons: null}, 
-{kind: 1, offset: "gridTemplateRows", len: 0, typ: NTI33554450, name: "gridTemplateRows", sons: null}, 
-{kind: 1, offset: "hangingPunctuation", len: 0, typ: NTI33554450, name: "hangingPunctuation", sons: null}, 
-{kind: 1, offset: "height", len: 0, typ: NTI33554450, name: "height", sons: null}, 
-{kind: 1, offset: "hyphens", len: 0, typ: NTI33554450, name: "hyphens", sons: null}, 
-{kind: 1, offset: "imageOrientation", len: 0, typ: NTI33554450, name: "imageOrientation", sons: null}, 
-{kind: 1, offset: "imageRendering", len: 0, typ: NTI33554450, name: "imageRendering", sons: null}, 
-{kind: 1, offset: "inlineSize", len: 0, typ: NTI33554450, name: "inlineSize", sons: null}, 
-{kind: 1, offset: "inset", len: 0, typ: NTI33554450, name: "inset", sons: null}, 
-{kind: 1, offset: "insetBlock", len: 0, typ: NTI33554450, name: "insetBlock", sons: null}, 
-{kind: 1, offset: "insetBlockEnd", len: 0, typ: NTI33554450, name: "insetBlockEnd", sons: null}, 
-{kind: 1, offset: "insetBlockStart", len: 0, typ: NTI33554450, name: "insetBlockStart", sons: null}, 
-{kind: 1, offset: "insetInline", len: 0, typ: NTI33554450, name: "insetInline", sons: null}, 
-{kind: 1, offset: "insetInlineEnd", len: 0, typ: NTI33554450, name: "insetInlineEnd", sons: null}, 
-{kind: 1, offset: "insetInlineStart", len: 0, typ: NTI33554450, name: "insetInlineStart", sons: null}, 
-{kind: 1, offset: "isolation", len: 0, typ: NTI33554450, name: "isolation", sons: null}, 
-{kind: 1, offset: "justifyContent", len: 0, typ: NTI33554450, name: "justifyContent", sons: null}, 
-{kind: 1, offset: "justifyItems", len: 0, typ: NTI33554450, name: "justifyItems", sons: null}, 
-{kind: 1, offset: "justifySelf", len: 0, typ: NTI33554450, name: "justifySelf", sons: null}, 
-{kind: 1, offset: "left", len: 0, typ: NTI33554450, name: "left", sons: null}, 
-{kind: 1, offset: "letterSpacing", len: 0, typ: NTI33554450, name: "letterSpacing", sons: null}, 
-{kind: 1, offset: "lineBreak", len: 0, typ: NTI33554450, name: "lineBreak", sons: null}, 
-{kind: 1, offset: "lineHeight", len: 0, typ: NTI33554450, name: "lineHeight", sons: null}, 
-{kind: 1, offset: "listStyle", len: 0, typ: NTI33554450, name: "listStyle", sons: null}, 
-{kind: 1, offset: "listStyleImage", len: 0, typ: NTI33554450, name: "listStyleImage", sons: null}, 
-{kind: 1, offset: "listStylePosition", len: 0, typ: NTI33554450, name: "listStylePosition", sons: null}, 
-{kind: 1, offset: "listStyleType", len: 0, typ: NTI33554450, name: "listStyleType", sons: null}, 
-{kind: 1, offset: "margin", len: 0, typ: NTI33554450, name: "margin", sons: null}, 
-{kind: 1, offset: "marginBlock", len: 0, typ: NTI33554450, name: "marginBlock", sons: null}, 
-{kind: 1, offset: "marginBlockEnd", len: 0, typ: NTI33554450, name: "marginBlockEnd", sons: null}, 
-{kind: 1, offset: "marginBlockStart", len: 0, typ: NTI33554450, name: "marginBlockStart", sons: null}, 
-{kind: 1, offset: "marginBottom", len: 0, typ: NTI33554450, name: "marginBottom", sons: null}, 
-{kind: 1, offset: "marginInline", len: 0, typ: NTI33554450, name: "marginInline", sons: null}, 
-{kind: 1, offset: "marginInlineEnd", len: 0, typ: NTI33554450, name: "marginInlineEnd", sons: null}, 
-{kind: 1, offset: "marginInlineStart", len: 0, typ: NTI33554450, name: "marginInlineStart", sons: null}, 
-{kind: 1, offset: "marginLeft", len: 0, typ: NTI33554450, name: "marginLeft", sons: null}, 
-{kind: 1, offset: "marginRight", len: 0, typ: NTI33554450, name: "marginRight", sons: null}, 
-{kind: 1, offset: "marginTop", len: 0, typ: NTI33554450, name: "marginTop", sons: null}, 
-{kind: 1, offset: "mask", len: 0, typ: NTI33554450, name: "mask", sons: null}, 
-{kind: 1, offset: "maskBorder", len: 0, typ: NTI33554450, name: "maskBorder", sons: null}, 
-{kind: 1, offset: "maskBorderMode", len: 0, typ: NTI33554450, name: "maskBorderMode", sons: null}, 
-{kind: 1, offset: "maskBorderOutset", len: 0, typ: NTI33554450, name: "maskBorderOutset", sons: null}, 
-{kind: 1, offset: "maskBorderRepeat", len: 0, typ: NTI33554450, name: "maskBorderRepeat", sons: null}, 
-{kind: 1, offset: "maskBorderSlice", len: 0, typ: NTI33554450, name: "maskBorderSlice", sons: null}, 
-{kind: 1, offset: "maskBorderSource", len: 0, typ: NTI33554450, name: "maskBorderSource", sons: null}, 
-{kind: 1, offset: "maskBorderWidth", len: 0, typ: NTI33554450, name: "maskBorderWidth", sons: null}, 
-{kind: 1, offset: "maskClip", len: 0, typ: NTI33554450, name: "maskClip", sons: null}, 
-{kind: 1, offset: "maskComposite", len: 0, typ: NTI33554450, name: "maskComposite", sons: null}, 
-{kind: 1, offset: "maskImage", len: 0, typ: NTI33554450, name: "maskImage", sons: null}, 
-{kind: 1, offset: "maskMode", len: 0, typ: NTI33554450, name: "maskMode", sons: null}, 
-{kind: 1, offset: "maskOrigin", len: 0, typ: NTI33554450, name: "maskOrigin", sons: null}, 
-{kind: 1, offset: "maskPosition", len: 0, typ: NTI33554450, name: "maskPosition", sons: null}, 
-{kind: 1, offset: "maskRepeat", len: 0, typ: NTI33554450, name: "maskRepeat", sons: null}, 
-{kind: 1, offset: "maskSize", len: 0, typ: NTI33554450, name: "maskSize", sons: null}, 
-{kind: 1, offset: "maskType", len: 0, typ: NTI33554450, name: "maskType", sons: null}, 
-{kind: 1, offset: "maxBlockSize", len: 0, typ: NTI33554450, name: "maxBlockSize", sons: null}, 
-{kind: 1, offset: "maxHeight", len: 0, typ: NTI33554450, name: "maxHeight", sons: null}, 
-{kind: 1, offset: "maxInlineSize", len: 0, typ: NTI33554450, name: "maxInlineSize", sons: null}, 
-{kind: 1, offset: "maxWidth", len: 0, typ: NTI33554450, name: "maxWidth", sons: null}, 
-{kind: 1, offset: "minBlockSize", len: 0, typ: NTI33554450, name: "minBlockSize", sons: null}, 
-{kind: 1, offset: "minHeight", len: 0, typ: NTI33554450, name: "minHeight", sons: null}, 
-{kind: 1, offset: "minInlineSize", len: 0, typ: NTI33554450, name: "minInlineSize", sons: null}, 
-{kind: 1, offset: "minWidth", len: 0, typ: NTI33554450, name: "minWidth", sons: null}, 
-{kind: 1, offset: "mixBlendMode", len: 0, typ: NTI33554450, name: "mixBlendMode", sons: null}, 
-{kind: 1, offset: "objectFit", len: 0, typ: NTI33554450, name: "objectFit", sons: null}, 
-{kind: 1, offset: "objectPosition", len: 0, typ: NTI33554450, name: "objectPosition", sons: null}, 
-{kind: 1, offset: "offset", len: 0, typ: NTI33554450, name: "offset", sons: null}, 
-{kind: 1, offset: "offsetAnchor", len: 0, typ: NTI33554450, name: "offsetAnchor", sons: null}, 
-{kind: 1, offset: "offsetDistance", len: 0, typ: NTI33554450, name: "offsetDistance", sons: null}, 
-{kind: 1, offset: "offsetPath", len: 0, typ: NTI33554450, name: "offsetPath", sons: null}, 
-{kind: 1, offset: "offsetRotate", len: 0, typ: NTI33554450, name: "offsetRotate", sons: null}, 
-{kind: 1, offset: "opacity", len: 0, typ: NTI33554450, name: "opacity", sons: null}, 
-{kind: 1, offset: "order", len: 0, typ: NTI33554450, name: "order", sons: null}, 
-{kind: 1, offset: "orphans", len: 0, typ: NTI33554450, name: "orphans", sons: null}, 
-{kind: 1, offset: "outline", len: 0, typ: NTI33554450, name: "outline", sons: null}, 
-{kind: 1, offset: "outlineColor", len: 0, typ: NTI33554450, name: "outlineColor", sons: null}, 
-{kind: 1, offset: "outlineOffset", len: 0, typ: NTI33554450, name: "outlineOffset", sons: null}, 
-{kind: 1, offset: "outlineStyle", len: 0, typ: NTI33554450, name: "outlineStyle", sons: null}, 
-{kind: 1, offset: "outlineWidth", len: 0, typ: NTI33554450, name: "outlineWidth", sons: null}, 
-{kind: 1, offset: "overflow", len: 0, typ: NTI33554450, name: "overflow", sons: null}, 
-{kind: 1, offset: "overflowAnchor", len: 0, typ: NTI33554450, name: "overflowAnchor", sons: null}, 
-{kind: 1, offset: "overflowBlock", len: 0, typ: NTI33554450, name: "overflowBlock", sons: null}, 
-{kind: 1, offset: "overflowInline", len: 0, typ: NTI33554450, name: "overflowInline", sons: null}, 
-{kind: 1, offset: "overflowWrap", len: 0, typ: NTI33554450, name: "overflowWrap", sons: null}, 
-{kind: 1, offset: "overflowX", len: 0, typ: NTI33554450, name: "overflowX", sons: null}, 
-{kind: 1, offset: "overflowY", len: 0, typ: NTI33554450, name: "overflowY", sons: null}, 
-{kind: 1, offset: "overscrollBehavior", len: 0, typ: NTI33554450, name: "overscrollBehavior", sons: null}, 
-{kind: 1, offset: "overscrollBehaviorBlock", len: 0, typ: NTI33554450, name: "overscrollBehaviorBlock", sons: null}, 
-{kind: 1, offset: "overscrollBehaviorInline", len: 0, typ: NTI33554450, name: "overscrollBehaviorInline", sons: null}, 
-{kind: 1, offset: "overscrollBehaviorX", len: 0, typ: NTI33554450, name: "overscrollBehaviorX", sons: null}, 
-{kind: 1, offset: "overscrollBehaviorY", len: 0, typ: NTI33554450, name: "overscrollBehaviorY", sons: null}, 
-{kind: 1, offset: "padding", len: 0, typ: NTI33554450, name: "padding", sons: null}, 
-{kind: 1, offset: "paddingBlock", len: 0, typ: NTI33554450, name: "paddingBlock", sons: null}, 
-{kind: 1, offset: "paddingBlockEnd", len: 0, typ: NTI33554450, name: "paddingBlockEnd", sons: null}, 
-{kind: 1, offset: "paddingBlockStart", len: 0, typ: NTI33554450, name: "paddingBlockStart", sons: null}, 
-{kind: 1, offset: "paddingBottom", len: 0, typ: NTI33554450, name: "paddingBottom", sons: null}, 
-{kind: 1, offset: "paddingInline", len: 0, typ: NTI33554450, name: "paddingInline", sons: null}, 
-{kind: 1, offset: "paddingInlineEnd", len: 0, typ: NTI33554450, name: "paddingInlineEnd", sons: null}, 
-{kind: 1, offset: "paddingInlineStart", len: 0, typ: NTI33554450, name: "paddingInlineStart", sons: null}, 
-{kind: 1, offset: "paddingLeft", len: 0, typ: NTI33554450, name: "paddingLeft", sons: null}, 
-{kind: 1, offset: "paddingRight", len: 0, typ: NTI33554450, name: "paddingRight", sons: null}, 
-{kind: 1, offset: "paddingTop", len: 0, typ: NTI33554450, name: "paddingTop", sons: null}, 
-{kind: 1, offset: "pageBreakAfter", len: 0, typ: NTI33554450, name: "pageBreakAfter", sons: null}, 
-{kind: 1, offset: "pageBreakBefore", len: 0, typ: NTI33554450, name: "pageBreakBefore", sons: null}, 
-{kind: 1, offset: "pageBreakInside", len: 0, typ: NTI33554450, name: "pageBreakInside", sons: null}, 
-{kind: 1, offset: "paintOrder", len: 0, typ: NTI33554450, name: "paintOrder", sons: null}, 
-{kind: 1, offset: "perspective", len: 0, typ: NTI33554450, name: "perspective", sons: null}, 
-{kind: 1, offset: "perspectiveOrigin", len: 0, typ: NTI33554450, name: "perspectiveOrigin", sons: null}, 
-{kind: 1, offset: "placeContent", len: 0, typ: NTI33554450, name: "placeContent", sons: null}, 
-{kind: 1, offset: "placeItems", len: 0, typ: NTI33554450, name: "placeItems", sons: null}, 
-{kind: 1, offset: "placeSelf", len: 0, typ: NTI33554450, name: "placeSelf", sons: null}, 
-{kind: 1, offset: "pointerEvents", len: 0, typ: NTI33554450, name: "pointerEvents", sons: null}, 
-{kind: 1, offset: "position", len: 0, typ: NTI33554450, name: "position", sons: null}, 
-{kind: 1, offset: "quotes", len: 0, typ: NTI33554450, name: "quotes", sons: null}, 
-{kind: 1, offset: "resize", len: 0, typ: NTI33554450, name: "resize", sons: null}, 
-{kind: 1, offset: "right", len: 0, typ: NTI33554450, name: "right", sons: null}, 
-{kind: 1, offset: "rotate", len: 0, typ: NTI33554450, name: "rotate", sons: null}, 
-{kind: 1, offset: "rowGap", len: 0, typ: NTI33554450, name: "rowGap", sons: null}, 
-{kind: 1, offset: "scale", len: 0, typ: NTI33554450, name: "scale", sons: null}, 
-{kind: 1, offset: "scrollBehavior", len: 0, typ: NTI33554450, name: "scrollBehavior", sons: null}, 
-{kind: 1, offset: "scrollMargin", len: 0, typ: NTI33554450, name: "scrollMargin", sons: null}, 
-{kind: 1, offset: "scrollMarginBlock", len: 0, typ: NTI33554450, name: "scrollMarginBlock", sons: null}, 
-{kind: 1, offset: "scrollMarginBlockEnd", len: 0, typ: NTI33554450, name: "scrollMarginBlockEnd", sons: null}, 
-{kind: 1, offset: "scrollMarginBlockStart", len: 0, typ: NTI33554450, name: "scrollMarginBlockStart", sons: null}, 
-{kind: 1, offset: "scrollMarginBottom", len: 0, typ: NTI33554450, name: "scrollMarginBottom", sons: null}, 
-{kind: 1, offset: "scrollMarginInline", len: 0, typ: NTI33554450, name: "scrollMarginInline", sons: null}, 
-{kind: 1, offset: "scrollMarginInlineEnd", len: 0, typ: NTI33554450, name: "scrollMarginInlineEnd", sons: null}, 
-{kind: 1, offset: "scrollMarginInlineStart", len: 0, typ: NTI33554450, name: "scrollMarginInlineStart", sons: null}, 
-{kind: 1, offset: "scrollMarginLeft", len: 0, typ: NTI33554450, name: "scrollMarginLeft", sons: null}, 
-{kind: 1, offset: "scrollMarginRight", len: 0, typ: NTI33554450, name: "scrollMarginRight", sons: null}, 
-{kind: 1, offset: "scrollMarginTop", len: 0, typ: NTI33554450, name: "scrollMarginTop", sons: null}, 
-{kind: 1, offset: "scrollPadding", len: 0, typ: NTI33554450, name: "scrollPadding", sons: null}, 
-{kind: 1, offset: "scrollPaddingBlock", len: 0, typ: NTI33554450, name: "scrollPaddingBlock", sons: null}, 
-{kind: 1, offset: "scrollPaddingBlockEnd", len: 0, typ: NTI33554450, name: "scrollPaddingBlockEnd", sons: null}, 
-{kind: 1, offset: "scrollPaddingBlockStart", len: 0, typ: NTI33554450, name: "scrollPaddingBlockStart", sons: null}, 
-{kind: 1, offset: "scrollPaddingBottom", len: 0, typ: NTI33554450, name: "scrollPaddingBottom", sons: null}, 
-{kind: 1, offset: "scrollPaddingInline", len: 0, typ: NTI33554450, name: "scrollPaddingInline", sons: null}, 
-{kind: 1, offset: "scrollPaddingInlineEnd", len: 0, typ: NTI33554450, name: "scrollPaddingInlineEnd", sons: null}, 
-{kind: 1, offset: "scrollPaddingInlineStart", len: 0, typ: NTI33554450, name: "scrollPaddingInlineStart", sons: null}, 
-{kind: 1, offset: "scrollPaddingLeft", len: 0, typ: NTI33554450, name: "scrollPaddingLeft", sons: null}, 
-{kind: 1, offset: "scrollPaddingRight", len: 0, typ: NTI33554450, name: "scrollPaddingRight", sons: null}, 
-{kind: 1, offset: "scrollPaddingTop", len: 0, typ: NTI33554450, name: "scrollPaddingTop", sons: null}, 
-{kind: 1, offset: "scrollSnapAlign", len: 0, typ: NTI33554450, name: "scrollSnapAlign", sons: null}, 
-{kind: 1, offset: "scrollSnapStop", len: 0, typ: NTI33554450, name: "scrollSnapStop", sons: null}, 
-{kind: 1, offset: "scrollSnapType", len: 0, typ: NTI33554450, name: "scrollSnapType", sons: null}, 
-{kind: 1, offset: "scrollbar3dLightColor", len: 0, typ: NTI33554450, name: "scrollbar3dLightColor", sons: null}, 
-{kind: 1, offset: "scrollbarArrowColor", len: 0, typ: NTI33554450, name: "scrollbarArrowColor", sons: null}, 
-{kind: 1, offset: "scrollbarBaseColor", len: 0, typ: NTI33554450, name: "scrollbarBaseColor", sons: null}, 
-{kind: 1, offset: "scrollbarColor", len: 0, typ: NTI33554450, name: "scrollbarColor", sons: null}, 
-{kind: 1, offset: "scrollbarDarkshadowColor", len: 0, typ: NTI33554450, name: "scrollbarDarkshadowColor", sons: null}, 
-{kind: 1, offset: "scrollbarFaceColor", len: 0, typ: NTI33554450, name: "scrollbarFaceColor", sons: null}, 
-{kind: 1, offset: "scrollbarHighlightColor", len: 0, typ: NTI33554450, name: "scrollbarHighlightColor", sons: null}, 
-{kind: 1, offset: "scrollbarShadowColor", len: 0, typ: NTI33554450, name: "scrollbarShadowColor", sons: null}, 
-{kind: 1, offset: "scrollbarTrackColor", len: 0, typ: NTI33554450, name: "scrollbarTrackColor", sons: null}, 
-{kind: 1, offset: "scrollbarWidth", len: 0, typ: NTI33554450, name: "scrollbarWidth", sons: null}, 
-{kind: 1, offset: "shapeImageThreshold", len: 0, typ: NTI33554450, name: "shapeImageThreshold", sons: null}, 
-{kind: 1, offset: "shapeMargin", len: 0, typ: NTI33554450, name: "shapeMargin", sons: null}, 
-{kind: 1, offset: "shapeOutside", len: 0, typ: NTI33554450, name: "shapeOutside", sons: null}, 
-{kind: 1, offset: "tabSize", len: 0, typ: NTI33554450, name: "tabSize", sons: null}, 
-{kind: 1, offset: "tableLayout", len: 0, typ: NTI33554450, name: "tableLayout", sons: null}, 
-{kind: 1, offset: "textAlign", len: 0, typ: NTI33554450, name: "textAlign", sons: null}, 
-{kind: 1, offset: "textAlignLast", len: 0, typ: NTI33554450, name: "textAlignLast", sons: null}, 
-{kind: 1, offset: "textCombineUpright", len: 0, typ: NTI33554450, name: "textCombineUpright", sons: null}, 
-{kind: 1, offset: "textDecoration", len: 0, typ: NTI33554450, name: "textDecoration", sons: null}, 
-{kind: 1, offset: "textDecorationColor", len: 0, typ: NTI33554450, name: "textDecorationColor", sons: null}, 
-{kind: 1, offset: "textDecorationLine", len: 0, typ: NTI33554450, name: "textDecorationLine", sons: null}, 
-{kind: 1, offset: "textDecorationSkipInk", len: 0, typ: NTI33554450, name: "textDecorationSkipInk", sons: null}, 
-{kind: 1, offset: "textDecorationStyle", len: 0, typ: NTI33554450, name: "textDecorationStyle", sons: null}, 
-{kind: 1, offset: "textDecorationThickness", len: 0, typ: NTI33554450, name: "textDecorationThickness", sons: null}, 
-{kind: 1, offset: "textEmphasis", len: 0, typ: NTI33554450, name: "textEmphasis", sons: null}, 
-{kind: 1, offset: "textEmphasisColor", len: 0, typ: NTI33554450, name: "textEmphasisColor", sons: null}, 
-{kind: 1, offset: "textEmphasisPosition", len: 0, typ: NTI33554450, name: "textEmphasisPosition", sons: null}, 
-{kind: 1, offset: "textEmphasisStyle", len: 0, typ: NTI33554450, name: "textEmphasisStyle", sons: null}, 
-{kind: 1, offset: "textIndent", len: 0, typ: NTI33554450, name: "textIndent", sons: null}, 
-{kind: 1, offset: "textJustify", len: 0, typ: NTI33554450, name: "textJustify", sons: null}, 
-{kind: 1, offset: "textOrientation", len: 0, typ: NTI33554450, name: "textOrientation", sons: null}, 
-{kind: 1, offset: "textOverflow", len: 0, typ: NTI33554450, name: "textOverflow", sons: null}, 
-{kind: 1, offset: "textRendering", len: 0, typ: NTI33554450, name: "textRendering", sons: null}, 
-{kind: 1, offset: "textShadow", len: 0, typ: NTI33554450, name: "textShadow", sons: null}, 
-{kind: 1, offset: "textTransform", len: 0, typ: NTI33554450, name: "textTransform", sons: null}, 
-{kind: 1, offset: "textUnderlineOffset", len: 0, typ: NTI33554450, name: "textUnderlineOffset", sons: null}, 
-{kind: 1, offset: "textUnderlinePosition", len: 0, typ: NTI33554450, name: "textUnderlinePosition", sons: null}, 
-{kind: 1, offset: "top", len: 0, typ: NTI33554450, name: "top", sons: null}, 
-{kind: 1, offset: "touchAction", len: 0, typ: NTI33554450, name: "touchAction", sons: null}, 
-{kind: 1, offset: "transform", len: 0, typ: NTI33554450, name: "transform", sons: null}, 
-{kind: 1, offset: "transformBox", len: 0, typ: NTI33554450, name: "transformBox", sons: null}, 
-{kind: 1, offset: "transformOrigin", len: 0, typ: NTI33554450, name: "transformOrigin", sons: null}, 
-{kind: 1, offset: "transformStyle", len: 0, typ: NTI33554450, name: "transformStyle", sons: null}, 
-{kind: 1, offset: "transition", len: 0, typ: NTI33554450, name: "transition", sons: null}, 
-{kind: 1, offset: "transitionDelay", len: 0, typ: NTI33554450, name: "transitionDelay", sons: null}, 
-{kind: 1, offset: "transitionDuration", len: 0, typ: NTI33554450, name: "transitionDuration", sons: null}, 
-{kind: 1, offset: "transitionProperty", len: 0, typ: NTI33554450, name: "transitionProperty", sons: null}, 
-{kind: 1, offset: "transitionTimingFunction", len: 0, typ: NTI33554450, name: "transitionTimingFunction", sons: null}, 
-{kind: 1, offset: "translate", len: 0, typ: NTI33554450, name: "translate", sons: null}, 
-{kind: 1, offset: "unicodeBidi", len: 0, typ: NTI33554450, name: "unicodeBidi", sons: null}, 
-{kind: 1, offset: "verticalAlign", len: 0, typ: NTI33554450, name: "verticalAlign", sons: null}, 
-{kind: 1, offset: "visibility", len: 0, typ: NTI33554450, name: "visibility", sons: null}, 
-{kind: 1, offset: "whiteSpace", len: 0, typ: NTI33554450, name: "whiteSpace", sons: null}, 
-{kind: 1, offset: "widows", len: 0, typ: NTI33554450, name: "widows", sons: null}, 
-{kind: 1, offset: "width", len: 0, typ: NTI33554450, name: "width", sons: null}, 
-{kind: 1, offset: "willChange", len: 0, typ: NTI33554450, name: "willChange", sons: null}, 
-{kind: 1, offset: "wordBreak", len: 0, typ: NTI33554450, name: "wordBreak", sons: null}, 
-{kind: 1, offset: "wordSpacing", len: 0, typ: NTI33554450, name: "wordSpacing", sons: null}, 
-{kind: 1, offset: "writingMode", len: 0, typ: NTI33554450, name: "writingMode", sons: null}, 
+var NNI855638158 = {kind: 2, len: 368, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "alignContent", len: 0, typ: NTI33554450, name: "alignContent", sons: null},
+{kind: 1, offset: "alignItems", len: 0, typ: NTI33554450, name: "alignItems", sons: null},
+{kind: 1, offset: "alignSelf", len: 0, typ: NTI33554450, name: "alignSelf", sons: null},
+{kind: 1, offset: "all", len: 0, typ: NTI33554450, name: "all", sons: null},
+{kind: 1, offset: "animation", len: 0, typ: NTI33554450, name: "animation", sons: null},
+{kind: 1, offset: "animationDelay", len: 0, typ: NTI33554450, name: "animationDelay", sons: null},
+{kind: 1, offset: "animationDirection", len: 0, typ: NTI33554450, name: "animationDirection", sons: null},
+{kind: 1, offset: "animationDuration", len: 0, typ: NTI33554450, name: "animationDuration", sons: null},
+{kind: 1, offset: "animationFillMode", len: 0, typ: NTI33554450, name: "animationFillMode", sons: null},
+{kind: 1, offset: "animationIterationCount", len: 0, typ: NTI33554450, name: "animationIterationCount", sons: null},
+{kind: 1, offset: "animationName", len: 0, typ: NTI33554450, name: "animationName", sons: null},
+{kind: 1, offset: "animationPlayState", len: 0, typ: NTI33554450, name: "animationPlayState", sons: null},
+{kind: 1, offset: "animationTimingFunction", len: 0, typ: NTI33554450, name: "animationTimingFunction", sons: null},
+{kind: 1, offset: "backdropFilter", len: 0, typ: NTI33554450, name: "backdropFilter", sons: null},
+{kind: 1, offset: "backfaceVisibility", len: 0, typ: NTI33554450, name: "backfaceVisibility", sons: null},
+{kind: 1, offset: "background", len: 0, typ: NTI33554450, name: "background", sons: null},
+{kind: 1, offset: "backgroundAttachment", len: 0, typ: NTI33554450, name: "backgroundAttachment", sons: null},
+{kind: 1, offset: "backgroundBlendMode", len: 0, typ: NTI33554450, name: "backgroundBlendMode", sons: null},
+{kind: 1, offset: "backgroundClip", len: 0, typ: NTI33554450, name: "backgroundClip", sons: null},
+{kind: 1, offset: "backgroundColor", len: 0, typ: NTI33554450, name: "backgroundColor", sons: null},
+{kind: 1, offset: "backgroundImage", len: 0, typ: NTI33554450, name: "backgroundImage", sons: null},
+{kind: 1, offset: "backgroundOrigin", len: 0, typ: NTI33554450, name: "backgroundOrigin", sons: null},
+{kind: 1, offset: "backgroundPosition", len: 0, typ: NTI33554450, name: "backgroundPosition", sons: null},
+{kind: 1, offset: "backgroundRepeat", len: 0, typ: NTI33554450, name: "backgroundRepeat", sons: null},
+{kind: 1, offset: "backgroundSize", len: 0, typ: NTI33554450, name: "backgroundSize", sons: null},
+{kind: 1, offset: "blockSize", len: 0, typ: NTI33554450, name: "blockSize", sons: null},
+{kind: 1, offset: "border", len: 0, typ: NTI33554450, name: "border", sons: null},
+{kind: 1, offset: "borderBlock", len: 0, typ: NTI33554450, name: "borderBlock", sons: null},
+{kind: 1, offset: "borderBlockColor", len: 0, typ: NTI33554450, name: "borderBlockColor", sons: null},
+{kind: 1, offset: "borderBlockEnd", len: 0, typ: NTI33554450, name: "borderBlockEnd", sons: null},
+{kind: 1, offset: "borderBlockEndColor", len: 0, typ: NTI33554450, name: "borderBlockEndColor", sons: null},
+{kind: 1, offset: "borderBlockEndStyle", len: 0, typ: NTI33554450, name: "borderBlockEndStyle", sons: null},
+{kind: 1, offset: "borderBlockEndWidth", len: 0, typ: NTI33554450, name: "borderBlockEndWidth", sons: null},
+{kind: 1, offset: "borderBlockStart", len: 0, typ: NTI33554450, name: "borderBlockStart", sons: null},
+{kind: 1, offset: "borderBlockStartColor", len: 0, typ: NTI33554450, name: "borderBlockStartColor", sons: null},
+{kind: 1, offset: "borderBlockStartStyle", len: 0, typ: NTI33554450, name: "borderBlockStartStyle", sons: null},
+{kind: 1, offset: "borderBlockStartWidth", len: 0, typ: NTI33554450, name: "borderBlockStartWidth", sons: null},
+{kind: 1, offset: "borderBlockStyle", len: 0, typ: NTI33554450, name: "borderBlockStyle", sons: null},
+{kind: 1, offset: "borderBlockWidth", len: 0, typ: NTI33554450, name: "borderBlockWidth", sons: null},
+{kind: 1, offset: "borderBottom", len: 0, typ: NTI33554450, name: "borderBottom", sons: null},
+{kind: 1, offset: "borderBottomColor", len: 0, typ: NTI33554450, name: "borderBottomColor", sons: null},
+{kind: 1, offset: "borderBottomLeftRadius", len: 0, typ: NTI33554450, name: "borderBottomLeftRadius", sons: null},
+{kind: 1, offset: "borderBottomRightRadius", len: 0, typ: NTI33554450, name: "borderBottomRightRadius", sons: null},
+{kind: 1, offset: "borderBottomStyle", len: 0, typ: NTI33554450, name: "borderBottomStyle", sons: null},
+{kind: 1, offset: "borderBottomWidth", len: 0, typ: NTI33554450, name: "borderBottomWidth", sons: null},
+{kind: 1, offset: "borderCollapse", len: 0, typ: NTI33554450, name: "borderCollapse", sons: null},
+{kind: 1, offset: "borderColor", len: 0, typ: NTI33554450, name: "borderColor", sons: null},
+{kind: 1, offset: "borderEndEndRadius", len: 0, typ: NTI33554450, name: "borderEndEndRadius", sons: null},
+{kind: 1, offset: "borderEndStartRadius", len: 0, typ: NTI33554450, name: "borderEndStartRadius", sons: null},
+{kind: 1, offset: "borderImage", len: 0, typ: NTI33554450, name: "borderImage", sons: null},
+{kind: 1, offset: "borderImageOutset", len: 0, typ: NTI33554450, name: "borderImageOutset", sons: null},
+{kind: 1, offset: "borderImageRepeat", len: 0, typ: NTI33554450, name: "borderImageRepeat", sons: null},
+{kind: 1, offset: "borderImageSlice", len: 0, typ: NTI33554450, name: "borderImageSlice", sons: null},
+{kind: 1, offset: "borderImageSource", len: 0, typ: NTI33554450, name: "borderImageSource", sons: null},
+{kind: 1, offset: "borderImageWidth", len: 0, typ: NTI33554450, name: "borderImageWidth", sons: null},
+{kind: 1, offset: "borderInline", len: 0, typ: NTI33554450, name: "borderInline", sons: null},
+{kind: 1, offset: "borderInlineColor", len: 0, typ: NTI33554450, name: "borderInlineColor", sons: null},
+{kind: 1, offset: "borderInlineEnd", len: 0, typ: NTI33554450, name: "borderInlineEnd", sons: null},
+{kind: 1, offset: "borderInlineEndColor", len: 0, typ: NTI33554450, name: "borderInlineEndColor", sons: null},
+{kind: 1, offset: "borderInlineEndStyle", len: 0, typ: NTI33554450, name: "borderInlineEndStyle", sons: null},
+{kind: 1, offset: "borderInlineEndWidth", len: 0, typ: NTI33554450, name: "borderInlineEndWidth", sons: null},
+{kind: 1, offset: "borderInlineStart", len: 0, typ: NTI33554450, name: "borderInlineStart", sons: null},
+{kind: 1, offset: "borderInlineStartColor", len: 0, typ: NTI33554450, name: "borderInlineStartColor", sons: null},
+{kind: 1, offset: "borderInlineStartStyle", len: 0, typ: NTI33554450, name: "borderInlineStartStyle", sons: null},
+{kind: 1, offset: "borderInlineStartWidth", len: 0, typ: NTI33554450, name: "borderInlineStartWidth", sons: null},
+{kind: 1, offset: "borderInlineStyle", len: 0, typ: NTI33554450, name: "borderInlineStyle", sons: null},
+{kind: 1, offset: "borderInlineWidth", len: 0, typ: NTI33554450, name: "borderInlineWidth", sons: null},
+{kind: 1, offset: "borderLeft", len: 0, typ: NTI33554450, name: "borderLeft", sons: null},
+{kind: 1, offset: "borderLeftColor", len: 0, typ: NTI33554450, name: "borderLeftColor", sons: null},
+{kind: 1, offset: "borderLeftStyle", len: 0, typ: NTI33554450, name: "borderLeftStyle", sons: null},
+{kind: 1, offset: "borderLeftWidth", len: 0, typ: NTI33554450, name: "borderLeftWidth", sons: null},
+{kind: 1, offset: "borderRadius", len: 0, typ: NTI33554450, name: "borderRadius", sons: null},
+{kind: 1, offset: "borderRight", len: 0, typ: NTI33554450, name: "borderRight", sons: null},
+{kind: 1, offset: "borderRightColor", len: 0, typ: NTI33554450, name: "borderRightColor", sons: null},
+{kind: 1, offset: "borderRightStyle", len: 0, typ: NTI33554450, name: "borderRightStyle", sons: null},
+{kind: 1, offset: "borderRightWidth", len: 0, typ: NTI33554450, name: "borderRightWidth", sons: null},
+{kind: 1, offset: "borderSpacing", len: 0, typ: NTI33554450, name: "borderSpacing", sons: null},
+{kind: 1, offset: "borderStartEndRadius", len: 0, typ: NTI33554450, name: "borderStartEndRadius", sons: null},
+{kind: 1, offset: "borderStartStartRadius", len: 0, typ: NTI33554450, name: "borderStartStartRadius", sons: null},
+{kind: 1, offset: "borderStyle", len: 0, typ: NTI33554450, name: "borderStyle", sons: null},
+{kind: 1, offset: "borderTop", len: 0, typ: NTI33554450, name: "borderTop", sons: null},
+{kind: 1, offset: "borderTopColor", len: 0, typ: NTI33554450, name: "borderTopColor", sons: null},
+{kind: 1, offset: "borderTopLeftRadius", len: 0, typ: NTI33554450, name: "borderTopLeftRadius", sons: null},
+{kind: 1, offset: "borderTopRightRadius", len: 0, typ: NTI33554450, name: "borderTopRightRadius", sons: null},
+{kind: 1, offset: "borderTopStyle", len: 0, typ: NTI33554450, name: "borderTopStyle", sons: null},
+{kind: 1, offset: "borderTopWidth", len: 0, typ: NTI33554450, name: "borderTopWidth", sons: null},
+{kind: 1, offset: "borderWidth", len: 0, typ: NTI33554450, name: "borderWidth", sons: null},
+{kind: 1, offset: "bottom", len: 0, typ: NTI33554450, name: "bottom", sons: null},
+{kind: 1, offset: "boxDecorationBreak", len: 0, typ: NTI33554450, name: "boxDecorationBreak", sons: null},
+{kind: 1, offset: "boxShadow", len: 0, typ: NTI33554450, name: "boxShadow", sons: null},
+{kind: 1, offset: "boxSizing", len: 0, typ: NTI33554450, name: "boxSizing", sons: null},
+{kind: 1, offset: "breakAfter", len: 0, typ: NTI33554450, name: "breakAfter", sons: null},
+{kind: 1, offset: "breakBefore", len: 0, typ: NTI33554450, name: "breakBefore", sons: null},
+{kind: 1, offset: "breakInside", len: 0, typ: NTI33554450, name: "breakInside", sons: null},
+{kind: 1, offset: "captionSide", len: 0, typ: NTI33554450, name: "captionSide", sons: null},
+{kind: 1, offset: "caretColor", len: 0, typ: NTI33554450, name: "caretColor", sons: null},
+{kind: 1, offset: "clear", len: 0, typ: NTI33554450, name: "clear", sons: null},
+{kind: 1, offset: "clip", len: 0, typ: NTI33554450, name: "clip", sons: null},
+{kind: 1, offset: "clipPath", len: 0, typ: NTI33554450, name: "clipPath", sons: null},
+{kind: 1, offset: "color", len: 0, typ: NTI33554450, name: "color", sons: null},
+{kind: 1, offset: "colorAdjust", len: 0, typ: NTI33554450, name: "colorAdjust", sons: null},
+{kind: 1, offset: "columnCount", len: 0, typ: NTI33554450, name: "columnCount", sons: null},
+{kind: 1, offset: "columnFill", len: 0, typ: NTI33554450, name: "columnFill", sons: null},
+{kind: 1, offset: "columnGap", len: 0, typ: NTI33554450, name: "columnGap", sons: null},
+{kind: 1, offset: "columnRule", len: 0, typ: NTI33554450, name: "columnRule", sons: null},
+{kind: 1, offset: "columnRuleColor", len: 0, typ: NTI33554450, name: "columnRuleColor", sons: null},
+{kind: 1, offset: "columnRuleStyle", len: 0, typ: NTI33554450, name: "columnRuleStyle", sons: null},
+{kind: 1, offset: "columnRuleWidth", len: 0, typ: NTI33554450, name: "columnRuleWidth", sons: null},
+{kind: 1, offset: "columnSpan", len: 0, typ: NTI33554450, name: "columnSpan", sons: null},
+{kind: 1, offset: "columnWidth", len: 0, typ: NTI33554450, name: "columnWidth", sons: null},
+{kind: 1, offset: "columns", len: 0, typ: NTI33554450, name: "columns", sons: null},
+{kind: 1, offset: "contain", len: 0, typ: NTI33554450, name: "contain", sons: null},
+{kind: 1, offset: "content", len: 0, typ: NTI33554450, name: "content", sons: null},
+{kind: 1, offset: "counterIncrement", len: 0, typ: NTI33554450, name: "counterIncrement", sons: null},
+{kind: 1, offset: "counterReset", len: 0, typ: NTI33554450, name: "counterReset", sons: null},
+{kind: 1, offset: "counterSet", len: 0, typ: NTI33554450, name: "counterSet", sons: null},
+{kind: 1, offset: "cursor", len: 0, typ: NTI33554450, name: "cursor", sons: null},
+{kind: 1, offset: "direction", len: 0, typ: NTI33554450, name: "direction", sons: null},
+{kind: 1, offset: "display", len: 0, typ: NTI33554450, name: "display", sons: null},
+{kind: 1, offset: "emptyCells", len: 0, typ: NTI33554450, name: "emptyCells", sons: null},
+{kind: 1, offset: "filter", len: 0, typ: NTI33554450, name: "filter", sons: null},
+{kind: 1, offset: "flex", len: 0, typ: NTI33554450, name: "flex", sons: null},
+{kind: 1, offset: "flexBasis", len: 0, typ: NTI33554450, name: "flexBasis", sons: null},
+{kind: 1, offset: "flexDirection", len: 0, typ: NTI33554450, name: "flexDirection", sons: null},
+{kind: 1, offset: "flexFlow", len: 0, typ: NTI33554450, name: "flexFlow", sons: null},
+{kind: 1, offset: "flexGrow", len: 0, typ: NTI33554450, name: "flexGrow", sons: null},
+{kind: 1, offset: "flexShrink", len: 0, typ: NTI33554450, name: "flexShrink", sons: null},
+{kind: 1, offset: "flexWrap", len: 0, typ: NTI33554450, name: "flexWrap", sons: null},
+{kind: 1, offset: "cssFloat", len: 0, typ: NTI33554450, name: "cssFloat", sons: null},
+{kind: 1, offset: "font", len: 0, typ: NTI33554450, name: "font", sons: null},
+{kind: 1, offset: "fontFamily", len: 0, typ: NTI33554450, name: "fontFamily", sons: null},
+{kind: 1, offset: "fontFeatureSettings", len: 0, typ: NTI33554450, name: "fontFeatureSettings", sons: null},
+{kind: 1, offset: "fontKerning", len: 0, typ: NTI33554450, name: "fontKerning", sons: null},
+{kind: 1, offset: "fontLanguageOverride", len: 0, typ: NTI33554450, name: "fontLanguageOverride", sons: null},
+{kind: 1, offset: "fontOpticalSizing", len: 0, typ: NTI33554450, name: "fontOpticalSizing", sons: null},
+{kind: 1, offset: "fontSize", len: 0, typ: NTI33554450, name: "fontSize", sons: null},
+{kind: 1, offset: "fontSizeAdjust", len: 0, typ: NTI33554450, name: "fontSizeAdjust", sons: null},
+{kind: 1, offset: "fontStretch", len: 0, typ: NTI33554450, name: "fontStretch", sons: null},
+{kind: 1, offset: "fontStyle", len: 0, typ: NTI33554450, name: "fontStyle", sons: null},
+{kind: 1, offset: "fontSynthesis", len: 0, typ: NTI33554450, name: "fontSynthesis", sons: null},
+{kind: 1, offset: "fontVariant", len: 0, typ: NTI33554450, name: "fontVariant", sons: null},
+{kind: 1, offset: "fontVariantAlternates", len: 0, typ: NTI33554450, name: "fontVariantAlternates", sons: null},
+{kind: 1, offset: "fontVariantCaps", len: 0, typ: NTI33554450, name: "fontVariantCaps", sons: null},
+{kind: 1, offset: "fontVariantEastAsian", len: 0, typ: NTI33554450, name: "fontVariantEastAsian", sons: null},
+{kind: 1, offset: "fontVariantLigatures", len: 0, typ: NTI33554450, name: "fontVariantLigatures", sons: null},
+{kind: 1, offset: "fontVariantNumeric", len: 0, typ: NTI33554450, name: "fontVariantNumeric", sons: null},
+{kind: 1, offset: "fontVariantPosition", len: 0, typ: NTI33554450, name: "fontVariantPosition", sons: null},
+{kind: 1, offset: "fontVariationSettings", len: 0, typ: NTI33554450, name: "fontVariationSettings", sons: null},
+{kind: 1, offset: "fontWeight", len: 0, typ: NTI33554450, name: "fontWeight", sons: null},
+{kind: 1, offset: "gap", len: 0, typ: NTI33554450, name: "gap", sons: null},
+{kind: 1, offset: "grid", len: 0, typ: NTI33554450, name: "grid", sons: null},
+{kind: 1, offset: "gridArea", len: 0, typ: NTI33554450, name: "gridArea", sons: null},
+{kind: 1, offset: "gridAutoColumns", len: 0, typ: NTI33554450, name: "gridAutoColumns", sons: null},
+{kind: 1, offset: "gridAutoFlow", len: 0, typ: NTI33554450, name: "gridAutoFlow", sons: null},
+{kind: 1, offset: "gridAutoRows", len: 0, typ: NTI33554450, name: "gridAutoRows", sons: null},
+{kind: 1, offset: "gridColumn", len: 0, typ: NTI33554450, name: "gridColumn", sons: null},
+{kind: 1, offset: "gridColumnEnd", len: 0, typ: NTI33554450, name: "gridColumnEnd", sons: null},
+{kind: 1, offset: "gridColumnStart", len: 0, typ: NTI33554450, name: "gridColumnStart", sons: null},
+{kind: 1, offset: "gridRow", len: 0, typ: NTI33554450, name: "gridRow", sons: null},
+{kind: 1, offset: "gridRowEnd", len: 0, typ: NTI33554450, name: "gridRowEnd", sons: null},
+{kind: 1, offset: "gridRowStart", len: 0, typ: NTI33554450, name: "gridRowStart", sons: null},
+{kind: 1, offset: "gridTemplate", len: 0, typ: NTI33554450, name: "gridTemplate", sons: null},
+{kind: 1, offset: "gridTemplateAreas", len: 0, typ: NTI33554450, name: "gridTemplateAreas", sons: null},
+{kind: 1, offset: "gridTemplateColumns", len: 0, typ: NTI33554450, name: "gridTemplateColumns", sons: null},
+{kind: 1, offset: "gridTemplateRows", len: 0, typ: NTI33554450, name: "gridTemplateRows", sons: null},
+{kind: 1, offset: "hangingPunctuation", len: 0, typ: NTI33554450, name: "hangingPunctuation", sons: null},
+{kind: 1, offset: "height", len: 0, typ: NTI33554450, name: "height", sons: null},
+{kind: 1, offset: "hyphens", len: 0, typ: NTI33554450, name: "hyphens", sons: null},
+{kind: 1, offset: "imageOrientation", len: 0, typ: NTI33554450, name: "imageOrientation", sons: null},
+{kind: 1, offset: "imageRendering", len: 0, typ: NTI33554450, name: "imageRendering", sons: null},
+{kind: 1, offset: "inlineSize", len: 0, typ: NTI33554450, name: "inlineSize", sons: null},
+{kind: 1, offset: "inset", len: 0, typ: NTI33554450, name: "inset", sons: null},
+{kind: 1, offset: "insetBlock", len: 0, typ: NTI33554450, name: "insetBlock", sons: null},
+{kind: 1, offset: "insetBlockEnd", len: 0, typ: NTI33554450, name: "insetBlockEnd", sons: null},
+{kind: 1, offset: "insetBlockStart", len: 0, typ: NTI33554450, name: "insetBlockStart", sons: null},
+{kind: 1, offset: "insetInline", len: 0, typ: NTI33554450, name: "insetInline", sons: null},
+{kind: 1, offset: "insetInlineEnd", len: 0, typ: NTI33554450, name: "insetInlineEnd", sons: null},
+{kind: 1, offset: "insetInlineStart", len: 0, typ: NTI33554450, name: "insetInlineStart", sons: null},
+{kind: 1, offset: "isolation", len: 0, typ: NTI33554450, name: "isolation", sons: null},
+{kind: 1, offset: "justifyContent", len: 0, typ: NTI33554450, name: "justifyContent", sons: null},
+{kind: 1, offset: "justifyItems", len: 0, typ: NTI33554450, name: "justifyItems", sons: null},
+{kind: 1, offset: "justifySelf", len: 0, typ: NTI33554450, name: "justifySelf", sons: null},
+{kind: 1, offset: "left", len: 0, typ: NTI33554450, name: "left", sons: null},
+{kind: 1, offset: "letterSpacing", len: 0, typ: NTI33554450, name: "letterSpacing", sons: null},
+{kind: 1, offset: "lineBreak", len: 0, typ: NTI33554450, name: "lineBreak", sons: null},
+{kind: 1, offset: "lineHeight", len: 0, typ: NTI33554450, name: "lineHeight", sons: null},
+{kind: 1, offset: "listStyle", len: 0, typ: NTI33554450, name: "listStyle", sons: null},
+{kind: 1, offset: "listStyleImage", len: 0, typ: NTI33554450, name: "listStyleImage", sons: null},
+{kind: 1, offset: "listStylePosition", len: 0, typ: NTI33554450, name: "listStylePosition", sons: null},
+{kind: 1, offset: "listStyleType", len: 0, typ: NTI33554450, name: "listStyleType", sons: null},
+{kind: 1, offset: "margin", len: 0, typ: NTI33554450, name: "margin", sons: null},
+{kind: 1, offset: "marginBlock", len: 0, typ: NTI33554450, name: "marginBlock", sons: null},
+{kind: 1, offset: "marginBlockEnd", len: 0, typ: NTI33554450, name: "marginBlockEnd", sons: null},
+{kind: 1, offset: "marginBlockStart", len: 0, typ: NTI33554450, name: "marginBlockStart", sons: null},
+{kind: 1, offset: "marginBottom", len: 0, typ: NTI33554450, name: "marginBottom", sons: null},
+{kind: 1, offset: "marginInline", len: 0, typ: NTI33554450, name: "marginInline", sons: null},
+{kind: 1, offset: "marginInlineEnd", len: 0, typ: NTI33554450, name: "marginInlineEnd", sons: null},
+{kind: 1, offset: "marginInlineStart", len: 0, typ: NTI33554450, name: "marginInlineStart", sons: null},
+{kind: 1, offset: "marginLeft", len: 0, typ: NTI33554450, name: "marginLeft", sons: null},
+{kind: 1, offset: "marginRight", len: 0, typ: NTI33554450, name: "marginRight", sons: null},
+{kind: 1, offset: "marginTop", len: 0, typ: NTI33554450, name: "marginTop", sons: null},
+{kind: 1, offset: "mask", len: 0, typ: NTI33554450, name: "mask", sons: null},
+{kind: 1, offset: "maskBorder", len: 0, typ: NTI33554450, name: "maskBorder", sons: null},
+{kind: 1, offset: "maskBorderMode", len: 0, typ: NTI33554450, name: "maskBorderMode", sons: null},
+{kind: 1, offset: "maskBorderOutset", len: 0, typ: NTI33554450, name: "maskBorderOutset", sons: null},
+{kind: 1, offset: "maskBorderRepeat", len: 0, typ: NTI33554450, name: "maskBorderRepeat", sons: null},
+{kind: 1, offset: "maskBorderSlice", len: 0, typ: NTI33554450, name: "maskBorderSlice", sons: null},
+{kind: 1, offset: "maskBorderSource", len: 0, typ: NTI33554450, name: "maskBorderSource", sons: null},
+{kind: 1, offset: "maskBorderWidth", len: 0, typ: NTI33554450, name: "maskBorderWidth", sons: null},
+{kind: 1, offset: "maskClip", len: 0, typ: NTI33554450, name: "maskClip", sons: null},
+{kind: 1, offset: "maskComposite", len: 0, typ: NTI33554450, name: "maskComposite", sons: null},
+{kind: 1, offset: "maskImage", len: 0, typ: NTI33554450, name: "maskImage", sons: null},
+{kind: 1, offset: "maskMode", len: 0, typ: NTI33554450, name: "maskMode", sons: null},
+{kind: 1, offset: "maskOrigin", len: 0, typ: NTI33554450, name: "maskOrigin", sons: null},
+{kind: 1, offset: "maskPosition", len: 0, typ: NTI33554450, name: "maskPosition", sons: null},
+{kind: 1, offset: "maskRepeat", len: 0, typ: NTI33554450, name: "maskRepeat", sons: null},
+{kind: 1, offset: "maskSize", len: 0, typ: NTI33554450, name: "maskSize", sons: null},
+{kind: 1, offset: "maskType", len: 0, typ: NTI33554450, name: "maskType", sons: null},
+{kind: 1, offset: "maxBlockSize", len: 0, typ: NTI33554450, name: "maxBlockSize", sons: null},
+{kind: 1, offset: "maxHeight", len: 0, typ: NTI33554450, name: "maxHeight", sons: null},
+{kind: 1, offset: "maxInlineSize", len: 0, typ: NTI33554450, name: "maxInlineSize", sons: null},
+{kind: 1, offset: "maxWidth", len: 0, typ: NTI33554450, name: "maxWidth", sons: null},
+{kind: 1, offset: "minBlockSize", len: 0, typ: NTI33554450, name: "minBlockSize", sons: null},
+{kind: 1, offset: "minHeight", len: 0, typ: NTI33554450, name: "minHeight", sons: null},
+{kind: 1, offset: "minInlineSize", len: 0, typ: NTI33554450, name: "minInlineSize", sons: null},
+{kind: 1, offset: "minWidth", len: 0, typ: NTI33554450, name: "minWidth", sons: null},
+{kind: 1, offset: "mixBlendMode", len: 0, typ: NTI33554450, name: "mixBlendMode", sons: null},
+{kind: 1, offset: "objectFit", len: 0, typ: NTI33554450, name: "objectFit", sons: null},
+{kind: 1, offset: "objectPosition", len: 0, typ: NTI33554450, name: "objectPosition", sons: null},
+{kind: 1, offset: "offset", len: 0, typ: NTI33554450, name: "offset", sons: null},
+{kind: 1, offset: "offsetAnchor", len: 0, typ: NTI33554450, name: "offsetAnchor", sons: null},
+{kind: 1, offset: "offsetDistance", len: 0, typ: NTI33554450, name: "offsetDistance", sons: null},
+{kind: 1, offset: "offsetPath", len: 0, typ: NTI33554450, name: "offsetPath", sons: null},
+{kind: 1, offset: "offsetRotate", len: 0, typ: NTI33554450, name: "offsetRotate", sons: null},
+{kind: 1, offset: "opacity", len: 0, typ: NTI33554450, name: "opacity", sons: null},
+{kind: 1, offset: "order", len: 0, typ: NTI33554450, name: "order", sons: null},
+{kind: 1, offset: "orphans", len: 0, typ: NTI33554450, name: "orphans", sons: null},
+{kind: 1, offset: "outline", len: 0, typ: NTI33554450, name: "outline", sons: null},
+{kind: 1, offset: "outlineColor", len: 0, typ: NTI33554450, name: "outlineColor", sons: null},
+{kind: 1, offset: "outlineOffset", len: 0, typ: NTI33554450, name: "outlineOffset", sons: null},
+{kind: 1, offset: "outlineStyle", len: 0, typ: NTI33554450, name: "outlineStyle", sons: null},
+{kind: 1, offset: "outlineWidth", len: 0, typ: NTI33554450, name: "outlineWidth", sons: null},
+{kind: 1, offset: "overflow", len: 0, typ: NTI33554450, name: "overflow", sons: null},
+{kind: 1, offset: "overflowAnchor", len: 0, typ: NTI33554450, name: "overflowAnchor", sons: null},
+{kind: 1, offset: "overflowBlock", len: 0, typ: NTI33554450, name: "overflowBlock", sons: null},
+{kind: 1, offset: "overflowInline", len: 0, typ: NTI33554450, name: "overflowInline", sons: null},
+{kind: 1, offset: "overflowWrap", len: 0, typ: NTI33554450, name: "overflowWrap", sons: null},
+{kind: 1, offset: "overflowX", len: 0, typ: NTI33554450, name: "overflowX", sons: null},
+{kind: 1, offset: "overflowY", len: 0, typ: NTI33554450, name: "overflowY", sons: null},
+{kind: 1, offset: "overscrollBehavior", len: 0, typ: NTI33554450, name: "overscrollBehavior", sons: null},
+{kind: 1, offset: "overscrollBehaviorBlock", len: 0, typ: NTI33554450, name: "overscrollBehaviorBlock", sons: null},
+{kind: 1, offset: "overscrollBehaviorInline", len: 0, typ: NTI33554450, name: "overscrollBehaviorInline", sons: null},
+{kind: 1, offset: "overscrollBehaviorX", len: 0, typ: NTI33554450, name: "overscrollBehaviorX", sons: null},
+{kind: 1, offset: "overscrollBehaviorY", len: 0, typ: NTI33554450, name: "overscrollBehaviorY", sons: null},
+{kind: 1, offset: "padding", len: 0, typ: NTI33554450, name: "padding", sons: null},
+{kind: 1, offset: "paddingBlock", len: 0, typ: NTI33554450, name: "paddingBlock", sons: null},
+{kind: 1, offset: "paddingBlockEnd", len: 0, typ: NTI33554450, name: "paddingBlockEnd", sons: null},
+{kind: 1, offset: "paddingBlockStart", len: 0, typ: NTI33554450, name: "paddingBlockStart", sons: null},
+{kind: 1, offset: "paddingBottom", len: 0, typ: NTI33554450, name: "paddingBottom", sons: null},
+{kind: 1, offset: "paddingInline", len: 0, typ: NTI33554450, name: "paddingInline", sons: null},
+{kind: 1, offset: "paddingInlineEnd", len: 0, typ: NTI33554450, name: "paddingInlineEnd", sons: null},
+{kind: 1, offset: "paddingInlineStart", len: 0, typ: NTI33554450, name: "paddingInlineStart", sons: null},
+{kind: 1, offset: "paddingLeft", len: 0, typ: NTI33554450, name: "paddingLeft", sons: null},
+{kind: 1, offset: "paddingRight", len: 0, typ: NTI33554450, name: "paddingRight", sons: null},
+{kind: 1, offset: "paddingTop", len: 0, typ: NTI33554450, name: "paddingTop", sons: null},
+{kind: 1, offset: "pageBreakAfter", len: 0, typ: NTI33554450, name: "pageBreakAfter", sons: null},
+{kind: 1, offset: "pageBreakBefore", len: 0, typ: NTI33554450, name: "pageBreakBefore", sons: null},
+{kind: 1, offset: "pageBreakInside", len: 0, typ: NTI33554450, name: "pageBreakInside", sons: null},
+{kind: 1, offset: "paintOrder", len: 0, typ: NTI33554450, name: "paintOrder", sons: null},
+{kind: 1, offset: "perspective", len: 0, typ: NTI33554450, name: "perspective", sons: null},
+{kind: 1, offset: "perspectiveOrigin", len: 0, typ: NTI33554450, name: "perspectiveOrigin", sons: null},
+{kind: 1, offset: "placeContent", len: 0, typ: NTI33554450, name: "placeContent", sons: null},
+{kind: 1, offset: "placeItems", len: 0, typ: NTI33554450, name: "placeItems", sons: null},
+{kind: 1, offset: "placeSelf", len: 0, typ: NTI33554450, name: "placeSelf", sons: null},
+{kind: 1, offset: "pointerEvents", len: 0, typ: NTI33554450, name: "pointerEvents", sons: null},
+{kind: 1, offset: "position", len: 0, typ: NTI33554450, name: "position", sons: null},
+{kind: 1, offset: "quotes", len: 0, typ: NTI33554450, name: "quotes", sons: null},
+{kind: 1, offset: "resize", len: 0, typ: NTI33554450, name: "resize", sons: null},
+{kind: 1, offset: "right", len: 0, typ: NTI33554450, name: "right", sons: null},
+{kind: 1, offset: "rotate", len: 0, typ: NTI33554450, name: "rotate", sons: null},
+{kind: 1, offset: "rowGap", len: 0, typ: NTI33554450, name: "rowGap", sons: null},
+{kind: 1, offset: "scale", len: 0, typ: NTI33554450, name: "scale", sons: null},
+{kind: 1, offset: "scrollBehavior", len: 0, typ: NTI33554450, name: "scrollBehavior", sons: null},
+{kind: 1, offset: "scrollMargin", len: 0, typ: NTI33554450, name: "scrollMargin", sons: null},
+{kind: 1, offset: "scrollMarginBlock", len: 0, typ: NTI33554450, name: "scrollMarginBlock", sons: null},
+{kind: 1, offset: "scrollMarginBlockEnd", len: 0, typ: NTI33554450, name: "scrollMarginBlockEnd", sons: null},
+{kind: 1, offset: "scrollMarginBlockStart", len: 0, typ: NTI33554450, name: "scrollMarginBlockStart", sons: null},
+{kind: 1, offset: "scrollMarginBottom", len: 0, typ: NTI33554450, name: "scrollMarginBottom", sons: null},
+{kind: 1, offset: "scrollMarginInline", len: 0, typ: NTI33554450, name: "scrollMarginInline", sons: null},
+{kind: 1, offset: "scrollMarginInlineEnd", len: 0, typ: NTI33554450, name: "scrollMarginInlineEnd", sons: null},
+{kind: 1, offset: "scrollMarginInlineStart", len: 0, typ: NTI33554450, name: "scrollMarginInlineStart", sons: null},
+{kind: 1, offset: "scrollMarginLeft", len: 0, typ: NTI33554450, name: "scrollMarginLeft", sons: null},
+{kind: 1, offset: "scrollMarginRight", len: 0, typ: NTI33554450, name: "scrollMarginRight", sons: null},
+{kind: 1, offset: "scrollMarginTop", len: 0, typ: NTI33554450, name: "scrollMarginTop", sons: null},
+{kind: 1, offset: "scrollPadding", len: 0, typ: NTI33554450, name: "scrollPadding", sons: null},
+{kind: 1, offset: "scrollPaddingBlock", len: 0, typ: NTI33554450, name: "scrollPaddingBlock", sons: null},
+{kind: 1, offset: "scrollPaddingBlockEnd", len: 0, typ: NTI33554450, name: "scrollPaddingBlockEnd", sons: null},
+{kind: 1, offset: "scrollPaddingBlockStart", len: 0, typ: NTI33554450, name: "scrollPaddingBlockStart", sons: null},
+{kind: 1, offset: "scrollPaddingBottom", len: 0, typ: NTI33554450, name: "scrollPaddingBottom", sons: null},
+{kind: 1, offset: "scrollPaddingInline", len: 0, typ: NTI33554450, name: "scrollPaddingInline", sons: null},
+{kind: 1, offset: "scrollPaddingInlineEnd", len: 0, typ: NTI33554450, name: "scrollPaddingInlineEnd", sons: null},
+{kind: 1, offset: "scrollPaddingInlineStart", len: 0, typ: NTI33554450, name: "scrollPaddingInlineStart", sons: null},
+{kind: 1, offset: "scrollPaddingLeft", len: 0, typ: NTI33554450, name: "scrollPaddingLeft", sons: null},
+{kind: 1, offset: "scrollPaddingRight", len: 0, typ: NTI33554450, name: "scrollPaddingRight", sons: null},
+{kind: 1, offset: "scrollPaddingTop", len: 0, typ: NTI33554450, name: "scrollPaddingTop", sons: null},
+{kind: 1, offset: "scrollSnapAlign", len: 0, typ: NTI33554450, name: "scrollSnapAlign", sons: null},
+{kind: 1, offset: "scrollSnapStop", len: 0, typ: NTI33554450, name: "scrollSnapStop", sons: null},
+{kind: 1, offset: "scrollSnapType", len: 0, typ: NTI33554450, name: "scrollSnapType", sons: null},
+{kind: 1, offset: "scrollbar3dLightColor", len: 0, typ: NTI33554450, name: "scrollbar3dLightColor", sons: null},
+{kind: 1, offset: "scrollbarArrowColor", len: 0, typ: NTI33554450, name: "scrollbarArrowColor", sons: null},
+{kind: 1, offset: "scrollbarBaseColor", len: 0, typ: NTI33554450, name: "scrollbarBaseColor", sons: null},
+{kind: 1, offset: "scrollbarColor", len: 0, typ: NTI33554450, name: "scrollbarColor", sons: null},
+{kind: 1, offset: "scrollbarDarkshadowColor", len: 0, typ: NTI33554450, name: "scrollbarDarkshadowColor", sons: null},
+{kind: 1, offset: "scrollbarFaceColor", len: 0, typ: NTI33554450, name: "scrollbarFaceColor", sons: null},
+{kind: 1, offset: "scrollbarHighlightColor", len: 0, typ: NTI33554450, name: "scrollbarHighlightColor", sons: null},
+{kind: 1, offset: "scrollbarShadowColor", len: 0, typ: NTI33554450, name: "scrollbarShadowColor", sons: null},
+{kind: 1, offset: "scrollbarTrackColor", len: 0, typ: NTI33554450, name: "scrollbarTrackColor", sons: null},
+{kind: 1, offset: "scrollbarWidth", len: 0, typ: NTI33554450, name: "scrollbarWidth", sons: null},
+{kind: 1, offset: "shapeImageThreshold", len: 0, typ: NTI33554450, name: "shapeImageThreshold", sons: null},
+{kind: 1, offset: "shapeMargin", len: 0, typ: NTI33554450, name: "shapeMargin", sons: null},
+{kind: 1, offset: "shapeOutside", len: 0, typ: NTI33554450, name: "shapeOutside", sons: null},
+{kind: 1, offset: "tabSize", len: 0, typ: NTI33554450, name: "tabSize", sons: null},
+{kind: 1, offset: "tableLayout", len: 0, typ: NTI33554450, name: "tableLayout", sons: null},
+{kind: 1, offset: "textAlign", len: 0, typ: NTI33554450, name: "textAlign", sons: null},
+{kind: 1, offset: "textAlignLast", len: 0, typ: NTI33554450, name: "textAlignLast", sons: null},
+{kind: 1, offset: "textCombineUpright", len: 0, typ: NTI33554450, name: "textCombineUpright", sons: null},
+{kind: 1, offset: "textDecoration", len: 0, typ: NTI33554450, name: "textDecoration", sons: null},
+{kind: 1, offset: "textDecorationColor", len: 0, typ: NTI33554450, name: "textDecorationColor", sons: null},
+{kind: 1, offset: "textDecorationLine", len: 0, typ: NTI33554450, name: "textDecorationLine", sons: null},
+{kind: 1, offset: "textDecorationSkipInk", len: 0, typ: NTI33554450, name: "textDecorationSkipInk", sons: null},
+{kind: 1, offset: "textDecorationStyle", len: 0, typ: NTI33554450, name: "textDecorationStyle", sons: null},
+{kind: 1, offset: "textDecorationThickness", len: 0, typ: NTI33554450, name: "textDecorationThickness", sons: null},
+{kind: 1, offset: "textEmphasis", len: 0, typ: NTI33554450, name: "textEmphasis", sons: null},
+{kind: 1, offset: "textEmphasisColor", len: 0, typ: NTI33554450, name: "textEmphasisColor", sons: null},
+{kind: 1, offset: "textEmphasisPosition", len: 0, typ: NTI33554450, name: "textEmphasisPosition", sons: null},
+{kind: 1, offset: "textEmphasisStyle", len: 0, typ: NTI33554450, name: "textEmphasisStyle", sons: null},
+{kind: 1, offset: "textIndent", len: 0, typ: NTI33554450, name: "textIndent", sons: null},
+{kind: 1, offset: "textJustify", len: 0, typ: NTI33554450, name: "textJustify", sons: null},
+{kind: 1, offset: "textOrientation", len: 0, typ: NTI33554450, name: "textOrientation", sons: null},
+{kind: 1, offset: "textOverflow", len: 0, typ: NTI33554450, name: "textOverflow", sons: null},
+{kind: 1, offset: "textRendering", len: 0, typ: NTI33554450, name: "textRendering", sons: null},
+{kind: 1, offset: "textShadow", len: 0, typ: NTI33554450, name: "textShadow", sons: null},
+{kind: 1, offset: "textTransform", len: 0, typ: NTI33554450, name: "textTransform", sons: null},
+{kind: 1, offset: "textUnderlineOffset", len: 0, typ: NTI33554450, name: "textUnderlineOffset", sons: null},
+{kind: 1, offset: "textUnderlinePosition", len: 0, typ: NTI33554450, name: "textUnderlinePosition", sons: null},
+{kind: 1, offset: "top", len: 0, typ: NTI33554450, name: "top", sons: null},
+{kind: 1, offset: "touchAction", len: 0, typ: NTI33554450, name: "touchAction", sons: null},
+{kind: 1, offset: "transform", len: 0, typ: NTI33554450, name: "transform", sons: null},
+{kind: 1, offset: "transformBox", len: 0, typ: NTI33554450, name: "transformBox", sons: null},
+{kind: 1, offset: "transformOrigin", len: 0, typ: NTI33554450, name: "transformOrigin", sons: null},
+{kind: 1, offset: "transformStyle", len: 0, typ: NTI33554450, name: "transformStyle", sons: null},
+{kind: 1, offset: "transition", len: 0, typ: NTI33554450, name: "transition", sons: null},
+{kind: 1, offset: "transitionDelay", len: 0, typ: NTI33554450, name: "transitionDelay", sons: null},
+{kind: 1, offset: "transitionDuration", len: 0, typ: NTI33554450, name: "transitionDuration", sons: null},
+{kind: 1, offset: "transitionProperty", len: 0, typ: NTI33554450, name: "transitionProperty", sons: null},
+{kind: 1, offset: "transitionTimingFunction", len: 0, typ: NTI33554450, name: "transitionTimingFunction", sons: null},
+{kind: 1, offset: "translate", len: 0, typ: NTI33554450, name: "translate", sons: null},
+{kind: 1, offset: "unicodeBidi", len: 0, typ: NTI33554450, name: "unicodeBidi", sons: null},
+{kind: 1, offset: "verticalAlign", len: 0, typ: NTI33554450, name: "verticalAlign", sons: null},
+{kind: 1, offset: "visibility", len: 0, typ: NTI33554450, name: "visibility", sons: null},
+{kind: 1, offset: "whiteSpace", len: 0, typ: NTI33554450, name: "whiteSpace", sons: null},
+{kind: 1, offset: "widows", len: 0, typ: NTI33554450, name: "widows", sons: null},
+{kind: 1, offset: "width", len: 0, typ: NTI33554450, name: "width", sons: null},
+{kind: 1, offset: "willChange", len: 0, typ: NTI33554450, name: "willChange", sons: null},
+{kind: 1, offset: "wordBreak", len: 0, typ: NTI33554450, name: "wordBreak", sons: null},
+{kind: 1, offset: "wordSpacing", len: 0, typ: NTI33554450, name: "wordSpacing", sons: null},
+{kind: 1, offset: "writingMode", len: 0, typ: NTI33554450, name: "writingMode", sons: null},
 {kind: 1, offset: "zIndex", len: 0, typ: NTI33554450, name: "zIndex", sons: null}]};
 NTI855638158.node = NNI855638158;
 NTI855638158.base = NTI33555179;
 NTI855638046.base = NTI855638158;
-var NNI855638130 = {kind: 2, len: 22, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "attributes", len: 0, typ: NTI855638131, name: "attributes", sons: null}, 
-{kind: 1, offset: "childNodes", len: 0, typ: NTI855638132, name: "childNodes", sons: null}, 
-{kind: 1, offset: "children", len: 0, typ: NTI855638133, name: "children", sons: null}, 
-{kind: 1, offset: "data", len: 0, typ: NTI33554450, name: "data", sons: null}, 
-{kind: 1, offset: "firstChild", len: 0, typ: NTI855638032, name: "firstChild", sons: null}, 
-{kind: 1, offset: "lastChild", len: 0, typ: NTI855638032, name: "lastChild", sons: null}, 
-{kind: 1, offset: "nextSibling", len: 0, typ: NTI855638032, name: "nextSibling", sons: null}, 
-{kind: 1, offset: "nodeName", len: 0, typ: NTI33554450, name: "nodeName", sons: null}, 
-{kind: 1, offset: "nodeType", len: 0, typ: NTI855638031, name: "nodeType", sons: null}, 
-{kind: 1, offset: "nodeValue", len: 0, typ: NTI33554450, name: "nodeValue", sons: null}, 
-{kind: 1, offset: "parentNode", len: 0, typ: NTI855638032, name: "parentNode", sons: null}, 
-{kind: 1, offset: "content", len: 0, typ: NTI855638032, name: "content", sons: null}, 
-{kind: 1, offset: "previousSibling", len: 0, typ: NTI855638032, name: "previousSibling", sons: null}, 
-{kind: 1, offset: "ownerDocument", len: 0, typ: NTI855638033, name: "ownerDocument", sons: null}, 
-{kind: 1, offset: "innerHTML", len: 0, typ: NTI33554450, name: "innerHTML", sons: null}, 
-{kind: 1, offset: "outerHTML", len: 0, typ: NTI33554450, name: "outerHTML", sons: null}, 
-{kind: 1, offset: "innerText", len: 0, typ: NTI33554450, name: "innerText", sons: null}, 
-{kind: 1, offset: "textContent", len: 0, typ: NTI33554450, name: "textContent", sons: null}, 
-{kind: 1, offset: "style", len: 0, typ: NTI855638046, name: "style", sons: null}, 
-{kind: 1, offset: "baseURI", len: 0, typ: NTI33554450, name: "baseURI", sons: null}, 
-{kind: 1, offset: "parentElement", len: 0, typ: NTI855638034, name: "parentElement", sons: null}, 
+var NNI855638130 = {kind: 2, len: 22, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "attributes", len: 0, typ: NTI855638131, name: "attributes", sons: null},
+{kind: 1, offset: "childNodes", len: 0, typ: NTI855638132, name: "childNodes", sons: null},
+{kind: 1, offset: "children", len: 0, typ: NTI855638133, name: "children", sons: null},
+{kind: 1, offset: "data", len: 0, typ: NTI33554450, name: "data", sons: null},
+{kind: 1, offset: "firstChild", len: 0, typ: NTI855638032, name: "firstChild", sons: null},
+{kind: 1, offset: "lastChild", len: 0, typ: NTI855638032, name: "lastChild", sons: null},
+{kind: 1, offset: "nextSibling", len: 0, typ: NTI855638032, name: "nextSibling", sons: null},
+{kind: 1, offset: "nodeName", len: 0, typ: NTI33554450, name: "nodeName", sons: null},
+{kind: 1, offset: "nodeType", len: 0, typ: NTI855638031, name: "nodeType", sons: null},
+{kind: 1, offset: "nodeValue", len: 0, typ: NTI33554450, name: "nodeValue", sons: null},
+{kind: 1, offset: "parentNode", len: 0, typ: NTI855638032, name: "parentNode", sons: null},
+{kind: 1, offset: "content", len: 0, typ: NTI855638032, name: "content", sons: null},
+{kind: 1, offset: "previousSibling", len: 0, typ: NTI855638032, name: "previousSibling", sons: null},
+{kind: 1, offset: "ownerDocument", len: 0, typ: NTI855638033, name: "ownerDocument", sons: null},
+{kind: 1, offset: "innerHTML", len: 0, typ: NTI33554450, name: "innerHTML", sons: null},
+{kind: 1, offset: "outerHTML", len: 0, typ: NTI33554450, name: "outerHTML", sons: null},
+{kind: 1, offset: "innerText", len: 0, typ: NTI33554450, name: "innerText", sons: null},
+{kind: 1, offset: "textContent", len: 0, typ: NTI33554450, name: "textContent", sons: null},
+{kind: 1, offset: "style", len: 0, typ: NTI855638046, name: "style", sons: null},
+{kind: 1, offset: "baseURI", len: 0, typ: NTI33554450, name: "baseURI", sons: null},
+{kind: 1, offset: "parentElement", len: 0, typ: NTI855638034, name: "parentElement", sons: null},
 {kind: 1, offset: "isConnected", len: 0, typ: NTI33554466, name: "isConnected", sons: null}]};
 NTI855638130.node = NNI855638130;
-var NNI855638085 = {kind: 2, len: 24, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "onabort", len: 0, typ: NTI855638086, name: "onabort", sons: null}, 
-{kind: 1, offset: "onblur", len: 0, typ: NTI855638087, name: "onblur", sons: null}, 
-{kind: 1, offset: "onchange", len: 0, typ: NTI855638088, name: "onchange", sons: null}, 
-{kind: 1, offset: "onclick", len: 0, typ: NTI855638089, name: "onclick", sons: null}, 
-{kind: 1, offset: "ondblclick", len: 0, typ: NTI855638090, name: "ondblclick", sons: null}, 
-{kind: 1, offset: "onerror", len: 0, typ: NTI855638091, name: "onerror", sons: null}, 
-{kind: 1, offset: "onfocus", len: 0, typ: NTI855638092, name: "onfocus", sons: null}, 
-{kind: 1, offset: "onkeydown", len: 0, typ: NTI855638093, name: "onkeydown", sons: null}, 
-{kind: 1, offset: "onkeypress", len: 0, typ: NTI855638094, name: "onkeypress", sons: null}, 
-{kind: 1, offset: "onkeyup", len: 0, typ: NTI855638095, name: "onkeyup", sons: null}, 
-{kind: 1, offset: "onload", len: 0, typ: NTI855638096, name: "onload", sons: null}, 
-{kind: 1, offset: "onmousedown", len: 0, typ: NTI855638097, name: "onmousedown", sons: null}, 
-{kind: 1, offset: "onmousemove", len: 0, typ: NTI855638098, name: "onmousemove", sons: null}, 
-{kind: 1, offset: "onmouseout", len: 0, typ: NTI855638099, name: "onmouseout", sons: null}, 
-{kind: 1, offset: "onmouseover", len: 0, typ: NTI855638100, name: "onmouseover", sons: null}, 
-{kind: 1, offset: "onmouseup", len: 0, typ: NTI855638101, name: "onmouseup", sons: null}, 
-{kind: 1, offset: "onreset", len: 0, typ: NTI855638102, name: "onreset", sons: null}, 
-{kind: 1, offset: "onselect", len: 0, typ: NTI855638103, name: "onselect", sons: null}, 
-{kind: 1, offset: "onstorage", len: 0, typ: NTI855638104, name: "onstorage", sons: null}, 
-{kind: 1, offset: "onsubmit", len: 0, typ: NTI855638105, name: "onsubmit", sons: null}, 
-{kind: 1, offset: "onunload", len: 0, typ: NTI855638106, name: "onunload", sons: null}, 
-{kind: 1, offset: "onloadstart", len: 0, typ: NTI855638107, name: "onloadstart", sons: null}, 
-{kind: 1, offset: "onprogress", len: 0, typ: NTI855638108, name: "onprogress", sons: null}, 
+var NNI855638085 = {kind: 2, len: 24, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "onabort", len: 0, typ: NTI855638086, name: "onabort", sons: null},
+{kind: 1, offset: "onblur", len: 0, typ: NTI855638087, name: "onblur", sons: null},
+{kind: 1, offset: "onchange", len: 0, typ: NTI855638088, name: "onchange", sons: null},
+{kind: 1, offset: "onclick", len: 0, typ: NTI855638089, name: "onclick", sons: null},
+{kind: 1, offset: "ondblclick", len: 0, typ: NTI855638090, name: "ondblclick", sons: null},
+{kind: 1, offset: "onerror", len: 0, typ: NTI855638091, name: "onerror", sons: null},
+{kind: 1, offset: "onfocus", len: 0, typ: NTI855638092, name: "onfocus", sons: null},
+{kind: 1, offset: "onkeydown", len: 0, typ: NTI855638093, name: "onkeydown", sons: null},
+{kind: 1, offset: "onkeypress", len: 0, typ: NTI855638094, name: "onkeypress", sons: null},
+{kind: 1, offset: "onkeyup", len: 0, typ: NTI855638095, name: "onkeyup", sons: null},
+{kind: 1, offset: "onload", len: 0, typ: NTI855638096, name: "onload", sons: null},
+{kind: 1, offset: "onmousedown", len: 0, typ: NTI855638097, name: "onmousedown", sons: null},
+{kind: 1, offset: "onmousemove", len: 0, typ: NTI855638098, name: "onmousemove", sons: null},
+{kind: 1, offset: "onmouseout", len: 0, typ: NTI855638099, name: "onmouseout", sons: null},
+{kind: 1, offset: "onmouseover", len: 0, typ: NTI855638100, name: "onmouseover", sons: null},
+{kind: 1, offset: "onmouseup", len: 0, typ: NTI855638101, name: "onmouseup", sons: null},
+{kind: 1, offset: "onreset", len: 0, typ: NTI855638102, name: "onreset", sons: null},
+{kind: 1, offset: "onselect", len: 0, typ: NTI855638103, name: "onselect", sons: null},
+{kind: 1, offset: "onstorage", len: 0, typ: NTI855638104, name: "onstorage", sons: null},
+{kind: 1, offset: "onsubmit", len: 0, typ: NTI855638105, name: "onsubmit", sons: null},
+{kind: 1, offset: "onunload", len: 0, typ: NTI855638106, name: "onunload", sons: null},
+{kind: 1, offset: "onloadstart", len: 0, typ: NTI855638107, name: "onloadstart", sons: null},
+{kind: 1, offset: "onprogress", len: 0, typ: NTI855638108, name: "onprogress", sons: null},
 {kind: 1, offset: "onloadend", len: 0, typ: NTI855638109, name: "onloadend", sons: null}]};
 NTI855638085.node = NNI855638085;
 NTI855638085.base = NTI33555179;
 NTI855638130.base = NTI855638085;
 NTI855638032.base = NTI855638130;
-var NNI771752030 = {kind: 2, len: 11, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "kind", len: 0, typ: NTI771751939, name: "kind", sons: null}, 
-{kind: 1, offset: "index", len: 0, typ: NTI33554435, name: "index", sons: null}, 
-{kind: 1, offset: "id", len: 0, typ: NTI33554450, name: "id", sons: null}, 
-{kind: 1, offset: "class", len: 0, typ: NTI33554450, name: "class", sons: null}, 
-{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null}, 
-{kind: 1, offset: "kids", len: 0, typ: NTI771752031, name: "kids", sons: null}, 
-{kind: 1, offset: "attrs", len: 0, typ: NTI771752032, name: "attrs", sons: null}, 
-{kind: 1, offset: "events", len: 0, typ: NTI771752025, name: "events", sons: null}, 
-{kind: 1, offset: "style", len: 0, typ: NTI838860852, name: "style", sons: null}, 
-{kind: 1, offset: "styleVersion", len: 0, typ: NTI33554435, name: "styleVersion", sons: null}, 
+var NNI771752030 = {kind: 2, len: 11, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "kind", len: 0, typ: NTI771751939, name: "kind", sons: null},
+{kind: 1, offset: "index", len: 0, typ: NTI33554435, name: "index", sons: null},
+{kind: 1, offset: "id", len: 0, typ: NTI33554450, name: "id", sons: null},
+{kind: 1, offset: "class", len: 0, typ: NTI33554450, name: "class", sons: null},
+{kind: 1, offset: "text", len: 0, typ: NTI33554450, name: "text", sons: null},
+{kind: 1, offset: "kids", len: 0, typ: NTI771752031, name: "kids", sons: null},
+{kind: 1, offset: "attrs", len: 0, typ: NTI771752032, name: "attrs", sons: null},
+{kind: 1, offset: "events", len: 0, typ: NTI771752025, name: "events", sons: null},
+{kind: 1, offset: "style", len: 0, typ: NTI838860852, name: "style", sons: null},
+{kind: 1, offset: "styleVersion", len: 0, typ: NTI33554435, name: "styleVersion", sons: null},
 {kind: 1, offset: "dom", len: 0, typ: NTI855638032, name: "dom", sons: null}]};
 NTI771752030.node = NNI771752030;
 NTI771752030.base = NTI33555179;
 NTI771752027.base = NTI771752030;
-var NNI738197511 = {kind: 2, offset: 0, typ: null, name: null, len: 6, sons: {"0": {kind: 1, offset: 0, typ: NTI738197511, name: "pkReplace", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI738197511, name: "pkRemove", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI738197511, name: "pkAppend", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI738197511, name: "pkInsertBefore", len: 0, sons: null}, 
-"4": {kind: 1, offset: 4, typ: NTI738197511, name: "pkDetach", len: 0, sons: null}, 
+var NNI738197511 = {kind: 2, offset: 0, typ: null, name: null, len: 6, sons: {"0": {kind: 1, offset: 0, typ: NTI738197511, name: "pkReplace", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI738197511, name: "pkRemove", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI738197511, name: "pkAppend", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI738197511, name: "pkInsertBefore", len: 0, sons: null},
+"4": {kind: 1, offset: 4, typ: NTI738197511, name: "pkDetach", len: 0, sons: null},
 "5": {kind: 1, offset: 5, typ: NTI738197511, name: "pkSame", len: 0, sons: null}}};
 NTI738197511.node = NNI738197511;
-var NNI738197512 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "k", len: 0, typ: NTI738197511, name: "k", sons: null}, 
-{kind: 1, offset: "parent", len: 0, typ: NTI855638032, name: "parent", sons: null}, 
-{kind: 1, offset: "current", len: 0, typ: NTI855638032, name: "current", sons: null}, 
-{kind: 1, offset: "newNode", len: 0, typ: NTI771752027, name: "newNode", sons: null}, 
+var NNI738197512 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "k", len: 0, typ: NTI738197511, name: "k", sons: null},
+{kind: 1, offset: "parent", len: 0, typ: NTI855638032, name: "parent", sons: null},
+{kind: 1, offset: "current", len: 0, typ: NTI855638032, name: "current", sons: null},
+{kind: 1, offset: "newNode", len: 0, typ: NTI771752027, name: "newNode", sons: null},
 {kind: 1, offset: "oldNode", len: 0, typ: NTI771752027, name: "oldNode", sons: null}]};
 NTI738197512.node = NNI738197512;
 NTI738197522.base = NTI738197512;
-var NNI738197513 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "parent", len: 0, typ: NTI771752027, name: "parent", sons: null}, 
-{kind: 1, offset: "newChild", len: 0, typ: NTI771752027, name: "newChild", sons: null}, 
+var NNI738197513 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "parent", len: 0, typ: NTI771752027, name: "parent", sons: null},
+{kind: 1, offset: "newChild", len: 0, typ: NTI771752027, name: "newChild", sons: null},
 {kind: 1, offset: "pos", len: 0, typ: NTI33554435, name: "pos", sons: null}]};
 NTI738197513.node = NNI738197513;
 NTI738197523.base = NTI738197513;
-var NNI771752033 = {kind: 2, len: 10, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "key", len: 0, typ: NTI33554450, name: "key", sons: null}, 
-{kind: 1, offset: "renderImpl", len: 0, typ: NTI771752034, name: "renderImpl", sons: null}, 
-{kind: 1, offset: "changedImpl", len: 0, typ: NTI771752035, name: "changedImpl", sons: null}, 
-{kind: 1, offset: "updatedImpl", len: 0, typ: NTI771752036, name: "updatedImpl", sons: null}, 
-{kind: 1, offset: "onAttachImpl", len: 0, typ: NTI771752037, name: "onAttachImpl", sons: null}, 
-{kind: 1, offset: "onDetachImpl", len: 0, typ: NTI771752038, name: "onDetachImpl", sons: null}, 
-{kind: 1, offset: "version", len: 0, typ: NTI33554435, name: "version", sons: null}, 
-{kind: 1, offset: "renderedVersion", len: 0, typ: NTI33554435, name: "renderedVersion", sons: null}, 
-{kind: 1, offset: "expanded", len: 0, typ: NTI771752027, name: "expanded", sons: null}, 
+var NNI771752033 = {kind: 2, len: 10, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "key", len: 0, typ: NTI33554450, name: "key", sons: null},
+{kind: 1, offset: "renderImpl", len: 0, typ: NTI771752034, name: "renderImpl", sons: null},
+{kind: 1, offset: "changedImpl", len: 0, typ: NTI771752035, name: "changedImpl", sons: null},
+{kind: 1, offset: "updatedImpl", len: 0, typ: NTI771752036, name: "updatedImpl", sons: null},
+{kind: 1, offset: "onAttachImpl", len: 0, typ: NTI771752037, name: "onAttachImpl", sons: null},
+{kind: 1, offset: "onDetachImpl", len: 0, typ: NTI771752038, name: "onDetachImpl", sons: null},
+{kind: 1, offset: "version", len: 0, typ: NTI33554435, name: "version", sons: null},
+{kind: 1, offset: "renderedVersion", len: 0, typ: NTI33554435, name: "renderedVersion", sons: null},
+{kind: 1, offset: "expanded", len: 0, typ: NTI771752027, name: "expanded", sons: null},
 {kind: 1, offset: "debugId", len: 0, typ: NTI33554435, name: "debugId", sons: null}]};
 NTI771752033.node = NNI771752033;
 NTI771752033.base = NTI771752030;
 NTI771752028.base = NTI771752033;
-var NNI738197514 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "oldNode", len: 0, typ: NTI771752028, name: "oldNode", sons: null}, 
-{kind: 1, offset: "newNode", len: 0, typ: NTI771752028, name: "newNode", sons: null}, 
-{kind: 1, offset: "parent", len: 0, typ: NTI855638032, name: "parent", sons: null}, 
+var NNI738197514 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "oldNode", len: 0, typ: NTI771752028, name: "oldNode", sons: null},
+{kind: 1, offset: "newNode", len: 0, typ: NTI771752028, name: "newNode", sons: null},
+{kind: 1, offset: "parent", len: 0, typ: NTI855638032, name: "parent", sons: null},
 {kind: 1, offset: "current", len: 0, typ: NTI855638032, name: "current", sons: null}]};
 NTI738197514.node = NNI738197514;
 NTI738197524.base = NTI738197514;
@@ -1204,35 +1208,35 @@ NTI738197532.base = NTI738197533;
 var NNI738197542 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI738197542.node = NNI738197542;
 NTI738197541.base = NTI738197542;
-var NNI738197519 = {kind: 2, len: 17, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "rootId", len: 0, typ: NTI33554450, name: "rootId", sons: null}, 
-{kind: 1, offset: "renderer", len: 0, typ: NTI738197520, name: "renderer", sons: null}, 
-{kind: 1, offset: "currentTree", len: 0, typ: NTI771752027, name: "currentTree", sons: null}, 
-{kind: 1, offset: "postRenderCallback", len: 0, typ: NTI738197521, name: "postRenderCallback", sons: null}, 
-{kind: 1, offset: "toFocus", len: 0, typ: NTI855638032, name: "toFocus", sons: null}, 
-{kind: 1, offset: "toFocusV", len: 0, typ: NTI771752027, name: "toFocusV", sons: null}, 
-{kind: 1, offset: "renderId", len: 0, typ: NTI33554435, name: "renderId", sons: null}, 
-{kind: 1, offset: "rendering", len: 0, typ: NTI33554466, name: "rendering", sons: null}, 
-{kind: 1, offset: "patches", len: 0, typ: NTI738197522, name: "patches", sons: null}, 
-{kind: 1, offset: "patchLen", len: 0, typ: NTI33554435, name: "patchLen", sons: null}, 
-{kind: 1, offset: "patchesV", len: 0, typ: NTI738197523, name: "patchesV", sons: null}, 
-{kind: 1, offset: "patchLenV", len: 0, typ: NTI33554435, name: "patchLenV", sons: null}, 
-{kind: 1, offset: "runCount", len: 0, typ: NTI33554435, name: "runCount", sons: null}, 
-{kind: 1, offset: "components", len: 0, typ: NTI738197524, name: "components", sons: null}, 
-{kind: 1, offset: "surpressRedraws", len: 0, typ: NTI33554466, name: "surpressRedraws", sons: null}, 
-{kind: 1, offset: "byId", len: 0, typ: NTI738197532, name: "byId", sons: null}, 
+var NNI738197519 = {kind: 2, len: 17, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "rootId", len: 0, typ: NTI33554450, name: "rootId", sons: null},
+{kind: 1, offset: "renderer", len: 0, typ: NTI738197520, name: "renderer", sons: null},
+{kind: 1, offset: "currentTree", len: 0, typ: NTI771752027, name: "currentTree", sons: null},
+{kind: 1, offset: "postRenderCallback", len: 0, typ: NTI738197521, name: "postRenderCallback", sons: null},
+{kind: 1, offset: "toFocus", len: 0, typ: NTI855638032, name: "toFocus", sons: null},
+{kind: 1, offset: "toFocusV", len: 0, typ: NTI771752027, name: "toFocusV", sons: null},
+{kind: 1, offset: "renderId", len: 0, typ: NTI33554435, name: "renderId", sons: null},
+{kind: 1, offset: "rendering", len: 0, typ: NTI33554466, name: "rendering", sons: null},
+{kind: 1, offset: "patches", len: 0, typ: NTI738197522, name: "patches", sons: null},
+{kind: 1, offset: "patchLen", len: 0, typ: NTI33554435, name: "patchLen", sons: null},
+{kind: 1, offset: "patchesV", len: 0, typ: NTI738197523, name: "patchesV", sons: null},
+{kind: 1, offset: "patchLenV", len: 0, typ: NTI33554435, name: "patchLenV", sons: null},
+{kind: 1, offset: "runCount", len: 0, typ: NTI33554435, name: "runCount", sons: null},
+{kind: 1, offset: "components", len: 0, typ: NTI738197524, name: "components", sons: null},
+{kind: 1, offset: "surpressRedraws", len: 0, typ: NTI33554466, name: "surpressRedraws", sons: null},
+{kind: 1, offset: "byId", len: 0, typ: NTI738197532, name: "byId", sons: null},
 {kind: 1, offset: "orphans", len: 0, typ: NTI738197541, name: "orphans", sons: null}]};
 NTI738197519.node = NNI738197519;
 NTI738197517.base = NTI738197519;
 var NNI570426412 = {kind: 1, offset: "kxi0", len: 0, typ: NTI738197517, name: "kxi0", sons: null};
 NTI570426412.node = NNI570426412;
 NTI570426412.base = NTI33555179;
-var NNI1090519129 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "a", len: 0, typ: NTI1090519122, name: "a", sons: null}, 
+var NNI1090519129 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "a", len: 0, typ: NTI1090519122, name: "a", sons: null},
 {kind: 1, offset: "b", len: 0, typ: NTI33554435, name: "b", sons: null}]};
 NTI1090519129.node = NNI1090519129;
 var NNI134217745 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI134217745.node = NNI134217745;
 NTI134217745.base = NTI33555184;
-var NNI570426441 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "action0", len: 0, typ: NTI771752039, name: "action0", sons: null}, 
+var NNI570426441 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "action0", len: 0, typ: NTI771752039, name: "action0", sons: null},
 {kind: 1, offset: "n1", len: 0, typ: NTI771752027, name: "n1", sons: null}]};
 NTI570426441.node = NNI570426441;
 NTI570426441.base = NTI33555179;
@@ -1240,148 +1244,148 @@ var NNI855638199 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []}
 NTI855638199.node = NNI855638199;
 NTI855638199.base = NTI33555179;
 NTI855638078.base = NTI855638199;
-var NNI570426443 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "timer0", len: 0, typ: NTI855638078, name: "timer0", sons: null}, 
-{kind: 1, offset: "n1", len: 0, typ: NTI771752027, name: "n1", sons: null}, 
+var NNI570426443 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "timer0", len: 0, typ: NTI855638078, name: "timer0", sons: null},
+{kind: 1, offset: "n1", len: 0, typ: NTI771752027, name: "n1", sons: null},
 {kind: 1, offset: "action2", len: 0, typ: NTI771752039, name: "action2", sons: null}]};
 NTI570426443.node = NNI570426443;
 NTI570426443.base = NTI33555179;
-var NNI855638161 = {kind: 2, len: 10, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "bubbles", len: 0, typ: NTI33554466, name: "bubbles", sons: null}, 
-{kind: 1, offset: "cancelBubble", len: 0, typ: NTI33554466, name: "cancelBubble", sons: null}, 
-{kind: 1, offset: "cancelable", len: 0, typ: NTI33554466, name: "cancelable", sons: null}, 
-{kind: 1, offset: "composed", len: 0, typ: NTI33554466, name: "composed", sons: null}, 
-{kind: 1, offset: "currentTarget", len: 0, typ: NTI855638032, name: "currentTarget", sons: null}, 
-{kind: 1, offset: "defaultPrevented", len: 0, typ: NTI33554466, name: "defaultPrevented", sons: null}, 
-{kind: 1, offset: "eventPhase", len: 0, typ: NTI33554435, name: "eventPhase", sons: null}, 
-{kind: 1, offset: "target", len: 0, typ: NTI855638032, name: "target", sons: null}, 
-{kind: 1, offset: "type", len: 0, typ: NTI33554450, name: "type", sons: null}, 
+var NNI855638161 = {kind: 2, len: 10, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "bubbles", len: 0, typ: NTI33554466, name: "bubbles", sons: null},
+{kind: 1, offset: "cancelBubble", len: 0, typ: NTI33554466, name: "cancelBubble", sons: null},
+{kind: 1, offset: "cancelable", len: 0, typ: NTI33554466, name: "cancelable", sons: null},
+{kind: 1, offset: "composed", len: 0, typ: NTI33554466, name: "composed", sons: null},
+{kind: 1, offset: "currentTarget", len: 0, typ: NTI855638032, name: "currentTarget", sons: null},
+{kind: 1, offset: "defaultPrevented", len: 0, typ: NTI33554466, name: "defaultPrevented", sons: null},
+{kind: 1, offset: "eventPhase", len: 0, typ: NTI33554435, name: "eventPhase", sons: null},
+{kind: 1, offset: "target", len: 0, typ: NTI855638032, name: "target", sons: null},
+{kind: 1, offset: "type", len: 0, typ: NTI33554450, name: "type", sons: null},
 {kind: 1, offset: "isTrusted", len: 0, typ: NTI33554466, name: "isTrusted", sons: null}]};
 NTI855638161.node = NNI855638161;
 NTI855638161.base = NTI33555179;
 NTI855638048.base = NTI855638161;
 NTI570426442.base = NTI570426443;
-var NNI570426445 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "ev0", len: 0, typ: NTI855638048, name: "ev0", sons: null}, 
+var NNI570426445 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "ev0", len: 0, typ: NTI855638048, name: "ev0", sons: null},
 {kind: 1, offset: "HEX3Aup", len: 0, typ: NTI570426442, name: ":up", sons: null}]};
 NTI570426445.node = NNI570426445;
 NTI570426445.base = NTI33555179;
-var NNI570426447 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "n0", len: 0, typ: NTI771752027, name: "n0", sons: null}, 
+var NNI570426447 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "n0", len: 0, typ: NTI771752027, name: "n0", sons: null},
 {kind: 1, offset: "action1", len: 0, typ: NTI771752039, name: "action1", sons: null}]};
 NTI570426447.node = NNI570426447;
 NTI570426447.base = NTI33555179;
-var NNI570426449 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "n0", len: 0, typ: NTI771752027, name: "n0", sons: null}, 
+var NNI570426449 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "n0", len: 0, typ: NTI771752027, name: "n0", sons: null},
 {kind: 1, offset: "action1", len: 0, typ: NTI771752039, name: "action1", sons: null}]};
 NTI570426449.node = NNI570426449;
 NTI570426449.base = NTI33555179;
 var NNI570426575 = {kind: 1, offset: "kxi0", len: 0, typ: NTI738197517, name: "kxi0", sons: null};
 NTI570426575.node = NNI570426575;
 NTI570426575.base = NTI33555179;
-var NNI1426063363 = {kind: 2, offset: 0, typ: null, name: null, len: 11, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063363, name: "viewChat", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1426063363, name: "viewSearch", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI1426063363, name: "viewJobs", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI1426063363, name: "viewRuns", len: 0, sons: null}, 
-"4": {kind: 1, offset: 4, typ: NTI1426063363, name: "viewLogs", len: 0, sons: null}, 
-"5": {kind: 1, offset: 5, typ: NTI1426063363, name: "viewSystem", len: 0, sons: null}, 
-"6": {kind: 1, offset: 6, typ: NTI1426063363, name: "viewTool", len: 0, sons: null}, 
-"7": {kind: 1, offset: 7, typ: NTI1426063363, name: "viewPlugin", len: 0, sons: null}, 
-"8": {kind: 1, offset: 8, typ: NTI1426063363, name: "viewNodeBuilder", len: 0, sons: null}, 
-"9": {kind: 1, offset: 9, typ: NTI1426063363, name: "viewSimulator", len: 0, sons: null}, 
+var NNI1426063363 = {kind: 2, offset: 0, typ: null, name: null, len: 11, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063363, name: "viewChat", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1426063363, name: "viewSearch", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI1426063363, name: "viewJobs", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI1426063363, name: "viewRuns", len: 0, sons: null},
+"4": {kind: 1, offset: 4, typ: NTI1426063363, name: "viewLogs", len: 0, sons: null},
+"5": {kind: 1, offset: 5, typ: NTI1426063363, name: "viewSystem", len: 0, sons: null},
+"6": {kind: 1, offset: 6, typ: NTI1426063363, name: "viewTool", len: 0, sons: null},
+"7": {kind: 1, offset: 7, typ: NTI1426063363, name: "viewPlugin", len: 0, sons: null},
+"8": {kind: 1, offset: 8, typ: NTI1426063363, name: "viewNodeBuilder", len: 0, sons: null},
+"9": {kind: 1, offset: 9, typ: NTI1426063363, name: "viewSimulator", len: 0, sons: null},
 "10": {kind: 1, offset: 10, typ: NTI1426063363, name: "viewAccount", len: 0, sons: null}}};
 NTI1426063363.node = NNI1426063363;
-var NNI1426063364 = {kind: 2, offset: 0, typ: null, name: null, len: 4, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063364, name: "tabRun", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1426063364, name: "tabTools", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI1426063364, name: "tabEvents", len: 0, sons: null}, 
+var NNI1426063364 = {kind: 2, offset: 0, typ: null, name: null, len: 4, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063364, name: "tabRun", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1426063364, name: "tabTools", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI1426063364, name: "tabEvents", len: 0, sons: null},
 "3": {kind: 1, offset: 3, typ: NTI1426063364, name: "tabRaw", len: 0, sons: null}}};
 NTI1426063364.node = NNI1426063364;
-var NNI1426063365 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063365, name: "cpNone", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1426063365, name: "cpAttach", len: 0, sons: null}, 
+var NNI1426063365 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063365, name: "cpNone", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1426063365, name: "cpAttach", len: 0, sons: null},
 "2": {kind: 1, offset: 2, typ: NTI1426063365, name: "cpTools", len: 0, sons: null}}};
 NTI1426063365.node = NNI1426063365;
-var NNI1426063366 = {kind: 2, offset: 0, typ: null, name: null, len: 2, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063366, name: "mrUser", len: 0, sons: null}, 
+var NNI1426063366 = {kind: 2, offset: 0, typ: null, name: null, len: 2, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063366, name: "mrUser", len: 0, sons: null},
 "1": {kind: 1, offset: 1, typ: NTI1426063366, name: "mrAssistant", len: 0, sons: null}}};
 NTI1426063366.node = NNI1426063366;
 NTI1426063389.base = NTI1426063370;
-var NNI1426063371 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554435, name: "id", sons: null}, 
-{kind: 1, offset: "role", len: 0, typ: NTI1426063366, name: "role", sons: null}, 
-{kind: 1, offset: "content", len: 0, typ: NTI33554449, name: "content", sons: null}, 
+var NNI1426063371 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554435, name: "id", sons: null},
+{kind: 1, offset: "role", len: 0, typ: NTI1426063366, name: "role", sons: null},
+{kind: 1, offset: "content", len: 0, typ: NTI33554449, name: "content", sons: null},
 {kind: 1, offset: "cards", len: 0, typ: NTI1426063389, name: "cards", sons: null}]};
 NTI1426063371.node = NNI1426063371;
 NTI1426063392.base = NTI1426063371;
-var NNI1426063372 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554435, name: "id", sons: null}, 
-{kind: 1, offset: "kind", len: 0, typ: NTI33554449, name: "kind", sons: null}, 
+var NNI1426063372 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554435, name: "id", sons: null},
+{kind: 1, offset: "kind", len: 0, typ: NTI33554449, name: "kind", sons: null},
 {kind: 1, offset: "message", len: 0, typ: NTI33554449, name: "message", sons: null}]};
 NTI1426063372.node = NNI1426063372;
 NTI1426063393.base = NTI1426063372;
-var NNI1426063375 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554449, name: "id", sons: null}, 
-{kind: 1, offset: "name", len: 0, typ: NTI33554449, name: "name", sons: null}, 
+var NNI1426063375 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554449, name: "id", sons: null},
+{kind: 1, offset: "name", len: 0, typ: NTI33554449, name: "name", sons: null},
 {kind: 1, offset: "enabled", len: 0, typ: NTI33554466, name: "enabled", sons: null}]};
 NTI1426063375.node = NNI1426063375;
 NTI1426063394.base = NTI1426063375;
-var NNI1426063376 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554449, name: "id", sons: null}, 
-{kind: 1, offset: "name", len: 0, typ: NTI33554449, name: "name", sons: null}, 
+var NNI1426063376 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "id", len: 0, typ: NTI33554449, name: "id", sons: null},
+{kind: 1, offset: "name", len: 0, typ: NTI33554449, name: "name", sons: null},
 {kind: 1, offset: "connected", len: 0, typ: NTI33554466, name: "connected", sons: null}]};
 NTI1426063376.node = NNI1426063376;
 NTI1426063395.base = NTI1426063376;
-var NNI1426063367 = {kind: 2, offset: 0, typ: null, name: null, len: 4, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063367, name: "amLogin", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1426063367, name: "amRegister", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI1426063367, name: "amForgotPassword", len: 0, sons: null}, 
+var NNI1426063367 = {kind: 2, offset: 0, typ: null, name: null, len: 4, sons: {"0": {kind: 1, offset: 0, typ: NTI1426063367, name: "amLogin", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1426063367, name: "amRegister", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI1426063367, name: "amForgotPassword", len: 0, sons: null},
 "3": {kind: 1, offset: 3, typ: NTI1426063367, name: "amResetPassword", len: 0, sons: null}}};
 NTI1426063367.node = NNI1426063367;
-var NNI1426063379 = {kind: 2, len: 18, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "checked", len: 0, typ: NTI33554466, name: "checked", sons: null}, 
-{kind: 1, offset: "loading", len: 0, typ: NTI33554466, name: "loading", sons: null}, 
-{kind: 1, offset: "authenticated", len: 0, typ: NTI33554466, name: "authenticated", sons: null}, 
-{kind: 1, offset: "mode", len: 0, typ: NTI1426063367, name: "mode", sons: null}, 
-{kind: 1, offset: "userId", len: 0, typ: NTI33554449, name: "userId", sons: null}, 
-{kind: 1, offset: "email", len: 0, typ: NTI33554449, name: "email", sons: null}, 
-{kind: 1, offset: "displayName", len: 0, typ: NTI33554449, name: "displayName", sons: null}, 
-{kind: 1, offset: "role", len: 0, typ: NTI33554449, name: "role", sons: null}, 
-{kind: 1, offset: "csrfToken", len: 0, typ: NTI33554449, name: "csrfToken", sons: null}, 
-{kind: 1, offset: "sessionId", len: 0, typ: NTI33554449, name: "sessionId", sons: null}, 
-{kind: 1, offset: "expiresAt", len: 0, typ: NTI33554449, name: "expiresAt", sons: null}, 
-{kind: 1, offset: "error", len: 0, typ: NTI33554449, name: "error", sons: null}, 
-{kind: 1, offset: "notice", len: 0, typ: NTI33554449, name: "notice", sons: null}, 
-{kind: 1, offset: "emailDraft", len: 0, typ: NTI33554449, name: "emailDraft", sons: null}, 
-{kind: 1, offset: "passwordDraft", len: 0, typ: NTI33554449, name: "passwordDraft", sons: null}, 
-{kind: 1, offset: "displayNameDraft", len: 0, typ: NTI33554449, name: "displayNameDraft", sons: null}, 
-{kind: 1, offset: "newPasswordDraft", len: 0, typ: NTI33554449, name: "newPasswordDraft", sons: null}, 
+var NNI1426063379 = {kind: 2, len: 18, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "checked", len: 0, typ: NTI33554466, name: "checked", sons: null},
+{kind: 1, offset: "loading", len: 0, typ: NTI33554466, name: "loading", sons: null},
+{kind: 1, offset: "authenticated", len: 0, typ: NTI33554466, name: "authenticated", sons: null},
+{kind: 1, offset: "mode", len: 0, typ: NTI1426063367, name: "mode", sons: null},
+{kind: 1, offset: "userId", len: 0, typ: NTI33554449, name: "userId", sons: null},
+{kind: 1, offset: "email", len: 0, typ: NTI33554449, name: "email", sons: null},
+{kind: 1, offset: "displayName", len: 0, typ: NTI33554449, name: "displayName", sons: null},
+{kind: 1, offset: "role", len: 0, typ: NTI33554449, name: "role", sons: null},
+{kind: 1, offset: "csrfToken", len: 0, typ: NTI33554449, name: "csrfToken", sons: null},
+{kind: 1, offset: "sessionId", len: 0, typ: NTI33554449, name: "sessionId", sons: null},
+{kind: 1, offset: "expiresAt", len: 0, typ: NTI33554449, name: "expiresAt", sons: null},
+{kind: 1, offset: "error", len: 0, typ: NTI33554449, name: "error", sons: null},
+{kind: 1, offset: "notice", len: 0, typ: NTI33554449, name: "notice", sons: null},
+{kind: 1, offset: "emailDraft", len: 0, typ: NTI33554449, name: "emailDraft", sons: null},
+{kind: 1, offset: "passwordDraft", len: 0, typ: NTI33554449, name: "passwordDraft", sons: null},
+{kind: 1, offset: "displayNameDraft", len: 0, typ: NTI33554449, name: "displayNameDraft", sons: null},
+{kind: 1, offset: "newPasswordDraft", len: 0, typ: NTI33554449, name: "newPasswordDraft", sons: null},
 {kind: 1, offset: "resetToken", len: 0, typ: NTI33554449, name: "resetToken", sons: null}]};
 NTI1426063379.node = NNI1426063379;
-var NNI1426063377 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "chatId", len: 0, typ: NTI33554449, name: "chatId", sons: null}, 
-{kind: 1, offset: "title", len: 0, typ: NTI33554449, name: "title", sons: null}, 
+var NNI1426063377 = {kind: 2, len: 3, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "chatId", len: 0, typ: NTI33554449, name: "chatId", sons: null},
+{kind: 1, offset: "title", len: 0, typ: NTI33554449, name: "title", sons: null},
 {kind: 1, offset: "updatedAt", len: 0, typ: NTI33554449, name: "updatedAt", sons: null}]};
 NTI1426063377.node = NNI1426063377;
 NTI1426063396.base = NTI1426063377;
-var NNI1426063378 = {kind: 2, len: 7, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "sessionId", len: 0, typ: NTI33554449, name: "sessionId", sons: null}, 
-{kind: 1, offset: "createdAt", len: 0, typ: NTI33554449, name: "createdAt", sons: null}, 
-{kind: 1, offset: "lastSeenAt", len: 0, typ: NTI33554449, name: "lastSeenAt", sons: null}, 
-{kind: 1, offset: "expiresAt", len: 0, typ: NTI33554449, name: "expiresAt", sons: null}, 
-{kind: 1, offset: "revokedAt", len: 0, typ: NTI33554449, name: "revokedAt", sons: null}, 
-{kind: 1, offset: "userAgent", len: 0, typ: NTI33554449, name: "userAgent", sons: null}, 
+var NNI1426063378 = {kind: 2, len: 7, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "sessionId", len: 0, typ: NTI33554449, name: "sessionId", sons: null},
+{kind: 1, offset: "createdAt", len: 0, typ: NTI33554449, name: "createdAt", sons: null},
+{kind: 1, offset: "lastSeenAt", len: 0, typ: NTI33554449, name: "lastSeenAt", sons: null},
+{kind: 1, offset: "expiresAt", len: 0, typ: NTI33554449, name: "expiresAt", sons: null},
+{kind: 1, offset: "revokedAt", len: 0, typ: NTI33554449, name: "revokedAt", sons: null},
+{kind: 1, offset: "userAgent", len: 0, typ: NTI33554449, name: "userAgent", sons: null},
 {kind: 1, offset: "current", len: 0, typ: NTI33554466, name: "current", sons: null}]};
 NTI1426063378.node = NNI1426063378;
 NTI1426063397.base = NTI1426063378;
-var NNI1426063391 = {kind: 2, len: 25, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "activeView", len: 0, typ: NTI1426063363, name: "activeView", sons: null}, 
-{kind: 1, offset: "inspectorTab", len: 0, typ: NTI1426063364, name: "inspectorTab", sons: null}, 
-{kind: 1, offset: "composerPanel", len: 0, typ: NTI1426063365, name: "composerPanel", sons: null}, 
-{kind: 1, offset: "inspectorOpen", len: 0, typ: NTI33554466, name: "inspectorOpen", sons: null}, 
-{kind: 1, offset: "headerMenuOpen", len: 0, typ: NTI33554466, name: "headerMenuOpen", sons: null}, 
-{kind: 1, offset: "composerDraft", len: 0, typ: NTI33554449, name: "composerDraft", sons: null}, 
-{kind: 1, offset: "searchDraft", len: 0, typ: NTI33554449, name: "searchDraft", sons: null}, 
-{kind: 1, offset: "composerSelectedToolId", len: 0, typ: NTI33554449, name: "composerSelectedToolId", sons: null}, 
-{kind: 1, offset: "selectedToolId", len: 0, typ: NTI33554449, name: "selectedToolId", sons: null}, 
-{kind: 1, offset: "selectedPluginId", len: 0, typ: NTI33554449, name: "selectedPluginId", sons: null}, 
-{kind: 1, offset: "pendingDeleteChatId", len: 0, typ: NTI33554449, name: "pendingDeleteChatId", sons: null}, 
-{kind: 1, offset: "toastMessage", len: 0, typ: NTI33554449, name: "toastMessage", sons: null}, 
-{kind: 1, offset: "messages", len: 0, typ: NTI1426063392, name: "messages", sons: null}, 
-{kind: 1, offset: "run", len: 0, typ: NTI1426063373, name: "run", sons: null}, 
-{kind: 1, offset: "runEvents", len: 0, typ: NTI1426063393, name: "runEvents", sons: null}, 
-{kind: 1, offset: "system", len: 0, typ: NTI1426063374, name: "system", sons: null}, 
-{kind: 1, offset: "tools", len: 0, typ: NTI1426063394, name: "tools", sons: null}, 
-{kind: 1, offset: "plugins", len: 0, typ: NTI1426063395, name: "plugins", sons: null}, 
-{kind: 1, offset: "auth", len: 0, typ: NTI1426063379, name: "auth", sons: null}, 
-{kind: 1, offset: "chats", len: 0, typ: NTI1426063396, name: "chats", sons: null}, 
-{kind: 1, offset: "currentChatId", len: 0, typ: NTI33554449, name: "currentChatId", sons: null}, 
-{kind: 1, offset: "sessions", len: 0, typ: NTI1426063397, name: "sessions", sons: null}, 
-{kind: 1, offset: "sessionsLoaded", len: 0, typ: NTI33554466, name: "sessionsLoaded", sons: null}, 
-{kind: 1, offset: "nextMessageId", len: 0, typ: NTI33554435, name: "nextMessageId", sons: null}, 
+var NNI1426063391 = {kind: 2, len: 25, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "activeView", len: 0, typ: NTI1426063363, name: "activeView", sons: null},
+{kind: 1, offset: "inspectorTab", len: 0, typ: NTI1426063364, name: "inspectorTab", sons: null},
+{kind: 1, offset: "composerPanel", len: 0, typ: NTI1426063365, name: "composerPanel", sons: null},
+{kind: 1, offset: "inspectorOpen", len: 0, typ: NTI33554466, name: "inspectorOpen", sons: null},
+{kind: 1, offset: "headerMenuOpen", len: 0, typ: NTI33554466, name: "headerMenuOpen", sons: null},
+{kind: 1, offset: "composerDraft", len: 0, typ: NTI33554449, name: "composerDraft", sons: null},
+{kind: 1, offset: "searchDraft", len: 0, typ: NTI33554449, name: "searchDraft", sons: null},
+{kind: 1, offset: "composerSelectedToolId", len: 0, typ: NTI33554449, name: "composerSelectedToolId", sons: null},
+{kind: 1, offset: "selectedToolId", len: 0, typ: NTI33554449, name: "selectedToolId", sons: null},
+{kind: 1, offset: "selectedPluginId", len: 0, typ: NTI33554449, name: "selectedPluginId", sons: null},
+{kind: 1, offset: "pendingDeleteChatId", len: 0, typ: NTI33554449, name: "pendingDeleteChatId", sons: null},
+{kind: 1, offset: "toastMessage", len: 0, typ: NTI33554449, name: "toastMessage", sons: null},
+{kind: 1, offset: "messages", len: 0, typ: NTI1426063392, name: "messages", sons: null},
+{kind: 1, offset: "run", len: 0, typ: NTI1426063373, name: "run", sons: null},
+{kind: 1, offset: "runEvents", len: 0, typ: NTI1426063393, name: "runEvents", sons: null},
+{kind: 1, offset: "system", len: 0, typ: NTI1426063374, name: "system", sons: null},
+{kind: 1, offset: "tools", len: 0, typ: NTI1426063394, name: "tools", sons: null},
+{kind: 1, offset: "plugins", len: 0, typ: NTI1426063395, name: "plugins", sons: null},
+{kind: 1, offset: "auth", len: 0, typ: NTI1426063379, name: "auth", sons: null},
+{kind: 1, offset: "chats", len: 0, typ: NTI1426063396, name: "chats", sons: null},
+{kind: 1, offset: "currentChatId", len: 0, typ: NTI33554449, name: "currentChatId", sons: null},
+{kind: 1, offset: "sessions", len: 0, typ: NTI1426063397, name: "sessions", sons: null},
+{kind: 1, offset: "sessionsLoaded", len: 0, typ: NTI33554466, name: "sessionsLoaded", sons: null},
+{kind: 1, offset: "nextMessageId", len: 0, typ: NTI33554435, name: "nextMessageId", sons: null},
 {kind: 1, offset: "nextEventId", len: 0, typ: NTI33554435, name: "nextEventId", sons: null}]};
 NTI1426063391.node = NNI1426063391;
 NTI1426063380.base = NTI1426063391;
@@ -1392,74 +1396,74 @@ NTI771752219.base = NTI33554450;
 var NNI570426658 = {kind: 1, offset: "onChange0", len: 0, typ: NTI1811939332, name: "onChange0", sons: null};
 NTI570426658.node = NNI570426658;
 NTI570426658.base = NTI33555179;
-var NNI570426681 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "action0", len: 0, typ: NTI771752039, name: "action0", sons: null}, 
+var NNI570426681 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "action0", len: 0, typ: NTI771752039, name: "action0", sons: null},
 {kind: 1, offset: "kxi1", len: 0, typ: NTI738197517, name: "kxi1", sons: null}]};
 NTI570426681.node = NNI570426681;
 NTI570426681.base = NTI33555179;
-var NNI1610612739 = {kind: 2, offset: 0, typ: null, name: null, len: 7, sons: {"0": {kind: 1, offset: 0, typ: NTI1610612739, name: "JNull", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1610612739, name: "JBool", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI1610612739, name: "JInt", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI1610612739, name: "JFloat", len: 0, sons: null}, 
-"4": {kind: 1, offset: 4, typ: NTI1610612739, name: "JString", len: 0, sons: null}, 
-"5": {kind: 1, offset: 5, typ: NTI1610612739, name: "JObject", len: 0, sons: null}, 
+var NNI1610612739 = {kind: 2, offset: 0, typ: null, name: null, len: 7, sons: {"0": {kind: 1, offset: 0, typ: NTI1610612739, name: "JNull", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1610612739, name: "JBool", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI1610612739, name: "JInt", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI1610612739, name: "JFloat", len: 0, sons: null},
+"4": {kind: 1, offset: 4, typ: NTI1610612739, name: "JString", len: 0, sons: null},
+"5": {kind: 1, offset: 5, typ: NTI1610612739, name: "JObject", len: 0, sons: null},
 "6": {kind: 1, offset: 6, typ: NTI1610612739, name: "JArray", len: 0, sons: null}}};
 NTI1610612739.node = NNI1610612739;
 NTI1610612757.base = NTI1610612740;
-var NNI1610612741 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "isUnquoted", len: 0, typ: NTI33554466, name: "isUnquoted", sons: null}, 
-{kind: 3, offset: "kind", len: 7, typ: NTI1610612739, name: "kind", sons: [[setConstr(4), {kind: 1, offset: "str", len: 0, typ: NTI33554449, name: "str", sons: null}], 
-[setConstr(2), {kind: 1, offset: "num", len: 0, typ: NTI184549379, name: "num", sons: null}], 
-[setConstr(3), {kind: 1, offset: "fnum", len: 0, typ: NTI33554445, name: "fnum", sons: null}], 
-[setConstr(1), {kind: 1, offset: "bval", len: 0, typ: NTI33554466, name: "bval", sons: null}], 
-[setConstr(0), {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []}], 
-[setConstr(5), {kind: 1, offset: "fields", len: 0, typ: NTI1610612750, name: "fields", sons: null}], 
+var NNI1610612741 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "isUnquoted", len: 0, typ: NTI33554466, name: "isUnquoted", sons: null},
+{kind: 3, offset: "kind", len: 7, typ: NTI1610612739, name: "kind", sons: [[setConstr(4), {kind: 1, offset: "str", len: 0, typ: NTI33554449, name: "str", sons: null}],
+[setConstr(2), {kind: 1, offset: "num", len: 0, typ: NTI184549379, name: "num", sons: null}],
+[setConstr(3), {kind: 1, offset: "fnum", len: 0, typ: NTI33554445, name: "fnum", sons: null}],
+[setConstr(1), {kind: 1, offset: "bval", len: 0, typ: NTI33554466, name: "bval", sons: null}],
+[setConstr(0), {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []}],
+[setConstr(5), {kind: 1, offset: "fields", len: 0, typ: NTI1610612750, name: "fields", sons: null}],
 [setConstr(6), {kind: 1, offset: "elems", len: 0, typ: NTI1610612757, name: "elems", sons: null}]]}]};
 NTI1610612741.node = NNI1610612741;
 NTI1610612740.base = NTI1610612741;
-var NNI1610612756 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI1291845635, name: "Field0", sons: null}, 
-{kind: 1, offset: "Field1", len: 0, typ: NTI33554435, name: "Field1", sons: null}, 
-{kind: 1, offset: "Field2", len: 0, typ: NTI33554449, name: "Field2", sons: null}, 
+var NNI1610612756 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI1291845635, name: "Field0", sons: null},
+{kind: 1, offset: "Field1", len: 0, typ: NTI33554435, name: "Field1", sons: null},
+{kind: 1, offset: "Field2", len: 0, typ: NTI33554449, name: "Field2", sons: null},
 {kind: 1, offset: "Field3", len: 0, typ: NTI1610612740, name: "Field3", sons: null}]};
 NTI1610612756.node = NNI1610612756;
 NTI1610612753.base = NTI1610612756;
-var NNI1610612750 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "data", len: 0, typ: NTI1610612753, name: "data", sons: null}, 
-{kind: 1, offset: "counter", len: 0, typ: NTI33554435, name: "counter", sons: null}, 
-{kind: 1, offset: "first", len: 0, typ: NTI33554435, name: "first", sons: null}, 
+var NNI1610612750 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "data", len: 0, typ: NTI1610612753, name: "data", sons: null},
+{kind: 1, offset: "counter", len: 0, typ: NTI33554435, name: "counter", sons: null},
+{kind: 1, offset: "first", len: 0, typ: NTI33554435, name: "first", sons: null},
 {kind: 1, offset: "last", len: 0, typ: NTI33554435, name: "last", sons: null}]};
 NTI1610612750.node = NNI1610612750;
 var NNI134217742 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI134217742.node = NNI134217742;
 NTI134217742.base = NTI134217741;
-var NNI1291845957 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554444, name: "Field0", sons: null}, 
+var NNI1291845957 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554444, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI33554444, name: "Field1", sons: null}]};
 NTI1291845957.node = NNI1291845957;
 var NNI134217750 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI134217750.node = NNI134217750;
 NTI134217750.base = NTI33555184;
-var NNI1509949515 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI1509949515 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
 NTI1509949515.node = NNI1509949515;
-var NNI1526726660 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726660, name: "cors", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1526726660, name: "no-cors", len: 0, sons: null}, 
+var NNI1526726660 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726660, name: "cors", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1526726660, name: "no-cors", len: 0, sons: null},
 "2": {kind: 1, offset: 2, typ: NTI1526726660, name: "same-origin", len: 0, sons: null}}};
 NTI1526726660.node = NNI1526726660;
-var NNI1526726661 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726661, name: "include", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1526726661, name: "same-origin", len: 0, sons: null}, 
+var NNI1526726661 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726661, name: "include", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1526726661, name: "same-origin", len: 0, sons: null},
 "2": {kind: 1, offset: 2, typ: NTI1526726661, name: "omit", len: 0, sons: null}}};
 NTI1526726661.node = NNI1526726661;
-var NNI1526726662 = {kind: 2, offset: 0, typ: null, name: null, len: 5, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726662, name: "default", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1526726662, name: "no-store", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI1526726662, name: "reload", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI1526726662, name: "no-cache", len: 0, sons: null}, 
+var NNI1526726662 = {kind: 2, offset: 0, typ: null, name: null, len: 5, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726662, name: "default", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1526726662, name: "no-store", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI1526726662, name: "reload", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI1526726662, name: "no-cache", len: 0, sons: null},
 "4": {kind: 1, offset: 4, typ: NTI1526726662, name: "force-cache", len: 0, sons: null}}};
 NTI1526726662.node = NNI1526726662;
-var NNI1526726664 = {kind: 2, offset: 0, typ: null, name: null, len: 5, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726664, name: "no-referrer", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1526726664, name: "no-referrer-when-downgrade", len: 0, sons: null}, 
-"2": {kind: 1, offset: 2, typ: NTI1526726664, name: "origin", len: 0, sons: null}, 
-"3": {kind: 1, offset: 3, typ: NTI1526726664, name: "origin-when-cross-origin", len: 0, sons: null}, 
+var NNI1526726664 = {kind: 2, offset: 0, typ: null, name: null, len: 5, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726664, name: "no-referrer", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1526726664, name: "no-referrer-when-downgrade", len: 0, sons: null},
+"2": {kind: 1, offset: 2, typ: NTI1526726664, name: "origin", len: 0, sons: null},
+"3": {kind: 1, offset: 3, typ: NTI1526726664, name: "origin-when-cross-origin", len: 0, sons: null},
 "4": {kind: 1, offset: 4, typ: NTI1526726664, name: "unsafe-url", len: 0, sons: null}}};
 NTI1526726664.node = NNI1526726664;
-var NNI1526726663 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726663, name: "follow", len: 0, sons: null}, 
-"1": {kind: 1, offset: 1, typ: NTI1526726663, name: "error", len: 0, sons: null}, 
+var NNI1526726663 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI1526726663, name: "follow", len: 0, sons: null},
+"1": {kind: 1, offset: 1, typ: NTI1526726663, name: "error", len: 0, sons: null},
 "2": {kind: 1, offset: 2, typ: NTI1526726663, name: "manual", len: 0, sons: null}}};
 NTI1526726663.node = NNI1526726663;
 var NNI1560281092 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
@@ -1469,16 +1473,16 @@ NTI33555189.node = NNI33555189;
 NTI33555189.base = NTI33555179;
 NTI1560281092.base = NTI33555189;
 NTI1560281091.base = NTI1560281092;
-var NNI1526726667 = {kind: 2, len: 11, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "keepalive", len: 0, typ: NTI33554466, name: "keepalive", sons: null}, 
-{kind: 1, offset: "method", len: 0, typ: NTI33554450, name: "metod", sons: null}, 
-{kind: 1, offset: "body", len: 0, typ: NTI33554450, name: "body", sons: null}, 
-{kind: 1, offset: "integrity", len: 0, typ: NTI33554450, name: "integrity", sons: null}, 
-{kind: 1, offset: "referrer", len: 0, typ: NTI33554450, name: "referrer", sons: null}, 
-{kind: 1, offset: "mode", len: 0, typ: NTI33554450, name: "mode", sons: null}, 
-{kind: 1, offset: "credentials", len: 0, typ: NTI33554450, name: "credentials", sons: null}, 
-{kind: 1, offset: "cache", len: 0, typ: NTI33554450, name: "cache", sons: null}, 
-{kind: 1, offset: "redirect", len: 0, typ: NTI33554450, name: "redirect", sons: null}, 
-{kind: 1, offset: "referrerPolicy", len: 0, typ: NTI33554450, name: "referrerPolicy", sons: null}, 
+var NNI1526726667 = {kind: 2, len: 11, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "keepalive", len: 0, typ: NTI33554466, name: "keepalive", sons: null},
+{kind: 1, offset: "method", len: 0, typ: NTI33554450, name: "metod", sons: null},
+{kind: 1, offset: "body", len: 0, typ: NTI33554450, name: "body", sons: null},
+{kind: 1, offset: "integrity", len: 0, typ: NTI33554450, name: "integrity", sons: null},
+{kind: 1, offset: "referrer", len: 0, typ: NTI33554450, name: "referrer", sons: null},
+{kind: 1, offset: "mode", len: 0, typ: NTI33554450, name: "mode", sons: null},
+{kind: 1, offset: "credentials", len: 0, typ: NTI33554450, name: "credentials", sons: null},
+{kind: 1, offset: "cache", len: 0, typ: NTI33554450, name: "cache", sons: null},
+{kind: 1, offset: "redirect", len: 0, typ: NTI33554450, name: "redirect", sons: null},
+{kind: 1, offset: "referrerPolicy", len: 0, typ: NTI33554450, name: "referrerPolicy", sons: null},
 {kind: 1, offset: "headers", len: 0, typ: NTI1560281091, name: "headers", sons: null}]};
 NTI1526726667.node = NNI1526726667;
 NTI1526726667.base = NTI33555189;
@@ -1488,83 +1492,83 @@ NTI134217747.base = NTI134217746;
 var NNI134217753 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI134217753.node = NNI134217753;
 NTI134217753.base = NTI33555184;
-var NNI1509949443 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "userId", len: 0, typ: NTI33554449, name: "userId", sons: null}, 
-{kind: 1, offset: "email", len: 0, typ: NTI33554449, name: "email", sons: null}, 
-{kind: 1, offset: "displayName", len: 0, typ: NTI33554449, name: "displayName", sons: null}, 
-{kind: 1, offset: "role", len: 0, typ: NTI33554449, name: "role", sons: null}, 
+var NNI1509949443 = {kind: 2, len: 5, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "userId", len: 0, typ: NTI33554449, name: "userId", sons: null},
+{kind: 1, offset: "email", len: 0, typ: NTI33554449, name: "email", sons: null},
+{kind: 1, offset: "displayName", len: 0, typ: NTI33554449, name: "displayName", sons: null},
+{kind: 1, offset: "role", len: 0, typ: NTI33554449, name: "role", sons: null},
 {kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null}]};
 NTI1509949443.node = NNI1509949443;
-var NNI1509949444 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "user", len: 0, typ: NTI1509949443, name: "user", sons: null}, 
-{kind: 1, offset: "sessionId", len: 0, typ: NTI33554449, name: "sessionId", sons: null}, 
-{kind: 1, offset: "expiresAt", len: 0, typ: NTI33554449, name: "expiresAt", sons: null}, 
+var NNI1509949444 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "user", len: 0, typ: NTI1509949443, name: "user", sons: null},
+{kind: 1, offset: "sessionId", len: 0, typ: NTI33554449, name: "sessionId", sons: null},
+{kind: 1, offset: "expiresAt", len: 0, typ: NTI33554449, name: "expiresAt", sons: null},
 {kind: 1, offset: "csrfToken", len: 0, typ: NTI33554449, name: "csrfToken", sons: null}]};
 NTI1509949444.node = NNI1509949444;
-var NNI1509949446 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "role", len: 0, typ: NTI33554449, name: "role", sons: null}, 
-{kind: 1, offset: "content", len: 0, typ: NTI33554449, name: "content", sons: null}, 
-{kind: 1, offset: "jobId", len: 0, typ: NTI33554449, name: "jobId", sons: null}, 
+var NNI1509949446 = {kind: 2, len: 4, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "role", len: 0, typ: NTI33554449, name: "role", sons: null},
+{kind: 1, offset: "content", len: 0, typ: NTI33554449, name: "content", sons: null},
+{kind: 1, offset: "jobId", len: 0, typ: NTI33554449, name: "jobId", sons: null},
 {kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null}]};
 NTI1509949446.node = NNI1509949446;
 NTI1442840587.base = NTI1426063370;
-NTI1795162149.base = NTI33554449;
-NTI1795162184.base = NTI1426063368;
-NTI1795162193.base = NTI1426063369;
-NTI1795162118.base = NTI1426063370;
-var NNI1795162116 = {kind: 2, len: 7, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "jobId", len: 0, typ: NTI33554449, name: "jobId", sons: null}, 
-{kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null}, 
-{kind: 1, offset: "selectedAgent", len: 0, typ: NTI33554449, name: "selectedAgent", sons: null}, 
-{kind: 1, offset: "proposedTool", len: 0, typ: NTI33554449, name: "proposedTool", sons: null}, 
-{kind: 1, offset: "answer", len: 0, typ: NTI33554449, name: "answer", sons: null}, 
-{kind: 1, offset: "error", len: 0, typ: NTI33554449, name: "error", sons: null}, 
-{kind: 1, offset: "presentations", len: 0, typ: NTI1795162118, name: "presentations", sons: null}]};
+NTI1795162150.base = NTI33554449;
+NTI1795162185.base = NTI1426063368;
+NTI1795162194.base = NTI1426063369;
+NTI1795162119.base = NTI1426063370;
+var NNI1795162116 = {kind: 2, len: 7, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "jobId", len: 0, typ: NTI33554449, name: "jobId", sons: null},
+{kind: 1, offset: "status", len: 0, typ: NTI33554449, name: "status", sons: null},
+{kind: 1, offset: "selectedAgent", len: 0, typ: NTI33554449, name: "selectedAgent", sons: null},
+{kind: 1, offset: "proposedTool", len: 0, typ: NTI33554449, name: "proposedTool", sons: null},
+{kind: 1, offset: "answer", len: 0, typ: NTI33554449, name: "answer", sons: null},
+{kind: 1, offset: "error", len: 0, typ: NTI33554449, name: "error", sons: null},
+{kind: 1, offset: "presentations", len: 0, typ: NTI1795162119, name: "presentations", sons: null}]};
 NTI1795162116.node = NNI1795162116;
-NTI1442840925.base = NTI1426063370;
-var NNI1509949942 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+NTI1442840927.base = NTI1426063370;
+var NNI1509949942 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
 NTI1509949942.node = NNI1509949942;
-var NNI1509949723 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI1509949723 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
 NTI1509949723.node = NNI1509949723;
-var NNI1509949630 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI1509949630 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
 NTI1509949630.node = NNI1509949630;
-var NNI1509949754 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI1509949754 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
 NTI1509949754.node = NNI1509949754;
-var NNI1509949785 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI1509949785 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
 NTI1509949785.node = NNI1509949785;
-var NNI570426731 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null}, 
+var NNI570426731 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null},
 {kind: 1, offset: "currentChat1", len: 0, typ: NTI1426063377, name: "currentChat1", sons: null}]};
 NTI570426731.node = NNI570426731;
 NTI570426731.base = NTI33555179;
-NTI1459618188.base = NTI1426063377;
-var NNI570426780 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null}, 
+NTI1459618179.base = NTI1426063377;
+var NNI570426780 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null},
 {kind: 1, offset: "target1", len: 0, typ: NTI1426063363, name: "target1", sons: null}]};
 NTI570426780.node = NNI570426780;
 NTI570426780.base = NTI33555179;
-var NNI956301382 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "a", len: 0, typ: NTI33554435, name: "a", sons: null}, 
+var NNI956301382 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "a", len: 0, typ: NTI33554435, name: "a", sons: null},
 {kind: 1, offset: "b", len: 0, typ: NTI33554435, name: "b", sons: null}]};
 NTI956301382.node = NNI956301382;
-var NNI570426863 = {kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null};
-NTI570426863.node = NNI570426863;
-NTI570426863.base = NTI33555179;
-var NNI570427070 = {kind: 1, offset: "currentSession0", len: 0, typ: NTI1426063378, name: "currentSession0", sons: null};
-NTI570427070.node = NNI570427070;
-NTI570427070.base = NTI33555179;
-var NNI570427123 = {kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null};
-NTI570427123.node = NNI570427123;
-NTI570427123.base = NTI33555179;
-var NNI1795162385 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI570426864 = {kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null};
+NTI570426864.node = NNI570426864;
+NTI570426864.base = NTI33555179;
+var NNI570427071 = {kind: 1, offset: "currentSession0", len: 0, typ: NTI1426063378, name: "currentSession0", sons: null};
+NTI570427071.node = NNI570427071;
+NTI570427071.base = NTI33555179;
+var NNI570427124 = {kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null};
+NTI570427124.node = NNI570427124;
+NTI570427124.base = NTI33555179;
+var NNI1795162443 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
-NTI1795162385.node = NNI1795162385;
-var NNI570427150 = {kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null};
-NTI570427150.node = NNI570427150;
-NTI570427150.base = NTI33555179;
-var NNI570427212 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null}, 
+NTI1795162443.node = NNI1795162443;
+var NNI570427151 = {kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null};
+NTI570427151.node = NNI570427151;
+NTI570427151.base = NTI33555179;
+var NNI570427213 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "state0", len: 0, typ: NTI1426063380, name: "state0", sons: null},
 {kind: 1, offset: "tool1", len: 0, typ: NTI1426063375, name: "tool1", sons: null}]};
-NTI570427212.node = NNI570427212;
-NTI570427212.base = NTI33555179;
-var NNI1509949683 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+NTI570427213.node = NNI570427213;
+NTI570427213.base = NTI33555179;
+var NNI1509949683 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null},
 {kind: 1, offset: "Field1", len: 0, typ: NTI1610612740, name: "Field1", sons: null}]};
 NTI1509949683.node = NNI1509949683;
 
@@ -1574,9 +1578,9 @@ function makeNimstrLit(c_p0) {
     result[i] = c_p0.charCodeAt(i);
   }
   return result;
-  
 
-  
+
+
 }
 
 function nimAddStrStr(x_p0, y_p1) {
@@ -1584,9 +1588,9 @@ function nimAddStrStr(x_p0, y_p1) {
   for (var i = 0; i < L; ++i) {
     x_p0.push(y_p1[i]);
   }
-  
 
-  
+
+
 }
 
 function isObj(obj_p0, subclass_p1) {
@@ -1598,7 +1602,7 @@ function isObj(obj_p0, subclass_p1) {
     result_33557489 = true;
     break BeforeRet;
     }
-    
+
     Label1: {
         Label2: while (true) {
         if (!!((x_33557490 == subclass_p1))) break Label2;
@@ -1606,7 +1610,7 @@ function isObj(obj_p0, subclass_p1) {
           result_33557489 = false;
           break BeforeRet;
           }
-          
+
           x_33557490 = x_33557490.base;
         }
     };
@@ -1644,13 +1648,13 @@ function toJSStr(s_p0) {
                   else {
                   helper_33557048.push("%");;
                   }
-                  
+
                   helper_33557048.push(code_33557049);;
                   i_33557020 += 1;
                   if ((((s_p0).length <= i_33557020) || (s_p0[i_33557020] < 128))) {
                   break Label3;
                   }
-                  
+
                   c_33557022 = s_p0[i_33557020];
                 }
             };
@@ -1668,7 +1672,7 @@ function toJSStr(s_p0) {
             } finally {
             }
           }
-          
+
           j_33557021 += 1;
         }
     };
@@ -1685,19 +1689,19 @@ function raiseException(e_p0, ename_p1) {
     if ((excHandler == 0)) {
     unhandledException(e_p0);
     }
-    
+
     throw e_p0;
 
-  
+
 }
 
 function subInt(a_p0, b_p1) {
         var result = a_p0 - b_p1;
     checkOverflowInt(result);
     return result;
-  
 
-  
+
+
 }
 
 function setConstr() {
@@ -1713,9 +1717,9 @@ function setConstr() {
       }
     }
     return result;
-  
 
-  
+
+
 }
 var ConstSet1 = setConstr(17, 16, 4, 18, 27, 19, 23, 22, 21);
 
@@ -1733,7 +1737,7 @@ function nimCopy(dest_p0, src_p1, ti_p2) {
       else {
         result_33557376 = [src_p1[0], src_p1[1]];
       }
-      
+
       break;
     case 19:
             if (dest_p0 === null || dest_p0 === undefined) {
@@ -1744,7 +1748,7 @@ function nimCopy(dest_p0, src_p1, ti_p2) {
       }
       for (var key in src_p1) { dest_p0[key] = src_p1[key]; }
       result_33557376 = dest_p0;
-    
+
       break;
     case 18:
     case 17:
@@ -1763,7 +1767,7 @@ function nimCopy(dest_p0, src_p1, ti_p2) {
       break;
     case 4:
     case 16:
-            if(ArrayBuffer.isView(src_p1)) { 
+            if(ArrayBuffer.isView(src_p1)) {
         if(dest_p0 === null || dest_p0 === undefined || dest_p0.length != src_p1.length) {
           dest_p0 = new src_p1.constructor(src_p1);
         } else {
@@ -1784,7 +1788,7 @@ function nimCopy(dest_p0, src_p1, ti_p2) {
           }
         }
       }
-    
+
       break;
     case 24:
     case 27:
@@ -1800,15 +1804,15 @@ function nimCopy(dest_p0, src_p1, ti_p2) {
           result_33557376[i] = nimCopy(result_33557376[i], src_p1[i], ti_p2.base);
         }
       }
-    
+
       break;
     case 28:
             if (src_p1 !== null) {
         result_33557376 = src_p1.slice(0);
       }
-    
+
       break;
-    default: 
+    default:
       result_33557376 = src_p1;
       break;
     }
@@ -1821,9 +1825,9 @@ function mnewString(len_p0) {
         var result = new Array(len_p0);
     for (var i = 0; i < len_p0; i++) {result[i] = 0;}
     return result;
-  
 
-  
+
+
 }
 
 function chckIndx(i_p0, a_p1, b_p2) {
@@ -1837,7 +1841,7 @@ function chckIndx(i_p0, a_p1, b_p2) {
     else {
     raiseIndexError(i_p0, a_p1, b_p2);
     }
-    
+
   };
 
   return result_33557411;
@@ -1848,9 +1852,9 @@ function addInt(a_p0, b_p1) {
         var result = a_p0 + b_p1;
     checkOverflowInt(result);
     return result;
-  
 
-  
+
+
 }
 
 function nimMax(a_p0, b_p1) {
@@ -1865,7 +1869,7 @@ function nimMax(a_p0, b_p1) {
     else {
     Temporary1 = b_p1;
     }
-    
+
     result_33557203 = Temporary1;
     break BeforeRet;
   };
@@ -1886,7 +1890,7 @@ function nimMin(a_p0, b_p1) {
     else {
     Temporary1 = b_p1;
     }
-    
+
     result_33557199 = Temporary1;
     break BeforeRet;
   };
@@ -1906,7 +1910,7 @@ function chckRange(i_p0, a_p1, b_p2) {
     else {
     raiseRangeError();
     }
-    
+
   };
 
   return result_33557416;
@@ -1948,9 +1952,9 @@ function cstrToNimstr(c_p0) {
     ++r;
   }
   return result;
-  
 
-  
+
+
 }
 
 function cmpClosures(a_p0, b_p1) {
@@ -1960,9 +1964,9 @@ function cmpClosures(a_p0, b_p1) {
     } else {
       return a_p0 == b_p1;
     }
-  
 
-  
+
+
 }
 var ConstSet3 = setConstr([88, 148]);
       var toTag_771752284 = ["#text", "#int", "#bool", "#vthunk", "#dthunk", "#component", "#verbatim", "html", "head", "title", "base", "link", "meta", "style", "script", "noscript", "body", "section", "nav", "article", "aside", "h1", "h2", "h3", "h4", "h5", "h6", "hgroup", "header", "footer", "address", "main", "p", "hr", "pre", "blockquote", "ol", "ul", "li", "dl", "dt", "dd", "figure", "figcaption", "div", "a", "em", "strong", "small", "s", "cite", "quote", "dfn", "abbr", "data", "time", "code", "var", "samp", "kbd", "sub", "sup", "i", "b", "u", "mark", "ruby", "rt", "rp", "bdi", "dbo", "span", "br", "wbr", "ins", "del", "img", "iframe", "embed", "object", "param", "video", "audio", "source", "track", "canvas", "map", "area", "animate", "animateMotion", "animateTransform", "circle", "clipPath", "defs", "desc", "discard", "ellipse", "feBlend", "feColorMatrix", "feComponentTransfer", "feComposite", "feConvolveMatrix", "feDiffuseLighting", "feDisplacementMap", "feDistantLight", "feDropShadow", "feFlood", "feFuncA", "feFuncB", "feFuncG", "feFuncR", "feGaussianBlur", "feImage", "feMerge", "feMergeNode", "feMorphology", "feOffset", "fePointLight", "feSpecularLighting", "feSpotLight", "feTile", "feTurbulence", "filter", "foreignObject", "g", "image", "line", "linearGradient", "marker", "mask", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialGradient", "rect", "set", "stop", "svg", "switch", "symbol", "text", "textPath", "tspan", "unknown", "use", "view", "maction", "math", "menclose", "merror", "mfenced", "mfrac", "mglyph", "mi", "mlabeledtr", "mmultiscripts", "mn", "mo", "mover", "mpadded", "mphantom", "mroot", "mrow", "ms", "mspace", "msqrt", "mstyle", "msub", "msubsup", "msup", "mtable", "mtd", "mtext", "mtr", "munder", "munderover", "semantics", "table", "caption", "colgroup", "col", "tbody", "thead", "tfoot", "tr", "td", "th", "form", "fieldset", "legend", "label", "input", "button", "select", "datalist", "optgroup", "option", "textarea", "keygen", "output", "progress", "meter", "details", "summary", "command", "menu", "bdo", "dialog", "slot", "template"];
@@ -1976,18 +1980,18 @@ function divInt(a_p0, b_p1) {
         if (b_p1 == 0) raiseDivByZero();
     if (b_p1 == -1 && a_p0 == 2147483647) raiseOverflow();
     return Math.trunc(a_p0 / b_p1);
-  
 
-  
+
+
 }
 
 function mulInt(a_p0, b_p1) {
         var result = a_p0 * b_p1;
     checkOverflowInt(result);
     return result;
-  
 
-  
+
+
 }
 
 function eqStrings(a_p0, b_p1) {
@@ -2000,16 +2004,16 @@ function eqStrings(a_p0, b_p1) {
     for (var i = 0; i < alen; ++i)
       if (a_p0[i] != b_p1[i]) return false;
     return true;
-  
 
-  
+
+
 }
 var ConstSet8 = setConstr(5);
 
 function raiseFieldError2(f_p0, discVal_p1) {
     raiseException({message: (f_p0).concat(discVal_p1,[39]), parent: null, m_type: NTI134217750, name: null, trace: [], up: null}, "FieldDefect");
 
-  
+
 }
 
 function nimBoolToStr(x_p0) {
@@ -2021,7 +2025,7 @@ function nimBoolToStr(x_p0) {
     else {
       result_33556475 = nimCopy(null, [102,97,108,115,101], NTI33554449);
     }
-    
+
 
   return result_33556475;
 
@@ -2039,7 +2043,7 @@ function reprDiscriminant(e_p0, typ_p1) {
     case 1:
       Temporary1 = nimBoolToStr(!((e_p0 == 0)));
       break;
-    default: 
+    default:
       Temporary1 = HEX24__systemZdollars_u14(e_p0);
       break;
     }
@@ -2057,7 +2061,7 @@ var ConstSet13 = setConstr(5);
 function addChar(x_p0, c_p1) {
     x_p0.push(c_p1);
 
-  
+
 }
 var ConstSet14 = setConstr(4);
 var ConstSet15 = setConstr(4);
@@ -2079,14 +2083,14 @@ function reraiseException() {
       if (isNimException__system_u2047()) {
       unhandledException(lastJSError);
       }
-      
+
       }
-      
+
       throw lastJSError;
     }
-    
 
-  
+
+
 }
 var ConstSet24 = setConstr(6);
 var ConstSet25 = setConstr(6);
@@ -2101,12 +2105,13 @@ var ConstSet33 = setConstr(32, 9, 11, 13, 10, 12);
 var ConstSet34 = setConstr([97, 122]);
 var ConstSet35 = setConstr(6);
 var ConstSet36 = setConstr(1);
-var ConstSet37 = setConstr([65, 90]);
-var ConstSet38 = setConstr(32, 9, 11, 13, 10, 12);
+var ConstSet37 = setConstr(6);
+var ConstSet38 = setConstr([65, 90]);
 var ConstSet39 = setConstr(32, 9, 11, 13, 10, 12);
 var ConstSet40 = setConstr(32, 9, 11, 13, 10, 12);
 var ConstSet41 = setConstr(32, 9, 11, 13, 10, 12);
 var ConstSet42 = setConstr(32, 9, 11, 13, 10, 12);
+var ConstSet43 = setConstr(32, 9, 11, 13, 10, 12);
 var svgNamespace_771752162 = [[104,116,116,112,58,47,47,119,119,119,46,119,51,46,111,114,103,47,50,48,48,48,47,115,118,103]];
 var mathNamespace_771752163 = [[104,116,116,112,58,47,47,119,119,119,46,119,51,46,111,114,103,47,49,57,57,56,47,77,97,116,104,47,77,97,116,104,77,76]];
 var gid_771752677 = [0];
@@ -2121,9 +2126,9 @@ function add__system_u1972(x_p0, x_p0_Idx, y_p1) {
       for (var i = 0; i < y_p1.length; ++i) {
         x_p0[x_p0_Idx][off+i] = y_p1.charCodeAt(i);
       }
-    
 
-  
+
+
 }
 
 function newSeq__system_u2562(len_p0) {
@@ -2137,7 +2142,7 @@ function newSeq__system_u2562(len_p0) {
 function isNimException__system_u2047() {
     return lastJSError && lastJSError.m_type;
 
-  
+
 }
 
 function getCurrentException() {
@@ -2146,7 +2151,7 @@ function getCurrentException() {
     if (isNimException__system_u2047()) {
     result_33556482 = lastJSError;
     }
-    
+
 
   return result_33556482;
 
@@ -2159,14 +2164,14 @@ function raiseDefect() {
     if ((excHandler == 0)) {
     unhandledException(e_33556698);
     }
-    
+
     throw e_33556698;
     }
-    
-    }
-    
 
-  
+    }
+
+
+
 }
 
 function unhandledException(e_p0) {
@@ -2178,7 +2183,7 @@ function unhandledException(e_p0) {
     else {
     nimAddStrStr(buf_33556692[0], [69,114,114,111,114,58,32,117,110,104,97,110,100,108,101,100,32,101,120,99,101,112,116,105,111,110]);;
     }
-    
+
     nimAddStrStr(buf_33556692[0], [32,91]);;
     add__system_u1972(buf_33556692, 0, e_p0.name);
     nimAddStrStr(buf_33556692[0], [93,10]);;
@@ -2189,22 +2194,22 @@ function unhandledException(e_p0) {
   else {
     throw cbuf_33556693;
   }
-  
 
-  
+
+
 }
 
 function raiseOverflow() {
     raiseException({message: [111,118,101,114,45,32,111,114,32,117,110,100,101,114,102,108,111,119], parent: null, m_type: NTI134217743, name: null, trace: [], up: null}, "OverflowDefect");
 
-  
+
 }
 
 function checkOverflowInt(a_p0) {
         if (a_p0 > 2147483647 || a_p0 < -2147483648) raiseOverflow();
-  
 
-  
+
+
 }
 
 function isFatPointer__system_u2924(ti_p0) {
@@ -2225,24 +2230,24 @@ function nimCopyAux(dest_p0, src_p1, n_p2) {
       break;
     case 1:
             dest_p0[n_p2.offset] = nimCopy(dest_p0[n_p2.offset], src_p1[n_p2.offset], n_p2.typ);
-    
+
       break;
     case 2:
           for (var i = 0; i < n_p2.sons.length; i++) {
       nimCopyAux(dest_p0, src_p1, n_p2.sons[i]);
     }
-    
+
       break;
     case 3:
             dest_p0[n_p2.offset] = nimCopy(dest_p0[n_p2.offset], src_p1[n_p2.offset], n_p2.typ);
       for (var i = 0; i < n_p2.sons.length; ++i) {
         nimCopyAux(dest_p0, src_p1, n_p2.sons[i][1]);
       }
-    
+
       break;
     }
 
-  
+
 }
 
 function addChars__stdZprivateZdigitsutils_u202(result_p0, result_p0_Idx, x_p1, start_p2, n_p3) {
@@ -2264,25 +2269,25 @@ function addChars__stdZprivateZdigitsutils_u202(result_p0, result_p0_Idx, x_p1, 
       };
     };
 
-  
+
 }
 
 function addChars__stdZprivateZdigitsutils_u198(result_p0, result_p0_Idx, x_p1) {
     addChars__stdZprivateZdigitsutils_u202(result_p0, result_p0_Idx, x_p1, 0, ((x_p1) == null ? 0 : (x_p1).length));
 
-  
+
 }
 
 function addInt__stdZprivateZdigitsutils_u223(result_p0, result_p0_Idx, x_p1) {
     addChars__stdZprivateZdigitsutils_u198(result_p0, result_p0_Idx, ((x_p1) + ""));
 
-  
+
 }
 
 function addInt__stdZprivateZdigitsutils_u241(result_p0, result_p0_Idx, x_p1) {
     addInt__stdZprivateZdigitsutils_u223(result_p0, result_p0_Idx, BigInt(x_p1));
 
-  
+
 }
 
 function HEX24__systemZdollars_u14(xHEX60gensym0_p0) {
@@ -2304,16 +2309,16 @@ function raiseIndexError(i_p0, a_p1, b_p2) {
     else {
     Temporary1 = ([105,110,100,101,120,32]).concat(HEX24__systemZdollars_u14(i_p0),[32,110,111,116,32,105,110,32],HEX24__systemZdollars_u14(a_p1),[32,46,46,32],HEX24__systemZdollars_u14(b_p2));
     }
-    
+
     raiseException({message: nimCopy(null, Temporary1, NTI33554449), parent: null, m_type: NTI134217749, name: null, trace: [], up: null}, "IndexDefect");
 
-  
+
 }
 
 function raiseRangeError() {
     raiseException({message: [118,97,108,117,101,32,111,117,116,32,111,102,32,114,97,110,103,101], parent: null, m_type: NTI134217751, name: null, trace: [], up: null}, "RangeDefect");
 
-  
+
 }
 
 function substr__system_u3776(s_p0, first_p1, last_p2) {
@@ -2353,7 +2358,7 @@ function nsuStrip(s_p0, leading_p1, trailing_p2, chars_p3) {
         }
     };
     }
-    
+
     if (trailing_p2) {
     Label3: {
         Label4: while (true) {
@@ -2362,7 +2367,7 @@ function nsuStrip(s_p0, leading_p1, trailing_p2, chars_p3) {
         }
     };
     }
-    
+
     result_905972301 = nimCopy(null, substr__system_u3776(s_p0, first_905972302, last_905972303), NTI33554449);
 
   return result_905972301;
@@ -2413,12 +2418,12 @@ function nsuStartsWith(s_p0, prefix_p1) {
           result_905971121 = true;
           break BeforeRet;
           }
-          
+
           if (((sLenHEX60gensym144_905971127 <= iHEX60gensym144_905971128) || !((s_p0[chckIndx(iHEX60gensym144_905971128, 0, (s_p0).length - 1)] == prefix_p1[chckIndx(iHEX60gensym144_905971128, 0, (prefix_p1).length - 1)])))) {
           result_905971121 = false;
           break BeforeRet;
           }
-          
+
           iHEX60gensym144_905971128 = addInt(iHEX60gensym144_905971128, 1);
         }
     };
@@ -2434,25 +2439,25 @@ function loadFrontendRuntimeConfig__configZruntime95config_u14() {
     if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && "backendBaseUrl" in globalThis.AGENTIC_CONFIG))) {
     raiseException({message: makeNimstrLit("Frontend runtime configuration is missing. Load public/config.js before app.js."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     if (!((typeof globalThis.AGENTIC_CONFIG === 'object' && globalThis.AGENTIC_CONFIG !== null && "pollIntervalMs" in globalThis.AGENTIC_CONFIG))) {
     raiseException({message: [65,71,69,78,84,73,67,95,67,79,78,70,73,71,46,112,111,108,108,73,110,116,101,114,118,97,108,77,115,32,105,115,32,109,105,115,115,105,110,103,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     var backendBaseUrl_1761607698 = normalizeBaseUrl__configZruntime95config_u11(cstrToNimstr(String(globalThis.AGENTIC_CONFIG["backendBaseUrl"])));
     var pollIntervalMs_1761607699 = Number(globalThis.AGENTIC_CONFIG["pollIntervalMs"]);
     if (((backendBaseUrl_1761607698).length == 0)) {
     raiseException({message: [65,71,69,78,84,73,67,95,67,79,78,70,73,71,46,98,97,99,107,101,110,100,66,97,115,101,85,114,108,32,109,117,115,116,32,110,111,116,32,98,101,32,101,109,112,116,121,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     if (!((nsuStartsWith(backendBaseUrl_1761607698, [104,116,116,112,58,47,47]) || nsuStartsWith(backendBaseUrl_1761607698, [104,116,116,112,115,58,47,47])))) {
     raiseException({message: [65,71,69,78,84,73,67,95,67,79,78,70,73,71,46,98,97,99,107,101,110,100,66,97,115,101,85,114,108,32,109,117,115,116,32,117,115,101,32,104,116,116,112,58,47,47,32,111,114,32,104,116,116,112,115,58,47,47,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     if ((pollIntervalMs_1761607699 <= 0)) {
     raiseException({message: [65,71,69,78,84,73,67,95,67,79,78,70,73,71,46,112,111,108,108,73,110,116,101,114,118,97,108,77,115,32,109,117,115,116,32,98,101,32,103,114,101,97,116,101,114,32,116,104,97,110,32,122,101,114,111,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     result_1761607695 = nimCopy(result_1761607695, {backendBaseUrl: nimCopy(null, backendBaseUrl_1761607698, NTI33554449), pollIntervalMs: pollIntervalMs_1761607699}, NTI1761607683);
 
   return result_1761607695;
@@ -2470,20 +2475,20 @@ function emptyRunState__appZstate_u3() {
 }
 
 function emptySystemState__appZstate_u63() {
-  var result_1442840640 = ({checked: false, checking: false, backendConnected: false, aiReachable: false, aiHealthy: false, aiReady: false, error: []});
+  var result_1442840640 = ({checked: false, checking: false, backendConnected: false, aiReachable: false, aiHealthy: false, aiReady: false, paloAltoConfigured: false, paloAltoHost: [], paloAltoMode: [], integrationsError: [], error: []});
 
-    result_1442840640 = nimCopy(result_1442840640, {checked: false, checking: false, backendConnected: false, aiReachable: false, aiHealthy: false, aiReady: false, error: []}, NTI1426063374);
+    result_1442840640 = nimCopy(result_1442840640, {checked: false, checking: false, backendConnected: false, aiReachable: false, aiHealthy: false, aiReady: false, paloAltoConfigured: false, paloAltoHost: [], paloAltoMode: [], integrationsError: [], error: []}, NTI1426063374);
 
   return result_1442840640;
 
 }
 
-function initAppState__appZstate_u87() {
-  var result_1442840664 = null;
+function initAppState__appZstate_u91() {
+  var result_1442840668 = null;
 
-    result_1442840664 = {activeView: 0, inspectorTab: 0, composerPanel: 0, inspectorOpen: false, headerMenuOpen: false, composerDraft: [], searchDraft: [], composerSelectedToolId: [], selectedToolId: [], selectedPluginId: [], pendingDeleteChatId: [], toastMessage: [], messages: [], run: emptyRunState__appZstate_u3(), runEvents: [], system: emptySystemState__appZstate_u63(), tools: [{id: [115,104,101,108,108], name: [83,104,101,108,108], enabled: true}, {id: [97,99,99,111,117,110,116], name: [65,99,99,111,117,110,116], enabled: true}, {id: [97,99,99,101,115,115], name: [65,99,99,101,115,115], enabled: true}, {id: [102,105,108,101,115], name: [70,105,108,101,115], enabled: false}, {id: [103,105,116], name: [71,105,116], enabled: false}], plugins: [{id: [106,105,114,97], name: [74,105,114,97,32,47,32,65,116,108,97,115,115,105,97,110], connected: false}, {id: [103,105,116,104,117,98], name: [71,105,116,72,117,98], connected: false}, {id: [100,105,114,101,99,116,111,114,121], name: [68,105,114,101,99,116,111,114,121,32,38,32,65,99,99,101,115,115], connected: false}, {id: [107,110,111,119,108,101,100,103,101], name: [75,110,111,119,108,101,100,103,101], connected: false}], nextMessageId: 1, nextEventId: 1, auth: ({checked: false, loading: false, authenticated: false, mode: 0, userId: [], email: [], displayName: [], role: [], csrfToken: [], sessionId: [], expiresAt: [], error: [], notice: [], emailDraft: [], passwordDraft: [], displayNameDraft: [], newPasswordDraft: [], resetToken: []}), chats: [], currentChatId: [], sessions: [], sessionsLoaded: false};
+    result_1442840668 = {activeView: 0, inspectorTab: 0, composerPanel: 0, inspectorOpen: false, headerMenuOpen: false, composerDraft: [], searchDraft: [], composerSelectedToolId: [], selectedToolId: [], selectedPluginId: [], pendingDeleteChatId: [], toastMessage: [], messages: [], run: emptyRunState__appZstate_u3(), runEvents: [], system: emptySystemState__appZstate_u63(), tools: [{id: [115,104,101,108,108], name: [83,104,101,108,108], enabled: true}, {id: [97,99,99,111,117,110,116], name: [65,99,99,111,117,110,116], enabled: true}, {id: [97,99,99,101,115,115], name: [65,99,99,101,115,115], enabled: true}, {id: [102,105,108,101,115], name: [70,105,108,101,115], enabled: false}, {id: [103,105,116], name: [71,105,116], enabled: false}], plugins: [{id: [112,97,108,111,45,97,108,116,111], name: [80,97,108,111,32,65,108,116,111,32,80,65,78,45,79,83], connected: false}, {id: [106,105,114,97], name: [74,105,114,97,32,47,32,65,116,108,97,115,115,105,97,110], connected: false}, {id: [103,105,116,104,117,98], name: [71,105,116,72,117,98], connected: false}, {id: [100,105,114,101,99,116,111,114,121], name: [68,105,114,101,99,116,111,114,121,32,38,32,65,99,99,101,115,115], connected: false}, {id: [107,110,111,119,108,101,100,103,101], name: [75,110,111,119,108,101,100,103,101], connected: false}], nextMessageId: 1, nextEventId: 1, auth: ({checked: false, loading: false, authenticated: false, mode: 0, userId: [], email: [], displayName: [], role: [], csrfToken: [], sessionId: [], expiresAt: [], error: [], notice: [], emailDraft: [], passwordDraft: [], displayNameDraft: [], newPasswordDraft: [], resetToken: []}), chats: [], currentChatId: [], sessions: [], sessionsLoaded: false};
 
-  return result_1442840664;
+  return result_1442840668;
 
 }
 
@@ -2506,7 +2511,7 @@ function newSeq__pkgZkaraxZkarax_u1660(len_p0) {
 function HEX3Aanonymous__pkgZkaraxZkarax_u1458() {
     dodraw__pkgZkaraxZkarax_u1453(this.kxi0);
 
-  
+
 }
 
 function HEX5BHEX5D__pkgZkaraxZkarax_u1470(s_p0, x_p1) {
@@ -2543,25 +2548,25 @@ function HEX2EHEX2E__stdZenumutils_u105(a_p0, b_p1) {
 function sysFatal__stdZassertions_u46(message_p1) {
     raiseException({message: nimCopy(null, message_p1, NTI33554449), m_type: NTI134217745, parent: null, name: null, trace: [], up: null}, "AssertionDefect");
 
-  
+
 }
 
 function raiseAssert__stdZassertions_u44(msg_p0) {
     sysFatal__stdZassertions_u46(msg_p0);
 
-  
+
 }
 
 function failedAssertImpl__stdZassertions_u86(msg_p0) {
     raiseAssert__stdZassertions_u44(msg_p0);
 
-  
+
 }
 
 function valueHEX3D__pkgZkaraxZvdom_u477(n_p0, v_p1) {
     n_p0.text = v_p1;
 
-  
+
 }
 
 function value__pkgZkaraxZvdom_u474(n_p0) {
@@ -2579,14 +2584,14 @@ function wrapper__pkgZkaraxZkarax_u282() {
     if (!(!(cmpClosures(this.HEX3Aup.action2, null)))) {
     failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,55,57,44,32,51,41,32,96,97,99,116,105,111,110,32,33,61,32,110,105,108,96,32]);
     }
-    
+
     this.HEX3Aup.action2(this.ev0, this.HEX3Aup.n1);
     if (!((value__pkgZkaraxZvdom_u474(this.HEX3Aup.n1) == vHEX60gensym15_738197788))) {
     this.ev0.target.value = value__pkgZkaraxZvdom_u474(this.HEX3Aup.n1);
     }
-    
 
-  
+
+
 }
 
 function HEX3Aanonymous__pkgZkaraxZkarax_u280(ev_p0) {
@@ -2599,11 +2604,11 @@ function HEX3Aanonymous__pkgZkaraxZkarax_u280(ev_p0) {
     if (!((this.timer0 == null))) {
     clearTimeout(this.timer0);
     }
-    
+
     Temporary1 = wrapper__pkgZkaraxZkarax_u282.bind(HEX3Aenv_570425952); Temporary1.ClP_0 = wrapper__pkgZkaraxZkarax_u282; Temporary1.ClE_0 = HEX3Aenv_570425952;
     this.timer0 = setTimeout(Temporary1, 400);
 
-  
+
 }
 
 function laterWrapper__pkgZkaraxZkarax_u275() {
@@ -2628,10 +2633,10 @@ function addEventShell__pkgZkaraxZkarax_u93(d_p0, name_p1, h_p2) {
     if ((d_p0.karaxEvents == null)) {
     d_p0.karaxEvents = new Array(0);
     }
-    
+
     d_p0.karaxEvents.push({Field0: name_p1, Field1: h_p2});
 
-  
+
 }
 
 function HEX3Aanonymous__pkgZkaraxZkarax_u246(ev_p0) {
@@ -2641,16 +2646,16 @@ function HEX3Aanonymous__pkgZkaraxZkarax_u246(ev_p0) {
     if (!(!(cmpClosures(this.action1, null)))) {
     failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,55,57,44,32,51,41,32,96,97,99,116,105,111,110,32,33,61,32,110,105,108,96,32]);
     }
-    
+
     this.action1(ev_p0, this.n0);
     if (!((value__pkgZkaraxZvdom_u474(this.n0) == vHEX60gensym8_738197753))) {
     ev_p0.target.value = value__pkgZkaraxZvdom_u474(this.n0);
     }
-    
-    }
-    
 
-  
+    }
+
+
+
 }
 
 function enterWrapper__pkgZkaraxZkarax_u242() {
@@ -2676,19 +2681,19 @@ function HEX3Aanonymous__pkgZkaraxZkarax_u201(ev_p0) {
     if (!(!(cmpClosures(this.action1, null)))) {
     failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,55,57,44,32,51,41,32,96,97,99,116,105,111,110,32,33,61,32,110,105,108,96,32]);
     }
-    
+
     this.action1(ev_p0, this.n0);
     if (!((value__pkgZkaraxZvdom_u474(this.n0) == vHEX60gensym1_738197720))) {
     ev_p0.target.value = value__pkgZkaraxZvdom_u474(this.n0);
     }
-    
+
     }
     else {
     this.action1(ev_p0, this.n0);
     }
-    
 
-  
+
+
 }
 
 function stdWrapper__pkgZkaraxZkarax_u197() {
@@ -2729,7 +2734,7 @@ function wrapEvent__pkgZkaraxZkarax_u191(d_p0, n_p1, k_p2, action_p3) {
       result_738197700 = Temporary2();
       addEventShell__pkgZkaraxZkarax_u93(d_p0, "keyup", result_738197700);
       break;
-    default: 
+    default:
       Temporary3 = stdWrapper__pkgZkaraxZkarax_u197.bind(HEX3Aenv_570426035); Temporary3.ClP_0 = stdWrapper__pkgZkaraxZkarax_u197; Temporary3.ClE_0 = HEX3Aenv_570426035;
       result_738197700 = Temporary3();
       addEventShell__pkgZkaraxZkarax_u93(d_p0, toEventName_771752361[chckIndx(k_p2, 0, (toEventName_771752361).length - 1)], result_738197700);
@@ -2757,7 +2762,7 @@ function applyEvents__pkgZkaraxZkarax_u318(n_p0) {
       };
     };
 
-  
+
 }
 
 function applyStyle__pkgZkaraxZvstyles_u537(n_p0, s_p1) {
@@ -2777,7 +2782,7 @@ function applyStyle__pkgZkaraxZvstyles_u537(n_p0, s_p1) {
       };
     };
 
-  
+
 }
 
 function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
@@ -2791,20 +2796,20 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
     if (!((n_p0.id == null))) {
     kxi_p2.byId[n_p0.id] = n_p0;
     }
-    
+
     result_738197855 = n_p0.dom;
     break BeforeRet;
     }
-    
+
     }
-    
+
     if ((n_p0.kind == 0)) {
     result_738197855 = document.createTextNode(n_p0.text);
     n_p0.dom = result_738197855;
     if (!((n_p0.id == null))) {
     kxi__.byId[n_p0.id] = n_p0;
     }
-    
+
     }
     else {
     if ((n_p0.kind == 6)) {
@@ -2814,7 +2819,7 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
     if (!((n_p0.id == null))) {
     kxi__.byId[n_p0.id] = n_p0;
     }
-    
+
     break BeforeRet;
     }
     else {
@@ -2825,7 +2830,7 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
     if (!((n_p0.id == null))) {
     kxi__.byId[n_p0.id] = n_p0;
     }
-    
+
     break BeforeRet;
     }
     else {
@@ -2834,12 +2839,12 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
     if (!(!((result_738197855 == null)))) {
     failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,49,56,53,44,32,53,41,32,96,114,101,115,117,108,116,32,33,61,32,110,105,108,96,32]);
     }
-    
+
     n_p0.dom = result_738197855;
     if (!((n_p0.id == null))) {
     kxi__.byId[n_p0.id] = n_p0;
     }
-    
+
     break BeforeRet;
     }
     else {
@@ -2848,25 +2853,25 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
     if (!(cmpClosures(x_738197925.onAttachImpl, null))) {
     x_738197925.onAttachImpl(x_738197925);
     }
-    
+
     if (!(!(cmpClosures(x_738197925.renderImpl, null)))) {
     failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,49,57,50,44,32,53,41,32,96,120,46,114,101,110,100,101,114,73,109,112,108,32,33,61,32,110,105,108,96,32]);
     }
-    
+
     if ((x_738197925.expanded == null)) {
     x_738197925.expanded = x_738197925.renderImpl(x_738197925);
     }
-    
+
     if (!(!((x_738197925.expanded == null)))) {
     failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,49,57,54,44,32,53,41,32,96,120,46,101,120,112,97,110,100,101,100,32,33,61,32,110,105,108,96,32]);
     }
-    
+
     result_738197855 = toDom__pkgZkaraxZkarax_u347(x_738197925.expanded, useAttachedNode_p1, kxi_p2);
     n_p0.dom = result_738197855;
     if (!((n_p0.id == null))) {
     kxi__.byId[n_p0.id] = n_p0;
     }
-    
+
     break BeforeRet;
     }
     else {
@@ -2886,7 +2891,7 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
       if (!((n_p0.id == null))) {
       kxi__.byId[n_p0.id] = n_p0;
       }
-      
+
       Label2: {
         var k_738197972 = null;
         Label3: {
@@ -2908,13 +2913,13 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
       if (!((n_p0.text == null))) {
       result_738197855.value = n_p0.text;
       }
-      
+
     }
     }}}}
     if (!((n_p0.id == null))) {
     result_738197855.id = n_p0.id;
     }
-    
+
     if (!((n_p0.class == null))) {
     if ((ConstSet5[n_p0.kind] != undefined)) {
     result_738197855.className.baseVal = n_p0.class;
@@ -2922,9 +2927,9 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
     else {
     result_738197855.className = n_p0.class;
     }
-    
+
     }
-    
+
     Label6: {
       var k_738197977 = null;
       var v_738197978 = null;
@@ -2942,7 +2947,7 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
               if (!((v_738197978 == null))) {
               result_738197855.setAttribute(k_738197977, v_738197978);
               }
-              
+
               res_570425922 = addInt(res_570425922, 2);
             }
         };
@@ -2952,12 +2957,12 @@ function toDom__pkgZkaraxZkarax_u347(n_p0, useAttachedNode_p1, kxi_p2) {
     if (((!((kxi_p2 == null)) && (n_p0 == kxi_p2.toFocusV)) && (kxi_p2.toFocus == null))) {
     kxi_p2.toFocus = result_738197855;
     }
-    
+
     if (!((n_p0.style == null))) {
     applyStyle__pkgZkaraxZvstyles_u537(result_738197855, n_p0.style);
     n_p0.styleVersion = (n_p0.style.__version || 0);
     }
-    
+
   };
 
   return result_738197855;
@@ -2969,7 +2974,7 @@ function replaceById__pkgZkaraxZkarax_u567(id_p0, newTree_p1) {
     x_738198074.parentNode.replaceChild(newTree_p1, x_738198074);
     newTree_p1.id = id_p0;
 
-  
+
 }
 
 function len__pkgZkaraxZvdom_u842(x_p0) {
@@ -3003,7 +3008,7 @@ function eq__pkgZkaraxZvstyles_u258(a_p0, b_p1) {
       result_838861061 = false;
       break BeforeRet;
     }
-    
+
     }
     else {
     if ((b_p1 == null)) {
@@ -3015,7 +3020,7 @@ function eq__pkgZkaraxZvstyles_u258(a_p0, b_p1) {
     result_838861061 = false;
     break BeforeRet;
     }
-    
+
     Label1: {
       var i_838861096 = 0;
       var colontmp__570426177 = 0;
@@ -3029,7 +3034,7 @@ function eq__pkgZkaraxZvstyles_u258(a_p0, b_p1) {
             result_838861061 = false;
             break BeforeRet;
             }
-            
+
             i_570426178 = addInt(i_570426178, 1);
           }
       };
@@ -3070,13 +3075,13 @@ function sameAttrs__pkgZkaraxZvdom_u1044(a_p0, b_p1) {
             result_771752983 = false;
             break BeforeRet;
             }
-            
+
             i_570426182 = addInt(i_570426182, 1);
           }
       };
     };
     }
-    
+
   };
 
   return result_771752983;
@@ -3091,24 +3096,24 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     if (!((a_p0.id == b_p1.id))) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     result_738198088 = 3;
     if (!((a_p0.index == b_p1.index))) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     if ((a_p0.kind == 0)) {
     if (!((a_p0.text == b_p1.text))) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     }
     else {
     if ((a_p0.kind == 3)) {
@@ -3116,12 +3121,12 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     if (!((len__pkgZkaraxZvdom_u842(a_p0) == len__pkgZkaraxZvdom_u842(b_p1)))) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     Label1: {
       var i_738198105 = 0;
       var colontmp__570426169 = 0;
@@ -3135,7 +3140,7 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
             result_738198088 = 1;
             break BeforeRet;
             }
-            
+
             i_570426170 = addInt(i_570426170, 1);
           }
       };
@@ -3151,7 +3156,7 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
       result_738198088 = 1;
       break BeforeRet;
     }
-    
+
     }
     else {
     if ((a_p0.kind == 6)) {
@@ -3159,7 +3164,7 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     }
     else {
     if ((b_p1.kind == 5)) {
@@ -3167,12 +3172,12 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     if (!((a_p0.key == b_p1.key))) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     result_738198088 = 0;
     break BeforeRet;
     }
@@ -3181,13 +3186,13 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
     result_738198088 = 2;
     break BeforeRet;
     }
-    
+
     if (recursive_p2) {
     if (!((len__pkgZkaraxZvdom_u842(a_p0) == len__pkgZkaraxZvdom_u842(b_p1)))) {
     result_738198088 = 1;
     break BeforeRet;
     }
-    
+
     Label4: {
       var i_738198131 = 0;
       var colontmp__570426173 = 0;
@@ -3201,13 +3206,13 @@ function eq__pkgZkaraxZkarax_u580(a_p0, b_p1, recursive_p2) {
             result_738198088 = 1;
             break BeforeRet;
             }
-            
+
             i_570426174 = addInt(i_570426174, 1);
           }
       };
     };
     }
-    
+
     break BeforeRet;
   };
 
@@ -3224,26 +3229,26 @@ function updateStyles__pkgZkaraxZkarax_u648(newNode_p0, oldNode_p1) {
     else {
       oldNode_p1.dom.style = {m_type: NTI855638158, alignContent: null, alignItems: null, alignSelf: null, all: null, animation: null, animationDelay: null, animationDirection: null, animationDuration: null, animationFillMode: null, animationIterationCount: null, animationName: null, animationPlayState: null, animationTimingFunction: null, backdropFilter: null, backfaceVisibility: null, background: null, backgroundAttachment: null, backgroundBlendMode: null, backgroundClip: null, backgroundColor: null, backgroundImage: null, backgroundOrigin: null, backgroundPosition: null, backgroundRepeat: null, backgroundSize: null, blockSize: null, border: null, borderBlock: null, borderBlockColor: null, borderBlockEnd: null, borderBlockEndColor: null, borderBlockEndStyle: null, borderBlockEndWidth: null, borderBlockStart: null, borderBlockStartColor: null, borderBlockStartStyle: null, borderBlockStartWidth: null, borderBlockStyle: null, borderBlockWidth: null, borderBottom: null, borderBottomColor: null, borderBottomLeftRadius: null, borderBottomRightRadius: null, borderBottomStyle: null, borderBottomWidth: null, borderCollapse: null, borderColor: null, borderEndEndRadius: null, borderEndStartRadius: null, borderImage: null, borderImageOutset: null, borderImageRepeat: null, borderImageSlice: null, borderImageSource: null, borderImageWidth: null, borderInline: null, borderInlineColor: null, borderInlineEnd: null, borderInlineEndColor: null, borderInlineEndStyle: null, borderInlineEndWidth: null, borderInlineStart: null, borderInlineStartColor: null, borderInlineStartStyle: null, borderInlineStartWidth: null, borderInlineStyle: null, borderInlineWidth: null, borderLeft: null, borderLeftColor: null, borderLeftStyle: null, borderLeftWidth: null, borderRadius: null, borderRight: null, borderRightColor: null, borderRightStyle: null, borderRightWidth: null, borderSpacing: null, borderStartEndRadius: null, borderStartStartRadius: null, borderStyle: null, borderTop: null, borderTopColor: null, borderTopLeftRadius: null, borderTopRightRadius: null, borderTopStyle: null, borderTopWidth: null, borderWidth: null, bottom: null, boxDecorationBreak: null, boxShadow: null, boxSizing: null, breakAfter: null, breakBefore: null, breakInside: null, captionSide: null, caretColor: null, clear: null, clip: null, clipPath: null, color: null, colorAdjust: null, columnCount: null, columnFill: null, columnGap: null, columnRule: null, columnRuleColor: null, columnRuleStyle: null, columnRuleWidth: null, columnSpan: null, columnWidth: null, columns: null, contain: null, content: null, counterIncrement: null, counterReset: null, counterSet: null, cursor: null, direction: null, display: null, emptyCells: null, filter: null, flex: null, flexBasis: null, flexDirection: null, flexFlow: null, flexGrow: null, flexShrink: null, flexWrap: null, cssFloat: null, font: null, fontFamily: null, fontFeatureSettings: null, fontKerning: null, fontLanguageOverride: null, fontOpticalSizing: null, fontSize: null, fontSizeAdjust: null, fontStretch: null, fontStyle: null, fontSynthesis: null, fontVariant: null, fontVariantAlternates: null, fontVariantCaps: null, fontVariantEastAsian: null, fontVariantLigatures: null, fontVariantNumeric: null, fontVariantPosition: null, fontVariationSettings: null, fontWeight: null, gap: null, grid: null, gridArea: null, gridAutoColumns: null, gridAutoFlow: null, gridAutoRows: null, gridColumn: null, gridColumnEnd: null, gridColumnStart: null, gridRow: null, gridRowEnd: null, gridRowStart: null, gridTemplate: null, gridTemplateAreas: null, gridTemplateColumns: null, gridTemplateRows: null, hangingPunctuation: null, height: null, hyphens: null, imageOrientation: null, imageRendering: null, inlineSize: null, inset: null, insetBlock: null, insetBlockEnd: null, insetBlockStart: null, insetInline: null, insetInlineEnd: null, insetInlineStart: null, isolation: null, justifyContent: null, justifyItems: null, justifySelf: null, left: null, letterSpacing: null, lineBreak: null, lineHeight: null, listStyle: null, listStyleImage: null, listStylePosition: null, listStyleType: null, margin: null, marginBlock: null, marginBlockEnd: null, marginBlockStart: null, marginBottom: null, marginInline: null, marginInlineEnd: null, marginInlineStart: null, marginLeft: null, marginRight: null, marginTop: null, mask: null, maskBorder: null, maskBorderMode: null, maskBorderOutset: null, maskBorderRepeat: null, maskBorderSlice: null, maskBorderSource: null, maskBorderWidth: null, maskClip: null, maskComposite: null, maskImage: null, maskMode: null, maskOrigin: null, maskPosition: null, maskRepeat: null, maskSize: null, maskType: null, maxBlockSize: null, maxHeight: null, maxInlineSize: null, maxWidth: null, minBlockSize: null, minHeight: null, minInlineSize: null, minWidth: null, mixBlendMode: null, objectFit: null, objectPosition: null, offset: null, offsetAnchor: null, offsetDistance: null, offsetPath: null, offsetRotate: null, opacity: null, order: null, orphans: null, outline: null, outlineColor: null, outlineOffset: null, outlineStyle: null, outlineWidth: null, overflow: null, overflowAnchor: null, overflowBlock: null, overflowInline: null, overflowWrap: null, overflowX: null, overflowY: null, overscrollBehavior: null, overscrollBehaviorBlock: null, overscrollBehaviorInline: null, overscrollBehaviorX: null, overscrollBehaviorY: null, padding: null, paddingBlock: null, paddingBlockEnd: null, paddingBlockStart: null, paddingBottom: null, paddingInline: null, paddingInlineEnd: null, paddingInlineStart: null, paddingLeft: null, paddingRight: null, paddingTop: null, pageBreakAfter: null, pageBreakBefore: null, pageBreakInside: null, paintOrder: null, perspective: null, perspectiveOrigin: null, placeContent: null, placeItems: null, placeSelf: null, pointerEvents: null, position: null, quotes: null, resize: null, right: null, rotate: null, rowGap: null, scale: null, scrollBehavior: null, scrollMargin: null, scrollMarginBlock: null, scrollMarginBlockEnd: null, scrollMarginBlockStart: null, scrollMarginBottom: null, scrollMarginInline: null, scrollMarginInlineEnd: null, scrollMarginInlineStart: null, scrollMarginLeft: null, scrollMarginRight: null, scrollMarginTop: null, scrollPadding: null, scrollPaddingBlock: null, scrollPaddingBlockEnd: null, scrollPaddingBlockStart: null, scrollPaddingBottom: null, scrollPaddingInline: null, scrollPaddingInlineEnd: null, scrollPaddingInlineStart: null, scrollPaddingLeft: null, scrollPaddingRight: null, scrollPaddingTop: null, scrollSnapAlign: null, scrollSnapStop: null, scrollSnapType: null, scrollbar3dLightColor: null, scrollbarArrowColor: null, scrollbarBaseColor: null, scrollbarColor: null, scrollbarDarkshadowColor: null, scrollbarFaceColor: null, scrollbarHighlightColor: null, scrollbarShadowColor: null, scrollbarTrackColor: null, scrollbarWidth: null, shapeImageThreshold: null, shapeMargin: null, shapeOutside: null, tabSize: null, tableLayout: null, textAlign: null, textAlignLast: null, textCombineUpright: null, textDecoration: null, textDecorationColor: null, textDecorationLine: null, textDecorationSkipInk: null, textDecorationStyle: null, textDecorationThickness: null, textEmphasis: null, textEmphasisColor: null, textEmphasisPosition: null, textEmphasisStyle: null, textIndent: null, textJustify: null, textOrientation: null, textOverflow: null, textRendering: null, textShadow: null, textTransform: null, textUnderlineOffset: null, textUnderlinePosition: null, top: null, touchAction: null, transform: null, transformBox: null, transformOrigin: null, transformStyle: null, transition: null, transitionDelay: null, transitionDuration: null, transitionProperty: null, transitionTimingFunction: null, translate: null, unicodeBidi: null, verticalAlign: null, visibility: null, whiteSpace: null, widows: null, width: null, willChange: null, wordBreak: null, wordSpacing: null, writingMode: null, zIndex: null};
     }
-    
+
     if ((ConstSet6[oldNode_p1.kind] != undefined)) {
     oldNode_p1.dom.className.baseVal = newNode_p0.class;
     }
     else {
     oldNode_p1.dom.className = newNode_p0.class;
     }
-    
+
     }
-    
+
     oldNode_p1.style = newNode_p0.style;
     oldNode_p1.class = newNode_p0.class;
 
-  
+
 }
 
 function takeOverAttr__pkgZkaraxZvdom_u834(newNode_p0, oldNode_p1) {
     oldNode_p1.attrs = newNode_p0.attrs;
 
-  
+
 }
 
 function updateAttributes__pkgZkaraxZkarax_u1062(newNode_p0, oldNode_p1) {
@@ -3285,17 +3290,17 @@ function updateAttributes__pkgZkaraxZkarax_u1062(newNode_p0, oldNode_p1) {
               if (!((v_738198576 == null))) {
               oldNode_p1.dom.setAttribute(k_738198575, v_738198576);
               }
-              
+
               res_570426194 = addInt(res_570426194, 2);
             }
         };
       };
     };
     }
-    
+
     takeOverAttr__pkgZkaraxZvdom_u834(newNode_p0, oldNode_p1);
 
-  
+
 }
 
 function getAttr__pkgZkaraxZvdom_u821(n_p0, key_p1) {
@@ -3315,7 +3320,7 @@ function getAttr__pkgZkaraxZvdom_u821(n_p0, key_p1) {
             result_771752760 = n_p0.attrs[chckIndx(addInt(i_771752769, 1), 0, (n_p0.attrs).length - 1)];
             break BeforeRet;
             }
-            
+
             res_570426198 = addInt(res_570426198, 2);
           }
       };
@@ -3343,9 +3348,9 @@ function removeAllEventHandlers__pkgZkaraxZkarax_u149(d_p0) {
       };
     };
     }
-    
 
-  
+
+
 }
 
 function mergeEvents__pkgZkaraxZkarax_u1073(newNode_p0, oldNode_p1, kxi_p2) {
@@ -3353,11 +3358,11 @@ function mergeEvents__pkgZkaraxZkarax_u1073(newNode_p0, oldNode_p1, kxi_p2) {
     if (!((d_738198581 == null))) {
     removeAllEventHandlers__pkgZkaraxZkarax_u149(d_738198581);
     }
-    
+
     oldNode_p1.events = newNode_p0.events;
     applyEvents__pkgZkaraxZkarax_u318(oldNode_p1);
 
-  
+
 }
 
 function addPatch__pkgZkaraxZkarax_u1082(kxi_p0, ka_p1, parenta_p2, currenta_p3, na_p4, oldNode_p5) {
@@ -3372,10 +3377,10 @@ function addPatch__pkgZkaraxZkarax_u1082(kxi_p0, ka_p1, parenta_p2, currenta_p3,
       kxi_p0.patches[chckIndx(L_738198593, 0, (kxi_p0.patches).length - 1)].newNode = na_p4;
       kxi_p0.patches[chckIndx(L_738198593, 0, (kxi_p0.patches).length - 1)].oldNode = oldNode_p5;
     }
-    
+
     kxi_p0.patchLen = addInt(kxi_p0.patchLen, 1);
 
-  
+
 }
 
 function diff__pkgZkaraxZkarax_u1246(newNode_p0, oldNode_p1, parent_p2, current_p3, kxi_p4) {
@@ -3397,7 +3402,7 @@ function diff__pkgZkaraxZkarax_u1246(newNode_p0, oldNode_p1, parent_p2, current_
       oldNode_p1.text = newNode_p0.text;
       oldNode_p1.dom.nodeValue = newNode_p0.text;
       }
-      
+
       if ((oldNode_p1.kind == 194)) {
       oldNode_p1.dom.value = newNode_p0.text;
       var checked_738198773 = getAttr__pkgZkaraxZvdom_u821(newNode_p0, "checked");
@@ -3407,31 +3412,31 @@ function diff__pkgZkaraxZkarax_u1246(newNode_p0, oldNode_p1, parent_p2, current_
       else {
       Temporary1 = true;
       }
-      
+
       oldNode_p1.dom.checked = Temporary1;
       }
-      
+
       if ((oldNode_p1.kind == 200)) {
       oldNode_p1.dom.value = newNode_p0.text;
       }
-      
+
       }
-      
+
       if ((!(((newNode_p0.events).length == 0)) || !(((oldNode_p1.events).length == 0)))) {
       mergeEvents__pkgZkaraxZkarax_u1073(newNode_p0, oldNode_p1, kxi_p4);
       }
-      
+
       var newLength_738198784 = len__pkgZkaraxZvdom_u842(newNode_p0);
       var oldLength_738198785 = len__pkgZkaraxZvdom_u842(oldNode_p1);
       if (((newLength_738198784 == 0) && (oldLength_738198785 == 0))) {
       break BeforeRet;
       }
-      
+
       var minLength_738198786 = nimMin(newLength_738198784, oldLength_738198785);
       if (!((oldNode_p1.kind == newNode_p0.kind))) {
       failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,53,50,56,44,32,53,41,32,96,111,108,100,78,111,100,101,46,107,105,110,100,32,61,61,32,110,101,119,78,111,100,101,46,107,105,110,100,96,32]);
       }
-      
+
       var commonPrefix_738198796 = 0;
       Label2: {
           Label3: while (true) {
@@ -3443,7 +3448,7 @@ function diff__pkgZkaraxZkarax_u1246(newNode_p0, oldNode_p1, parent_p2, current_
             else {
               break Label2;
             }
-            
+
           }
       };
       var oldPos_738198806 = subInt(oldLength_738198785, 1);
@@ -3459,7 +3464,7 @@ function diff__pkgZkaraxZkarax_u1246(newNode_p0, oldNode_p1, parent_p2, current_
             else {
               break Label4;
             }
-            
+
           }
       };
       var pos_738198822 = addInt(nimMin(oldPos_738198806, newPos_738198807), 1);
@@ -3506,7 +3511,7 @@ function diff__pkgZkaraxZkarax_u1246(newNode_p0, oldNode_p1, parent_p2, current_
           };
         };
       }
-      
+
       Label15: {
         var i_738198843 = 0;
         var res_570426166 = pos_738198822;
@@ -3529,12 +3534,12 @@ function diff__pkgZkaraxZkarax_u1246(newNode_p0, oldNode_p1, parent_p2, current_
       if (true) {
       failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,53,55,48,44,32,50,54,41,32,96,102,97,108,115,101,96,32,101,113,32,114,101,116,117,114,110,101,100,32,117,115,101,110,101,119,78,111,100,101]);
       }
-      
+
       break;
     }
   };
 
-  
+
 }
 
 function applyComponents__pkgZkaraxZkarax_u1364(kxi_p0) {
@@ -3558,23 +3563,23 @@ function applyComponents__pkgZkaraxZkarax_u1364(kxi_p0) {
           else {
             diff__pkgZkaraxZkarax_u1246(x_738198875.expanded, oldExpanded_738198883, parent_738198882, current_738198881, kxi_p0);
           }
-          
+
           }
-          
+
           i_738198870 = addInt(i_738198870, 1);
         }
     };
     if (kxi_p0.components.length < 0) { for (var i = kxi_p0.components.length ; i < 0 ; ++i) kxi_p0.components.push(({oldNode: null, newNode: null, parent: null, current: null})); }
                else { kxi_p0.components.length = 0; };
 
-  
+
 }
 
 function reapplyEvents__pkgZkaraxZkarax_u329(n_p0) {
     removeAllEventHandlers__pkgZkaraxZkarax_u149(n_p0.dom);
     applyEvents__pkgZkaraxZkarax_u318(n_p0);
 
-  
+
 }
 
 function moveDom__pkgZkaraxZkarax_u1176(dest_p0, src_p1) {
@@ -3584,11 +3589,11 @@ function moveDom__pkgZkaraxZkarax_u1176(dest_p0, src_p1) {
     if (!((dest_p0.id == null))) {
     kxi__.byId[dest_p0.id] = dest_p0;
     }
-    
+
     if (!((len__pkgZkaraxZvdom_u842(dest_p0) == len__pkgZkaraxZvdom_u842(src_p1)))) {
     failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,52,49,57,44,32,51,41,32,96,100,101,115,116,46,108,101,110,32,61,61,32,115,114,99,46,108,101,110,96,32]);
     }
-    
+
     Label1: {
       var i_738198698 = 0;
       var colontmp__570426212 = 0;
@@ -3604,13 +3609,13 @@ function moveDom__pkgZkaraxZkarax_u1176(dest_p0, src_p1) {
       };
     };
 
-  
+
 }
 
 function HEX5BHEX5DHEX3D__pkgZkaraxZvdom_u853(x_p0, idx_p1, y_p2) {
     x_p0.kids[chckIndx(idx_p1, 0, (x_p0.kids).length - 1)] = y_p2;
 
-  
+
 }
 
 function applyPatch__pkgZkaraxZkarax_u1195(kxi_p0) {
@@ -3635,9 +3640,9 @@ function applyPatch__pkgZkaraxZkarax_u1195(kxi_p0) {
                 else {
                 p_738198706.parent.appendChild(nn_738198707);
                 }
-                
+
               }
-              
+
               break;
             case 5:
               moveDom__pkgZkaraxZkarax_u1176(p_738198706.newNode, p_738198706.oldNode);
@@ -3658,19 +3663,19 @@ function applyPatch__pkgZkaraxZkarax_u1195(kxi_p0) {
               if (!((n_738198718.id == null))) {
               delete kxi_p0.byId[n_738198718.id];
               }
-              
+
               if ((n_738198718.kind == 5)) {
               var x_738198728 = n_738198718;
               if (!(cmpClosures(x_738198728.onDetachImpl, null))) {
               x_738198728.onDetachImpl(x_738198728);
               }
-              
+
               }
-              
+
               if (!(kxi_p0.surpressRedraws)) {
               n_738198718.dom = null;
               }
-              
+
               break;
             }
             i_570426206 = addInt(i_570426206, 1);
@@ -3690,14 +3695,14 @@ function applyPatch__pkgZkaraxZkarax_u1195(kxi_p0) {
             if (!(!((p_738198738.newChild.dom == null)))) {
             failedAssertImpl__stdZassertions_u86([107,97,114,97,120,46,110,105,109,40,52,53,56,44,32,53,41,32,96,112,46,110,101,119,67,104,105,108,100,46,100,111,109,32,33,61,32,110,105,108,96,32]);
             }
-            
+
             i_570426209 = addInt(i_570426209, 1);
           }
       };
     };
     kxi_p0.patchLenV = 0;
 
-  
+
 }
 
 function dodraw__pkgZkaraxZkarax_u1453(kxi_p0) {
@@ -3710,14 +3715,14 @@ function dodraw__pkgZkaraxZkarax_u1453(kxi_p0) {
     if ((HEX3Aenv_570425868.kxi0.renderer == null)) {
     break BeforeRet;
     }
-    
+
     HEX3Aenv_570425868.kxi0.renderId = 0;
     if (HEX3Aenv_570425868.kxi0.rendering) {
     Temporary1 = HEX3Aanonymous__pkgZkaraxZkarax_u1458.bind(HEX3Aenv_570425868); Temporary1.ClP_0 = HEX3Aanonymous__pkgZkaraxZkarax_u1458; Temporary1.ClE_0 = HEX3Aenv_570425868;
     HEX3Aenv_570425868.kxi0.renderId = window.requestAnimationFrame(Temporary1);
     break BeforeRet;
     }
-    
+
     HEX3Aenv_570425868.kxi0.rendering = true;
     var rdata_738198963 = {hashPart: null, queryString: null};
     if ((window.location.hash.indexOf("?")>=0)) {
@@ -3729,7 +3734,7 @@ function dodraw__pkgZkaraxZkarax_u1453(kxi_p0) {
       rdata_738198963.hashPart = window.location.hash;
       rdata_738198963.queryString = window.location.search;
     }
-    
+
     var newtree_738198998 = HEX3Aenv_570425868.kxi0.renderer(rdata_738198963);
     HEX3Aenv_570425868.kxi0.runCount = addInt(HEX3Aenv_570425868.kxi0.runCount, 1);
     newtree_738198998.id = HEX3Aenv_570425868.kxi0.rootId;
@@ -3742,22 +3747,22 @@ function dodraw__pkgZkaraxZkarax_u1453(kxi_p0) {
       var olddom_738199009 = document.getElementById(HEX3Aenv_570425868.kxi0.rootId);
       diff__pkgZkaraxZkarax_u1246(newtree_738198998, HEX3Aenv_570425868.kxi0.currentTree, null, olddom_738199009, HEX3Aenv_570425868.kxi0);
     }
-    
+
     applyComponents__pkgZkaraxZkarax_u1364(HEX3Aenv_570425868.kxi0);
     applyPatch__pkgZkaraxZkarax_u1195(HEX3Aenv_570425868.kxi0);
     HEX3Aenv_570425868.kxi0.currentTree = newtree_738198998;
     if (!((HEX3Aenv_570425868.kxi0.postRenderCallback == null))) {
     HEX3Aenv_570425868.kxi0.postRenderCallback(rdata_738198963);
     }
-    
+
     if (!((HEX3Aenv_570425868.kxi0.toFocus == null))) {
     HEX3Aenv_570425868.kxi0.toFocus.focus();
     }
-    
+
     HEX3Aenv_570425868.kxi0.rendering = false;
   };
 
-  
+
 }
 
 function init__pkgZkaraxZkarax_u1555(ev_p0) {
@@ -3766,19 +3771,19 @@ function init__pkgZkaraxZkarax_u1555(ev_p0) {
 function HEX3Aanonymous__pkgZkaraxZkarax_u1557() {
     dodraw__pkgZkaraxZkarax_u1453(kxi__);
 
-  
+
 }
 
     Temporary1 = HEX3Aanonymous__pkgZkaraxZkarax_u1557.bind(null); Temporary1.ClP_0 = HEX3Aanonymous__pkgZkaraxZkarax_u1557; Temporary1.ClE_0 = null;
     kxi__.renderId = window.requestAnimationFrame(Temporary1);
 
-  
+
 }
 
 function HEX3Aanonymous__pkgZkaraxZkarax_u1552() {
     dodraw__pkgZkaraxZkarax_u1453(this.kxi0);
 
-  
+
 }
 
 function redraw__pkgZkaraxZkarax_u1550(kxi_p0) {
@@ -3791,9 +3796,9 @@ function redraw__pkgZkaraxZkarax_u1550(kxi_p0) {
     Temporary1 = HEX3Aanonymous__pkgZkaraxZkarax_u1552.bind(HEX3Aenv_570426218); Temporary1.ClP_0 = HEX3Aanonymous__pkgZkaraxZkarax_u1552; Temporary1.ClE_0 = HEX3Aenv_570426218;
     HEX3Aenv_570426218.kxi0.renderId = window.requestAnimationFrame(Temporary1);
     }
-    
 
-  
+
+
 }
 
 function setRenderer__pkgZkaraxZkarax_u1589(renderer_p0, root_p1, clientPostRenderCallback_p2) {
@@ -3803,7 +3808,7 @@ function setRenderer__pkgZkaraxZkarax_u1589(renderer_p0, root_p1, clientPostRend
 function HEX3Aanonymous__pkgZkaraxZkarax_u1713() {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 
-  
+
 }
 
   var result_738199101 = null;
@@ -3812,7 +3817,7 @@ function HEX3Aanonymous__pkgZkaraxZkarax_u1713() {
     var msg_738199105 = (("Could not find a <div> with id=" + root_p1) + ". Karax needs it as its rendering target.");
     raiseException({message: cstrToNimstr(msg_738199105), parent: null, m_type: NTI33555183, name: null, trace: [], up: null}, "Exception");
     }
-    
+
     result_738199101 = {rootId: root_p1, renderer: renderer_p0, postRenderCallback: clientPostRenderCallback_p2, patches: newSeq__pkgZkaraxZkarax_u1619(60), patchesV: newSeq__pkgZkaraxZkarax_u1660(30), components: [], surpressRedraws: false, byId: {}, orphans: {}, currentTree: null, toFocus: null, toFocusV: null, renderId: 0, rendering: false, patchLen: 0, patchLenV: 0, runCount: 0};
     kxi__ = result_738199101;
     Temporary1 = init__pkgZkaraxZkarax_u1555.bind(null); Temporary1.ClP_0 = init__pkgZkaraxZkarax_u1555; Temporary1.ClE_0 = null;
@@ -3837,9 +3842,9 @@ function wrapPostRender__pkgZkaraxZkarax_u1880(data_p0) {
     if (!(cmpClosures(this.clientPostRenderCallback1, null))) {
     this.clientPostRenderCallback1();
     }
-    
 
-  
+
+
 }
 
 function setRenderer__pkgZkaraxZkarax_u1870(renderer_p0, root_p1, clientPostRenderCallback_p2) {
@@ -3872,7 +3877,7 @@ function newVNode__pkgZkaraxZvdom_u940(kind_p0) {
 function add__pkgZkaraxZvdom_u857(parent_p0, kid_p1) {
     parent_p0.kids.push(kid_p1);;
 
-  
+
 }
 
 function tree__pkgZkaraxZvdom_u943(kind_p0, kids_p1) {
@@ -3915,7 +3920,7 @@ function setAttr__pkgZkaraxZvdom_u772(n_p0, key_p1, val_p2) {
               n_p0.attrs[chckIndx(addInt(i_771752728, 1), 0, (n_p0.attrs).length - 1)] = val_p2;
               break BeforeRet;
               }
-              
+
               res_570426323 = addInt(res_570426323, 2);
             }
         };
@@ -3923,10 +3928,10 @@ function setAttr__pkgZkaraxZvdom_u772(n_p0, key_p1, val_p2) {
       n_p0.attrs.push(key_p1);;
       n_p0.attrs.push(val_p2);;
     }
-    
+
   };
 
-  
+
 }
 
 function text__pkgZkaraxZvdom_u1011(s_p0) {
@@ -3941,7 +3946,7 @@ function text__pkgZkaraxZvdom_u1011(s_p0) {
 function addEventListener__pkgZkaraxZvdom_u1062(n_p0, event_p1, handler_p2) {
     n_p0.events.push({Field0: event_p1, Field1: handler_p2, Field2: null});;
 
-  
+
 }
 
 function wrapper__pkgZkaraxZkarax_u1968(ev_p0, n_p1) {
@@ -3949,9 +3954,9 @@ function wrapper__pkgZkaraxZkarax_u1968(ev_p0, n_p1) {
     if (!(this.kxi1.surpressRedraws)) {
     redraw__pkgZkaraxZkarax_u1550(this.kxi1);
     }
-    
 
-  
+
+
 }
 
 function addEventHandler__pkgZkaraxZkarax_u1963(n_p0, k_p1, action_p2, kxi_p3) {
@@ -3964,13 +3969,13 @@ function addEventHandler__pkgZkaraxZkarax_u1963(n_p0, k_p1, action_p2, kxi_p3) {
     Temporary1 = wrapper__pkgZkaraxZkarax_u1968.bind(HEX3Aenv_570426364); Temporary1.ClP_0 = wrapper__pkgZkaraxZkarax_u1968; Temporary1.ClE_0 = HEX3Aenv_570426364;
     addEventListener__pkgZkaraxZvdom_u1062(n_p0, k_p1, Temporary1);
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZauth_u52(event_p0, node_p1) {
     this.onChange0(cstrToNimstr(value__pkgZkaraxZvdom_u474(node_p1)));
 
-  
+
 }
 
 function authInput__componentsZauth_u9(labelText_p0, inputType_p1, placeholderText_p2, valueText_p3, onChange_p4) {
@@ -4003,13 +4008,13 @@ function authInput__componentsZauth_u9(labelText_p0, inputType_p1, placeholderTe
 function HEX3Aanonymous__componentsZauth_u103(value_p0) {
     this.state0.auth.emailDraft = nimCopy(null, value_p0, NTI33554449);
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZauth_u105(value_p0) {
     this.state0.auth.passwordDraft = nimCopy(null, value_p0, NTI33554449);
 
-  
+
 }
 
 function setAttr__pkgZkaraxZvdom_u817(n_p0, key_p1, val_p2) {
@@ -4021,10 +4026,10 @@ function setAttr__pkgZkaraxZvdom_u817(n_p0, key_p1, val_p2) {
     else {
     Temporary1 = null;
     }
-    
+
     setAttr__pkgZkaraxZvdom_u772(n_p0, key_p1, Temporary1);
 
-  
+
 }
 
 function newJArray__pureZjson_u203() {
@@ -4054,7 +4059,7 @@ function nextPowerOfTwo__pureZmath_u274(x_p0) {
 function raiseDivByZero() {
     raiseException({message: [100,105,118,105,115,105,111,110,32,98,121,32,122,101,114,111], parent: null, m_type: NTI134217742, name: null, trace: [], up: null}, "DivByZeroDefect");
 
-  
+
 }
 
 function slotsNeeded__pureZcollectionsZtables_u42(count_p0) {
@@ -4269,17 +4274,17 @@ function hashFarm__pureZhashes_u637(s_p0) {
     result_1291846271 = len0_16__pureZhashes_u494(s_p0);
     break BeforeRet;
     }
-    
+
     if (((s_p0).length <= 32)) {
     result_1291846271 = len17_32__pureZhashes_u546(s_p0);
     break BeforeRet;
     }
-    
+
     if (((s_p0).length <= 64)) {
     result_1291846271 = len33_64__pureZhashes_u560(s_p0);
     break BeforeRet;
     }
-    
+
     var o_1291846282 = 0;
     var x_1291846283 = 81n;
     var y_1291846284 = 2480279821605975764n;
@@ -4306,7 +4311,7 @@ function hashFarm__pureZhashes_u637(s_p0) {
           if ((o_1291846282 == eos_1291846300)) {
           break Label1;
           }
-          
+
         }
     };
     var mul_1291846322 = BigInt.asUintN(64, (13011662864482103923n + BigInt.asUintN(64, (z_1291846285 & 255n) << (BigInt(1) & 63n))));
@@ -4366,12 +4371,12 @@ function rawGet__pureZjson_u483(t_p0, key_p1, hc_p2, hc_p2_Idx) {
     if ((hc_p2[hc_p2_Idx] == 0)) {
     hc_p2[hc_p2_Idx] = 314159265;
     }
-    
+
     if (((t_p0.data).length == 0)) {
     result_1610613225 = (-1);
     break BeforeRet;
     }
-    
+
     var h_1610613275 = (hc_p2[hc_p2_Idx] & (t_p0.data).length - 1);
     Label1: {
         Label2: while (true) {
@@ -4380,7 +4385,7 @@ function rawGet__pureZjson_u483(t_p0, key_p1, hc_p2, hc_p2_Idx) {
           result_1610613225 = h_1610613275;
           break BeforeRet;
           }
-          
+
           h_1610613275 = nextTry__pureZcollectionsZtables_u34(h_1610613275, (t_p0.data).length - 1);
         }
     };
@@ -4397,7 +4402,7 @@ function mustRehash__pureZjson_u804(t_p0) {
     if (!((t_p0.counter < (t_p0.data).length))) {
     failedAssertImpl__stdZassertions_u86([104,97,115,104,99,111,109,109,111,110,46,110,105,109,40,51,52,44,32,57,41,32,96,10,116,46,99,111,117,110,116,101,114,32,60,32,116,46,100,97,116,97,76,101,110,96,32]);
     }
-    
+
     result_1610613543 = (((t_p0.data).length < addInt(t_p0.counter, divInt(t_p0.counter, 2))) || (subInt((t_p0.data).length, t_p0.counter) < 4));
 
   return result_1610613543;
@@ -4412,14 +4417,14 @@ function rawInsert__pureZjson_u1338(t_p0, data_p1, data_p1_Idx, key_p2, val_p3, 
     if ((t_p0.first < 0)) {
     t_p0.first = h_p5;
     }
-    
+
     if ((0 <= t_p0.last)) {
     data_p1[data_p1_Idx][chckIndx(t_p0.last, 0, (data_p1[data_p1_Idx]).length - 1)].Field1 = h_p5;
     }
-    
+
     t_p0.last = h_p5;
 
-  
+
 }
 
 function enlarge__pureZjson_u955(t_p0) {
@@ -4452,12 +4457,12 @@ function enlarge__pureZjson_u955(t_p0) {
           n_1610613697[chckIndx(h_1610613745, 0, (n_1610613697).length - 1)].Field3 = null;
           rawInsert__pureZjson_u1338(t_p0, t_p0, "data", Temporary5, Temporary6, n_1610613697[chckIndx(h_1610613745, 0, (n_1610613697).length - 1)].Field0, j_1610613853);
           }
-          
+
           h_1610613745 = nxt_1610613799;
         }
     };
 
-  
+
 }
 
 function rawGetKnownHC__pureZjson_u1600(t_p0, key_p1, hc_p2) {
@@ -4468,7 +4473,7 @@ function rawGetKnownHC__pureZjson_u1600(t_p0, key_p1, hc_p2) {
     result_1610614342 = (-1);
     break BeforeRet;
     }
-    
+
     var h_1610614389 = (hc_p2 & (t_p0.data).length - 1);
     Label1: {
         Label2: while (true) {
@@ -4477,7 +4482,7 @@ function rawGetKnownHC__pureZjson_u1600(t_p0, key_p1, hc_p2) {
           result_1610614342 = h_1610614389;
           break BeforeRet;
           }
-          
+
           h_1610614389 = nextTry__pureZcollectionsZtables_u34(h_1610614389, (t_p0.data).length - 1);
         }
     };
@@ -4495,7 +4500,7 @@ function HEX5BHEX5DHEX3D__pureZjson_u414(t_p0, key_p1, val_p2) {
     t_p0.data = new Array(chckRange(correctSizeHEX60gensym13_1610613201, 0, 2147483647)); for (var i = 0 ; i < chckRange(correctSizeHEX60gensym13_1610613201, 0, 2147483647) ; ++i) { t_p0.data[i] = {Field0: 0, Field1: 0, Field2: [], Field3: null}; }    t_p0.first = (-1);
     t_p0.last = (-1);
     }
-    
+
     var hc_1610613210 = [0];
     var index_1610613441 = rawGet__pureZjson_u483(t_p0, key_p1, hc_1610613210, 0);
     if ((0 <= index_1610613441)) {
@@ -4508,19 +4513,19 @@ function HEX5BHEX5DHEX3D__pureZjson_u414(t_p0, key_p1, val_p2) {
       t_p0.data = new Array(chckRange(correctSizeHEX60gensym18_1610613535, 0, 2147483647)); for (var i = 0 ; i < chckRange(correctSizeHEX60gensym18_1610613535, 0, 2147483647) ; ++i) { t_p0.data[i] = {Field0: 0, Field1: 0, Field2: [], Field3: null}; }      t_p0.first = (-1);
       t_p0.last = (-1);
       }
-      
+
       if (mustRehash__pureZjson_u804(t_p0)) {
       enlarge__pureZjson_u955(t_p0);
       index_1610613441 = rawGetKnownHC__pureZjson_u1600(t_p0, key_p1, hc_1610613210[0]);
       }
-      
+
       index_1610613441 = subInt((-1), index_1610613441);
       rawInsert__pureZjson_u1338(t_p0, t_p0, "data", key_p1, val_p2, hc_1610613210[0], index_1610613441);
       t_p0.counter = addInt(t_p0.counter, 1);
     }
-    
 
-  
+
+
 }
 
 function reprEnum(e_p0, typ_p1) {
@@ -4535,7 +4540,7 @@ function reprEnum(e_p0, typ_p1) {
     else {
       result_33557684 = nimCopy(null, (HEX24__systemZdollars_u14(e_p0)).concat([32,40,105,110,118,97,108,105,100,32,100,97,116,97,33,41]), NTI33554449);
     }
-    
+
 
   return result_33557684;
 
@@ -4551,7 +4556,7 @@ function HEX25__pureZjson_u1858(keyVals_p0) {
     result_1610614598 = newJArray__pureZjson_u203();
     break BeforeRet;
     }
-    
+
     result_1610614598 = newJObject__pureZjson_u136();
     Label1: {
       var key_1610614615 = [];
@@ -4596,7 +4601,7 @@ function newfetchOptions__stdZjsfetch_u115(metod_p0, body_p1, mode_p2, credentia
     else {
     Temporary1 = null;
     }
-    
+
     switch (metod_p0) {
     case 0:
       Temporary2 = "HEAD";
@@ -4616,7 +4621,7 @@ function newfetchOptions__stdZjsfetch_u115(metod_p0, body_p1, mode_p2, credentia
     case 8:
       Temporary2 = "PATCH";
       break;
-    default: 
+    default:
       Temporary2 = "GET";
       break;
     }
@@ -4652,7 +4657,7 @@ function len__pureZjson_u3028(n_p0) {
       if (ConstSet11[Temporary2.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'fields\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary2.kind, NTI1610612739)); }
       result_1610615766 = len__pureZjson_u2184(Temporary2.fields);
       break;
-    default: 
+    default:
       result_1610615766 = 0;
       break;
     }
@@ -4680,7 +4685,7 @@ function toHexImpl__pureZstrutils_u777(x_p0, len_p1, handleNegative_p2) {
             if (((n_905970447 == 0n) && handleNegative_p2)) {
             n_905970447 = 18446744073709551615n;
             }
-            
+
             res_570426429 = subInt(res_570426429, 1);
           }
       };
@@ -4763,7 +4768,7 @@ function escapeJsonUnquoted__pureZjson_u4335(s_p0, result_p1, result_p1_Idx) {
             case 92:
               nimAddStrStr(result_p1[result_p1_Idx], [92,92]);;
               break;
-            default: 
+            default:
               addChar(result_p1[result_p1_Idx], c_1610617074);;
               break;
             }
@@ -4771,12 +4776,12 @@ function escapeJsonUnquoted__pureZjson_u4335(s_p0, result_p1, result_p1_Idx) {
             if (!(((s_p0).length == L_570426424))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(272, 11) `len(a) == L` the length of the string changed while iterating over it"));
             }
-            
+
           }
       };
     };
 
-  
+
 }
 
 function escapeJson__pureZjson_u4356(s_p0, result_p1, result_p1_Idx) {
@@ -4784,7 +4789,7 @@ function escapeJson__pureZjson_u4356(s_p0, result_p1, result_p1_Idx) {
     escapeJsonUnquoted__pureZjson_u4335(s_p0, result_p1, result_p1_Idx);
     nimAddStrStr(result_p1[result_p1_Idx], [34]);;
 
-  
+
 }
 
 function nimFloatToString__stdZformatfloat_u130(a_p0) {
@@ -4805,7 +4810,7 @@ function nimFloatToString__stdZformatfloat_u130(a_p0) {
           result_419430532 = a_p0+".0";
         }
       }
-    
+
 
   return result_419430532;
 
@@ -4814,7 +4819,7 @@ function nimFloatToString__stdZformatfloat_u130(a_p0) {
 function addFloat__system_u3227(result_p0, result_p0_Idx, x_p1) {
     add__system_u1972(result_p0, result_p0_Idx, nimFloatToString__stdZformatfloat_u130(x_p1));
 
-  
+
 }
 
 function toUgly__pureZjson_u4366(result_p0, result_p0_Idx, node_p1) {
@@ -4849,13 +4854,13 @@ function toUgly__pureZjson_u4366(result_p0, result_p0_Idx, node_p1) {
               else {
                 comma_1610617105 = true;
               }
-              
+
               toUgly__pureZjson_u4366(result_p0, result_p0_Idx, child_1610617109);
               i_570426411 += 1;
               if (!(((colontmp__570426409).length == L_570426412))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
@@ -4886,21 +4891,21 @@ function toUgly__pureZjson_u4366(result_p0, result_p0_Idx, node_p1) {
               else {
                 comma_1610617105 = true;
               }
-              
+
               escapeJson__pureZjson_u4356(key_1610617114, result_p0, result_p0_Idx);
               nimAddStrStr(result_p0[result_p0_Idx], [58]);;
               toUgly__pureZjson_u4366(result_p0, result_p0_Idx, value_1610617115);
               if (!((len__pureZjson_u2184(colontmp__570426415) == L_570426417))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("tables.nim(1822, 11) `len(t) == L` the length of the table changed while iterating over it"));
               }
-              
+
               }
-              
+
               h_570426418 = nxt_570426420;
             }
         };
         }
-        
+
       };
       nimAddStrStr(result_p0[result_p0_Idx], [125]);;
       break;
@@ -4915,7 +4920,7 @@ function toUgly__pureZjson_u4366(result_p0, result_p0_Idx, node_p1) {
         if (ConstSet15[Temporary10.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'str\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary10.kind, NTI1610612739)); }
       escapeJson__pureZjson_u4356(Temporary10.str, result_p0, result_p0_Idx);
       }
-      
+
       break;
     case 2:
       var Temporary11 = node_p1;
@@ -4936,7 +4941,7 @@ function toUgly__pureZjson_u4366(result_p0, result_p0_Idx, node_p1) {
       else {
       Temporary13 = [102,97,108,115,101];
       }
-      
+
       nimAddStrStr(result_p0[result_p0_Idx], Temporary13);;
       break;
     case 0:
@@ -4944,7 +4949,7 @@ function toUgly__pureZjson_u4366(result_p0, result_p0_Idx, node_p1) {
       break;
     }
 
-  
+
 }
 
 function HEX24__pureZjson_u4466(node_p0) {
@@ -4965,7 +4970,7 @@ function jsonHeaders__apiZauth95client_u112(csrfToken_p0) {
     if ((0 < (csrfToken_p0).length)) {
     result_1509949554.set("X-CSRF-Token", toJSStr(csrfToken_p0));
     }
-    
+
 
   return result_1509949554;
 
@@ -4998,13 +5003,13 @@ function getVarType__pureZjson_u5233(x_p0, isRawNumber_p1, isRawNumber_p1_Idx) {
         result_1610617972 = 4;
         break BeforeRet;
       }
-      
+
       }
       else {
         result_1610617972 = 3;
         break BeforeRet;
       }
-      
+
       break;
     case "[object Boolean]":
       result_1610617972 = 1;
@@ -5018,11 +5023,11 @@ function getVarType__pureZjson_u5233(x_p0, isRawNumber_p1, isRawNumber_p1_Idx) {
       result_1610617972 = 4;
       break BeforeRet;
       break;
-    default: 
+    default:
       if (true) {
       failedAssertImpl__stdZassertions_u86([106,115,111,110,46,110,105,109,40,57,57,52,44,32,49,49,41,32,96,102,97,108,115,101,96,32]);
       }
-      
+
       break;
     }
   };
@@ -5035,7 +5040,7 @@ function len__pureZjson_u5254(x_p0) {
   var result_1610617992 = 0;
 
           result_1610617992 = x_p0.length;
-    
+
 
   return result_1610617992;
 
@@ -5047,12 +5052,12 @@ function add__pureZjson_u349(father_p0, child_p1) {
     if (!((father_p0.kind == 6))) {
     failedAssertImpl__stdZassertions_u86([106,115,111,110,46,110,105,109,40,51,48,55,44,32,51,41,32,96,102,97,116,104,101,114,46,107,105,110,100,32,61,61,32,74,65,114,114,97,121,96,32]);
     }
-    
+
     var Temporary1 = father_p0;
     if (ConstSet19[Temporary1.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'elems\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary1.kind, NTI1610612739)); }
     Temporary1.elems.push(child_p1);;
 
-  
+
 }
 
 function HEX5BHEX5DHEX3D__pureZjson_u1973(obj_p0, key_p1, val_p2) {
@@ -5061,12 +5066,12 @@ function HEX5BHEX5DHEX3D__pureZjson_u1973(obj_p0, key_p1, val_p2) {
     if (!((obj_p0.kind == 5))) {
     failedAssertImpl__stdZassertions_u86([106,115,111,110,46,110,105,109,40,51,57,54,44,32,57,41,32,96,111,98,106,46,107,105,110,100,32,61,61,32,74,79,98,106,101,99,116,96,32]);
     }
-    
+
     var Temporary1 = obj_p0;
     if (ConstSet20[Temporary1.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'fields\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary1.kind, NTI1610612739)); }
     HEX5BHEX5DHEX3D__pureZjson_u414(Temporary1.fields, key_p1, val_p2);
 
-  
+
 }
 
 function newJInt__pureZjson_u125(n_p0) {
@@ -5149,7 +5154,7 @@ function convertObject__pureZjson_u5257(x_p0) {
       result_1610617995 = newJObject__pureZjson_u136();
       for (var property in x_p0) {
         if (x_p0.hasOwnProperty(property)) {
-      
+
       var nimProperty_1610618002 = null;
       var nimValue_1610618003 = null;
       nimProperty_1610618002 = property; nimValue_1610618003 = x_p0[property];
@@ -5171,7 +5176,7 @@ function convertObject__pureZjson_u5257(x_p0) {
       else {
         result_1610617995 = newJString__pureZjson_u42(cstrToNimstr((x_p0)));
       }
-      
+
       break;
     case 1:
       result_1610617995 = newJBool__pureZjson_u131((x_p0));
@@ -5215,7 +5220,7 @@ function hasKey__pureZjson_u3191(node_p0, key_p1) {
     if (!((node_p0.kind == 5))) {
     failedAssertImpl__stdZassertions_u86([106,115,111,110,46,110,105,109,40,53,54,56,44,32,57,41,32,96,110,111,100,101,46,107,105,110,100,32,61,61,32,74,79,98,106,101,99,116,96,32]);
     }
-    
+
     var Temporary1 = node_p0;
     if (ConstSet21[Temporary1.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'fields\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary1.kind, NTI1610612739)); }
     result_1610615930 = hasKey__pureZjson_u2584(Temporary1.fields, key_p1);
@@ -5232,12 +5237,12 @@ function rawGet__pureZjson_u2665(t_p0, key_p1, hc_p2, hc_p2_Idx) {
     if ((hc_p2[hc_p2_Idx] == 0)) {
     hc_p2[hc_p2_Idx] = 314159265;
     }
-    
+
     if (((t_p0.data).length == 0)) {
     result_1610615407 = (-1);
     break BeforeRet;
     }
-    
+
     var h_1610615457 = (hc_p2[hc_p2_Idx] & (t_p0.data).length - 1);
     Label1: {
         Label2: while (true) {
@@ -5246,7 +5251,7 @@ function rawGet__pureZjson_u2665(t_p0, key_p1, hc_p2, hc_p2_Idx) {
           result_1610615407 = h_1610615457;
           break BeforeRet;
           }
-          
+
           h_1610615457 = nextTry__pureZcollectionsZtables_u34(h_1610615457, (t_p0.data).length - 1);
         }
     };
@@ -5260,7 +5265,7 @@ function rawGet__pureZjson_u2665(t_p0, key_p1, hc_p2, hc_p2_Idx) {
 function raiseKeyError__jsZjsffi_u1724(key_p0) {
     raiseException({message: ([107,101,121,32,110,111,116,32,102,111,117,110,100,58,32]).concat(key_p0), parent: null, m_type: NTI134217747, name: null, trace: [], up: null}, "KeyError");
 
-  
+
 }
 
 function HEX5BHEX5D__pureZjson_u2658(t_p0, key_p1) {
@@ -5275,7 +5280,7 @@ function HEX5BHEX5D__pureZjson_u2658(t_p0, key_p1) {
     else {
     raiseKeyError__jsZjsffi_u1724(key_p1);
     }
-    
+
 
   return [result_1610615399, result_1610615399_Idx];
 
@@ -5290,11 +5295,11 @@ function HEX5BHEX5D__pureZjson_u3078(node_p0, name_p1) {
     if (!(!((node_p0 == null)))) {
     failedAssertImpl__stdZassertions_u86([106,115,111,110,46,110,105,109,40,53,50,49,44,32,57,41,32,96,110,111,116,32,105,115,78,105,108,40,110,111,100,101,41,96,32]);
     }
-    
+
     if (!((node_p0.kind == 5))) {
     failedAssertImpl__stdZassertions_u86([106,115,111,110,46,110,105,109,40,53,50,50,44,32,57,41,32,96,110,111,100,101,46,107,105,110,100,32,61,61,32,74,79,98,106,101,99,116,96,32]);
     }
-    
+
     var Temporary1 = node_p0;
     if (ConstSet22[Temporary1.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'fields\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary1.kind, NTI1610612739)); }
     result_1610615817 = (Temporary2 = HEX5BHEX5D__pureZjson_u2658(Temporary1.fields, name_p1), Temporary2)[0][Temporary2[1]];
@@ -5319,7 +5324,7 @@ function getStr__pureZjson_u241(n_p0, default_p1) {
       result_1610612980 = nimCopy(null, Temporary1.str, NTI33554449);
       break BeforeRet;
     }
-    
+
   };
 
   return result_1610612980;
@@ -5334,7 +5339,7 @@ function jsonText__apiZauth95client_u36(node_p0, key_p1) {
     result_1509949479 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
+
     var value_1509949484 = HEX5BHEX5D__pureZjson_u3078(node_p0, key_p1);
     switch (value_1509949484.kind) {
     case 4:
@@ -5345,7 +5350,7 @@ function jsonText__apiZauth95client_u36(node_p0, key_p1) {
       result_1509949479 = nimCopy(null, [], NTI33554449);
       break BeforeRet;
       break;
-    default: 
+    default:
       result_1509949479 = nimCopy(null, HEX24__pureZjson_u4466(value_1509949484), NTI33554449);
       break BeforeRet;
       break;
@@ -5369,11 +5374,11 @@ function apiError__apiZauth95client_u115(responseStatus_p0, responseBody_p1) {
     if ((0 < (parsedCode_1509949562).length)) {
     code_1509949559 = nimCopy(null, parsedCode_1509949562, NTI33554449);
     }
-    
+
     if ((0 < (parsedMessage_1509949563).length)) {
     message_1509949560 = nimCopy(null, parsedMessage_1509949563, NTI33554449);
     }
-    
+
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -5418,7 +5423,7 @@ function parseAuthResponse__apiZauth95client_u81(data_p0) {
     if ((!((data_p0.kind == 5)) || !(hasKey__pureZjson_u3191(data_p0, [117,115,101,114])))) {
     raiseException({message: [66,97,99,107,101,110,100,32,97,117,116,104,32,114,101,115,112,111,110,115,101,32,105,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     result_1509949523 = nimCopy(result_1509949523, {user: parseUser__apiZauth95client_u58(HEX5BHEX5D__pureZjson_u3078(data_p0, [117,115,101,114])), sessionId: jsonText__apiZauth95client_u36(data_p0, [115,101,115,115,105,111,110,95,105,100]), expiresAt: jsonText__apiZauth95client_u36(data_p0, [101,120,112,105,114,101,115,95,97,116]), csrfToken: jsonText__apiZauth95client_u36(data_p0, [99,115,114,102,95,116,111,107,101,110])}, NTI1509949444);
 
   return result_1509949523;
@@ -5434,7 +5439,7 @@ async function login__apiZauth95client_u146(email_p0, password_p1) {
     if (!(response_1509949635.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949635.status), responseBody_1509949640), "ValueError");
     }
-    
+
     result_1509949591 = parseAuthResponse__apiZauth95client_u81(parseJson__pureZjson_u5285(responseBody_1509949640));
 
   return result_1509949591;
@@ -5452,7 +5457,7 @@ function applyAuth__appZauth95bridge_u22(state_p0, auth_p1) {
     state_p0.auth.expiresAt = nimCopy(null, auth_p1.expiresAt, NTI33554449);
     state_p0.auth.error = nimCopy(null, [], NTI33554449);
 
-  
+
 }
 
 function newSeq__apiZauth95client_u678(len_p0) {
@@ -5474,7 +5479,7 @@ async function listChats__apiZauth95client_u621() {
     if (!(response_1509950083.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950083.status), responseBody_1509950088), "ValueError");
     }
-    
+
     var data_1509950089 = parseJson__pureZjson_u5285(responseBody_1509950088);
     var items_1509950162 = newSeq__apiZauth95client_u678(0);
     if ((((data_1509950089.kind == 5) && hasKey__pureZjson_u3191(data_1509950089, [99,104,97,116,115])) && (HEX5BHEX5D__pureZjson_u3078(data_1509950089, [99,104,97,116,115]).kind == 6))) {
@@ -5485,7 +5490,7 @@ async function listChats__apiZauth95client_u621() {
       if (!((colontmp__570426442.kind == 6))) {
       failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(colontmp__570426442.kind, NTI1610612739)));
       }
-      
+
       Label2: {
         var i_570426449 = null;
         var colontmp__570426450 = [];
@@ -5504,13 +5509,13 @@ async function listChats__apiZauth95client_u621() {
               if (!(((colontmp__570426450).length == L_570426452))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
     };
     }
-    
+
     result_1509950064 = items_1509950162;
     break BeforeRet;
   };
@@ -5538,7 +5543,7 @@ async function getChatHistory__apiZauth95client_u861(chatId_p0) {
     if (!(response_1509950324.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950324.status), responseBody_1509950329), "ValueError");
     }
-    
+
     var data_1509950330 = parseJson__pureZjson_u5285(responseBody_1509950329);
     var items_1509950403 = newSeq__apiZauth95client_u919(0);
     if ((((data_1509950330.kind == 5) && hasKey__pureZjson_u3191(data_1509950330, [109,101,115,115,97,103,101,115])) && (HEX5BHEX5D__pureZjson_u3078(data_1509950330, [109,101,115,115,97,103,101,115]).kind == 6))) {
@@ -5549,7 +5554,7 @@ async function getChatHistory__apiZauth95client_u861(chatId_p0) {
       if (!((colontmp__570426455.kind == 6))) {
       failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(colontmp__570426455.kind, NTI1610612739)));
       }
-      
+
       Label2: {
         var i_570426457 = null;
         var colontmp__570426458 = [];
@@ -5568,13 +5573,13 @@ async function getChatHistory__apiZauth95client_u861(chatId_p0) {
               if (!(((colontmp__570426458).length == L_570426460))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
     };
     }
-    
+
     result_1509950305 = items_1509950403;
     break BeforeRet;
   };
@@ -5616,7 +5621,7 @@ function find__stdZenumutils_u55(a_p0, item_p1) {
             if (eqStrings(i_1090519104, item_p1)) {
             break BeforeRet;
             }
-            
+
             result_1090519100 = addInt(result_1090519100, 1);
             i_1577062325 += 1;
           }
@@ -5663,14 +5668,14 @@ function applyHistory__appZauth95bridge_u43(state_p0, chatId_p1, history_p2) {
               if (((item_1459617869.content).length == 0)) {
               break Label4;
               }
-              
+
               if (eqStrings(item_1459617869.role, [117,115,101,114])) {
               Temporary5 = 0;
               }
               else {
               Temporary5 = 1;
               }
-              
+
               var role_1459617870 = Temporary5;
               state_p0.messages.push({id: state_p0.nextMessageId, role: role_1459617870, content: nimCopy(null, item_1459617869.content, NTI33554449), cards: []});;
               state_p0.nextMessageId = addInt(state_p0.nextMessageId, 1);
@@ -5679,7 +5684,7 @@ function applyHistory__appZauth95bridge_u43(state_p0, chatId_p1, history_p2) {
             if (!(((history_p2).length == L_570426466))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
@@ -5688,73 +5693,73 @@ function applyHistory__appZauth95bridge_u43(state_p0, chatId_p1, history_p2) {
     if ((contains__stdZenumutils_u50([[112,101,110,100,105,110,103], [112,114,111,99,101,115,115,105,110,103], [119,97,105,116,105,110,103,95,97,112,112,114,111,118,97,108], [97,112,112,114,111,118,105,110,103]], latest_1459617896.status) && (0 < (latest_1459617896.jobId).length))) {
     state_p0.run = nimCopy(state_p0.run, {active: true, request: [], jobId: nimCopy(null, latest_1459617896.jobId, NTI33554449), status: nimCopy(null, latest_1459617896.status, NTI33554449), agent: [], tool: [], presentations: []}, NTI1426063373);
     }
-    
-    }
-    
 
-  
+    }
+
+
+
 }
 
-function addRunEvent__appZstate_u544(state_p0, kind_p1, message_p2) {
+function addRunEvent__appZstate_u552(state_p0, kind_p1, message_p2) {
     state_p0.runEvents.push({id: state_p0.nextEventId, kind: nimCopy(null, kind_p1, NTI33554449), message: nimCopy(null, message_p2, NTI33554449)});;
     state_p0.nextEventId = addInt(state_p0.nextEventId, 1);
 
-  
+
 }
 
-function jsonValueText__apiZclient_u24(node_p0, key_p1) {
-  var result_1795162139 = [];
+function jsonValueText__apiZclient_u28(node_p0, key_p1) {
+  var result_1795162143 = [];
 
   BeforeRet: {
     if (!((node_p0.kind == 5))) {
-    result_1795162139 = nimCopy(null, [], NTI33554449);
+    result_1795162143 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
+
     if (!(hasKey__pureZjson_u3191(node_p0, key_p1))) {
-    result_1795162139 = nimCopy(null, [], NTI33554449);
+    result_1795162143 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
-    var value_1795162144 = HEX5BHEX5D__pureZjson_u3078(node_p0, key_p1);
-    switch (value_1795162144.kind) {
+
+    var value_1795162148 = HEX5BHEX5D__pureZjson_u3078(node_p0, key_p1);
+    switch (value_1795162148.kind) {
     case 4:
-      result_1795162139 = nimCopy(null, getStr__pureZjson_u241(value_1795162144, []), NTI33554449);
+      result_1795162143 = nimCopy(null, getStr__pureZjson_u241(value_1795162148, []), NTI33554449);
       break BeforeRet;
       break;
     case 0:
-      result_1795162139 = nimCopy(null, [], NTI33554449);
+      result_1795162143 = nimCopy(null, [], NTI33554449);
       break BeforeRet;
       break;
-    default: 
-      result_1795162139 = nimCopy(null, HEX24__pureZjson_u4466(value_1795162144), NTI33554449);
+    default:
+      result_1795162143 = nimCopy(null, HEX24__pureZjson_u4466(value_1795162148), NTI33554449);
       break BeforeRet;
       break;
     }
   };
 
-  return result_1795162139;
+  return result_1795162143;
 
 }
 
-function publicApiError__apiZclient_u46(responseStatus_p0, responseBody_p1) {
-  var result_1795162161 = null;
+function publicApiError__apiZclient_u50(responseStatus_p0, responseBody_p1) {
+  var result_1795162165 = null;
 
-    var code_1795162162 = [114,101,113,117,101,115,116,95,102,97,105,108,101,100];
-    var message_1795162163 = [84,104,101,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46];
+    var code_1795162166 = [114,101,113,117,101,115,116,95,102,97,105,108,101,100];
+    var message_1795162167 = [84,104,101,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46];
 ++excHandler;
     try {
-    var data_1795162164 = parseJson__pureZjson_u5285(responseBody_p1);
-    var parsedCode_1795162165 = jsonValueText__apiZclient_u24(data_1795162164, [101,114,114,111,114]);
-    var parsedMessage_1795162166 = jsonValueText__apiZclient_u24(data_1795162164, [109,101,115,115,97,103,101]);
-    if ((0 < (parsedCode_1795162165).length)) {
-    code_1795162162 = nimCopy(null, parsedCode_1795162165, NTI33554449);
+    var data_1795162168 = parseJson__pureZjson_u5285(responseBody_p1);
+    var parsedCode_1795162169 = jsonValueText__apiZclient_u28(data_1795162168, [101,114,114,111,114]);
+    var parsedMessage_1795162170 = jsonValueText__apiZclient_u28(data_1795162168, [109,101,115,115,97,103,101]);
+    if ((0 < (parsedCode_1795162169).length)) {
+    code_1795162166 = nimCopy(null, parsedCode_1795162169, NTI33554449);
     }
-    
-    if ((0 < (parsedMessage_1795162166).length)) {
-    message_1795162163 = nimCopy(null, parsedMessage_1795162166, NTI33554449);
+
+    if ((0 < (parsedMessage_1795162170).length)) {
+    message_1795162167 = nimCopy(null, parsedMessage_1795162170, NTI33554449);
     }
-    
+
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -5768,140 +5773,140 @@ function publicApiError__apiZclient_u46(responseStatus_p0, responseBody_p1) {
     lastJSError = prevJSError;
     } finally {
     }
-    result_1795162161 = {message: ([72,84,84,80,32]).concat(responseStatus_p0,[32,194,183,32],code_1795162162,[32,194,183,32],message_1795162163), parent: null, m_type: NTI134217746, name: null, trace: [], up: null};
+    result_1795162165 = {message: ([72,84,84,80,32]).concat(responseStatus_p0,[32,194,183,32],code_1795162166,[32,194,183,32],message_1795162167), parent: null, m_type: NTI134217746, name: null, trace: [], up: null};
 
-  return result_1795162161;
+  return result_1795162165;
 
 }
 
-function extractProposedTool__apiZclient_u310(data_p0) {
-  var result_1795162424 = [];
+function extractProposedTool__apiZclient_u314(data_p0) {
+  var result_1795162428 = [];
 
   BeforeRet: {
     if (!((data_p0.kind == 5))) {
-    result_1795162424 = nimCopy(null, [], NTI33554449);
+    result_1795162428 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
+
     if (!(hasKey__pureZjson_u3191(data_p0, [112,114,111,112,111,115,101,100,95,116,111,111,108]))) {
-    result_1795162424 = nimCopy(null, [], NTI33554449);
+    result_1795162428 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
-    var proposedTool_1795162429 = HEX5BHEX5D__pureZjson_u3078(data_p0, [112,114,111,112,111,115,101,100,95,116,111,111,108]);
-    if (!((proposedTool_1795162429.kind == 5))) {
-    result_1795162424 = nimCopy(null, [], NTI33554449);
+
+    var proposedTool_1795162433 = HEX5BHEX5D__pureZjson_u3078(data_p0, [112,114,111,112,111,115,101,100,95,116,111,111,108]);
+    if (!((proposedTool_1795162433.kind == 5))) {
+    result_1795162428 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
-    result_1795162424 = nimCopy(null, jsonValueText__apiZclient_u24(proposedTool_1795162429, [116,111,111,108]), NTI33554449);
+
+    result_1795162428 = nimCopy(null, jsonValueText__apiZclient_u28(proposedTool_1795162433, [116,111,111,108]), NTI33554449);
     break BeforeRet;
   };
 
-  return result_1795162424;
+  return result_1795162428;
 
 }
 
-function extractAnswer__apiZclient_u297(data_p0) {
-  var result_1795162411 = [];
+function extractAnswer__apiZclient_u301(data_p0) {
+  var result_1795162415 = [];
 
   BeforeRet: {
     if (!((data_p0.kind == 5))) {
-    result_1795162411 = nimCopy(null, [], NTI33554449);
+    result_1795162415 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
+
     if (!(hasKey__pureZjson_u3191(data_p0, [114,101,115,117,108,116]))) {
-    result_1795162411 = nimCopy(null, [], NTI33554449);
+    result_1795162415 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
-    var jobResult_1795162416 = HEX5BHEX5D__pureZjson_u3078(data_p0, [114,101,115,117,108,116]);
-    if (!((jobResult_1795162416.kind == 5))) {
-    result_1795162411 = nimCopy(null, [], NTI33554449);
+
+    var jobResult_1795162420 = HEX5BHEX5D__pureZjson_u3078(data_p0, [114,101,115,117,108,116]);
+    if (!((jobResult_1795162420.kind == 5))) {
+    result_1795162415 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
-    
-    var answer_1795162421 = jsonValueText__apiZclient_u24(jobResult_1795162416, [97,110,115,119,101,114]);
-    if ((0 < (answer_1795162421).length)) {
-    result_1795162411 = nimCopy(null, answer_1795162421, NTI33554449);
+
+    var answer_1795162425 = jsonValueText__apiZclient_u28(jobResult_1795162420, [97,110,115,119,101,114]);
+    if ((0 < (answer_1795162425).length)) {
+    result_1795162415 = nimCopy(null, answer_1795162425, NTI33554449);
     break BeforeRet;
     }
-    
-    result_1795162411 = nimCopy(null, jsonValueText__apiZclient_u24(jobResult_1795162416, [118,97,108,117,101]), NTI33554449);
+
+    result_1795162415 = nimCopy(null, jsonValueText__apiZclient_u28(jobResult_1795162420, [118,97,108,117,101]), NTI33554449);
     break BeforeRet;
   };
 
-  return result_1795162411;
+  return result_1795162415;
 
 }
 
-function parseResultField__apiZclient_u56(node_p0, field_p1) {
-  var result_1795162171 = false;
+function parseResultField__apiZclient_u60(node_p0, field_p1) {
+  var result_1795162175 = false;
 
   BeforeRet: {
     if (!((node_p0.kind == 5))) {
-    result_1795162171 = false;
+    result_1795162175 = false;
     break BeforeRet;
     }
-    
-    var label_1795162176 = jsonValueText__apiZclient_u24(node_p0, [108,97,98,101,108]);
-    var value_1795162177 = jsonValueText__apiZclient_u24(node_p0, [118,97,108,117,101]);
-    if ((((label_1795162176).length == 0) || ((value_1795162177).length == 0))) {
-    result_1795162171 = false;
+
+    var label_1795162180 = jsonValueText__apiZclient_u28(node_p0, [108,97,98,101,108]);
+    var value_1795162181 = jsonValueText__apiZclient_u28(node_p0, [118,97,108,117,101]);
+    if ((((label_1795162180).length == 0) || ((value_1795162181).length == 0))) {
+    result_1795162175 = false;
     break BeforeRet;
     }
-    
-    field_p1 = nimCopy(field_p1, {label: nimCopy(null, label_1795162176, NTI33554449), value: nimCopy(null, value_1795162177, NTI33554449)}, NTI1426063368);
-    result_1795162171 = true;
+
+    field_p1 = nimCopy(field_p1, {label: nimCopy(null, label_1795162180, NTI33554449), value: nimCopy(null, value_1795162181, NTI33554449)}, NTI1426063368);
+    result_1795162175 = true;
     break BeforeRet;
   };
 
-  return result_1795162171;
+  return result_1795162175;
 
 }
 
-function parseResultSection__apiZclient_u83(node_p0, section_p1) {
+function parseResultSection__apiZclient_u87(node_p0, section_p1) {
           var Temporary3;
 
-  var result_1795162198 = false;
+  var result_1795162202 = false;
 
   BeforeRet: {
     if (!((node_p0.kind == 5))) {
-    result_1795162198 = false;
+    result_1795162202 = false;
     break BeforeRet;
     }
-    
-    var kind_1795162203 = jsonValueText__apiZclient_u24(node_p0, [107,105,110,100]);
-    var title_1795162204 = jsonValueText__apiZclient_u24(node_p0, [116,105,116,108,101]);
-    if ((((kind_1795162203).length == 0) || ((title_1795162204).length == 0))) {
-    result_1795162198 = false;
+
+    var kind_1795162207 = jsonValueText__apiZclient_u28(node_p0, [107,105,110,100]);
+    var title_1795162208 = jsonValueText__apiZclient_u28(node_p0, [116,105,116,108,101]);
+    if ((((kind_1795162207).length == 0) || ((title_1795162208).length == 0))) {
+    result_1795162202 = false;
     break BeforeRet;
     }
-    
+
     if (!(hasKey__pureZjson_u3191(node_p0, [99,111,110,116,101,110,116]))) {
-    result_1795162198 = false;
+    result_1795162202 = false;
     break BeforeRet;
     }
-    
-    var contentNode_1795162205 = HEX5BHEX5D__pureZjson_u3078(node_p0, [99,111,110,116,101,110,116]);
-    var content_1795162206 = [];
-    var items_1795162211 = [];
-    switch (contentNode_1795162205.kind) {
+
+    var contentNode_1795162209 = HEX5BHEX5D__pureZjson_u3078(node_p0, [99,111,110,116,101,110,116]);
+    var content_1795162210 = [];
+    var items_1795162215 = [];
+    switch (contentNode_1795162209.kind) {
     case 4:
-      content_1795162206 = nimCopy(null, getStr__pureZjson_u241(contentNode_1795162205, []), NTI33554449);
+      content_1795162210 = nimCopy(null, getStr__pureZjson_u241(contentNode_1795162209, []), NTI33554449);
       break;
     case 6:
       Label1: {
-        var itemNode_1795162212 = null;
-        if (!((contentNode_1795162205.kind == 6))) {
-        failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(contentNode_1795162205.kind, NTI1610612739)));
+        var itemNode_1795162216 = null;
+        if (!((contentNode_1795162209.kind == 6))) {
+        failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(contentNode_1795162209.kind, NTI1610612739)));
         }
-        
+
         Label2: {
           var i_570426493 = null;
           var colontmp__570426494 = [];
-          var Temporary3 = contentNode_1795162205;
+          var Temporary3 = contentNode_1795162209;
           if (ConstSet29[Temporary3.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'elems\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary3.kind, NTI1610612739)); }
           colontmp__570426494 = Temporary3.elems;
           var i_570426495 = 0;
@@ -5910,96 +5915,96 @@ function parseResultSection__apiZclient_u83(node_p0, section_p1) {
               Label5: while (true) {
               if (!(i_570426495 < L_570426496)) break Label5;
                 i_570426493 = colontmp__570426494[chckIndx(i_570426495, 0, (colontmp__570426494).length - 1)];
-                itemNode_1795162212 = i_570426493;
-                if ((itemNode_1795162212.kind == 4)) {
-                var item_1795162217 = getStr__pureZjson_u241(itemNode_1795162212, []);
-                if ((0 < (item_1795162217).length)) {
-                var Temporary6 = nimCopy(null, item_1795162217, NTI33554449);
-                items_1795162211.push(Temporary6);;
+                itemNode_1795162216 = i_570426493;
+                if ((itemNode_1795162216.kind == 4)) {
+                var item_1795162221 = getStr__pureZjson_u241(itemNode_1795162216, []);
+                if ((0 < (item_1795162221).length)) {
+                var Temporary6 = nimCopy(null, item_1795162221, NTI33554449);
+                items_1795162215.push(Temporary6);;
                 }
-                
+
                 }
-                
+
                 i_570426495 += 1;
                 if (!(((colontmp__570426494).length == L_570426496))) {
                 failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
                 }
-                
+
               }
           };
         };
       };
       break;
-    default: 
-      result_1795162198 = false;
+    default:
+      result_1795162202 = false;
       break BeforeRet;
       break;
     }
-    if (eqStrings(kind_1795162203, [108,105,115,116])) {
-    if (((items_1795162211).length == 0)) {
-    result_1795162198 = false;
+    if (eqStrings(kind_1795162207, [108,105,115,116])) {
+    if (((items_1795162215).length == 0)) {
+    result_1795162202 = false;
     break BeforeRet;
     }
-    
+
     }
     else {
-      if (((content_1795162206).length == 0)) {
-      result_1795162198 = false;
+      if (((content_1795162210).length == 0)) {
+      result_1795162202 = false;
       break BeforeRet;
       }
-      
+
     }
-    
-    section_p1 = nimCopy(section_p1, {kind: nimCopy(null, kind_1795162203, NTI33554449), title: nimCopy(null, title_1795162204, NTI33554449), content: nimCopy(null, content_1795162206, NTI33554449), items: nimCopy(null, items_1795162211, NTI1795162149)}, NTI1426063369);
-    result_1795162198 = true;
+
+    section_p1 = nimCopy(section_p1, {kind: nimCopy(null, kind_1795162207, NTI33554449), title: nimCopy(null, title_1795162208, NTI33554449), content: nimCopy(null, content_1795162210, NTI33554449), items: nimCopy(null, items_1795162215, NTI1795162150)}, NTI1426063369);
+    result_1795162202 = true;
     break BeforeRet;
   };
 
-  return result_1795162198;
+  return result_1795162202;
 
 }
 
-function parseResultCard__apiZclient_u132(node_p0, card_p1) {
+function parseResultCard__apiZclient_u136(node_p0, card_p1) {
         var Temporary3;
         var Temporary9;
 
-  var result_1795162247 = false;
+  var result_1795162251 = false;
 
   BeforeRet: {
     if (!((node_p0.kind == 5))) {
-    result_1795162247 = false;
+    result_1795162251 = false;
     break BeforeRet;
     }
-    
-    var schema_1795162252 = jsonValueText__apiZclient_u24(node_p0, [115,99,104,101,109,97]);
-    var kind_1795162253 = jsonValueText__apiZclient_u24(node_p0, [107,105,110,100]);
-    var title_1795162254 = jsonValueText__apiZclient_u24(node_p0, [116,105,116,108,101]);
-    var status_1795162255 = jsonValueText__apiZclient_u24(node_p0, [115,116,97,116,117,115]);
-    if (!(eqStrings(schema_1795162252, [114,101,115,117,108,116,45,99,97,114,100,46,118,49]))) {
-    result_1795162247 = false;
+
+    var schema_1795162256 = jsonValueText__apiZclient_u28(node_p0, [115,99,104,101,109,97]);
+    var kind_1795162257 = jsonValueText__apiZclient_u28(node_p0, [107,105,110,100]);
+    var title_1795162258 = jsonValueText__apiZclient_u28(node_p0, [116,105,116,108,101]);
+    var status_1795162259 = jsonValueText__apiZclient_u28(node_p0, [115,116,97,116,117,115]);
+    if (!(eqStrings(schema_1795162256, [114,101,115,117,108,116,45,99,97,114,100,46,118,49]))) {
+    result_1795162251 = false;
     break BeforeRet;
     }
-    
-    if (((((kind_1795162253).length == 0) || ((title_1795162254).length == 0)) || ((status_1795162255).length == 0))) {
-    result_1795162247 = false;
+
+    if (((((kind_1795162257).length == 0) || ((title_1795162258).length == 0)) || ((status_1795162259).length == 0))) {
+    result_1795162251 = false;
     break BeforeRet;
     }
-    
-    var fields_1795162260 = [];
-    var sections_1795162265 = [];
+
+    var fields_1795162264 = [];
+    var sections_1795162269 = [];
     if (hasKey__pureZjson_u3191(node_p0, [102,105,101,108,100,115])) {
-    var fieldsNode_1795162266 = HEX5BHEX5D__pureZjson_u3078(node_p0, [102,105,101,108,100,115]);
-    if ((fieldsNode_1795162266.kind == 6)) {
+    var fieldsNode_1795162270 = HEX5BHEX5D__pureZjson_u3078(node_p0, [102,105,101,108,100,115]);
+    if ((fieldsNode_1795162270.kind == 6)) {
     Label1: {
-      var fieldNode_1795162271 = null;
-      if (!((fieldsNode_1795162266.kind == 6))) {
-      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(fieldsNode_1795162266.kind, NTI1610612739)));
+      var fieldNode_1795162275 = null;
+      if (!((fieldsNode_1795162270.kind == 6))) {
+      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(fieldsNode_1795162270.kind, NTI1610612739)));
       }
-      
+
       Label2: {
         var i_570426479 = null;
         var colontmp__570426480 = [];
-        var Temporary3 = fieldsNode_1795162266;
+        var Temporary3 = fieldsNode_1795162270;
         if (ConstSet27[Temporary3.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'elems\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary3.kind, NTI1610612739)); }
         colontmp__570426480 = Temporary3.elems;
         var i_570426481 = 0;
@@ -6008,39 +6013,39 @@ function parseResultCard__apiZclient_u132(node_p0, card_p1) {
             Label5: while (true) {
             if (!(i_570426481 < L_570426482)) break Label5;
               i_570426479 = colontmp__570426480[chckIndx(i_570426481, 0, (colontmp__570426480).length - 1)];
-              fieldNode_1795162271 = i_570426479;
-              var field_1795162272 = [{label: [], value: []}];
-              if (parseResultField__apiZclient_u56(fieldNode_1795162271, field_1795162272[0])) {
-              var Temporary6 = nimCopy(null, field_1795162272[0], NTI1426063368);
-              fields_1795162260.push(Temporary6);;
+              fieldNode_1795162275 = i_570426479;
+              var field_1795162276 = [{label: [], value: []}];
+              if (parseResultField__apiZclient_u60(fieldNode_1795162275, field_1795162276[0])) {
+              var Temporary6 = nimCopy(null, field_1795162276[0], NTI1426063368);
+              fields_1795162264.push(Temporary6);;
               }
-              
+
               i_570426481 += 1;
               if (!(((colontmp__570426480).length == L_570426482))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
     };
     }
-    
+
     }
-    
+
     if (hasKey__pureZjson_u3191(node_p0, [115,101,99,116,105,111,110,115])) {
-    var sectionsNode_1795162277 = HEX5BHEX5D__pureZjson_u3078(node_p0, [115,101,99,116,105,111,110,115]);
-    if ((sectionsNode_1795162277.kind == 6)) {
+    var sectionsNode_1795162281 = HEX5BHEX5D__pureZjson_u3078(node_p0, [115,101,99,116,105,111,110,115]);
+    if ((sectionsNode_1795162281.kind == 6)) {
     Label7: {
-      var sectionNode_1795162282 = null;
-      if (!((sectionsNode_1795162277.kind == 6))) {
-      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(sectionsNode_1795162277.kind, NTI1610612739)));
+      var sectionNode_1795162286 = null;
+      if (!((sectionsNode_1795162281.kind == 6))) {
+      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(sectionsNode_1795162281.kind, NTI1610612739)));
       }
-      
+
       Label8: {
         var i_570426486 = null;
         var colontmp__570426487 = [];
-        var Temporary9 = sectionsNode_1795162277;
+        var Temporary9 = sectionsNode_1795162281;
         if (ConstSet28[Temporary9.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'elems\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary9.kind, NTI1610612739)); }
         colontmp__570426487 = Temporary9.elems;
         var i_570426488 = 0;
@@ -6049,74 +6054,74 @@ function parseResultCard__apiZclient_u132(node_p0, card_p1) {
             Label11: while (true) {
             if (!(i_570426488 < L_570426489)) break Label11;
               i_570426486 = colontmp__570426487[chckIndx(i_570426488, 0, (colontmp__570426487).length - 1)];
-              sectionNode_1795162282 = i_570426486;
-              var section_1795162283 = [{kind: [], title: [], content: [], items: []}];
-              if (parseResultSection__apiZclient_u83(sectionNode_1795162282, section_1795162283[0])) {
-              var Temporary12 = nimCopy(null, section_1795162283[0], NTI1426063369);
-              sections_1795162265.push(Temporary12);;
+              sectionNode_1795162286 = i_570426486;
+              var section_1795162287 = [{kind: [], title: [], content: [], items: []}];
+              if (parseResultSection__apiZclient_u87(sectionNode_1795162286, section_1795162287[0])) {
+              var Temporary12 = nimCopy(null, section_1795162287[0], NTI1426063369);
+              sections_1795162269.push(Temporary12);;
               }
-              
+
               i_570426488 += 1;
               if (!(((colontmp__570426487).length == L_570426489))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
     };
     }
-    
+
     }
-    
-    card_p1 = nimCopy(card_p1, {schema: nimCopy(null, schema_1795162252, NTI33554449), kind: nimCopy(null, kind_1795162253, NTI33554449), title: nimCopy(null, title_1795162254, NTI33554449), status: nimCopy(null, status_1795162255, NTI33554449), fields: nimCopy(null, fields_1795162260, NTI1795162184), sections: nimCopy(null, sections_1795162265, NTI1795162193)}, NTI1426063370);
-    result_1795162247 = true;
+
+    card_p1 = nimCopy(card_p1, {schema: nimCopy(null, schema_1795162256, NTI33554449), kind: nimCopy(null, kind_1795162257, NTI33554449), title: nimCopy(null, title_1795162258, NTI33554449), status: nimCopy(null, status_1795162259, NTI33554449), fields: nimCopy(null, fields_1795162264, NTI1795162185), sections: nimCopy(null, sections_1795162269, NTI1795162194)}, NTI1426063370);
+    result_1795162251 = true;
     break BeforeRet;
   };
 
-  return result_1795162247;
+  return result_1795162251;
 
 }
 
-function extractPresentations__apiZclient_u261(data_p0) {
+function extractPresentations__apiZclient_u265(data_p0) {
         var Temporary3;
 
-  var result_1795162375 = [];
+  var result_1795162379 = [];
 
   BeforeRet: {
-    result_1795162375 = nimCopy(null, [], NTI1442840587);
+    result_1795162379 = nimCopy(null, [], NTI1442840587);
     if (!((data_p0.kind == 5))) {
     break BeforeRet;
     }
-    
+
     if (!(hasKey__pureZjson_u3191(data_p0, [114,101,115,117,108,116]))) {
     break BeforeRet;
     }
-    
-    var jobResult_1795162384 = HEX5BHEX5D__pureZjson_u3078(data_p0, [114,101,115,117,108,116]);
-    if (!((jobResult_1795162384.kind == 5))) {
+
+    var jobResult_1795162388 = HEX5BHEX5D__pureZjson_u3078(data_p0, [114,101,115,117,108,116]);
+    if (!((jobResult_1795162388.kind == 5))) {
     break BeforeRet;
     }
-    
-    if (!(hasKey__pureZjson_u3191(jobResult_1795162384, [114,101,115,117,108,116,115]))) {
+
+    if (!(hasKey__pureZjson_u3191(jobResult_1795162388, [114,101,115,117,108,116,115]))) {
     break BeforeRet;
     }
-    
-    var specialistResults_1795162389 = HEX5BHEX5D__pureZjson_u3078(jobResult_1795162384, [114,101,115,117,108,116,115]);
-    if (!((specialistResults_1795162389.kind == 6))) {
+
+    var specialistResults_1795162393 = HEX5BHEX5D__pureZjson_u3078(jobResult_1795162388, [114,101,115,117,108,116,115]);
+    if (!((specialistResults_1795162393.kind == 6))) {
     break BeforeRet;
     }
-    
+
     Label1: {
-      var specialistResult_1795162394 = null;
-      if (!((specialistResults_1795162389.kind == 6))) {
-      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(specialistResults_1795162389.kind, NTI1610612739)));
+      var specialistResult_1795162398 = null;
+      if (!((specialistResults_1795162393.kind == 6))) {
+      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(specialistResults_1795162393.kind, NTI1610612739)));
       }
-      
+
       Label2: {
         var i_570426472 = null;
         var colontmp__570426473 = [];
-        var Temporary3 = specialistResults_1795162389;
+        var Temporary3 = specialistResults_1795162393;
         if (ConstSet26[Temporary3.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'elems\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary3.kind, NTI1610612739)); }
         colontmp__570426473 = Temporary3.elems;
         var i_570426474 = 0;
@@ -6125,65 +6130,65 @@ function extractPresentations__apiZclient_u261(data_p0) {
             Label5: while (true) {
             if (!(i_570426474 < L_570426475)) break Label5;
               i_570426472 = colontmp__570426473[chckIndx(i_570426474, 0, (colontmp__570426473).length - 1)];
-              specialistResult_1795162394 = i_570426472;
+              specialistResult_1795162398 = i_570426472;
               Label6: {
-                if (!((specialistResult_1795162394.kind == 5))) {
+                if (!((specialistResult_1795162398.kind == 5))) {
                 break Label6;
                 }
-                
-                if (!(hasKey__pureZjson_u3191(specialistResult_1795162394, [112,114,101,115,101,110,116,97,116,105,111,110]))) {
+
+                if (!(hasKey__pureZjson_u3191(specialistResult_1795162398, [112,114,101,115,101,110,116,97,116,105,111,110]))) {
                 break Label6;
                 }
-                
-                var presentationNode_1795162399 = HEX5BHEX5D__pureZjson_u3078(specialistResult_1795162394, [112,114,101,115,101,110,116,97,116,105,111,110]);
-                if (!((presentationNode_1795162399.kind == 5))) {
+
+                var presentationNode_1795162403 = HEX5BHEX5D__pureZjson_u3078(specialistResult_1795162398, [112,114,101,115,101,110,116,97,116,105,111,110]);
+                if (!((presentationNode_1795162403.kind == 5))) {
                 break Label6;
                 }
-                
-                var card_1795162404 = [{schema: [], kind: [], title: [], status: [], fields: [], sections: []}];
-                if (parseResultCard__apiZclient_u132(presentationNode_1795162399, card_1795162404[0])) {
-                var Temporary7 = nimCopy(null, card_1795162404[0], NTI1426063370);
-                result_1795162375.push(Temporary7);;
+
+                var card_1795162408 = [{schema: [], kind: [], title: [], status: [], fields: [], sections: []}];
+                if (parseResultCard__apiZclient_u136(presentationNode_1795162403, card_1795162408[0])) {
+                var Temporary7 = nimCopy(null, card_1795162408[0], NTI1426063370);
+                result_1795162379.push(Temporary7);;
                 }
-                
+
               };
               i_570426474 += 1;
               if (!(((colontmp__570426473).length == L_570426475))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
     };
   };
 
-  return result_1795162375;
+  return result_1795162379;
 
 }
 
-function parseJobResponse__apiZclient_u322(data_p0) {
-  var result_1795162436 = ({jobId: [], status: [], selectedAgent: [], proposedTool: [], answer: [], error: [], presentations: []});
+function parseJobResponse__apiZclient_u326(data_p0) {
+  var result_1795162440 = ({jobId: [], status: [], selectedAgent: [], proposedTool: [], answer: [], error: [], presentations: []});
 
-    result_1795162436 = nimCopy(result_1795162436, {jobId: jsonValueText__apiZclient_u24(data_p0, [106,111,98,95,105,100]), status: jsonValueText__apiZclient_u24(data_p0, [115,116,97,116,117,115]), selectedAgent: jsonValueText__apiZclient_u24(data_p0, [115,101,108,101,99,116,101,100,95,97,103,101,110,116]), proposedTool: extractProposedTool__apiZclient_u310(data_p0), answer: extractAnswer__apiZclient_u297(data_p0), error: jsonValueText__apiZclient_u24(data_p0, [101,114,114,111,114]), presentations: extractPresentations__apiZclient_u261(data_p0)}, NTI1795162116);
+    result_1795162440 = nimCopy(result_1795162440, {jobId: jsonValueText__apiZclient_u28(data_p0, [106,111,98,95,105,100]), status: jsonValueText__apiZclient_u28(data_p0, [115,116,97,116,117,115]), selectedAgent: jsonValueText__apiZclient_u28(data_p0, [115,101,108,101,99,116,101,100,95,97,103,101,110,116]), proposedTool: extractProposedTool__apiZclient_u314(data_p0), answer: extractAnswer__apiZclient_u301(data_p0), error: jsonValueText__apiZclient_u28(data_p0, [101,114,114,111,114]), presentations: extractPresentations__apiZclient_u265(data_p0)}, NTI1795162116);
 
-  return result_1795162436;
+  return result_1795162440;
 
 }
-async function getJob__apiZclient_u524(jobId_p0) {
-  var result_1795162640 = null;
+async function getJob__apiZclient_u615(jobId_p0) {
+  var result_1795162731 = null;
 
-    var options_1795162650 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_1795162659 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,106,111,98,115,47],jobId_p0)), options_1795162650));
-    var responseBody_1795162664 = cstrToNimstr((await response_1795162659.text()));
-    if (!(response_1795162659.ok)) {
-    raiseException(publicApiError__apiZclient_u46(HEX24__systemZdollars_u29(response_1795162659.status), responseBody_1795162664), "ValueError");
+    var options_1795162741 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_1795162750 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,106,111,98,115,47],jobId_p0)), options_1795162741));
+    var responseBody_1795162755 = cstrToNimstr((await response_1795162750.text()));
+    if (!(response_1795162750.ok)) {
+    raiseException(publicApiError__apiZclient_u50(HEX24__systemZdollars_u29(response_1795162750.status), responseBody_1795162755), "ValueError");
     }
-    
-    var data_1795162665 = parseJson__pureZjson_u5285(responseBody_1795162664);
-    result_1795162640 = parseJobResponse__apiZclient_u322(data_1795162665);
 
-  return result_1795162640;
+    var data_1795162756 = parseJson__pureZjson_u5285(responseBody_1795162755);
+    result_1795162731 = parseJobResponse__apiZclient_u326(data_1795162756);
+
+  return result_1795162731;
 
 }
 
@@ -6193,9 +6198,9 @@ function applyJobState__appZbackend95bridge_u15(state_p0, job_p1) {
     state_p0.run.status = nimCopy(null, job_p1.status, NTI33554449);
     state_p0.run.agent = nimCopy(null, job_p1.selectedAgent, NTI33554449);
     state_p0.run.tool = nimCopy(null, job_p1.proposedTool, NTI33554449);
-    state_p0.run.presentations = nimCopy(null, job_p1.presentations, NTI1795162118);
+    state_p0.run.presentations = nimCopy(null, job_p1.presentations, NTI1795162119);
 
-  
+
 }
 
 function nsuFindChar(s_p0, sub_p1, start_p2, last_p3) {
@@ -6211,7 +6216,7 @@ function nsuFindChar(s_p0, sub_p1, start_p2, last_p3) {
     else {
     Temporary1 = last_p3;
     }
-    
+
     var last_905971369 = Temporary1;
     Label2: {
       var iHEX60gensym174_905971383 = 0;
@@ -6224,7 +6229,7 @@ function nsuFindChar(s_p0, sub_p1, start_p2, last_p3) {
             result_905971368 = iHEX60gensym174_905971383;
             break BeforeRet;
             }
-            
+
             res_570426504 = addInt(res_570426504, 1);
           }
       };
@@ -6254,7 +6259,7 @@ function fill__pureZstrutils_u1623(a_p0, value_p1) {
         }
     };
 
-  
+
 }
 
 function nsuInitSkipTable(a_p0, sub_p1) {
@@ -6275,7 +6280,7 @@ function nsuInitSkipTable(a_p0, sub_p1) {
       };
     };
 
-  
+
 }
 
 function nsuInitNewSkipTable(sub_p0) {
@@ -6299,14 +6304,14 @@ function nsuFindStrA(a_p0, s_p1, sub_p2, start_p3, last_p4) {
     else {
     Temporary1 = last_p4;
     }
-    
+
     var last_905971348 = Temporary1;
     var subLast_905971349 = subInt((sub_p2).length, 1);
     if ((subLast_905971349 == (-1))) {
     result_905971347 = start_p3;
     break BeforeRet;
     }
-    
+
     result_905971347 = (-1);
     var skip_905971350 = start_p3;
     Label2: {
@@ -6320,7 +6325,7 @@ function nsuFindStrA(a_p0, s_p1, sub_p2, start_p3, last_p4) {
                 result_905971347 = skip_905971350;
                 break BeforeRet;
                 }
-                
+
                 i_905971351 = subInt(i_905971351, 1);
               }
           };
@@ -6353,7 +6358,7 @@ function nsuReplaceStr(s_p0, sub_p1, by_p2) {
           if ((j_905971560 < 0)) {
           break Label1;
           }
-          
+
           nimAddStrStr(result_905971555, substr__system_u3776(s_p0, i_905971559, subInt(j_905971560, 1)));;
           nimAddStrStr(result_905971555, by_p2);;
           i_905971559 = addInt(j_905971560, subLen_905971556);
@@ -6372,7 +6377,7 @@ function nsuReplaceStr(s_p0, sub_p1, by_p2) {
             if ((j_905971564 < 0)) {
             break Label3;
             }
-            
+
             nimAddStrStr(result_905971555, substr__system_u3776(s_p0, i_905971563, subInt(j_905971564, 1)));;
             nimAddStrStr(result_905971555, by_p2);;
             i_905971563 = addInt(j_905971564, subLen_905971556);
@@ -6386,19 +6391,19 @@ function nsuReplaceStr(s_p0, sub_p1, by_p2) {
 
 }
 
-function addAssistantMessage__appZstate_u626(state_p0, content_p1, cards_p2) {
-    var cleanContent_1442841210 = nimCopy(null, content_p1, NTI33554449);
-    cleanContent_1442841210 = nimCopy(null, nsuReplaceStr(cleanContent_1442841210, [42,42], []), NTI33554449);
-    state_p0.messages.push({id: state_p0.nextMessageId, role: 1, content: nimCopy(null, cleanContent_1442841210, NTI33554449), cards: nimCopy(null, cards_p2, NTI1442840925)});;
+function addAssistantMessage__appZstate_u634(state_p0, content_p1, cards_p2) {
+    var cleanContent_1442841218 = nimCopy(null, content_p1, NTI33554449);
+    cleanContent_1442841218 = nimCopy(null, nsuReplaceStr(cleanContent_1442841218, [42,42], []), NTI33554449);
+    state_p0.messages.push({id: state_p0.nextMessageId, role: 1, content: nimCopy(null, cleanContent_1442841218, NTI33554449), cards: nimCopy(null, cards_p2, NTI1442840927)});;
     state_p0.nextMessageId = addInt(state_p0.nextMessageId, 1);
 
-  
+
 }
 
-function showToast__appZstate_u402(state_p0, message_p1) {
+function showToast__appZstate_u410(state_p0, message_p1) {
     state_p0.toastMessage = nimCopy(null, message_p1, NTI33554449);
 
-  
+
 }
 
 function finishCompletedJob__appZbackend95bridge_u21(state_p0, job_p1) {
@@ -6410,17 +6415,17 @@ function finishCompletedJob__appZbackend95bridge_u21(state_p0, job_p1) {
     else {
     Temporary1 = [74,111,98,32,99,111,109,112,108,101,116,101,100,32,115,117,99,99,101,115,115,102,117,108,108,121,46];
     }
-    
-    var answer_1778384920 = nimCopy(null, Temporary1, NTI33554449);
-    addAssistantMessage__appZstate_u626(state_p0, answer_1778384920, job_p1.presentations);
-    if ((0 < (job_p1.presentations).length)) {
-    addRunEvent__appZstate_u544(state_p0, [114,101,115,117,108,116], [82,101,99,101,105,118,101,100,32,115,116,114,117,99,116,117,114,101,100,32,114,101,115,117,108,116,32,100,97,116,97,32,102,114,111,109,32,116,104,101,32,99,111,109,112,108,101,116,101,100,32,106,111,98,46]);
-    }
-    
-    addRunEvent__appZstate_u544(state_p0, [99,111,109,112,108,101,116,105,111,110], [80,104,111,101,110,105,120,32,114,101,112,111,114,116,101,100,32,116,104,101,32,100,117,114,97,98,108,101,32,106,111,98,32,99,111,109,112,108,101,116,101,100,46]);
-    showToast__appZstate_u402(state_p0, [67,111,109,112,108,101,116,101,100,46]);
 
-  
+    var answer_1778384920 = nimCopy(null, Temporary1, NTI33554449);
+    addAssistantMessage__appZstate_u634(state_p0, answer_1778384920, job_p1.presentations);
+    if ((0 < (job_p1.presentations).length)) {
+    addRunEvent__appZstate_u552(state_p0, [114,101,115,117,108,116], [82,101,99,101,105,118,101,100,32,115,116,114,117,99,116,117,114,101,100,32,114,101,115,117,108,116,32,100,97,116,97,32,102,114,111,109,32,116,104,101,32,99,111,109,112,108,101,116,101,100,32,106,111,98,46]);
+    }
+
+    addRunEvent__appZstate_u552(state_p0, [99,111,109,112,108,101,116,105,111,110], [80,104,111,101,110,105,120,32,114,101,112,111,114,116,101,100,32,116,104,101,32,100,117,114,97,98,108,101,32,106,111,98,32,99,111,109,112,108,101,116,101,100,46]);
+    showToast__appZstate_u410(state_p0, [67,111,109,112,108,101,116,101,100,46]);
+
+
 }
 
 function jobFailureMessage__appZbackend95bridge_u18(job_p0) {
@@ -6431,7 +6436,7 @@ function jobFailureMessage__appZbackend95bridge_u18(job_p0) {
     result_1778384916 = nimCopy(null, job_p0.error, NTI33554449);
     break BeforeRet;
     }
-    
+
     result_1778384916 = nimCopy(null, [84,104,101,32,98,97,99,107,101,110,100,32,106,111,98,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46], NTI33554449);
     break BeforeRet;
   };
@@ -6442,11 +6447,11 @@ function jobFailureMessage__appZbackend95bridge_u18(job_p0) {
 
 function finishFailedJob__appZbackend95bridge_u29(state_p0, job_p1) {
     var failureMessage_1778384928 = jobFailureMessage__appZbackend95bridge_u18(job_p1);
-    addAssistantMessage__appZstate_u626(state_p0, failureMessage_1778384928, []);
-    addRunEvent__appZstate_u544(state_p0, [102,97,105,108,117,114,101], [80,104,111,101,110,105,120,32,114,101,112,111,114,116,101,100,32,116,104,101,32,100,117,114,97,98,108,101,32,106,111,98,32,102,97,105,108,101,100,46]);
-    showToast__appZstate_u402(state_p0, [82,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46]);
+    addAssistantMessage__appZstate_u634(state_p0, failureMessage_1778384928, []);
+    addRunEvent__appZstate_u552(state_p0, [102,97,105,108,117,114,101], [80,104,111,101,110,105,120,32,114,101,112,111,114,116,101,100,32,116,104,101,32,100,117,114,97,98,108,101,32,106,111,98,32,102,97,105,108,101,100,46]);
+    showToast__appZstate_u410(state_p0, [82,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46]);
 
-  
+
 }
 
 function finishWaitingApproval__appZbackend95bridge_u33(state_p0, job_p1, addMessage_p2) {
@@ -6459,15 +6464,15 @@ function finishWaitingApproval__appZbackend95bridge_u33(state_p0, job_p1, addMes
     else {
     Temporary1 = [84,104,105,115,32,97,99,116,105,111,110,32,114,101,113,117,105,114,101,115,32,121,111,117,114,32,97,112,112,114,111,118,97,108,32,98,101,102,111,114,101,32,105,116,32,99,97,110,32,99,111,110,116,105,110,117,101,46];
     }
-    
-    var approvalMessage_1778384933 = nimCopy(null, Temporary1, NTI33554449);
-    addAssistantMessage__appZstate_u626(state_p0, approvalMessage_1778384933, job_p1.presentations);
-    }
-    
-    addRunEvent__appZstate_u544(state_p0, [97,112,112,114,111,118,97,108], [80,104,111,101,110,105,120,32,114,101,112,111,114,116,101,100,32,116,104,97,116,32,101,120,112,108,105,99,105,116,32,97,112,112,114,111,118,97,108,32,105,115,32,114,101,113,117,105,114,101,100,46]);
-    showToast__appZstate_u402(state_p0, [87,97,105,116,105,110,103,32,102,111,114,32,121,111,117,114,32,97,112,112,114,111,118,97,108,46]);
 
-  
+    var approvalMessage_1778384933 = nimCopy(null, Temporary1, NTI33554449);
+    addAssistantMessage__appZstate_u634(state_p0, approvalMessage_1778384933, job_p1.presentations);
+    }
+
+    addRunEvent__appZstate_u552(state_p0, [97,112,112,114,111,118,97,108], [80,104,111,101,110,105,120,32,114,101,112,111,114,116,101,100,32,116,104,97,116,32,101,120,112,108,105,99,105,116,32,97,112,112,114,111,118,97,108,32,105,115,32,114,101,113,117,105,114,101,100,46]);
+    showToast__appZstate_u410(state_p0, [87,97,105,116,105,110,103,32,102,111,114,32,121,111,117,114,32,97,112,112,114,111,118,97,108,46]);
+
+
 }
 async function pollBackendJob__appZbackend95bridge_u39(state_p0, jobId_p1, addWaitingMessage_p2) {
   var result_1778384940 = null;
@@ -6477,19 +6482,19 @@ async function pollBackendJob__appZbackend95bridge_u39(state_p0, jobId_p1, addWa
     result_1778384940 = undefined;
     break BeforeRet;
     }
-    
+
 ++excHandler;
     try {
     Label2: {
         Label3: while (true) {
         if (!true) break Label3;
           var previousStatus_1778384946 = nimCopy(null, state_p0.run.status, NTI33554449);
-          var job_1778384951 = (await getJob__apiZclient_u524(jobId_p1));
+          var job_1778384951 = (await getJob__apiZclient_u615(jobId_p1));
           applyJobState__appZbackend95bridge_u15(state_p0, job_1778384951);
           if (!(eqStrings(job_1778384951.status, previousStatus_1778384946))) {
-          addRunEvent__appZstate_u544(state_p0, [115,116,97,116,117,115], ([68,117,114,97,98,108,101,32,106,111,98,32,115,116,97,116,101,32,99,104,97,110,103,101,100,58,32]).concat(previousStatus_1778384946,[32,45,62,32],job_1778384951.status));
+          addRunEvent__appZstate_u552(state_p0, [115,116,97,116,117,115], ([68,117,114,97,98,108,101,32,106,111,98,32,115,116,97,116,101,32,99,104,97,110,103,101,100,58,32]).concat(previousStatus_1778384946,[32,45,62,32],job_1778384951.status));
           }
-          
+
           redraw__pkgZkaraxZkarax_u1550(kxi__);
           switch (toJSStr(job_1778384951.status)) {
           case "completed":
@@ -6514,9 +6519,9 @@ async function pollBackendJob__appZbackend95bridge_u39(state_p0, jobId_p1, addWa
           case "processing":
           case "approving":
             break;
-          default: 
-            addRunEvent__appZstate_u544(state_p0, [115,116,97,116,117,115], [80,104,111,101,110,105,120,32,114,101,116,117,114,110,101,100,32,97,32,106,111,98,32,115,116,97,116,101,32,116,104,105,115,32,102,114,111,110,116,101,110,100,32,100,111,101,115,32,110,111,116,32,121,101,116,32,114,101,110,100,101,114,46]);
-            showToast__appZstate_u402(state_p0, [74,111,98,32,115,116,97,116,101,32,99,104,97,110,103,101,100,46,32,82,101,102,114,101,115,104,32,116,104,101,32,99,104,97,116,32,116,111,32,99,111,110,116,105,110,117,101,46]);
+          default:
+            addRunEvent__appZstate_u552(state_p0, [115,116,97,116,117,115], [80,104,111,101,110,105,120,32,114,101,116,117,114,110,101,100,32,97,32,106,111,98,32,115,116,97,116,101,32,116,104,105,115,32,102,114,111,110,116,101,110,100,32,100,111,101,115,32,110,111,116,32,121,101,116,32,114,101,110,100,101,114,46]);
+            showToast__appZstate_u410(state_p0, [74,111,98,32,115,116,97,116,101,32,99,104,97,110,103,101,100,46,32,82,101,102,114,101,115,104,32,116,104,101,32,99,104,97,116,32,116,111,32,99,111,110,116,105,110,117,101,46]);
             redraw__pkgZkaraxZkarax_u1550(kxi__);
             result_1778384940 = undefined;
             break BeforeRet;
@@ -6531,8 +6536,8 @@ async function pollBackendJob__appZbackend95bridge_u39(state_p0, jobId_p1, addWa
  lastJSError = EXCEPTION;
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    addRunEvent__appZstate_u544(state_p0, [99,111,110,110,101,99,116,105,111,110], makeNimstrLit("Polling was interrupted before the durable job reached a terminal state."));
-    showToast__appZstate_u402(state_p0, [67,111,110,110,101,99,116,105,111,110,32,105,110,116,101,114,114,117,112,116,101,100,46,32,82,101,108,111,97,100,32,111,114,32,114,101,111,112,101,110,32,116,104,105,115,32,99,104,97,116,32,116,111,32,114,101,115,117,109,101,46]);
+    addRunEvent__appZstate_u552(state_p0, [99,111,110,110,101,99,116,105,111,110], makeNimstrLit("Polling was interrupted before the durable job reached a terminal state."));
+    showToast__appZstate_u410(state_p0, [67,111,110,110,101,99,116,105,111,110,32,105,110,116,101,114,114,117,112,116,101,100,46,32,82,101,108,111,97,100,32,111,114,32,114,101,111,112,101,110,32,116,104,105,115,32,99,104,97,116,32,116,111,32,114,101,115,117,109,101,46]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
     }
     else {
@@ -6556,13 +6561,13 @@ async function resumeBackendJob__appZbackend95bridge_u61(state_p0) {
     result_1778384960 = undefined;
     break BeforeRet;
     }
-    
+
     if (!(contains__stdZenumutils_u50([[112,101,110,100,105,110,103], [112,114,111,99,101,115,115,105,110,103], [97,112,112,114,111,118,105,110,103]], state_p0.run.status))) {
     result_1778384960 = undefined;
     break BeforeRet;
     }
-    
-    addRunEvent__appZstate_u544(state_p0, [114,101,115,117,109,101], [82,101,115,117,109,105,110,103,32,111,98,115,101,114,118,97,116,105,111,110,32,111,102,32,116,104,101,32,100,117,114,97,98,108,101,32,98,97,99,107,101,110,100,32,106,111,98,46]);
+
+    addRunEvent__appZstate_u552(state_p0, [114,101,115,117,109,101], [82,101,115,117,109,105,110,103,32,111,98,115,101,114,118,97,116,105,111,110,32,111,102,32,116,104,101,32,100,117,114,97,98,108,101,32,98,97,99,107,101,110,100,32,106,111,98,46]);
     (await pollBackendJob__appZbackend95bridge_u39(state_p0, state_p0.run.jobId, false));
     result_1778384960 = undefined;
     break BeforeRet;
@@ -6579,7 +6584,7 @@ async function loadChatHistory__appZauth95bridge_u147(state_p0, chatId_p1) {
     result_1459617943 = undefined;
     break BeforeRet;
     }
-    
+
     state_p0.auth.loading = true;
     state_p0.auth.error = nimCopy(null, [], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
@@ -6590,7 +6595,7 @@ async function loadChatHistory__appZauth95bridge_u147(state_p0, chatId_p1) {
     if (((state_p0.run.active && (0 < (state_p0.run.jobId).length)) && contains__stdZenumutils_u50([[112,101,110,100,105,110,103], [112,114,111,99,101,115,115,105,110,103], [97,112,112,114,111,118,105,110,103]], state_p0.run.status))) {
     (resumeBackendJob__appZbackend95bridge_u61(state_p0));
     }
-    
+
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -6624,12 +6629,12 @@ async function createChat__apiZauth95client_u758(csrfToken_p0, title_p1) {
     if (!(response_1509950239.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950239.status), responseBody_1509950244), "ValueError");
     }
-    
+
     var data_1509950245 = parseJson__pureZjson_u5285(responseBody_1509950244);
     if ((!((data_1509950245.kind == 5)) || !(hasKey__pureZjson_u3191(data_1509950245, [99,104,97,116])))) {
     raiseException({message: [66,97,99,107,101,110,100,32,99,104,97,116,32,114,101,115,112,111,110,115,101,32,105,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     var node_1509950251 = HEX5BHEX5D__pureZjson_u3078(data_1509950245, [99,104,97,116]);
     result_1509950203 = {chatId: jsonText__apiZauth95client_u36(node_1509950251, [99,104,97,116,95,105,100]), title: jsonText__apiZauth95client_u36(node_1509950251, [116,105,116,108,101]), createdAt: jsonText__apiZauth95client_u36(node_1509950251, [99,114,101,97,116,101,100,95,97,116]), updatedAt: jsonText__apiZauth95client_u36(node_1509950251, [117,112,100,97,116,101,100,95,97,116])};
 
@@ -6644,7 +6649,7 @@ async function loadChats__appZauth95bridge_u169(state_p0) {
     result_1459617964 = undefined;
     break BeforeRet;
     }
-    
+
     var remoteChats_1459617974 = (await listChats__apiZauth95client_u621());
     if (state_p0.chats.length < 0) { for (var i = state_p0.chats.length ; i < 0 ; ++i) state_p0.chats.push(({chatId: [], title: [], updatedAt: []})); }
                else { state_p0.chats.length = 0; };
@@ -6661,7 +6666,7 @@ async function loadChats__appZauth95bridge_u169(state_p0) {
             if (!(((remoteChats_1459617974).length == L_570426439))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
@@ -6674,9 +6679,9 @@ async function loadChats__appZauth95bridge_u169(state_p0) {
       state_p0.chats.push({chatId: nimCopy(null, created_1459618018.chatId, NTI33554449), title: nimCopy(null, created_1459618018.title, NTI33554449), updatedAt: nimCopy(null, created_1459618018.updatedAt, NTI33554449)});;
       applyHistory__appZauth95bridge_u43(state_p0, created_1459618018.chatId, []);
     }
-    
+
     }
-    
+
     result_1459617964 = undefined;
     break BeforeRet;
   };
@@ -6684,26 +6689,26 @@ async function loadChats__appZauth95bridge_u169(state_p0) {
   return result_1459617964;
 
 }
-async function loginApplication__appZauth95bridge_u328(state_p0) {
-  var result_1459618123 = null;
+async function loginApplication__appZauth95bridge_u312(state_p0) {
+  var result_1459618107 = null;
 
   BeforeRet: {
-    var email_1459618129 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet7);
-    var password_1459618130 = nimCopy(null, state_p0.auth.passwordDraft, NTI33554449);
-    if ((((email_1459618129).length == 0) || ((password_1459618130).length == 0))) {
+    var email_1459618113 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet7);
+    var password_1459618114 = nimCopy(null, state_p0.auth.passwordDraft, NTI33554449);
+    if ((((email_1459618113).length == 0) || ((password_1459618114).length == 0))) {
     state_p0.auth.error = nimCopy(null, [69,109,97,105,108,32,97,110,100,32,112,97,115,115,119,111,114,100,32,97,114,101,32,114,101,113,117,105,114,101,100,46], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618123 = undefined;
+    result_1459618107 = undefined;
     break BeforeRet;
     }
-    
+
     state_p0.auth.loading = true;
     state_p0.auth.error = nimCopy(null, [], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var auth_1459618135 = (await login__apiZauth95client_u146(email_1459618129, password_1459618130));
-    applyAuth__appZauth95bridge_u22(state_p0, auth_1459618135);
+    var auth_1459618119 = (await login__apiZauth95client_u146(email_1459618113, password_1459618114));
+    applyAuth__appZauth95bridge_u22(state_p0, auth_1459618119);
     state_p0.auth.passwordDraft = nimCopy(null, [], NTI33554449);
     state_p0.auth.notice = nimCopy(null, [], NTI33554449);
     (await loadChats__appZauth95bridge_u169(state_p0));
@@ -6713,8 +6718,8 @@ async function loginApplication__appZauth95bridge_u328(state_p0) {
  lastJSError = EXCEPTION;
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    var exc_1459618140 = getCurrentException();
-    state_p0.auth.error = nimCopy(null, exc_1459618140.message, NTI33554449);
+    var exc_1459618124 = getCurrentException();
+    state_p0.auth.error = nimCopy(null, exc_1459618124.message, NTI33554449);
     }
     else {
     	reraiseException();
@@ -6724,32 +6729,32 @@ async function loginApplication__appZauth95bridge_u328(state_p0) {
     state_p0.auth.loading = false;
     }
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618123 = undefined;
+    result_1459618107 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618123;
+  return result_1459618107;
 
 }
 
 function HEX3Aanonymous__componentsZauth_u107(event_p0, node_p1) {
-    (loginApplication__appZauth95bridge_u328(this.state0));
+    (loginApplication__appZauth95bridge_u312(this.state0));
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZauth_u110(event_p0, node_p1) {
     this.state0.auth.error = nimCopy(null, [], NTI33554449);
     this.state0.auth.mode = 1;
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZauth_u113(event_p0, node_p1) {
     this.state0.auth.error = nimCopy(null, [], NTI33554449);
     this.state0.auth.mode = 2;
 
-  
+
 }
 async function resendVerification__apiZauth95client_u467(email_p0) {
   var result_1509949910 = null;
@@ -6762,7 +6767,7 @@ async function resendVerification__apiZauth95client_u467(email_p0) {
     if (!(response_1509949942.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949942.status), responseBody_1509949947), "ValueError");
     }
-    
+
     result_1509949910 = undefined;
     break BeforeRet;
   };
@@ -6770,25 +6775,197 @@ async function resendVerification__apiZauth95client_u467(email_p0) {
   return result_1509949910;
 
 }
-async function resendVerificationApplication__appZauth95bridge_u368(state_p0) {
+async function resendVerificationApplication__appZauth95bridge_u352(state_p0) {
+  var result_1459618147 = null;
+
+  BeforeRet: {
+    var email_1459618153 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet30);
+    if (((email_1459618153).length == 0)) {
+    state_p0.auth.error = nimCopy(null, [69,110,116,101,114,32,121,111,117,114,32,101,109,97,105,108,32,102,105,114,115,116,46], NTI33554449);
+    redraw__pkgZkaraxZkarax_u1550(kxi__);
+    result_1459618147 = undefined;
+    break BeforeRet;
+    }
+
+    state_p0.auth.loading = true;
+    state_p0.auth.error = nimCopy(null, [], NTI33554449);
+    redraw__pkgZkaraxZkarax_u1550(kxi__);
+++excHandler;
+    try {
+    (await resendVerification__apiZauth95client_u467(email_1459618153));
+    state_p0.auth.notice = nimCopy(null, [73,102,32,116,104,101,32,97,99,99,111,117,110,116,32,115,116,105,108,108,32,110,101,101,100,115,32,118,101,114,105,102,105,99,97,116,105,111,110,44,32,97,32,110,101,119,32,101,109,97,105,108,32,119,97,115,32,115,101,110,116,46], NTI33554449);
+--excHandler;
+} catch (EXCEPTION) {
+ var prevJSError = lastJSError;
+ lastJSError = EXCEPTION;
+ --excHandler;
+    if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
+    var exc_1459618158 = getCurrentException();
+    state_p0.auth.error = nimCopy(null, exc_1459618158.message, NTI33554449);
+    }
+    else {
+    	reraiseException();
+    }
+    lastJSError = prevJSError;
+    } finally {
+    state_p0.auth.loading = false;
+    }
+    redraw__pkgZkaraxZkarax_u1550(kxi__);
+    result_1459618147 = undefined;
+    break BeforeRet;
+  };
+
+  return result_1459618147;
+
+}
+
+function HEX3Aanonymous__componentsZauth_u116(event_p0, node_p1) {
+    (resendVerificationApplication__appZauth95bridge_u352(this.state0));
+
+
+}
+
+function HEX3Aanonymous__componentsZauth_u119(value_p0) {
+    this.state0.auth.displayNameDraft = nimCopy(null, value_p0, NTI33554449);
+
+
+}
+
+function HEX3Aanonymous__componentsZauth_u121(value_p0) {
+    this.state0.auth.emailDraft = nimCopy(null, value_p0, NTI33554449);
+
+
+}
+
+function HEX3Aanonymous__componentsZauth_u123(value_p0) {
+    this.state0.auth.passwordDraft = nimCopy(null, value_p0, NTI33554449);
+
+
+}
+async function register__apiZauth95client_u333(displayName_p0, email_p1, password_p2) {
+  var result_1509949778 = null;
+
+  BeforeRet: {
+    var payload_1509949800 = HEX25__pureZjson_u1858([nimCopy(null, {Field0: [100,105,115,112,108,97,121,95,110,97,109,101], Field1: HEX25__pureZjson_u1829(displayName_p0)}, NTI1509949630), nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1829(email_p1)}, NTI1509949630), nimCopy(null, {Field0: [112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1829(password_p2)}, NTI1509949630)]);
+    var options_1509949801 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4466(payload_1509949800)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u112([]));
+    var response_1509949810 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,103,105,115,116,101,114])), options_1509949801));
+    var responseBody_1509949815 = cstrToNimstr((await response_1509949810.text()));
+    if (!(response_1509949810.ok)) {
+    raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949810.status), responseBody_1509949815), "ValueError");
+    }
+
+    result_1509949778 = undefined;
+    break BeforeRet;
+  };
+
+  return result_1509949778;
+
+}
+async function registerApplication__appZauth95bridge_u334(state_p0) {
+  var result_1459618129 = null;
+
+  BeforeRet: {
+    var displayName_1459618135 = nsuStrip(state_p0.auth.displayNameDraft, true, true, ConstSet31);
+    var email_1459618136 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet32);
+    var password_1459618137 = nimCopy(null, state_p0.auth.passwordDraft, NTI33554449);
+    if (((((displayName_1459618135).length == 0) || ((email_1459618136).length == 0)) || ((password_1459618137).length == 0))) {
+    state_p0.auth.error = nimCopy(null, [68,105,115,112,108,97,121,32,110,97,109,101,44,32,101,109,97,105,108,32,97,110,100,32,112,97,115,115,119,111,114,100,32,97,114,101,32,114,101,113,117,105,114,101,100,46], NTI33554449);
+    redraw__pkgZkaraxZkarax_u1550(kxi__);
+    result_1459618129 = undefined;
+    break BeforeRet;
+    }
+
+    state_p0.auth.loading = true;
+    state_p0.auth.error = nimCopy(null, [], NTI33554449);
+    redraw__pkgZkaraxZkarax_u1550(kxi__);
+++excHandler;
+    try {
+    (await register__apiZauth95client_u333(displayName_1459618135, email_1459618136, password_1459618137));
+    state_p0.auth.notice = nimCopy(null, makeNimstrLit("Registration created. Check your email for the verification link."), NTI33554449);
+    state_p0.auth.passwordDraft = nimCopy(null, [], NTI33554449);
+    state_p0.auth.mode = 0;
+--excHandler;
+} catch (EXCEPTION) {
+ var prevJSError = lastJSError;
+ lastJSError = EXCEPTION;
+ --excHandler;
+    if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
+    var exc_1459618142 = getCurrentException();
+    state_p0.auth.error = nimCopy(null, exc_1459618142.message, NTI33554449);
+    }
+    else {
+    	reraiseException();
+    }
+    lastJSError = prevJSError;
+    } finally {
+    state_p0.auth.loading = false;
+    }
+    redraw__pkgZkaraxZkarax_u1550(kxi__);
+    result_1459618129 = undefined;
+    break BeforeRet;
+  };
+
+  return result_1459618129;
+
+}
+
+function HEX3Aanonymous__componentsZauth_u125(event_p0, node_p1) {
+    (registerApplication__appZauth95bridge_u334(this.state0));
+
+
+}
+
+function HEX3Aanonymous__componentsZauth_u128(event_p0, node_p1) {
+    this.state0.auth.error = nimCopy(null, [], NTI33554449);
+    this.state0.auth.mode = 0;
+
+
+}
+
+function HEX3Aanonymous__componentsZauth_u131(value_p0) {
+    this.state0.auth.emailDraft = nimCopy(null, value_p0, NTI33554449);
+
+
+}
+async function forgotPassword__apiZauth95client_u509(email_p0) {
+  var result_1509949952 = null;
+
+  BeforeRet: {
+    var payload_1509949974 = HEX25__pureZjson_u1858([nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1829(email_p0)}, NTI1509949754)]);
+    var options_1509949975 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4466(payload_1509949974)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u112([]));
+    var response_1509949984 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,102,111,114,103,111,116,45,112,97,115,115,119,111,114,100])), options_1509949975));
+    var responseBody_1509949989 = cstrToNimstr((await response_1509949984.text()));
+    if (!(response_1509949984.ok)) {
+    raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949984.status), responseBody_1509949989), "ValueError");
+    }
+
+    result_1509949952 = undefined;
+    break BeforeRet;
+  };
+
+  return result_1509949952;
+
+}
+async function forgotPasswordApplication__appZauth95bridge_u368(state_p0) {
   var result_1459618163 = null;
 
   BeforeRet: {
-    var email_1459618169 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet30);
+    var email_1459618169 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet33);
     if (((email_1459618169).length == 0)) {
     state_p0.auth.error = nimCopy(null, [69,110,116,101,114,32,121,111,117,114,32,101,109,97,105,108,32,102,105,114,115,116,46], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
     result_1459618163 = undefined;
     break BeforeRet;
     }
-    
+
     state_p0.auth.loading = true;
     state_p0.auth.error = nimCopy(null, [], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    (await resendVerification__apiZauth95client_u467(email_1459618169));
-    state_p0.auth.notice = nimCopy(null, [73,102,32,116,104,101,32,97,99,99,111,117,110,116,32,115,116,105,108,108,32,110,101,101,100,115,32,118,101,114,105,102,105,99,97,116,105,111,110,44,32,97,32,110,101,119,32,101,109,97,105,108,32,119,97,115,32,115,101,110,116,46], NTI33554449);
+    (await forgotPassword__apiZauth95client_u509(email_1459618169));
+    state_p0.auth.notice = nimCopy(null, [73,102,32,116,104,101,32,97,99,99,111,117,110,116,32,101,120,105,115,116,115,44,32,97,32,112,97,115,115,119,111,114,100,32,114,101,115,101,116,32,101,109,97,105,108,32,119,97,115,32,115,101,110,116,46], NTI33554449);
+    state_p0.auth.mode = 0;
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -6814,195 +6991,23 @@ async function resendVerificationApplication__appZauth95bridge_u368(state_p0) {
 
 }
 
-function HEX3Aanonymous__componentsZauth_u116(event_p0, node_p1) {
-    (resendVerificationApplication__appZauth95bridge_u368(this.state0));
-
-  
-}
-
-function HEX3Aanonymous__componentsZauth_u119(value_p0) {
-    this.state0.auth.displayNameDraft = nimCopy(null, value_p0, NTI33554449);
-
-  
-}
-
-function HEX3Aanonymous__componentsZauth_u121(value_p0) {
-    this.state0.auth.emailDraft = nimCopy(null, value_p0, NTI33554449);
-
-  
-}
-
-function HEX3Aanonymous__componentsZauth_u123(value_p0) {
-    this.state0.auth.passwordDraft = nimCopy(null, value_p0, NTI33554449);
-
-  
-}
-async function register__apiZauth95client_u333(displayName_p0, email_p1, password_p2) {
-  var result_1509949778 = null;
-
-  BeforeRet: {
-    var payload_1509949800 = HEX25__pureZjson_u1858([nimCopy(null, {Field0: [100,105,115,112,108,97,121,95,110,97,109,101], Field1: HEX25__pureZjson_u1829(displayName_p0)}, NTI1509949630), nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1829(email_p1)}, NTI1509949630), nimCopy(null, {Field0: [112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1829(password_p2)}, NTI1509949630)]);
-    var options_1509949801 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4466(payload_1509949800)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u112([]));
-    var response_1509949810 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,103,105,115,116,101,114])), options_1509949801));
-    var responseBody_1509949815 = cstrToNimstr((await response_1509949810.text()));
-    if (!(response_1509949810.ok)) {
-    raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949810.status), responseBody_1509949815), "ValueError");
-    }
-    
-    result_1509949778 = undefined;
-    break BeforeRet;
-  };
-
-  return result_1509949778;
-
-}
-async function registerApplication__appZauth95bridge_u350(state_p0) {
-  var result_1459618145 = null;
-
-  BeforeRet: {
-    var displayName_1459618151 = nsuStrip(state_p0.auth.displayNameDraft, true, true, ConstSet31);
-    var email_1459618152 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet32);
-    var password_1459618153 = nimCopy(null, state_p0.auth.passwordDraft, NTI33554449);
-    if (((((displayName_1459618151).length == 0) || ((email_1459618152).length == 0)) || ((password_1459618153).length == 0))) {
-    state_p0.auth.error = nimCopy(null, [68,105,115,112,108,97,121,32,110,97,109,101,44,32,101,109,97,105,108,32,97,110,100,32,112,97,115,115,119,111,114,100,32,97,114,101,32,114,101,113,117,105,114,101,100,46], NTI33554449);
-    redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618145 = undefined;
-    break BeforeRet;
-    }
-    
-    state_p0.auth.loading = true;
-    state_p0.auth.error = nimCopy(null, [], NTI33554449);
-    redraw__pkgZkaraxZkarax_u1550(kxi__);
-++excHandler;
-    try {
-    (await register__apiZauth95client_u333(displayName_1459618151, email_1459618152, password_1459618153));
-    state_p0.auth.notice = nimCopy(null, makeNimstrLit("Registration created. Check your email for the verification link."), NTI33554449);
-    state_p0.auth.passwordDraft = nimCopy(null, [], NTI33554449);
-    state_p0.auth.mode = 0;
---excHandler;
-} catch (EXCEPTION) {
- var prevJSError = lastJSError;
- lastJSError = EXCEPTION;
- --excHandler;
-    if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    var exc_1459618158 = getCurrentException();
-    state_p0.auth.error = nimCopy(null, exc_1459618158.message, NTI33554449);
-    }
-    else {
-    	reraiseException();
-    }
-    lastJSError = prevJSError;
-    } finally {
-    state_p0.auth.loading = false;
-    }
-    redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618145 = undefined;
-    break BeforeRet;
-  };
-
-  return result_1459618145;
-
-}
-
-function HEX3Aanonymous__componentsZauth_u125(event_p0, node_p1) {
-    (registerApplication__appZauth95bridge_u350(this.state0));
-
-  
-}
-
-function HEX3Aanonymous__componentsZauth_u128(event_p0, node_p1) {
-    this.state0.auth.error = nimCopy(null, [], NTI33554449);
-    this.state0.auth.mode = 0;
-
-  
-}
-
-function HEX3Aanonymous__componentsZauth_u131(value_p0) {
-    this.state0.auth.emailDraft = nimCopy(null, value_p0, NTI33554449);
-
-  
-}
-async function forgotPassword__apiZauth95client_u509(email_p0) {
-  var result_1509949952 = null;
-
-  BeforeRet: {
-    var payload_1509949974 = HEX25__pureZjson_u1858([nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1829(email_p0)}, NTI1509949754)]);
-    var options_1509949975 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4466(payload_1509949974)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u112([]));
-    var response_1509949984 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,102,111,114,103,111,116,45,112,97,115,115,119,111,114,100])), options_1509949975));
-    var responseBody_1509949989 = cstrToNimstr((await response_1509949984.text()));
-    if (!(response_1509949984.ok)) {
-    raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949984.status), responseBody_1509949989), "ValueError");
-    }
-    
-    result_1509949952 = undefined;
-    break BeforeRet;
-  };
-
-  return result_1509949952;
-
-}
-async function forgotPasswordApplication__appZauth95bridge_u384(state_p0) {
-  var result_1459618179 = null;
-
-  BeforeRet: {
-    var email_1459618185 = nsuStrip(state_p0.auth.emailDraft, true, true, ConstSet33);
-    if (((email_1459618185).length == 0)) {
-    state_p0.auth.error = nimCopy(null, [69,110,116,101,114,32,121,111,117,114,32,101,109,97,105,108,32,102,105,114,115,116,46], NTI33554449);
-    redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618179 = undefined;
-    break BeforeRet;
-    }
-    
-    state_p0.auth.loading = true;
-    state_p0.auth.error = nimCopy(null, [], NTI33554449);
-    redraw__pkgZkaraxZkarax_u1550(kxi__);
-++excHandler;
-    try {
-    (await forgotPassword__apiZauth95client_u509(email_1459618185));
-    state_p0.auth.notice = nimCopy(null, [73,102,32,116,104,101,32,97,99,99,111,117,110,116,32,101,120,105,115,116,115,44,32,97,32,112,97,115,115,119,111,114,100,32,114,101,115,101,116,32,101,109,97,105,108,32,119,97,115,32,115,101,110,116,46], NTI33554449);
-    state_p0.auth.mode = 0;
---excHandler;
-} catch (EXCEPTION) {
- var prevJSError = lastJSError;
- lastJSError = EXCEPTION;
- --excHandler;
-    if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    var exc_1459618190 = getCurrentException();
-    state_p0.auth.error = nimCopy(null, exc_1459618190.message, NTI33554449);
-    }
-    else {
-    	reraiseException();
-    }
-    lastJSError = prevJSError;
-    } finally {
-    state_p0.auth.loading = false;
-    }
-    redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618179 = undefined;
-    break BeforeRet;
-  };
-
-  return result_1459618179;
-
-}
-
 function HEX3Aanonymous__componentsZauth_u133(event_p0, node_p1) {
-    (forgotPasswordApplication__appZauth95bridge_u384(this.state0));
+    (forgotPasswordApplication__appZauth95bridge_u368(this.state0));
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZauth_u136(event_p0, node_p1) {
     this.state0.auth.error = nimCopy(null, [], NTI33554449);
     this.state0.auth.mode = 0;
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZauth_u139(value_p0) {
     this.state0.auth.newPasswordDraft = nimCopy(null, value_p0, NTI33554449);
 
-  
+
 }
 async function resetPassword__apiZauth95client_u551(token_p0, newPassword_p1) {
   var result_1509949995 = null;
@@ -7015,7 +7020,7 @@ async function resetPassword__apiZauth95client_u551(token_p0, newPassword_p1) {
     if (!(response_1509950027.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950027.status), responseBody_1509950032), "ValueError");
     }
-    
+
     result_1509949995 = undefined;
     break BeforeRet;
   };
@@ -7023,17 +7028,17 @@ async function resetPassword__apiZauth95client_u551(token_p0, newPassword_p1) {
   return result_1509949995;
 
 }
-async function resetPasswordApplication__appZauth95bridge_u400(state_p0) {
-  var result_1459618195 = null;
+async function resetPasswordApplication__appZauth95bridge_u384(state_p0) {
+  var result_1459618179 = null;
 
   BeforeRet: {
     if ((((state_p0.auth.resetToken).length == 0) || ((state_p0.auth.newPasswordDraft).length == 0))) {
     state_p0.auth.error = nimCopy(null, [65,32,114,101,115,101,116,32,116,111,107,101,110,32,97,110,100,32,110,101,119,32,112,97,115,115,119,111,114,100,32,97,114,101,32,114,101,113,117,105,114,101,100,46], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618195 = undefined;
+    result_1459618179 = undefined;
     break BeforeRet;
     }
-    
+
     state_p0.auth.loading = true;
     state_p0.auth.error = nimCopy(null, [], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
@@ -7051,8 +7056,8 @@ async function resetPasswordApplication__appZauth95bridge_u400(state_p0) {
  lastJSError = EXCEPTION;
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    var exc_1459618205 = getCurrentException();
-    state_p0.auth.error = nimCopy(null, exc_1459618205.message, NTI33554449);
+    var exc_1459618189 = getCurrentException();
+    state_p0.auth.error = nimCopy(null, exc_1459618189.message, NTI33554449);
     }
     else {
     	reraiseException();
@@ -7062,18 +7067,18 @@ async function resetPasswordApplication__appZauth95bridge_u400(state_p0) {
     state_p0.auth.loading = false;
     }
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618195 = undefined;
+    result_1459618179 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618195;
+  return result_1459618179;
 
 }
 
 function HEX3Aanonymous__componentsZauth_u141(event_p0, node_p1) {
-    (resetPasswordApplication__appZauth95bridge_u400(this.state0));
+    (resetPasswordApplication__appZauth95bridge_u384(this.state0));
 
-  
+
 }
 
 function renderAuthScreen__componentsZauth_u70(state_p0) {
@@ -7148,7 +7153,7 @@ function renderAuthScreen__componentsZauth_u70(state_p0) {
         else {
         add__pkgZkaraxZvdom_u857(tmp_1811939411, text__pkgZkaraxZvdom_u1011([83,105,103,110,32,105,110]));
         }
-        
+
         Temporary3 = HEX3Aanonymous__componentsZauth_u107.bind(HEX3Aenv_570426269); Temporary3.ClP_0 = HEX3Aanonymous__componentsZauth_u107; Temporary3.ClE_0 = HEX3Aenv_570426269;
         addEventHandler__pkgZkaraxZkarax_u1963(tmp_1811939411, 0, Temporary3, kxi__);
         add__pkgZkaraxZvdom_u857(tmp_1811939402, tmp_1811939411);
@@ -7252,16 +7257,16 @@ function renderAuthScreen__componentsZauth_u70(state_p0) {
       add__pkgZkaraxZvdom_u857(tmp_1811939429, text__pkgZkaraxZvdom_u1011(HEX3Aenv_570426269.state0.auth.notice));
       add__pkgZkaraxZvdom_u857(tmp_1811939402, tmp_1811939429);
       }
-      
+
       if ((0 < (HEX3Aenv_570426269.state0.auth.error).length)) {
       var tmp_1811939430 = tree__pkgZkaraxZvdom_u943(44, []);
       tmp_1811939430.class = "auth-error";
       add__pkgZkaraxZvdom_u857(tmp_1811939430, text__pkgZkaraxZvdom_u1011(HEX3Aenv_570426269.state0.auth.error));
       add__pkgZkaraxZvdom_u857(tmp_1811939402, tmp_1811939430);
       }
-      
+
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_1811939401, tmp_1811939402);
     result_1811939400 = tmp_1811939401;
 
@@ -7269,50 +7274,50 @@ function renderAuthScreen__componentsZauth_u70(state_p0) {
 
 }
 
-function insert__appZauth95bridge_u453(x_p0, x_p0_Idx, item_p1, i_p2) {
-    var it_1459618270 = ({chatId: [], title: [], updatedAt: []});
-    x_p0[x_p0_Idx] = x_p0[x_p0_Idx] || []; x_p0[x_p0_Idx].splice(i_p2, 0, it_1459618270);
+function insert__appZauth95bridge_u437(x_p0, x_p0_Idx, item_p1, i_p2) {
+    var it_1459618254 = ({chatId: [], title: [], updatedAt: []});
+    x_p0[x_p0_Idx] = x_p0[x_p0_Idx] || []; x_p0[x_p0_Idx].splice(i_p2, 0, it_1459618254);
     x_p0[x_p0_Idx][chckIndx(i_p2, 0, (x_p0[x_p0_Idx]).length - 1)] = nimCopy(x_p0[x_p0_Idx][chckIndx(i_p2, 0, (x_p0[x_p0_Idx]).length - 1)], item_p1, NTI1426063377);
 
-  
+
 }
-async function createNewChat__appZauth95bridge_u429(state_p0) {
-  var result_1459618224 = null;
+async function createNewChat__appZauth95bridge_u413(state_p0) {
+  var result_1459618208 = null;
 
   BeforeRet: {
     if (!(state_p0.auth.authenticated)) {
-    result_1459618224 = undefined;
+    result_1459618208 = undefined;
     break BeforeRet;
     }
-    
+
     if ((((0 < (state_p0.currentChatId).length) && ((state_p0.messages).length == 0)) && !(state_p0.run.active))) {
     state_p0.activeView = 0;
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618224 = undefined;
+    result_1459618208 = undefined;
     break BeforeRet;
     }
-    
+
     if ((state_p0.run.active && contains__stdZenumutils_u50([[115,117,98,109,105,116,116,105,110,103], [112,101,110,100,105,110,103], [112,114,111,99,101,115,115,105,110,103], [119,97,105,116,105,110,103,95,97,112,112,114,111,118,97,108], [97,112,112,114,111,118,105,110,103]], state_p0.run.status))) {
-    showToast__appZstate_u402(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,99,114,101,97,116,105,110,103,32,97,110,111,116,104,101,114,32,99,104,97,116,46]);
+    showToast__appZstate_u410(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,99,114,101,97,116,105,110,103,32,97,110,111,116,104,101,114,32,99,104,97,116,46]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618224 = undefined;
+    result_1459618208 = undefined;
     break BeforeRet;
     }
-    
+
 ++excHandler;
     try {
-    var created_1459618244 = (await createChat__apiZauth95client_u758(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
-    insert__appZauth95bridge_u453(state_p0, "chats", {chatId: nimCopy(null, created_1459618244.chatId, NTI33554449), title: nimCopy(null, created_1459618244.title, NTI33554449), updatedAt: nimCopy(null, created_1459618244.updatedAt, NTI33554449)}, 0);
-    applyHistory__appZauth95bridge_u43(state_p0, created_1459618244.chatId, []);
+    var created_1459618228 = (await createChat__apiZauth95client_u758(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
+    insert__appZauth95bridge_u437(state_p0, "chats", {chatId: nimCopy(null, created_1459618228.chatId, NTI33554449), title: nimCopy(null, created_1459618228.title, NTI33554449), updatedAt: nimCopy(null, created_1459618228.updatedAt, NTI33554449)}, 0);
+    applyHistory__appZauth95bridge_u43(state_p0, created_1459618228.chatId, []);
     state_p0.activeView = 0;
-    showToast__appZstate_u402(state_p0, [78,101,119,32,99,104,97,116,32,99,114,101,97,116,101,100,46]);
+    showToast__appZstate_u410(state_p0, [78,101,119,32,99,104,97,116,32,99,114,101,97,116,101,100,46]);
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
  lastJSError = EXCEPTION;
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    showToast__appZstate_u402(state_p0, [67,111,117,108,100,32,110,111,116,32,99,114,101,97,116,101,32,97,32,110,101,119,32,99,104,97,116,32,114,105,103,104,116,32,110,111,119,46]);
+    showToast__appZstate_u410(state_p0, [67,111,117,108,100,32,110,111,116,32,99,114,101,97,116,101,32,97,32,110,101,119,32,99,104,97,116,32,114,105,103,104,116,32,110,111,119,46]);
     }
     else {
     	reraiseException();
@@ -7321,52 +7326,52 @@ async function createNewChat__appZauth95bridge_u429(state_p0) {
     } finally {
     }
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618224 = undefined;
+    result_1459618208 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618224;
+  return result_1459618208;
 
 }
 
 function HEX3Aanonymous__componentsZsidebar_u66(event_p0, node_p1) {
-    (createNewChat__appZauth95bridge_u429(this.state0));
+    (createNewChat__appZauth95bridge_u413(this.state0));
 
-  
+
 }
-async function selectChat__appZauth95bridge_u605(state_p0, chatId_p1) {
-  var result_1459618401 = null;
+async function selectChat__appZauth95bridge_u589(state_p0, chatId_p1) {
+  var result_1459618385 = null;
 
   BeforeRet: {
     if (eqStrings(chatId_p1, state_p0.currentChatId)) {
     state_p0.activeView = 0;
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618401 = undefined;
+    result_1459618385 = undefined;
     break BeforeRet;
     }
-    
+
     if ((state_p0.run.active && contains__stdZenumutils_u50([[115,117,98,109,105,116,116,105,110,103], [112,101,110,100,105,110,103], [112,114,111,99,101,115,115,105,110,103], [119,97,105,116,105,110,103,95,97,112,112,114,111,118,97,108], [97,112,112,114,111,118,105,110,103]], state_p0.run.status))) {
-    showToast__appZstate_u402(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,115,119,105,116,99,104,105,110,103,32,99,104,97,116,115,46]);
+    showToast__appZstate_u410(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,115,119,105,116,99,104,105,110,103,32,99,104,97,116,115,46]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618401 = undefined;
+    result_1459618385 = undefined;
     break BeforeRet;
     }
-    
+
     (await loadChatHistory__appZauth95bridge_u147(state_p0, chatId_p1));
     state_p0.activeView = 0;
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618401 = undefined;
+    result_1459618385 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618401;
+  return result_1459618385;
 
 }
 
 function HEX3Aanonymous__componentsZsidebar_u77(event_p0, node_p1) {
-    (selectChat__appZauth95bridge_u605(this.state0, this.currentChat1.chatId));
+    (selectChat__appZauth95bridge_u589(this.state0, this.currentChat1.chatId));
 
-  
+
 }
 async function deleteChat__apiZauth95client_u832(chatId_p0, csrfToken_p1) {
   var result_1509950276 = null;
@@ -7375,14 +7380,14 @@ async function deleteChat__apiZauth95client_u832(chatId_p0, csrfToken_p1) {
     if (((chatId_p0).length == 0)) {
     raiseException({message: [65,32,99,104,97,116,32,73,68,32,105,115,32,114,101,113,117,105,114,101,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
+
     var options_1509950283 = newfetchOptions__stdZjsfetch_u115(4, null, 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u112(csrfToken_p1));
     var response_1509950292 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115,47],chatId_p0)), options_1509950283));
     var responseBody_1509950297 = cstrToNimstr((await response_1509950292.text()));
     if (!(response_1509950292.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950292.status), responseBody_1509950297), "ValueError");
     }
-    
+
     result_1509950276 = undefined;
     break BeforeRet;
   };
@@ -7390,69 +7395,69 @@ async function deleteChat__apiZauth95client_u832(chatId_p0, csrfToken_p1) {
   return result_1509950276;
 
 }
-async function deleteChatApplication__appZauth95bridge_u484(state_p0, chatId_p1) {
-  var result_1459618280 = null;
+async function deleteChatApplication__appZauth95bridge_u468(state_p0, chatId_p1) {
+  var result_1459618264 = null;
 
   BeforeRet: {
     if ((!(state_p0.auth.authenticated) || ((chatId_p1).length == 0))) {
-    result_1459618280 = undefined;
+    result_1459618264 = undefined;
     break BeforeRet;
     }
-    
+
     if (((eqStrings(chatId_p1, state_p0.currentChatId) && state_p0.run.active) && contains__stdZenumutils_u50([[115,117,98,109,105,116,116,105,110,103], [112,101,110,100,105,110,103], [112,114,111,99,101,115,115,105,110,103], [119,97,105,116,105,110,103,95,97,112,112,114,111,118,97,108], [97,112,112,114,111,118,105,110,103]], state_p0.run.status))) {
-    showToast__appZstate_u402(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,100,101,108,101,116,105,110,103,32,116,104,105,115,32,99,104,97,116,46]);
+    showToast__appZstate_u410(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,100,101,108,101,116,105,110,103,32,116,104,105,115,32,99,104,97,116,46]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618280 = undefined;
+    result_1459618264 = undefined;
     break BeforeRet;
     }
-    
+
 ++excHandler;
     try {
     (await deleteChat__apiZauth95client_u832(chatId_p1, state_p0.auth.csrfToken));
-    var wasCurrent_1459618296 = eqStrings(chatId_p1, state_p0.currentChatId);
-    var remaining_1459618301 = [];
+    var wasCurrent_1459618280 = eqStrings(chatId_p1, state_p0.currentChatId);
+    var remaining_1459618285 = [];
     Label2: {
-      var chat_1459618323 = ({chatId: [], title: [], updatedAt: []});
+      var chat_1459618307 = ({chatId: [], title: [], updatedAt: []});
       var i_570426565 = 0;
       var L_570426566 = (state_p0.chats).length;
       Label3: {
           Label4: while (true) {
           if (!(i_570426565 < L_570426566)) break Label4;
-            chat_1459618323 = state_p0.chats[chckIndx(i_570426565, 0, (state_p0.chats).length - 1)];
-            if (!(eqStrings(chat_1459618323.chatId, chatId_p1))) {
-            var Temporary5 = nimCopy(null, chat_1459618323, NTI1426063377);
-            remaining_1459618301.push(Temporary5);;
+            chat_1459618307 = state_p0.chats[chckIndx(i_570426565, 0, (state_p0.chats).length - 1)];
+            if (!(eqStrings(chat_1459618307.chatId, chatId_p1))) {
+            var Temporary5 = nimCopy(null, chat_1459618307, NTI1426063377);
+            remaining_1459618285.push(Temporary5);;
             }
-            
+
             i_570426565 += 1;
             if (!(((state_p0.chats).length == L_570426566))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
-    state_p0.chats = nimCopy(null, remaining_1459618301, NTI1459618188);
-    if (wasCurrent_1459618296) {
+    state_p0.chats = nimCopy(null, remaining_1459618285, NTI1459618179);
+    if (wasCurrent_1459618280) {
     if ((0 < (state_p0.chats).length)) {
     (await loadChatHistory__appZauth95bridge_u147(state_p0, state_p0.chats[chckIndx(0, 0, (state_p0.chats).length - 1)].chatId));
     }
     else {
-      var created_1459618339 = (await createChat__apiZauth95client_u758(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
-      state_p0.chats.push({chatId: nimCopy(null, created_1459618339.chatId, NTI33554449), title: nimCopy(null, created_1459618339.title, NTI33554449), updatedAt: nimCopy(null, created_1459618339.updatedAt, NTI33554449)});;
-      applyHistory__appZauth95bridge_u43(state_p0, created_1459618339.chatId, []);
+      var created_1459618323 = (await createChat__apiZauth95client_u758(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
+      state_p0.chats.push({chatId: nimCopy(null, created_1459618323.chatId, NTI33554449), title: nimCopy(null, created_1459618323.title, NTI33554449), updatedAt: nimCopy(null, created_1459618323.updatedAt, NTI33554449)});;
+      applyHistory__appZauth95bridge_u43(state_p0, created_1459618323.chatId, []);
     }
-    
+
     }
-    
-    showToast__appZstate_u402(state_p0, [67,104,97,116,32,100,101,108,101,116,101,100,46]);
+
+    showToast__appZstate_u410(state_p0, [67,104,97,116,32,100,101,108,101,116,101,100,46]);
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
  lastJSError = EXCEPTION;
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    showToast__appZstate_u402(state_p0, [67,111,117,108,100,32,110,111,116,32,100,101,108,101,116,101,32,116,104,105,115,32,99,104,97,116,32,114,105,103,104,116,32,110,111,119,46]);
+    showToast__appZstate_u410(state_p0, [67,111,117,108,100,32,110,111,116,32,100,101,108,101,116,101,32,116,104,105,115,32,99,104,97,116,32,114,105,103,104,116,32,110,111,119,46]);
     }
     else {
     	reraiseException();
@@ -7461,33 +7466,33 @@ async function deleteChatApplication__appZauth95bridge_u484(state_p0, chatId_p1)
     } finally {
     }
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618280 = undefined;
+    result_1459618264 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618280;
+  return result_1459618264;
 
 }
 
 function HEX3Aanonymous__componentsZsidebar_u80(event_p0, node_p1) {
     this.state0.pendingDeleteChatId = nimCopy(null, [], NTI33554449);
-    (deleteChatApplication__appZauth95bridge_u484(this.state0, this.currentChat1.chatId));
+    (deleteChatApplication__appZauth95bridge_u468(this.state0, this.currentChat1.chatId));
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZsidebar_u83(event_p0, node_p1) {
     this.state0.pendingDeleteChatId = nimCopy(null, [], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZsidebar_u86(event_p0, node_p1) {
     this.state0.pendingDeleteChatId = nimCopy(null, this.currentChat1.chatId, NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 
-  
+
 }
 
 function viewNavClass__componentsZsidebar_u11(state_p0, target_p1) {
@@ -7501,24 +7506,24 @@ function viewNavClass__componentsZsidebar_u11(state_p0, target_p1) {
     else {
     Temporary1 = "nav-item";
     }
-    
+
     result_1828716558 = Temporary1;
 
   return result_1828716558;
 
 }
 
-function setActiveView__appZstate_u407(state_p0, view_p1) {
+function setActiveView__appZstate_u415(state_p0, view_p1) {
     state_p0.activeView = view_p1;
     state_p0.headerMenuOpen = false;
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZsidebar_u31(event_p0, node_p1) {
-    setActiveView__appZstate_u407(this.state0, this.target1);
+    setActiveView__appZstate_u415(this.state0, this.target1);
 
-  
+
 }
 
 function renderViewButton__componentsZsidebar_u20(state_p0, icon_p1, label_p2, target_p3, tail_p4) {
@@ -7545,7 +7550,7 @@ function renderViewButton__componentsZsidebar_u20(state_p0, icon_p1, label_p2, t
     add__pkgZkaraxZvdom_u857(tmp_1828716574, text__pkgZkaraxZvdom_u1011(tail_p4));
     add__pkgZkaraxZvdom_u857(tmp_1828716571, tmp_1828716574);
     }
-    
+
     Temporary1 = HEX3Aanonymous__componentsZsidebar_u31.bind(HEX3Aenv_570426572); Temporary1.ClP_0 = HEX3Aanonymous__componentsZsidebar_u31; Temporary1.ClE_0 = HEX3Aenv_570426572;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1828716571, 0, Temporary1, kxi__);
     result_1828716570 = tmp_1828716571;
@@ -7563,7 +7568,7 @@ function nsuToUpperAsciiChar(c_p0) {
     else {
       result_905969770 = c_p0;
     }
-    
+
 
   return result_905969770;
 
@@ -7648,7 +7653,7 @@ function getBool__pureZjson_u282(n_p0, default_p1) {
       result_1610613021 = Temporary1.bval;
       break BeforeRet;
     }
-    
+
   };
 
   return result_1610613021;
@@ -7663,13 +7668,13 @@ function jsonBool__apiZauth95client_u45(node_p0, key_p1) {
     result_1509949488 = false;
     break BeforeRet;
     }
-    
+
     var value_1509949493 = HEX5BHEX5D__pureZjson_u3078(node_p0, key_p1);
     if ((value_1509949493.kind == 1)) {
     result_1509949488 = getBool__pureZjson_u282(value_1509949493, false);
     break BeforeRet;
     }
-    
+
     result_1509949488 = false;
     break BeforeRet;
   };
@@ -7689,7 +7694,7 @@ async function listSessions__apiZauth95client_u999() {
     if (!(response_1509950461.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950461.status), responseBody_1509950466), "ValueError");
     }
-    
+
     var data_1509950467 = parseJson__pureZjson_u5285(responseBody_1509950466);
     var items_1509950543 = newSeq__apiZauth95client_u1056(0);
     if ((((data_1509950467.kind == 5) && hasKey__pureZjson_u3191(data_1509950467, [115,101,115,115,105,111,110,115])) && (HEX5BHEX5D__pureZjson_u3078(data_1509950467, [115,101,115,115,105,111,110,115]).kind == 6))) {
@@ -7700,7 +7705,7 @@ async function listSessions__apiZauth95client_u999() {
       if (!((colontmp__570426619.kind == 6))) {
       failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(colontmp__570426619.kind, NTI1610612739)));
       }
-      
+
       Label2: {
         var i_570426621 = null;
         var colontmp__570426622 = [];
@@ -7719,13 +7724,13 @@ async function listSessions__apiZauth95client_u999() {
               if (!(((colontmp__570426622).length == L_570426624))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
     };
     }
-    
+
     result_1509950442 = items_1509950543;
     break BeforeRet;
   };
@@ -7733,34 +7738,34 @@ async function listSessions__apiZauth95client_u999() {
   return result_1509950442;
 
 }
-async function loadAuthSessions__appZauth95bridge_u626(state_p0) {
-  var result_1459618421 = null;
+async function loadAuthSessions__appZauth95bridge_u610(state_p0) {
+  var result_1459618405 = null;
 
   BeforeRet: {
     if (!(state_p0.auth.authenticated)) {
-    result_1459618421 = undefined;
+    result_1459618405 = undefined;
     break BeforeRet;
     }
-    
+
 ++excHandler;
     try {
-    var remoteSessions_1459618431 = (await listSessions__apiZauth95client_u999());
+    var remoteSessions_1459618415 = (await listSessions__apiZauth95client_u999());
     if (state_p0.sessions.length < 0) { for (var i = state_p0.sessions.length ; i < 0 ; ++i) state_p0.sessions.push(({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false})); }
                else { state_p0.sessions.length = 0; };
     Label2: {
-      var remote_1459618458 = ({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false});
+      var remote_1459618442 = ({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false});
       var i_570426615 = 0;
-      var L_570426616 = (remoteSessions_1459618431).length;
+      var L_570426616 = (remoteSessions_1459618415).length;
       Label3: {
           Label4: while (true) {
           if (!(i_570426615 < L_570426616)) break Label4;
-            remote_1459618458 = remoteSessions_1459618431[chckIndx(i_570426615, 0, (remoteSessions_1459618431).length - 1)];
-            state_p0.sessions.push({sessionId: nimCopy(null, remote_1459618458.sessionId, NTI33554449), createdAt: nimCopy(null, remote_1459618458.createdAt, NTI33554449), lastSeenAt: nimCopy(null, remote_1459618458.lastSeenAt, NTI33554449), expiresAt: nimCopy(null, remote_1459618458.expiresAt, NTI33554449), revokedAt: nimCopy(null, remote_1459618458.revokedAt, NTI33554449), userAgent: nimCopy(null, remote_1459618458.userAgent, NTI33554449), current: remote_1459618458.current});;
+            remote_1459618442 = remoteSessions_1459618415[chckIndx(i_570426615, 0, (remoteSessions_1459618415).length - 1)];
+            state_p0.sessions.push({sessionId: nimCopy(null, remote_1459618442.sessionId, NTI33554449), createdAt: nimCopy(null, remote_1459618442.createdAt, NTI33554449), lastSeenAt: nimCopy(null, remote_1459618442.lastSeenAt, NTI33554449), expiresAt: nimCopy(null, remote_1459618442.expiresAt, NTI33554449), revokedAt: nimCopy(null, remote_1459618442.revokedAt, NTI33554449), userAgent: nimCopy(null, remote_1459618442.userAgent, NTI33554449), current: remote_1459618442.current});;
             i_570426615 += 1;
-            if (!(((remoteSessions_1459618431).length == L_570426616))) {
+            if (!(((remoteSessions_1459618415).length == L_570426616))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
@@ -7771,8 +7776,8 @@ async function loadAuthSessions__appZauth95bridge_u626(state_p0) {
  lastJSError = EXCEPTION;
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    var exc_1459618463 = getCurrentException();
-    showToast__appZstate_u402(state_p0, ([83,101,115,115,105,111,110,32,104,105,115,116,111,114,121,32,102,97,105,108,101,100,58,32]).concat(exc_1459618463.message));
+    var exc_1459618447 = getCurrentException();
+    showToast__appZstate_u410(state_p0, ([83,101,115,115,105,111,110,32,104,105,115,116,111,114,121,32,102,97,105,108,101,100,58,32]).concat(exc_1459618447.message));
     }
     else {
     	reraiseException();
@@ -7781,19 +7786,19 @@ async function loadAuthSessions__appZauth95bridge_u626(state_p0) {
     } finally {
     }
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618421 = undefined;
+    result_1459618405 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618421;
+  return result_1459618405;
 
 }
 
 function HEX3Aanonymous__componentsZsidebar_u125(event_p0, node_p1) {
-    setActiveView__appZstate_u407(this.state0, 10);
-    (loadAuthSessions__appZauth95bridge_u626(this.state0));
+    setActiveView__appZstate_u415(this.state0, 10);
+    (loadAuthSessions__appZauth95bridge_u610(this.state0));
 
-  
+
 }
 
 function renderSidebar__componentsZsidebar_u34(state_p0) {
@@ -7872,7 +7877,7 @@ function renderSidebar__componentsZsidebar_u34(state_p0) {
               else {
               Temporary5 = "chat-nav-main";
               }
-              
+
               tmp_1828716593.class = Temporary5;
               var tmp_1828716594 = tree__pkgZkaraxZvdom_u943(71, []);
               tmp_1828716594.class = "nav-icon";
@@ -7913,18 +7918,18 @@ function renderSidebar__componentsZsidebar_u34(state_p0) {
                 addEventHandler__pkgZkaraxZkarax_u1963(tmp_1828716599, 0, Temporary9, kxi__);
                 add__pkgZkaraxZvdom_u857(tmp_1828716592, tmp_1828716599);
               }
-              
+
               add__pkgZkaraxZvdom_u857(tmp_1828716589, tmp_1828716592);
               i_570426560 += 1;
               if (!(((HEX3Aenv_570426522.state0.chats).length == L_570426561))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_1828716581, tmp_1828716589);
     var tmp_1828716600 = tree__pkgZkaraxZvdom_u943(18, []);
     tmp_1828716600.class = "nav-section";
@@ -7973,7 +7978,7 @@ function renderSidebar__componentsZsidebar_u34(state_p0) {
     else {
     Temporary11 = HEX3Aenv_570426522.state0.auth.email;
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_1828716607, text__pkgZkaraxZvdom_u1011(Temporary11));
     add__pkgZkaraxZvdom_u857(tmp_1828716606, tmp_1828716607);
     var tmp_1828716608 = tree__pkgZkaraxZvdom_u943(71, []);
@@ -7983,7 +7988,7 @@ function renderSidebar__componentsZsidebar_u34(state_p0) {
     else {
     Temporary12 = [97,117,116,104,101,110,116,105,99,97,116,101,100];
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_1828716608, text__pkgZkaraxZvdom_u1011(Temporary12));
     add__pkgZkaraxZvdom_u857(tmp_1828716606, tmp_1828716608);
     add__pkgZkaraxZvdom_u857(tmp_1828716604, tmp_1828716606);
@@ -8080,90 +8085,90 @@ function activeViewSubtitle__agentic70rontend_u21() {
 
 }
 
-function jsonValueBool__apiZclient_u33(node_p0, key_p1) {
-  var result_1795162148 = false;
+function jsonValueBool__apiZclient_u37(node_p0, key_p1) {
+  var result_1795162152 = false;
 
   BeforeRet: {
     if (!((node_p0.kind == 5))) {
-    result_1795162148 = false;
+    result_1795162152 = false;
     break BeforeRet;
     }
-    
+
     if (!(hasKey__pureZjson_u3191(node_p0, key_p1))) {
-    result_1795162148 = false;
+    result_1795162152 = false;
     break BeforeRet;
     }
-    
-    var value_1795162153 = HEX5BHEX5D__pureZjson_u3078(node_p0, key_p1);
-    if ((value_1795162153.kind == 1)) {
-    result_1795162148 = getBool__pureZjson_u282(value_1795162153, false);
+
+    var value_1795162157 = HEX5BHEX5D__pureZjson_u3078(node_p0, key_p1);
+    if ((value_1795162157.kind == 1)) {
+    result_1795162152 = getBool__pureZjson_u282(value_1795162157, false);
     break BeforeRet;
     }
-    
-    result_1795162148 = false;
+
+    result_1795162152 = false;
     break BeforeRet;
   };
 
-  return result_1795162148;
+  return result_1795162152;
 
 }
-async function getSystemHealth__apiZclient_u350() {
-  var result_1795162465 = null;
+async function getSystemHealth__apiZclient_u354() {
+  var result_1795162469 = null;
 
-    var options_1795162475 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 2, 0, 1, false, 0, "client", "", new Headers());
-    var response_1795162484 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,104,101,97,108,116,104])), options_1795162475));
-    var responseBody_1795162489 = cstrToNimstr((await response_1795162484.text()));
-    if (!(response_1795162484.ok)) {
-    raiseException({message: ([66,97,99,107,101,110,100,32,104,101,97,108,116,104,32,114,101,116,117,114,110,101,100,32,72,84,84,80,32]).concat(HEX24__systemZdollars_u29(response_1795162484.status),[58,32],responseBody_1795162489), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
+    var options_1795162479 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 2, 0, 1, false, 0, "client", "", new Headers());
+    var response_1795162488 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,104,101,97,108,116,104])), options_1795162479));
+    var responseBody_1795162493 = cstrToNimstr((await response_1795162488.text()));
+    if (!(response_1795162488.ok)) {
+    raiseException({message: ([66,97,99,107,101,110,100,32,104,101,97,108,116,104,32,114,101,116,117,114,110,101,100,32,72,84,84,80,32]).concat(HEX24__systemZdollars_u29(response_1795162488.status),[58,32],responseBody_1795162493), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
-    var data_1795162491 = parseJson__pureZjson_u5285(responseBody_1795162489);
-    if (!((data_1795162491.kind == 5))) {
+
+    var data_1795162495 = parseJson__pureZjson_u5285(responseBody_1795162493);
+    if (!((data_1795162495.kind == 5))) {
     raiseException({message: [66,97,99,107,101,110,100,32,104,101,97,108,116,104,32,114,101,115,112,111,110,115,101,32,109,117,115,116,32,98,101,32,97,32,74,83,79,78,32,111,98,106,101,99,116,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
-    if (!(eqStrings(jsonValueText__apiZclient_u24(data_1795162491, [115,116,97,116,117,115]), [111,107]))) {
+
+    if (!(eqStrings(jsonValueText__apiZclient_u28(data_1795162495, [115,116,97,116,117,115]), [111,107]))) {
     raiseException({message: [66,97,99,107,101,110,100,32,104,101,97,108,116,104,32,114,101,115,112,111,110,115,101,32,105,115,32,110,111,116,32,104,101,97,108,116,104,121,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
-    
-    var aiReachable_1795162498 = false;
-    var aiHealthy_1795162499 = false;
-    var aiReady_1795162500 = false;
-    if (hasKey__pureZjson_u3191(data_1795162491, [97,105,95,115,101,114,118,105,99,101])) {
-    var aiService_1795162501 = HEX5BHEX5D__pureZjson_u3078(data_1795162491, [97,105,95,115,101,114,118,105,99,101]);
-    if ((aiService_1795162501.kind == 5)) {
-    aiReachable_1795162498 = jsonValueBool__apiZclient_u33(aiService_1795162501, [114,101,97,99,104,97,98,108,101]);
-    aiHealthy_1795162499 = jsonValueBool__apiZclient_u33(aiService_1795162501, [104,101,97,108,116,104,121]);
-    aiReady_1795162500 = jsonValueBool__apiZclient_u33(aiService_1795162501, [114,101,97,100,121]);
-    }
-    
-    }
-    
-    result_1795162465 = {backendConnected: true, aiReachable: aiReachable_1795162498, aiHealthy: aiHealthy_1795162499, aiReady: aiReady_1795162500};
 
-  return result_1795162465;
+    var aiReachable_1795162502 = false;
+    var aiHealthy_1795162503 = false;
+    var aiReady_1795162504 = false;
+    if (hasKey__pureZjson_u3191(data_1795162495, [97,105,95,115,101,114,118,105,99,101])) {
+    var aiService_1795162505 = HEX5BHEX5D__pureZjson_u3078(data_1795162495, [97,105,95,115,101,114,118,105,99,101]);
+    if ((aiService_1795162505.kind == 5)) {
+    aiReachable_1795162502 = jsonValueBool__apiZclient_u37(aiService_1795162505, [114,101,97,99,104,97,98,108,101]);
+    aiHealthy_1795162503 = jsonValueBool__apiZclient_u37(aiService_1795162505, [104,101,97,108,116,104,121]);
+    aiReady_1795162504 = jsonValueBool__apiZclient_u37(aiService_1795162505, [114,101,97,100,121]);
+    }
+
+    }
+
+    result_1795162469 = {backendConnected: true, aiReachable: aiReachable_1795162502, aiHealthy: aiHealthy_1795162503, aiReady: aiReady_1795162504};
+
+  return result_1795162469;
 
 }
-async function refreshSystemStatus__appZbackend95bridge_u129(state_p0) {
-  var result_1778385028 = null;
+async function refreshSystemStatusBase__appZbackend95bridge_u169(state_p0) {
+  var result_1778385068 = null;
 
   BeforeRet: {
     if (state_p0.system.checking) {
-    result_1778385028 = undefined;
+    result_1778385068 = undefined;
     break BeforeRet;
     }
-    
+
     state_p0.system.checking = true;
     state_p0.system.error = nimCopy(null, [], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var health_1778385038 = (await getSystemHealth__apiZclient_u350());
+    var health_1778385078 = (await getSystemHealth__apiZclient_u354());
     state_p0.system.checked = true;
-    state_p0.system.backendConnected = health_1778385038.backendConnected;
-    state_p0.system.aiReachable = health_1778385038.aiReachable;
-    state_p0.system.aiHealthy = health_1778385038.aiHealthy;
-    state_p0.system.aiReady = health_1778385038.aiReady;
+    state_p0.system.backendConnected = health_1778385078.backendConnected;
+    state_p0.system.aiReachable = health_1778385078.aiReachable;
+    state_p0.system.aiHealthy = health_1778385078.aiHealthy;
+    state_p0.system.aiReady = health_1778385078.aiReady;
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -8185,6 +8190,119 @@ async function refreshSystemStatus__appZbackend95bridge_u129(state_p0) {
     state_p0.system.checking = false;
     }
     redraw__pkgZkaraxZkarax_u1550(kxi__);
+    result_1778385068 = undefined;
+    break BeforeRet;
+  };
+
+  return result_1778385068;
+
+}
+async function getIntegrationStatus__apiZclient_u439() {
+        var Temporary3;
+
+  var result_1795162554 = null;
+
+    var options_1795162564 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_1795162573 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,105,110,116,101,103,114,97,116,105,111,110,115])), options_1795162564));
+    var responseBody_1795162578 = cstrToNimstr((await response_1795162573.text()));
+    if (!(response_1795162573.ok)) {
+    raiseException({message: ([73,110,116,101,103,114,97,116,105,111,110,32,115,116,97,116,117,115,32,114,101,116,117,114,110,101,100,32,72,84,84,80,32]).concat(HEX24__systemZdollars_u29(response_1795162573.status),[58,32],responseBody_1795162578), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
+    }
+
+    var data_1795162580 = parseJson__pureZjson_u5285(responseBody_1795162578);
+    var configured_1795162581 = false;
+    var host_1795162582 = [];
+    var mode_1795162583 = [];
+    if (((data_1795162580.kind == 5) && hasKey__pureZjson_u3191(data_1795162580, [105,110,116,101,103,114,97,116,105,111,110,115]))) {
+    var integrations_1795162588 = HEX5BHEX5D__pureZjson_u3078(data_1795162580, [105,110,116,101,103,114,97,116,105,111,110,115]);
+    if ((integrations_1795162588.kind == 6)) {
+    Label1: {
+      var integration_1795162593 = null;
+      if (!((integrations_1795162588.kind == 6))) {
+      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(integrations_1795162588.kind, NTI1610612739)));
+      }
+
+      Label2: {
+        var i_570426632 = null;
+        var colontmp__570426633 = [];
+        var Temporary3 = integrations_1795162588;
+        if (ConstSet37[Temporary3.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'elems\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary3.kind, NTI1610612739)); }
+        colontmp__570426633 = Temporary3.elems;
+        var i_570426634 = 0;
+        var L_570426635 = (colontmp__570426633).length;
+        Label4: {
+            Label5: while (true) {
+            if (!(i_570426634 < L_570426635)) break Label5;
+              i_570426632 = colontmp__570426633[chckIndx(i_570426634, 0, (colontmp__570426633).length - 1)];
+              integration_1795162593 = i_570426632;
+              if (((integration_1795162593.kind == 5) && eqStrings(jsonValueText__apiZclient_u28(integration_1795162593, [105,100]), [112,97,108,111,95,97,108,116,111]))) {
+              configured_1795162581 = jsonValueBool__apiZclient_u37(integration_1795162593, [99,111,110,102,105,103,117,114,101,100]);
+              host_1795162582 = nimCopy(null, jsonValueText__apiZclient_u28(integration_1795162593, [104,111,115,116]), NTI33554449);
+              mode_1795162583 = nimCopy(null, jsonValueText__apiZclient_u28(integration_1795162593, [109,111,100,101]), NTI33554449);
+              }
+
+              i_570426634 += 1;
+              if (!(((colontmp__570426633).length == L_570426635))) {
+              failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
+              }
+
+            }
+        };
+      };
+    };
+    }
+
+    }
+
+    result_1795162554 = {paloAltoConfigured: configured_1795162581, paloAltoHost: nimCopy(null, host_1795162582, NTI33554449), paloAltoMode: nimCopy(null, mode_1795162583, NTI33554449)};
+
+  return result_1795162554;
+
+}
+async function refreshIntegrationStatus__appZbackend95bridge_u129(state_p0) {
+  var result_1778385028 = null;
+
+  BeforeRet: {
+++excHandler;
+    try {
+    var integrations_1778385038 = (await getIntegrationStatus__apiZclient_u439());
+    state_p0.system.paloAltoConfigured = integrations_1778385038.paloAltoConfigured;
+    state_p0.system.paloAltoHost = nimCopy(null, integrations_1778385038.paloAltoHost, NTI33554449);
+    state_p0.system.paloAltoMode = nimCopy(null, integrations_1778385038.paloAltoMode, NTI33554449);
+    state_p0.system.integrationsError = nimCopy(null, [], NTI33554449);
+    Label2: {
+      var i_1778385046 = 0;
+      var colontmp__570426627 = 0;
+      colontmp__570426627 = (state_p0.plugins).length;
+      var i_570426628 = 0;
+      Label3: {
+          Label4: while (true) {
+          if (!(i_570426628 < colontmp__570426627)) break Label4;
+            i_1778385046 = i_570426628;
+            if (eqStrings(state_p0.plugins[chckIndx(i_1778385046, 0, (state_p0.plugins).length - 1)].id, [112,97,108,111,45,97,108,116,111])) {
+            state_p0.plugins[chckIndx(i_1778385046, 0, (state_p0.plugins).length - 1)].connected = integrations_1778385038.paloAltoConfigured;
+            break Label2;
+            }
+
+            i_570426628 = addInt(i_570426628, 1);
+          }
+      };
+    };
+--excHandler;
+} catch (EXCEPTION) {
+ var prevJSError = lastJSError;
+ lastJSError = EXCEPTION;
+ --excHandler;
+    if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
+    var exc_1778385047 = getCurrentException();
+    state_p0.system.integrationsError = nimCopy(null, exc_1778385047.message, NTI33554449);
+    }
+    else {
+        reraiseException();
+    }
+    lastJSError = prevJSError;
+    } finally {
+    }
     result_1778385028 = undefined;
     break BeforeRet;
   };
@@ -8192,18 +8310,32 @@ async function refreshSystemStatus__appZbackend95bridge_u129(state_p0) {
   return result_1778385028;
 
 }
+async function refreshSystemStatus__appZbackend95bridge_u184(state_p0) {
+  var result_1778385083 = null;
 
-function toggleHeaderMenu__appZstate_u415(state_p0) {
-    state_p0.headerMenuOpen = !(state_p0.headerMenuOpen);
+  BeforeRet: {
+    (await refreshSystemStatusBase__appZbackend95bridge_u169(state_p0));
+    (await refreshIntegrationStatus__appZbackend95bridge_u129(state_p0));
+    redraw__pkgZkaraxZkarax_u1550(kxi__);
+    result_1778385083 = undefined;
+    break BeforeRet;
+  };
 
-  
+  return result_1778385083;
+
 }
 
-function toggleInspector__appZstate_u413(state_p0) {
+function toggleHeaderMenu__appZstate_u423(state_p0) {
+    state_p0.headerMenuOpen = !(state_p0.headerMenuOpen);
+
+
+}
+
+function toggleInspector__appZstate_u421(state_p0) {
     state_p0.inspectorOpen = !(state_p0.inspectorOpen);
     state_p0.headerMenuOpen = false;
 
-  
+
 }
 
 function clearAuthenticatedState__appZauth95bridge_u25(state_p0) {
@@ -8227,7 +8359,7 @@ function clearAuthenticatedState__appZauth95bridge_u25(state_p0) {
     if (state_p0.runEvents.length < 0) { for (var i = state_p0.runEvents.length ; i < 0 ; ++i) state_p0.runEvents.push(({id: 0, kind: [], message: []})); }
                else { state_p0.runEvents.length = 0; };
 
-  
+
 }
 async function logout__apiZauth95client_u594(csrfToken_p0) {
   var result_1509950037 = null;
@@ -8239,7 +8371,7 @@ async function logout__apiZauth95client_u594(csrfToken_p0) {
     if (!(response_1509950052.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950052.status), responseBody_1509950057), "ValueError");
     }
-    
+
     result_1509950037 = undefined;
     break BeforeRet;
   };
@@ -8247,18 +8379,18 @@ async function logout__apiZauth95client_u594(csrfToken_p0) {
   return result_1509950037;
 
 }
-async function logoutApplication__appZauth95bridge_u415(state_p0) {
-  var result_1459618210 = null;
+async function logoutApplication__appZauth95bridge_u399(state_p0) {
+  var result_1459618194 = null;
 
   BeforeRet: {
     if (!(state_p0.auth.authenticated)) {
     clearAuthenticatedState__appZauth95bridge_u25(state_p0);
     state_p0.auth.checked = true;
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618210 = undefined;
+    result_1459618194 = undefined;
     break BeforeRet;
     }
-    
+
     state_p0.auth.loading = true;
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
@@ -8283,11 +8415,11 @@ async function logoutApplication__appZauth95bridge_u415(state_p0) {
     state_p0.auth.mode = 0;
     state_p0.auth.notice = nimCopy(null, [83,105,103,110,101,100,32,111,117,116,46], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618210 = undefined;
+    result_1459618194 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618210;
+  return result_1459618194;
 
 }
 
@@ -8296,42 +8428,42 @@ function renderHeaderMenu__agentic70rontend_u402() {
 
 function HEX3Aanonymous__agentic70rontend_u410(event_p0, node_p1) {
     appState_570425362[0].headerMenuOpen = false;
-    (createNewChat__appZauth95bridge_u429(appState_570425362[0]));
+    (createNewChat__appZauth95bridge_u413(appState_570425362[0]));
 
-  
+
 }
     var Temporary2;
 
 function HEX3Aanonymous__agentic70rontend_u413(event_p0, node_p1) {
     appState_570425362[0].headerMenuOpen = false;
-    setActiveView__appZstate_u407(appState_570425362[0], 10);
-    (loadAuthSessions__appZauth95bridge_u626(appState_570425362[0]));
+    setActiveView__appZstate_u415(appState_570425362[0], 10);
+    (loadAuthSessions__appZauth95bridge_u610(appState_570425362[0]));
 
-  
+
 }
     var Temporary3;
 
 function HEX3Aanonymous__agentic70rontend_u416(event_p0, node_p1) {
     appState_570425362[0].headerMenuOpen = false;
-    setActiveView__appZstate_u407(appState_570425362[0], 5);
-    (refreshSystemStatus__appZbackend95bridge_u129(appState_570425362[0]));
+    setActiveView__appZstate_u415(appState_570425362[0], 5);
+    (refreshSystemStatus__appZbackend95bridge_u184(appState_570425362[0]));
 
-  
+
 }
     var Temporary4;
 
 function HEX3Aanonymous__agentic70rontend_u419(event_p0, node_p1) {
-    toggleInspector__appZstate_u413(appState_570425362[0]);
+    toggleInspector__appZstate_u421(appState_570425362[0]);
 
-  
+
 }
     var Temporary5;
 
 function HEX3Aanonymous__agentic70rontend_u422(event_p0, node_p1) {
     appState_570425362[0].headerMenuOpen = false;
-    (logoutApplication__appZauth95bridge_u415(appState_570425362[0]));
+    (logoutApplication__appZauth95bridge_u399(appState_570425362[0]));
 
-  
+
 }
 
   var result_570425747 = null;
@@ -8360,7 +8492,7 @@ function HEX3Aanonymous__agentic70rontend_u422(event_p0, node_p1) {
     else {
     add__pkgZkaraxZvdom_u857(tmp_570425752, text__pkgZkaraxZvdom_u1011([68,101,118,101,108,111,112,101,114,32,100,105,97,103,110,111,115,116,105,99,115]));
     }
-    
+
     Temporary4 = HEX3Aanonymous__agentic70rontend_u419.bind(null); Temporary4.ClP_0 = HEX3Aanonymous__agentic70rontend_u419; Temporary4.ClE_0 = null;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_570425752, 0, Temporary4, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_570425748, tmp_570425752);
@@ -8413,26 +8545,26 @@ function renderSection__componentsZresult95card_u14(section_p0) {
       tmp_1862270996.class = "result-card-list";
       Label1: {
         var item_1862271002 = [];
-        var i_570426648 = 0;
-        var L_570426649 = (section_p0.items).length;
+        var i_570426659 = 0;
+        var L_570426660 = (section_p0.items).length;
         Label2: {
             Label3: while (true) {
-            if (!(i_570426648 < L_570426649)) break Label3;
-              item_1862271002 = section_p0.items[chckIndx(i_570426648, 0, (section_p0.items).length - 1)];
+            if (!(i_570426659 < L_570426660)) break Label3;
+              item_1862271002 = section_p0.items[chckIndx(i_570426659, 0, (section_p0.items).length - 1)];
               var tmp_1862270997 = tree__pkgZkaraxZvdom_u943(38, []);
               add__pkgZkaraxZvdom_u857(tmp_1862270997, text__pkgZkaraxZvdom_u1011(item_1862271002));
               add__pkgZkaraxZvdom_u857(tmp_1862270996, tmp_1862270997);
-              i_570426648 += 1;
-              if (!(((section_p0.items).length == L_570426649))) {
+              i_570426659 += 1;
+              if (!(((section_p0.items).length == L_570426660))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
       add__pkgZkaraxZvdom_u857(tmp_1862270993, tmp_1862270996);
       break;
-    default: 
+    default:
       var tmp_1862270998 = tree__pkgZkaraxZvdom_u943(32, []);
       tmp_1862270998.class = "result-card-text";
       add__pkgZkaraxZvdom_u857(tmp_1862270998, text__pkgZkaraxZvdom_u1011(section_p0.content));
@@ -8472,47 +8604,47 @@ function renderResultCard__componentsZresult95card_u27(card_p0) {
     tmp_1862271012.class = "result-card-fields";
     Label1: {
       var field_1862271039 = ({label: [], value: []});
-      var i_570426638 = 0;
-      var L_570426639 = (card_p0.fields).length;
+      var i_570426649 = 0;
+      var L_570426650 = (card_p0.fields).length;
       Label2: {
           Label3: while (true) {
-          if (!(i_570426638 < L_570426639)) break Label3;
-            field_1862271039 = card_p0.fields[chckIndx(i_570426638, 0, (card_p0.fields).length - 1)];
+          if (!(i_570426649 < L_570426650)) break Label3;
+            field_1862271039 = card_p0.fields[chckIndx(i_570426649, 0, (card_p0.fields).length - 1)];
             add__pkgZkaraxZvdom_u857(tmp_1862271012, renderField__componentsZresult95card_u8(field_1862271039));
-            i_570426638 += 1;
-            if (!(((card_p0.fields).length == L_570426639))) {
+            i_570426649 += 1;
+            if (!(((card_p0.fields).length == L_570426650))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
     add__pkgZkaraxZvdom_u857(tmp_1862271006, tmp_1862271012);
     }
-    
+
     if ((0 < (card_p0.sections).length)) {
     var tmp_1862271013 = tree__pkgZkaraxZvdom_u943(44, []);
     tmp_1862271013.class = "result-card-sections";
     Label4: {
       var section_1862271065 = ({kind: [], title: [], content: [], items: []});
-      var i_570426643 = 0;
-      var L_570426644 = (card_p0.sections).length;
+      var i_570426654 = 0;
+      var L_570426655 = (card_p0.sections).length;
       Label5: {
           Label6: while (true) {
-          if (!(i_570426643 < L_570426644)) break Label6;
-            section_1862271065 = card_p0.sections[chckIndx(i_570426643, 0, (card_p0.sections).length - 1)];
+          if (!(i_570426654 < L_570426655)) break Label6;
+            section_1862271065 = card_p0.sections[chckIndx(i_570426654, 0, (card_p0.sections).length - 1)];
             add__pkgZkaraxZvdom_u857(tmp_1862271013, renderSection__componentsZresult95card_u14(section_1862271065));
-            i_570426643 += 1;
-            if (!(((card_p0.sections).length == L_570426644))) {
+            i_570426654 += 1;
+            if (!(((card_p0.sections).length == L_570426655))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
     add__pkgZkaraxZvdom_u857(tmp_1862271006, tmp_1862271013);
     }
-    
+
     result_1862271005 = tmp_1862271006;
 
   return result_1862271005;
@@ -8558,30 +8690,30 @@ function renderMessage__componentsZchat_u10(message_p0) {
       add__pkgZkaraxZvdom_u857(tmp_1845493781, text__pkgZkaraxZvdom_u1011(message_p0.content));
       add__pkgZkaraxZvdom_u857(tmp_1845493779, tmp_1845493781);
       }
-      
+
       if ((0 < (message_p0.cards).length)) {
       var tmp_1845493782 = tree__pkgZkaraxZvdom_u943(44, []);
       tmp_1845493782.class = "message-result-cards";
       Label1: {
         var card_1845493807 = ({schema: [], kind: [], title: [], status: [], fields: [], sections: []});
-        var i_570426633 = 0;
-        var L_570426634 = (message_p0.cards).length;
+        var i_570426644 = 0;
+        var L_570426645 = (message_p0.cards).length;
         Label2: {
             Label3: while (true) {
-            if (!(i_570426633 < L_570426634)) break Label3;
-              card_1845493807 = message_p0.cards[chckIndx(i_570426633, 0, (message_p0.cards).length - 1)];
+            if (!(i_570426644 < L_570426645)) break Label3;
+              card_1845493807 = message_p0.cards[chckIndx(i_570426644, 0, (message_p0.cards).length - 1)];
               add__pkgZkaraxZvdom_u857(tmp_1845493782, renderResultCard__componentsZresult95card_u27(card_1845493807));
-              i_570426633 += 1;
-              if (!(((message_p0.cards).length == L_570426634))) {
+              i_570426644 += 1;
+              if (!(((message_p0.cards).length == L_570426645))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
       add__pkgZkaraxZvdom_u857(tmp_1845493779, tmp_1845493782);
       }
-      
+
       add__pkgZkaraxZvdom_u857(tmp_1845493777, tmp_1845493779);
       result_1845493772 = tmp_1845493777;
       break;
@@ -8590,23 +8722,23 @@ function renderMessage__componentsZchat_u10(message_p0) {
   return result_1845493772;
 
 }
-async function approveJob__apiZclient_u576(jobId_p0, csrfToken_p1) {
-  var result_1795162692 = null;
+async function approveJob__apiZclient_u667(jobId_p0, csrfToken_p1) {
+  var result_1795162783 = null;
 
-    var headers_1795162702 = new Headers();
-    headers_1795162702.set("Content-Type", "application/json");
-    headers_1795162702.set("X-CSRF-Token", toJSStr(csrfToken_p1));
-    var options_1795162703 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", headers_1795162702);
-    var response_1795162712 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,106,111,98,115,47],jobId_p0,[47,97,112,112,114,111,118,101])), options_1795162703));
-    var responseBody_1795162717 = cstrToNimstr((await response_1795162712.text()));
-    if (!(response_1795162712.ok)) {
-    raiseException(publicApiError__apiZclient_u46(HEX24__systemZdollars_u29(response_1795162712.status), responseBody_1795162717), "ValueError");
+    var headers_1795162793 = new Headers();
+    headers_1795162793.set("Content-Type", "application/json");
+    headers_1795162793.set("X-CSRF-Token", toJSStr(csrfToken_p1));
+    var options_1795162794 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", headers_1795162793);
+    var response_1795162803 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,106,111,98,115,47],jobId_p0,[47,97,112,112,114,111,118,101])), options_1795162794));
+    var responseBody_1795162808 = cstrToNimstr((await response_1795162803.text()));
+    if (!(response_1795162803.ok)) {
+    raiseException(publicApiError__apiZclient_u50(HEX24__systemZdollars_u29(response_1795162803.status), responseBody_1795162808), "ValueError");
     }
-    
-    var data_1795162718 = parseJson__pureZjson_u5285(responseBody_1795162717);
-    result_1795162692 = parseJobResponse__apiZclient_u322(data_1795162718);
 
-  return result_1795162692;
+    var data_1795162809 = parseJson__pureZjson_u5285(responseBody_1795162808);
+    result_1795162783 = parseJobResponse__apiZclient_u326(data_1795162809);
+
+  return result_1795162783;
 
 }
 async function approvePendingJob__appZbackend95bridge_u109(state_p0) {
@@ -8614,25 +8746,25 @@ async function approvePendingJob__appZbackend95bridge_u109(state_p0) {
 
   BeforeRet: {
     if ((!(state_p0.run.active) || ((state_p0.run.jobId).length == 0))) {
-    showToast__appZstate_u402(state_p0, [84,104,101,114,101,32,105,115,32,110,111,32,98,97,99,107,101,110,100,32,106,111,98,32,116,111,32,97,112,112,114,111,118,101,46]);
+    showToast__appZstate_u410(state_p0, [84,104,101,114,101,32,105,115,32,110,111,32,98,97,99,107,101,110,100,32,106,111,98,32,116,111,32,97,112,112,114,111,118,101,46]);
     result_1778385008 = undefined;
     break BeforeRet;
     }
-    
+
     if (!(eqStrings(state_p0.run.status, [119,97,105,116,105,110,103,95,97,112,112,114,111,118,97,108]))) {
-    showToast__appZstate_u402(state_p0, [84,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,105,115,32,110,111,116,32,119,97,105,116,105,110,103,32,102,111,114,32,97,112,112,114,111,118,97,108,46]);
+    showToast__appZstate_u410(state_p0, [84,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,105,115,32,110,111,116,32,119,97,105,116,105,110,103,32,102,111,114,32,97,112,112,114,111,118,97,108,46]);
     result_1778385008 = undefined;
     break BeforeRet;
     }
-    
+
     var jobId_1778385014 = nimCopy(null, state_p0.run.jobId, NTI33554449);
     state_p0.run.status = nimCopy(null, [97,112,112,114,111,118,105,110,103], NTI33554449);
-    addRunEvent__appZstate_u544(state_p0, [97,112,112,114,111,118,97,108], [83,117,98,109,105,116,116,105,110,103,32,101,120,112,108,105,99,105,116,32,97,112,112,114,111,118,97,108,32,116,111,32,80,104,111,101,110,105,120,46]);
-    showToast__appZstate_u402(state_p0, [65,112,112,114,111,118,105,110,103,226,128,166]);
+    addRunEvent__appZstate_u552(state_p0, [97,112,112,114,111,118,97,108], [83,117,98,109,105,116,116,105,110,103,32,101,120,112,108,105,99,105,116,32,97,112,112,114,111,118,97,108,32,116,111,32,80,104,111,101,110,105,120,46]);
+    showToast__appZstate_u410(state_p0, [65,112,112,114,111,118,105,110,103,226,128,166]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var job_1778385019 = (await approveJob__apiZclient_u576(jobId_1778385014, state_p0.auth.csrfToken));
+    var job_1778385019 = (await approveJob__apiZclient_u667(jobId_1778385014, state_p0.auth.csrfToken));
     applyJobState__appZbackend95bridge_u15(state_p0, job_1778385019);
     switch (toJSStr(job_1778385019.status)) {
     case "completed":
@@ -8647,13 +8779,13 @@ async function approvePendingJob__appZbackend95bridge_u109(state_p0) {
     case "pending":
     case "processing":
     case "approving":
-      addRunEvent__appZstate_u544(state_p0, [97,112,112,114,111,118,97,108], [65,112,112,114,111,118,97,108,32,119,97,115,32,97,99,99,101,112,116,101,100,59,32,119,97,105,116,105,110,103,32,102,111,114,32,100,117,114,97,98,108,101,32,101,120,101,99,117,116,105,111,110,32,116,111,32,102,105,110,105,115,104,46]);
+      addRunEvent__appZstate_u552(state_p0, [97,112,112,114,111,118,97,108], [65,112,112,114,111,118,97,108,32,119,97,115,32,97,99,99,101,112,116,101,100,59,32,119,97,105,116,105,110,103,32,102,111,114,32,100,117,114,97,98,108,101,32,101,120,101,99,117,116,105,111,110,32,116,111,32,102,105,110,105,115,104,46]);
       redraw__pkgZkaraxZkarax_u1550(kxi__);
       (await pollBackendJob__appZbackend95bridge_u39(state_p0, jobId_1778385014, false));
       break;
-    default: 
-      addRunEvent__appZstate_u544(state_p0, [97,112,112,114,111,118,97,108], [65,112,112,114,111,118,97,108,32,114,101,116,117,114,110,101,100,32,97,32,106,111,98,32,115,116,97,116,101,32,116,104,105,115,32,102,114,111,110,116,101,110,100,32,100,111,101,115,32,110,111,116,32,121,101,116,32,114,101,110,100,101,114,46]);
-      showToast__appZstate_u402(state_p0, [65,112,112,114,111,118,97,108,32,115,116,97,116,101,32,99,104,97,110,103,101,100,46,32,82,101,102,114,101,115,104,32,116,104,101,32,99,104,97,116,32,116,111,32,99,111,110,116,105,110,117,101,46]);
+    default:
+      addRunEvent__appZstate_u552(state_p0, [97,112,112,114,111,118,97,108], [65,112,112,114,111,118,97,108,32,114,101,116,117,114,110,101,100,32,97,32,106,111,98,32,115,116,97,116,101,32,116,104,105,115,32,102,114,111,110,116,101,110,100,32,100,111,101,115,32,110,111,116,32,121,101,116,32,114,101,110,100,101,114,46]);
+      showToast__appZstate_u410(state_p0, [65,112,112,114,111,118,97,108,32,115,116,97,116,101,32,99,104,97,110,103,101,100,46,32,82,101,102,114,101,115,104,32,116,104,101,32,99,104,97,116,32,116,111,32,99,111,110,116,105,110,117,101,46]);
       break;
     }
 --excHandler;
@@ -8663,8 +8795,8 @@ async function approvePendingJob__appZbackend95bridge_u109(state_p0) {
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
     state_p0.run.status = nimCopy(null, [119,97,105,116,105,110,103,95,97,112,112,114,111,118,97,108], NTI33554449);
-    addRunEvent__appZstate_u544(state_p0, [99,111,110,110,101,99,116,105,111,110], [84,104,101,32,97,112,112,114,111,118,97,108,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,100,101,108,105,118,101,114,101,100,46]);
-    showToast__appZstate_u402(state_p0, [65,112,112,114,111,118,97,108,32,114,101,113,117,101,115,116,32,102,97,105,108,101,100,46,32,84,114,121,32,97,103,97,105,110,46]);
+    addRunEvent__appZstate_u552(state_p0, [99,111,110,110,101,99,116,105,111,110], [84,104,101,32,97,112,112,114,111,118,97,108,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,100,101,108,105,118,101,114,101,100,46]);
+    showToast__appZstate_u410(state_p0, [65,112,112,114,111,118,97,108,32,114,101,113,117,101,115,116,32,102,97,105,108,101,100,46,32,84,114,121,32,97,103,97,105,110,46]);
     }
     else {
     	reraiseException();
@@ -8684,7 +8816,7 @@ async function approvePendingJob__appZbackend95bridge_u109(state_p0) {
 function HEX3Aanonymous__componentsZchat_u74(event_p0, node_p1) {
     (approvePendingJob__appZbackend95bridge_u109(this.state0));
 
-  
+
 }
 
 function renderApprovalAction__componentsZchat_u64(state_p0) {
@@ -8692,9 +8824,9 @@ function renderApprovalAction__componentsZchat_u64(state_p0) {
 
   var result_1845493826 = null;
 
-    var HEX3Aenv_570426654 = null;
-    HEX3Aenv_570426654 = {m_type: NTI570426863, state0: null};
-    HEX3Aenv_570426654.state0 = state_p0;
+    var HEX3Aenv_570426665 = null;
+    HEX3Aenv_570426665 = {m_type: NTI570426864, state0: null};
+    HEX3Aenv_570426665.state0 = state_p0;
     var tmp_1845493827 = tree__pkgZkaraxZvdom_u943(44, []);
     tmp_1845493827.class = "message-row assistant";
     var tmp_1845493828 = tree__pkgZkaraxZvdom_u943(44, []);
@@ -8716,7 +8848,7 @@ function renderApprovalAction__componentsZchat_u64(state_p0) {
     tmp_1845493833.class = "inspector-toggle";
     setAttr__pkgZkaraxZvdom_u772(tmp_1845493833, "title", "Approve and execute this governed action");
     add__pkgZkaraxZvdom_u857(tmp_1845493833, text__pkgZkaraxZvdom_u1011([65,112,112,114,111,118,101,32,97,99,116,105,111,110]));
-    Temporary1 = HEX3Aanonymous__componentsZchat_u74.bind(HEX3Aenv_570426654); Temporary1.ClP_0 = HEX3Aanonymous__componentsZchat_u74; Temporary1.ClE_0 = HEX3Aenv_570426654;
+    Temporary1 = HEX3Aanonymous__componentsZchat_u74.bind(HEX3Aenv_570426665); Temporary1.ClP_0 = HEX3Aanonymous__componentsZchat_u74; Temporary1.ClE_0 = HEX3Aenv_570426665;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1845493833, 0, Temporary1, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1845493831, tmp_1845493833);
     add__pkgZkaraxZvdom_u857(tmp_1845493829, tmp_1845493831);
@@ -8765,27 +8897,27 @@ function renderChat__componentsZchat_u77(state_p0) {
     else {
       Label1: {
         var message_1845493874 = ({id: 0, role: 0, content: [], cards: []});
-        var i_570426628 = 0;
-        var L_570426629 = (state_p0.messages).length;
+        var i_570426639 = 0;
+        var L_570426640 = (state_p0.messages).length;
         Label2: {
             Label3: while (true) {
-            if (!(i_570426628 < L_570426629)) break Label3;
-              message_1845493874 = state_p0.messages[chckIndx(i_570426628, 0, (state_p0.messages).length - 1)];
+            if (!(i_570426639 < L_570426640)) break Label3;
+              message_1845493874 = state_p0.messages[chckIndx(i_570426639, 0, (state_p0.messages).length - 1)];
               add__pkgZkaraxZvdom_u857(tmp_1845493840, renderMessage__componentsZchat_u10(message_1845493874));
-              i_570426628 += 1;
-              if (!(((state_p0.messages).length == L_570426629))) {
+              i_570426639 += 1;
+              if (!(((state_p0.messages).length == L_570426640))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
       if ((state_p0.run.active && eqStrings(state_p0.run.status, [119,97,105,116,105,110,103,95,97,112,112,114,111,118,97,108]))) {
       add__pkgZkaraxZvdom_u857(tmp_1845493840, renderApprovalAction__componentsZchat_u64(state_p0));
       }
-      
+
     }
-    
+
     result_1845493839 = tmp_1845493840;
 
   return result_1845493839;
@@ -8795,13 +8927,13 @@ function renderChat__componentsZchat_u77(state_p0) {
 function nsuToLowerAsciiChar(c_p0) {
   var result_905969751 = 0;
 
-    if ((ConstSet37[c_p0] != undefined)) {
+    if ((ConstSet38[c_p0] != undefined)) {
     result_905969751 = (c_p0 ^ 32);
     }
     else {
       result_905969751 = c_p0;
     }
-    
+
 
   return result_905969751;
 
@@ -8813,15 +8945,15 @@ function nsuToLowerAsciiStr(s_p0) {
     result_905969761 = nimCopy(null, mnewString(chckRange((s_p0).length, 0, 2147483647)), NTI33554449);
     Label1: {
       var iHEX60gensym7_905969767 = 0;
-      var colontmp__570426696 = 0;
-      colontmp__570426696 = subInt((s_p0).length, 1);
-      var res_570426697 = 0;
+      var colontmp__570426707 = 0;
+      colontmp__570426707 = subInt((s_p0).length, 1);
+      var res_570426708 = 0;
       Label2: {
           Label3: while (true) {
-          if (!(res_570426697 <= colontmp__570426696)) break Label3;
-            iHEX60gensym7_905969767 = res_570426697;
+          if (!(res_570426708 <= colontmp__570426707)) break Label3;
+            iHEX60gensym7_905969767 = res_570426708;
             result_905969761[chckIndx(iHEX60gensym7_905969767, 0, (result_905969761).length - 1)] = nsuToLowerAsciiChar(s_p0[chckIndx(iHEX60gensym7_905969767, 0, (s_p0).length - 1)]);
-            res_570426697 = addInt(res_570426697, 1);
+            res_570426708 = addInt(res_570426708, 1);
           }
       };
     };
@@ -8838,12 +8970,12 @@ function nsuFindStr(s_p0, sub_p1, start_p2, last_p3) {
     result_905971405 = (-1);
     break BeforeRet;
     }
-    
+
     if (((sub_p1).length == 1)) {
     result_905971405 = nsuFindChar(s_p0, sub_p1[chckIndx(0, 0, (sub_p1).length - 1)], start_p2, last_p3);
     break BeforeRet;
     }
-    
+
     result_905971405 = nsuFindStrA(nsuInitNewSkipTable(sub_p1), s_p0, sub_p1, start_p2, last_p3);
   };
 
@@ -8863,57 +8995,57 @@ function contains__pureZstrutils_u1879(s_p0, sub_p1) {
 
 }
 
-function setSearchDraft__appZstate_u420(state_p0, value_p1) {
+function setSearchDraft__appZstate_u428(state_p0, value_p1) {
     state_p0.searchDraft = nimCopy(null, value_p1, NTI33554449);
 
-  
+
 }
 
 function renderSearchView__agentic70rontend_u23() {
     var Temporary4;
 
 function HEX3Aanonymous__agentic70rontend_u52(event_p0, node_p1) {
-    setSearchDraft__appZstate_u420(appState_570425362[0], cstrToNimstr(value__pkgZkaraxZvdom_u474(node_p1)));
+    setSearchDraft__appZstate_u428(appState_570425362[0], cstrToNimstr(value__pkgZkaraxZvdom_u474(node_p1)));
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 
-  
+
 }
     var Temporary5;
 
 function HEX3Aanonymous__agentic70rontend_u55(event_p0, node_p1) {
-    setSearchDraft__appZstate_u420(appState_570425362[0], []);
+    setSearchDraft__appZstate_u428(appState_570425362[0], []);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 
-  
+
 }
 
   var result_570425368 = null;
 
-    var query_570425369 = nsuToLowerAsciiStr(nsuStrip(appState_570425362[0].searchDraft, true, true, ConstSet38));
+    var query_570425369 = nsuToLowerAsciiStr(nsuStrip(appState_570425362[0].searchDraft, true, true, ConstSet39));
     var resultCount_570425370 = 0;
     if ((0 < (query_570425369).length)) {
     Label1: {
       var message_570425374 = ({id: 0, role: 0, content: [], cards: []});
-      var i_570426688 = 0;
-      var L_570426689 = (appState_570425362[0].messages).length;
+      var i_570426699 = 0;
+      var L_570426700 = (appState_570425362[0].messages).length;
       Label2: {
           Label3: while (true) {
-          if (!(i_570426688 < L_570426689)) break Label3;
-            message_570425374 = appState_570425362[0].messages[chckIndx(i_570426688, 0, (appState_570425362[0].messages).length - 1)];
+          if (!(i_570426699 < L_570426700)) break Label3;
+            message_570425374 = appState_570425362[0].messages[chckIndx(i_570426699, 0, (appState_570425362[0].messages).length - 1)];
             if (contains__pureZstrutils_u1879(nsuToLowerAsciiStr(message_570425374.content), query_570425369)) {
             resultCount_570425370 = addInt(resultCount_570425370, 1);
             }
-            
-            i_570426688 += 1;
-            if (!(((appState_570425362[0].messages).length == L_570426689))) {
+
+            i_570426699 += 1;
+            if (!(((appState_570425362[0].messages).length == L_570426700))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
     }
-    
+
     var tmp_570425380 = tree__pkgZkaraxZvdom_u943(17, []);
     tmp_570425380.class = "conversation";
     var tmp_570425381 = tree__pkgZkaraxZvdom_u943(44, []);
@@ -8951,7 +9083,7 @@ function HEX3Aanonymous__agentic70rontend_u55(event_p0, node_p1) {
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_570425389, 0, Temporary5, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_570425386, tmp_570425389);
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_570425381, tmp_570425386);
     if (((query_570425369).length == 0)) {
     var tmp_570425390 = tree__pkgZkaraxZvdom_u943(44, []);
@@ -8971,12 +9103,12 @@ function HEX3Aanonymous__agentic70rontend_u55(event_p0, node_p1) {
       tmp_570425392.class = "search-results";
       Label6: {
         var message_570425405 = ({id: 0, role: 0, content: [], cards: []});
-        var i_570426692 = 0;
-        var L_570426693 = (appState_570425362[0].messages).length;
+        var i_570426703 = 0;
+        var L_570426704 = (appState_570425362[0].messages).length;
         Label7: {
             Label8: while (true) {
-            if (!(i_570426692 < L_570426693)) break Label8;
-              message_570425405 = appState_570425362[0].messages[chckIndx(i_570426692, 0, (appState_570425362[0].messages).length - 1)];
+            if (!(i_570426703 < L_570426704)) break Label8;
+              message_570425405 = appState_570425362[0].messages[chckIndx(i_570426703, 0, (appState_570425362[0].messages).length - 1)];
               if (contains__pureZstrutils_u1879(nsuToLowerAsciiStr(message_570425405.content), query_570425369)) {
               var tmp_570425393 = tree__pkgZkaraxZvdom_u943(44, []);
               tmp_570425393.class = "search-result";
@@ -8995,12 +9127,12 @@ function HEX3Aanonymous__agentic70rontend_u55(event_p0, node_p1) {
               add__pkgZkaraxZvdom_u857(tmp_570425393, tmp_570425395);
               add__pkgZkaraxZvdom_u857(tmp_570425392, tmp_570425393);
               }
-              
-              i_570426692 += 1;
-              if (!(((appState_570425362[0].messages).length == L_570426693))) {
+
+              i_570426703 += 1;
+              if (!(((appState_570425362[0].messages).length == L_570426704))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
@@ -9018,9 +9150,9 @@ function renderActivityView__agentic70rontend_u78() {
     var Temporary1;
 
 function HEX3Aanonymous__agentic70rontend_u112(event_p0, node_p1) {
-    setActiveView__appZstate_u407(appState_570425362[0], 0);
+    setActiveView__appZstate_u415(appState_570425362[0], 0);
 
-  
+
 }
       var Temporary2;
       var Temporary3;
@@ -9081,7 +9213,7 @@ function HEX3Aanonymous__agentic70rontend_u112(event_p0, node_p1) {
       else {
       Temporary2 = [87,97,105,116,105,110,103,32,102,111,114,32,98,97,99,107,101,110,100];
       }
-      
+
       add__pkgZkaraxZvdom_u857(tmp_570425438, text__pkgZkaraxZvdom_u1011(Temporary2));
       add__pkgZkaraxZvdom_u857(tmp_570425436, tmp_570425438);
       add__pkgZkaraxZvdom_u857(tmp_570425432, tmp_570425436);
@@ -9098,7 +9230,7 @@ function HEX3Aanonymous__agentic70rontend_u112(event_p0, node_p1) {
       else {
       Temporary3 = [84,104,105,115,32,106,111,98,32,119,97,115,32,114,101,99,111,118,101,114,101,100,32,102,114,111,109,32,100,117,114,97,98,108,101,32,99,104,97,116,32,104,105,115,116,111,114,121,46];
       }
-      
+
       add__pkgZkaraxZvdom_u857(tmp_570425441, text__pkgZkaraxZvdom_u1011(Temporary3));
       add__pkgZkaraxZvdom_u857(tmp_570425439, tmp_570425441);
       add__pkgZkaraxZvdom_u857(tmp_570425432, tmp_570425439);
@@ -9119,12 +9251,12 @@ function HEX3Aanonymous__agentic70rontend_u112(event_p0, node_p1) {
       tmp_570425446.class = "activity-timeline";
       Label4: {
         var runEvent_570425468 = ({id: 0, kind: [], message: []});
-        var i_570426701 = 0;
-        var L_570426702 = (appState_570425362[0].runEvents).length;
+        var i_570426712 = 0;
+        var L_570426713 = (appState_570425362[0].runEvents).length;
         Label5: {
             Label6: while (true) {
-            if (!(i_570426701 < L_570426702)) break Label6;
-              runEvent_570425468 = appState_570425362[0].runEvents[chckIndx(i_570426701, 0, (appState_570425362[0].runEvents).length - 1)];
+            if (!(i_570426712 < L_570426713)) break Label6;
+              runEvent_570425468 = appState_570425362[0].runEvents[chckIndx(i_570426712, 0, (appState_570425362[0].runEvents).length - 1)];
               var tmp_570425447 = tree__pkgZkaraxZvdom_u943(44, []);
               tmp_570425447.class = "activity-event";
               var tmp_570425448 = tree__pkgZkaraxZvdom_u943(71, []);
@@ -9140,18 +9272,18 @@ function HEX3Aanonymous__agentic70rontend_u112(event_p0, node_p1) {
               add__pkgZkaraxZvdom_u857(tmp_570425449, tmp_570425451);
               add__pkgZkaraxZvdom_u857(tmp_570425447, tmp_570425449);
               add__pkgZkaraxZvdom_u857(tmp_570425446, tmp_570425447);
-              i_570426701 += 1;
-              if (!(((appState_570425362[0].runEvents).length == L_570426702))) {
+              i_570426712 += 1;
+              if (!(((appState_570425362[0].runEvents).length == L_570426713))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
       add__pkgZkaraxZvdom_u857(tmp_570425442, tmp_570425446);
       add__pkgZkaraxZvdom_u857(tmp_570425425, tmp_570425442);
       }
-      
+
       if ((0 < (appState_570425362[0].run.presentations).length)) {
       var tmp_570425452 = tree__pkgZkaraxZvdom_u943(44, []);
       tmp_570425452.class = "activity-section";
@@ -9165,27 +9297,27 @@ function HEX3Aanonymous__agentic70rontend_u112(event_p0, node_p1) {
       tmp_570425455.class = "run-result-cards";
       Label7: {
         var card_570425475 = ({schema: [], kind: [], title: [], status: [], fields: [], sections: []});
-        var i_570426705 = 0;
-        var L_570426706 = (appState_570425362[0].run.presentations).length;
+        var i_570426716 = 0;
+        var L_570426717 = (appState_570425362[0].run.presentations).length;
         Label8: {
             Label9: while (true) {
-            if (!(i_570426705 < L_570426706)) break Label9;
-              card_570425475 = appState_570425362[0].run.presentations[chckIndx(i_570426705, 0, (appState_570425362[0].run.presentations).length - 1)];
+            if (!(i_570426716 < L_570426717)) break Label9;
+              card_570425475 = appState_570425362[0].run.presentations[chckIndx(i_570426716, 0, (appState_570425362[0].run.presentations).length - 1)];
               add__pkgZkaraxZvdom_u857(tmp_570425455, renderResultCard__componentsZresult95card_u27(card_570425475));
-              i_570426705 += 1;
-              if (!(((appState_570425362[0].run.presentations).length == L_570426706))) {
+              i_570426716 += 1;
+              if (!(((appState_570425362[0].run.presentations).length == L_570426717))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
       add__pkgZkaraxZvdom_u857(tmp_570425452, tmp_570425455);
       add__pkgZkaraxZvdom_u857(tmp_570425425, tmp_570425452);
       }
-      
+
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_570425424, tmp_570425425);
     result_570425423 = tmp_570425424;
 
@@ -9199,9 +9331,9 @@ function renderSystemView__agentic70rontend_u132() {
     var Temporary3;
 
 function HEX3Aanonymous__agentic70rontend_u165(event_p0, node_p1) {
-    (refreshSystemStatus__appZbackend95bridge_u129(appState_570425362[0]));
+    (refreshSystemStatus__appZbackend95bridge_u184(appState_570425362[0]));
 
-  
+
 }
     var Temporary4;
     var Temporary5;
@@ -9267,7 +9399,7 @@ function HEX3Aanonymous__agentic70rontend_u165(event_p0, node_p1) {
     else {
     add__pkgZkaraxZvdom_u857(tmp_570425486, text__pkgZkaraxZvdom_u1011([82,101,102,114,101,115,104]));
     }
-    
+
     Temporary3 = HEX3Aanonymous__agentic70rontend_u165.bind(null); Temporary3.ClP_0 = HEX3Aanonymous__agentic70rontend_u165; Temporary3.ClE_0 = null;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_570425486, 0, Temporary3, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_570425482, tmp_570425486);
@@ -9363,7 +9495,7 @@ function HEX3Aanonymous__agentic70rontend_u165(event_p0, node_p1) {
     add__pkgZkaraxZvdom_u857(tmp_570425508, text__pkgZkaraxZvdom_u1011(appState_570425362[0].system.error));
     add__pkgZkaraxZvdom_u857(tmp_570425481, tmp_570425508);
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_570425480, tmp_570425481);
     result_570425477 = tmp_570425480;
 
@@ -9389,7 +9521,7 @@ function pluginDescription__agentic70rontend_u168(pluginId_p0) {
     case "knowledge":
       Temporary1 = makeNimstrLit("Knowledge and runbook retrieval can be exposed through trusted read-only capabilities.");
       break;
-    default: 
+    default:
       Temporary1 = [83,101,114,118,101,114,45,109,97,110,97,103,101,100,32,105,110,116,101,103,114,97,116,105,111,110,32,115,117,114,102,97,99,101,46];
       break;
     }
@@ -9421,12 +9553,12 @@ function renderPluginView__agentic70rontend_u171() {
     tmp_570425523.class = "plugin-grid";
     Label1: {
       var plugin_570425536 = ({id: [], name: [], connected: false});
-      var i_570426710 = 0;
-      var L_570426711 = (appState_570425362[0].plugins).length;
+      var i_570426721 = 0;
+      var L_570426722 = (appState_570425362[0].plugins).length;
       Label2: {
           Label3: while (true) {
-          if (!(i_570426710 < L_570426711)) break Label3;
-            plugin_570425536 = appState_570425362[0].plugins[chckIndx(i_570426710, 0, (appState_570425362[0].plugins).length - 1)];
+          if (!(i_570426721 < L_570426722)) break Label3;
+            plugin_570425536 = appState_570425362[0].plugins[chckIndx(i_570426721, 0, (appState_570425362[0].plugins).length - 1)];
             var currentPlugin_570425537 = nimCopy(null, plugin_570425536, NTI1426063376);
             var tmp_570425524 = tree__pkgZkaraxZvdom_u943(44, []);
             tmp_570425524.class = "plugin-card integration-card";
@@ -9448,11 +9580,11 @@ function renderPluginView__agentic70rontend_u171() {
             add__pkgZkaraxZvdom_u857(tmp_570425529, text__pkgZkaraxZvdom_u1011(pluginDescription__agentic70rontend_u168(currentPlugin_570425537.id)));
             add__pkgZkaraxZvdom_u857(tmp_570425524, tmp_570425529);
             add__pkgZkaraxZvdom_u857(tmp_570425523, tmp_570425524);
-            i_570426710 += 1;
-            if (!(((appState_570425362[0].plugins).length == L_570426711))) {
+            i_570426721 += 1;
+            if (!(((appState_570425362[0].plugins).length == L_570426722))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
@@ -9752,15 +9884,15 @@ function renderSimulatorView__agentic70rontend_u257() {
 }
 
 function HEX3Aanonymous__agentic70rontend_u332(event_p0, node_p1) {
-    (logoutApplication__appZauth95bridge_u415(appState_570425362[0]));
+    (logoutApplication__appZauth95bridge_u399(appState_570425362[0]));
 
-  
+
 }
 
 function HEX3Aanonymous__agentic70rontend_u335(event_p0, node_p1) {
-    (loadAuthSessions__appZauth95bridge_u626(appState_570425362[0]));
+    (loadAuthSessions__appZauth95bridge_u610(appState_570425362[0]));
 
-  
+
 }
 async function revokeSession__apiZauth95client_u1137(csrfToken_p0, sessionId_p1) {
   var result_1509950581 = null;
@@ -9772,7 +9904,7 @@ async function revokeSession__apiZauth95client_u1137(csrfToken_p0, sessionId_p1)
     if (!(response_1509950596.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509950596.status), responseBody_1509950601), "ValueError");
     }
-    
+
     result_1509950581 = undefined;
     break BeforeRet;
   };
@@ -9780,15 +9912,15 @@ async function revokeSession__apiZauth95client_u1137(csrfToken_p0, sessionId_p1)
   return result_1509950581;
 
 }
-async function revokeAuthSession__appZauth95bridge_u711(state_p0, sessionId_p1) {
-  var result_1459618507 = null;
+async function revokeAuthSession__appZauth95bridge_u695(state_p0, sessionId_p1) {
+  var result_1459618491 = null;
 
   BeforeRet: {
     if ((!(state_p0.auth.authenticated) || ((sessionId_p1).length == 0))) {
-    result_1459618507 = undefined;
+    result_1459618491 = undefined;
     break BeforeRet;
     }
-    
+
 ++excHandler;
     try {
     (await revokeSession__apiZauth95client_u1137(state_p0.auth.csrfToken, sessionId_p1));
@@ -9799,17 +9931,17 @@ async function revokeAuthSession__appZauth95bridge_u711(state_p0, sessionId_p1) 
     state_p0.auth.notice = nimCopy(null, [67,117,114,114,101,110,116,32,115,101,115,115,105,111,110,32,114,101,118,111,107,101,100,46], NTI33554449);
     }
     else {
-    (await loadAuthSessions__appZauth95bridge_u626(state_p0));
+    (await loadAuthSessions__appZauth95bridge_u610(state_p0));
     }
-    
+
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
  lastJSError = EXCEPTION;
  --excHandler;
     if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
-    var exc_1459618521 = getCurrentException();
-    showToast__appZstate_u402(state_p0, ([67,111,117,108,100,32,110,111,116,32,114,101,118,111,107,101,32,115,101,115,115,105,111,110,58,32]).concat(exc_1459618521.message));
+    var exc_1459618505 = getCurrentException();
+    showToast__appZstate_u410(state_p0, ([67,111,117,108,100,32,110,111,116,32,114,101,118,111,107,101,32,115,101,115,115,105,111,110,58,32]).concat(exc_1459618505.message));
     }
     else {
     	reraiseException();
@@ -9818,18 +9950,18 @@ async function revokeAuthSession__appZauth95bridge_u711(state_p0, sessionId_p1) 
     } finally {
     }
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    result_1459618507 = undefined;
+    result_1459618491 = undefined;
     break BeforeRet;
   };
 
-  return result_1459618507;
+  return result_1459618491;
 
 }
 
 function HEX3Aanonymous__agentic70rontend_u365(event_p0, node_p1) {
-    (revokeAuthSession__appZauth95bridge_u711(appState_570425362[0], this.currentSession0.sessionId));
+    (revokeAuthSession__appZauth95bridge_u695(appState_570425362[0], this.currentSession0.sessionId));
 
-  
+
 }
 
 function renderAccountView__agentic70rontend_u298() {
@@ -9841,8 +9973,8 @@ function renderAccountView__agentic70rontend_u298() {
 
   var result_570425643 = null;
 
-    var HEX3Aenv_570426716 = null;
-    HEX3Aenv_570426716 = {m_type: NTI570427070, currentSession0: ({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false})};
+    var HEX3Aenv_570426727 = null;
+    HEX3Aenv_570426727 = {m_type: NTI570427071, currentSession0: ({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false})};
     var tmp_570425644 = tree__pkgZkaraxZvdom_u943(17, []);
     tmp_570425644.class = "conversation";
     var tmp_570425645 = tree__pkgZkaraxZvdom_u943(44, []);
@@ -9879,7 +10011,7 @@ function renderAccountView__agentic70rontend_u298() {
     else {
     Temporary2 = [78,111,116,32,115,101,116];
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_570425654, text__pkgZkaraxZvdom_u1011(Temporary2));
     add__pkgZkaraxZvdom_u857(tmp_570425652, tmp_570425654);
     add__pkgZkaraxZvdom_u857(tmp_570425651, tmp_570425652);
@@ -9937,38 +10069,38 @@ function renderAccountView__agentic70rontend_u298() {
     else {
       Label4: {
         var authSession_570425707 = ({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false});
-        var i_570426757 = 0;
-        var L_570426758 = (appState_570425362[0].sessions).length;
+        var i_570426768 = 0;
+        var L_570426769 = (appState_570425362[0].sessions).length;
         Label5: {
             Label6: while (true) {
-            if (!(i_570426757 < L_570426758)) break Label6;
-              authSession_570425707 = appState_570425362[0].sessions[chckIndx(i_570426757, 0, (appState_570425362[0].sessions).length - 1)];
-              HEX3Aenv_570426716.currentSession0 = nimCopy(HEX3Aenv_570426716.currentSession0, authSession_570425707, NTI1426063378);
+            if (!(i_570426768 < L_570426769)) break Label6;
+              authSession_570425707 = appState_570425362[0].sessions[chckIndx(i_570426768, 0, (appState_570425362[0].sessions).length - 1)];
+              HEX3Aenv_570426727.currentSession0 = nimCopy(HEX3Aenv_570426727.currentSession0, authSession_570425707, NTI1426063378);
               var tmp_570425669 = tree__pkgZkaraxZvdom_u943(44, []);
               tmp_570425669.class = "system-row account-session-row";
               var tmp_570425670 = tree__pkgZkaraxZvdom_u943(44, []);
               var tmp_570425671 = tree__pkgZkaraxZvdom_u943(47, []);
-              if (HEX3Aenv_570426716.currentSession0.current) {
+              if (HEX3Aenv_570426727.currentSession0.current) {
               Temporary7 = [67,117,114,114,101,110,116,32,115,101,115,115,105,111,110];
               }
               else {
               Temporary7 = [83,101,115,115,105,111,110];
               }
-              
+
               add__pkgZkaraxZvdom_u857(tmp_570425671, text__pkgZkaraxZvdom_u1011(Temporary7));
               add__pkgZkaraxZvdom_u857(tmp_570425670, tmp_570425671);
               var tmp_570425672 = tree__pkgZkaraxZvdom_u943(71, []);
-              add__pkgZkaraxZvdom_u857(tmp_570425672, text__pkgZkaraxZvdom_u1011((HEX3Aenv_570426716.currentSession0.userAgent).concat([32,194,183,32,101,120,112,105,114,101,115,32],HEX3Aenv_570426716.currentSession0.expiresAt)));
+              add__pkgZkaraxZvdom_u857(tmp_570425672, text__pkgZkaraxZvdom_u1011((HEX3Aenv_570426727.currentSession0.userAgent).concat([32,194,183,32,101,120,112,105,114,101,115,32],HEX3Aenv_570426727.currentSession0.expiresAt)));
               add__pkgZkaraxZvdom_u857(tmp_570425670, tmp_570425672);
               add__pkgZkaraxZvdom_u857(tmp_570425669, tmp_570425670);
-              if ((0 < (HEX3Aenv_570426716.currentSession0.revokedAt).length)) {
+              if ((0 < (HEX3Aenv_570426727.currentSession0.revokedAt).length)) {
               var tmp_570425673 = tree__pkgZkaraxZvdom_u943(71, []);
               tmp_570425673.class = "capability-badge disabled";
               add__pkgZkaraxZvdom_u857(tmp_570425673, text__pkgZkaraxZvdom_u1011([82,101,118,111,107,101,100]));
               add__pkgZkaraxZvdom_u857(tmp_570425669, tmp_570425673);
               }
               else {
-              if (HEX3Aenv_570426716.currentSession0.current) {
+              if (HEX3Aenv_570426727.currentSession0.current) {
               var tmp_570425674 = tree__pkgZkaraxZvdom_u943(71, []);
               tmp_570425674.class = "capability-badge enabled";
               add__pkgZkaraxZvdom_u857(tmp_570425674, text__pkgZkaraxZvdom_u1011([67,117,114,114,101,110,116]));
@@ -9978,17 +10110,17 @@ function renderAccountView__agentic70rontend_u298() {
                 var tmp_570425675 = tree__pkgZkaraxZvdom_u943(195, []);
                 tmp_570425675.class = "secondary-action";
                 add__pkgZkaraxZvdom_u857(tmp_570425675, text__pkgZkaraxZvdom_u1011([82,101,118,111,107,101]));
-                Temporary8 = HEX3Aanonymous__agentic70rontend_u365.bind(HEX3Aenv_570426716); Temporary8.ClP_0 = HEX3Aanonymous__agentic70rontend_u365; Temporary8.ClE_0 = HEX3Aenv_570426716;
+                Temporary8 = HEX3Aanonymous__agentic70rontend_u365.bind(HEX3Aenv_570426727); Temporary8.ClP_0 = HEX3Aanonymous__agentic70rontend_u365; Temporary8.ClE_0 = HEX3Aenv_570426727;
                 addEventHandler__pkgZkaraxZkarax_u1963(tmp_570425675, 0, Temporary8, kxi__);
                 add__pkgZkaraxZvdom_u857(tmp_570425669, tmp_570425675);
               }
               }
               add__pkgZkaraxZvdom_u857(tmp_570425661, tmp_570425669);
-              i_570426757 += 1;
-              if (!(((appState_570425362[0].sessions).length == L_570426758))) {
+              i_570426768 += 1;
+              if (!(((appState_570425362[0].sessions).length == L_570426769))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
@@ -10054,49 +10186,49 @@ function backendJobBusy__componentsZcomposer_u12(state_p0) {
 
 }
 
-function clearToast__appZstate_u405(state_p0) {
+function clearToast__appZstate_u413(state_p0) {
     state_p0.toastMessage = nimCopy(null, [], NTI33554449);
 
-  
+
 }
 
-function setComposerDraft__appZstate_u417(state_p0, value_p1) {
+function setComposerDraft__appZstate_u425(state_p0, value_p1) {
     state_p0.composerDraft = nimCopy(null, value_p1, NTI33554449);
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZcomposer_u39(event_p0, node_p1) {
-    clearToast__appZstate_u405(this.state0);
-    setComposerDraft__appZstate_u417(this.state0, cstrToNimstr(value__pkgZkaraxZvdom_u474(node_p1)));
+    clearToast__appZstate_u413(this.state0);
+    setComposerDraft__appZstate_u425(this.state0, cstrToNimstr(value__pkgZkaraxZvdom_u474(node_p1)));
 
-  
+
 }
 
-function addUserMessage__appZstate_u575(state_p0, content_p1) {
+function addUserMessage__appZstate_u583(state_p0, content_p1) {
     state_p0.messages.push({id: state_p0.nextMessageId, role: 0, content: nimCopy(null, content_p1, NTI33554449), cards: []});;
     state_p0.nextMessageId = addInt(state_p0.nextMessageId, 1);
 
-  
+
 }
-async function createJob__apiZclient_u435(chatId_p0, message_p1, csrfToken_p2) {
-  var result_1795162553 = null;
+async function createJob__apiZclient_u526(chatId_p0, message_p1, csrfToken_p2) {
+  var result_1795162644 = null;
 
-    var headers_1795162563 = new Headers();
-    headers_1795162563.set("Content-Type", "application/json");
-    var payload_1795162580 = HEX25__pureZjson_u1858([nimCopy(null, {Field0: [99,104,97,116,95,105,100], Field1: HEX25__pureZjson_u1829(chatId_p0)}, NTI1795162385), nimCopy(null, {Field0: [109,101,115,115,97,103,101], Field1: HEX25__pureZjson_u1829(message_p1)}, NTI1795162385)]);
-    headers_1795162563.set("X-CSRF-Token", toJSStr(csrfToken_p2));
-    var options_1795162581 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4466(payload_1795162580)), 0, 0, 0, 1, false, 0, "client", "", headers_1795162563);
-    var response_1795162590 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,106,111,98,115])), options_1795162581));
-    var responseBody_1795162595 = cstrToNimstr((await response_1795162590.text()));
-    if (!(response_1795162590.ok)) {
-    raiseException(publicApiError__apiZclient_u46(HEX24__systemZdollars_u29(response_1795162590.status), responseBody_1795162595), "ValueError");
+    var headers_1795162654 = new Headers();
+    headers_1795162654.set("Content-Type", "application/json");
+    var payload_1795162671 = HEX25__pureZjson_u1858([nimCopy(null, {Field0: [99,104,97,116,95,105,100], Field1: HEX25__pureZjson_u1829(chatId_p0)}, NTI1795162443), nimCopy(null, {Field0: [109,101,115,115,97,103,101], Field1: HEX25__pureZjson_u1829(message_p1)}, NTI1795162443)]);
+    headers_1795162654.set("X-CSRF-Token", toJSStr(csrfToken_p2));
+    var options_1795162672 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4466(payload_1795162671)), 0, 0, 0, 1, false, 0, "client", "", headers_1795162654);
+    var response_1795162681 = (await fetch(toJSStr((frontendConfig_1761607720.backendBaseUrl).concat([47,97,112,105,47,118,49,47,106,111,98,115])), options_1795162672));
+    var responseBody_1795162686 = cstrToNimstr((await response_1795162681.text()));
+    if (!(response_1795162681.ok)) {
+    raiseException(publicApiError__apiZclient_u50(HEX24__systemZdollars_u29(response_1795162681.status), responseBody_1795162686), "ValueError");
     }
-    
-    var data_1795162596 = parseJson__pureZjson_u5285(responseBody_1795162595);
-    result_1795162553 = {jobId: getStr__pureZjson_u241(HEX5BHEX5D__pureZjson_u3078(data_1795162596, [106,111,98,95,105,100]), []), status: getStr__pureZjson_u241(HEX5BHEX5D__pureZjson_u3078(data_1795162596, [115,116,97,116,117,115]), [])};
 
-  return result_1795162553;
+    var data_1795162687 = parseJson__pureZjson_u5285(responseBody_1795162686);
+    result_1795162644 = {jobId: getStr__pureZjson_u241(HEX5BHEX5D__pureZjson_u3078(data_1795162687, [106,111,98,95,105,100]), []), status: getStr__pureZjson_u241(HEX5BHEX5D__pureZjson_u3078(data_1795162687, [115,116,97,116,117,115]), [])};
+
+  return result_1795162644;
 
 }
 async function submitBackendJob__appZbackend95bridge_u81(state_p0, message_p1) {
@@ -10104,32 +10236,32 @@ async function submitBackendJob__appZbackend95bridge_u81(state_p0, message_p1) {
 
   BeforeRet: {
     if (!(state_p0.auth.authenticated)) {
-    showToast__appZstate_u402(state_p0, [83,105,103,110,32,105,110,32,98,101,102,111,114,101,32,115,117,98,109,105,116,116,105,110,103,32,97,32,114,101,113,117,101,115,116,46]);
+    showToast__appZstate_u410(state_p0, [83,105,103,110,32,105,110,32,98,101,102,111,114,101,32,115,117,98,109,105,116,116,105,110,103,32,97,32,114,101,113,117,101,115,116,46]);
     result_1778384981 = undefined;
     break BeforeRet;
     }
-    
+
     if (((state_p0.currentChatId).length == 0)) {
-    showToast__appZstate_u402(state_p0, [67,114,101,97,116,101,32,111,114,32,115,101,108,101,99,116,32,97,32,99,104,97,116,32,98,101,102,111,114,101,32,115,117,98,109,105,116,116,105,110,103,32,97,32,114,101,113,117,101,115,116,46]);
+    showToast__appZstate_u410(state_p0, [67,114,101,97,116,101,32,111,114,32,115,101,108,101,99,116,32,97,32,99,104,97,116,32,98,101,102,111,114,101,32,115,117,98,109,105,116,116,105,110,103,32,97,32,114,101,113,117,101,115,116,46]);
     result_1778384981 = undefined;
     break BeforeRet;
     }
-    
-    addUserMessage__appZstate_u575(state_p0, message_p1);
+
+    addUserMessage__appZstate_u583(state_p0, message_p1);
     state_p0.run = nimCopy(state_p0.run, {active: true, request: nimCopy(null, message_p1, NTI33554449), jobId: [], status: [115,117,98,109,105,116,116,105,110,103], agent: [], tool: [], presentations: []}, NTI1426063373);
     if (state_p0.runEvents.length < 0) { for (var i = state_p0.runEvents.length ; i < 0 ; ++i) state_p0.runEvents.push(({id: 0, kind: [], message: []})); }
                else { state_p0.runEvents.length = 0; };
     state_p0.inspectorTab = 0;
-    addRunEvent__appZstate_u544(state_p0, [114,101,113,117,101,115,116], [83,117,98,109,105,116,116,105,110,103,32,114,101,113,117,101,115,116,32,116,111,32,116,104,101,32,100,117,114,97,98,108,101,32,80,104,111,101,110,105,120,32,106,111,98,32,65,80,73,46]);
-    showToast__appZstate_u402(state_p0, [83,117,98,109,105,116,116,105,110,103,32,114,101,113,117,101,115,116,226,128,166]);
+    addRunEvent__appZstate_u552(state_p0, [114,101,113,117,101,115,116], [83,117,98,109,105,116,116,105,110,103,32,114,101,113,117,101,115,116,32,116,111,32,116,104,101,32,100,117,114,97,98,108,101,32,80,104,111,101,110,105,120,32,106,111,98,32,65,80,73,46]);
+    showToast__appZstate_u410(state_p0, [83,117,98,109,105,116,116,105,110,103,32,114,101,113,117,101,115,116,226,128,166]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var response_1778384999 = (await createJob__apiZclient_u435(state_p0.currentChatId, message_p1, state_p0.auth.csrfToken));
+    var response_1778384999 = (await createJob__apiZclient_u526(state_p0.currentChatId, message_p1, state_p0.auth.csrfToken));
     state_p0.run.jobId = nimCopy(null, response_1778384999.jobId, NTI33554449);
     state_p0.run.status = nimCopy(null, response_1778384999.status, NTI33554449);
-    addRunEvent__appZstate_u544(state_p0, [98,97,99,107,101,110,100], [80,104,111,101,110,105,120,32,97,99,99,101,112,116,101,100,32,116,104,101,32,100,117,114,97,98,108,101,32,106,111,98,46]);
-    showToast__appZstate_u402(state_p0, [81,117,101,117,101,100,46]);
+    addRunEvent__appZstate_u552(state_p0, [98,97,99,107,101,110,100], [80,104,111,101,110,105,120,32,97,99,99,101,112,116,101,100,32,116,104,101,32,100,117,114,97,98,108,101,32,106,111,98,46]);
+    showToast__appZstate_u410(state_p0, [81,117,101,117,101,100,46]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
     (await pollBackendJob__appZbackend95bridge_u39(state_p0, response_1778384999.jobId, true));
 --excHandler;
@@ -10141,10 +10273,10 @@ async function submitBackendJob__appZbackend95bridge_u81(state_p0, message_p1) {
     if (((state_p0.run.jobId).length == 0)) {
     state_p0.run.status = nimCopy(null, [102,97,105,108,101,100], NTI33554449);
     }
-    
-    addRunEvent__appZstate_u544(state_p0, [99,111,110,110,101,99,116,105,111,110], [84,104,101,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,115,117,98,109,105,116,116,101,100,32,116,111,32,116,104,101,32,98,97,99,107,101,110,100,46]);
-    addAssistantMessage__appZstate_u626(state_p0, makeNimstrLit("The request could not be submitted. Check the backend connection and try again."), []);
-    showToast__appZstate_u402(state_p0, [67,111,117,108,100,32,110,111,116,32,115,117,98,109,105,116,32,116,104,101,32,114,101,113,117,101,115,116,46]);
+
+    addRunEvent__appZstate_u552(state_p0, [99,111,110,110,101,99,116,105,111,110], [84,104,101,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,115,117,98,109,105,116,116,101,100,32,116,111,32,116,104,101,32,98,97,99,107,101,110,100,46]);
+    addAssistantMessage__appZstate_u634(state_p0, makeNimstrLit("The request could not be submitted. Check the backend connection and try again."), []);
+    showToast__appZstate_u410(state_p0, [67,111,117,108,100,32,110,111,116,32,115,117,98,109,105,116,32,116,104,101,32,114,101,113,117,101,115,116,46]);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
     }
     else {
@@ -10163,49 +10295,49 @@ async function submitBackendJob__appZbackend95bridge_u81(state_p0, message_p1) {
 
 function submitDraft__componentsZcomposer_u18(state_p0, textareaNode_p1) {
   BeforeRet: {
-    var message_1879048213 = nsuStrip(state_p0.composerDraft, true, true, ConstSet40);
+    var message_1879048213 = nsuStrip(state_p0.composerDraft, true, true, ConstSet41);
     if (((message_1879048213).length == 0)) {
     break BeforeRet;
     }
-    
+
     if (((state_p0.currentChatId).length == 0)) {
-    showToast__appZstate_u402(state_p0, [67,114,101,97,116,101,32,111,114,32,115,101,108,101,99,116,32,97,32,99,104,97,116,32,98,101,102,111,114,101,32,115,101,110,100,105,110,103,32,97,32,109,101,115,115,97,103,101,46]);
+    showToast__appZstate_u410(state_p0, [67,114,101,97,116,101,32,111,114,32,115,101,108,101,99,116,32,97,32,99,104,97,116,32,98,101,102,111,114,101,32,115,101,110,100,105,110,103,32,97,32,109,101,115,115,97,103,101,46]);
     break BeforeRet;
     }
-    
+
     if (backendJobBusy__componentsZcomposer_u12(state_p0)) {
-    showToast__appZstate_u402(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,115,116,97,114,116,105,110,103,32,97,110,111,116,104,101,114,46]);
+    showToast__appZstate_u410(state_p0, [70,105,110,105,115,104,32,116,104,101,32,99,117,114,114,101,110,116,32,106,111,98,32,98,101,102,111,114,101,32,115,116,97,114,116,105,110,103,32,97,110,111,116,104,101,114,46]);
     break BeforeRet;
     }
-    
-    clearToast__appZstate_u405(state_p0);
+
+    clearToast__appZstate_u413(state_p0);
     (submitBackendJob__appZbackend95bridge_u81(state_p0, message_1879048213));
-    setComposerDraft__appZstate_u417(state_p0, []);
+    setComposerDraft__appZstate_u425(state_p0, []);
     if (!((textareaNode_p1 == null))) {
     valueHEX3D__pkgZkaraxZvdom_u477(textareaNode_p1, "");
     }
-    
+
   };
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZcomposer_u42(event_p0, node_p1) {
     var keyboardEvent_1879048237 = event_p0;
-    setComposerDraft__appZstate_u417(this.state0, cstrToNimstr(value__pkgZkaraxZvdom_u474(node_p1)));
+    setComposerDraft__appZstate_u425(this.state0, cstrToNimstr(value__pkgZkaraxZvdom_u474(node_p1)));
     if (((keyboardEvent_1879048237.key == "Enter") && !(keyboardEvent_1879048237.shiftKey))) {
     event_p0.preventDefault();
     submitDraft__componentsZcomposer_u18(this.state0, node_p1);
     }
-    
 
-  
+
+
 }
 
 function HEX3Aanonymous__componentsZcomposer_u46(event_p0, node_p1) {
     submitDraft__componentsZcomposer_u18(this.state0, null);
 
-  
+
 }
 
 function composerStatusText__componentsZcomposer_u15(state_p0) {
@@ -10236,7 +10368,7 @@ function composerStatusText__componentsZcomposer_u15(state_p0) {
     case "failed":
       Temporary1 = [82,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46];
       break;
-    default: 
+    default:
       if ((0 < (state_p0.toastMessage).length)) {
       Temporary2 = state_p0.toastMessage;
       }
@@ -10265,18 +10397,18 @@ function renderComposer__componentsZcomposer_u26(state_p0) {
 
   var result_1879048220 = null;
 
-    var HEX3Aenv_570426765 = null;
-    HEX3Aenv_570426765 = {m_type: NTI570427123, state0: null};
-    HEX3Aenv_570426765.state0 = state_p0;
-    var jobBusy_1879048221 = backendJobBusy__componentsZcomposer_u12(HEX3Aenv_570426765.state0);
-    var sendDisabled_1879048222 = ((((nsuStrip(HEX3Aenv_570426765.state0.composerDraft, true, true, ConstSet39)).length == 0) || ((HEX3Aenv_570426765.state0.currentChatId).length == 0)) || jobBusy_1879048221);
+    var HEX3Aenv_570426776 = null;
+    HEX3Aenv_570426776 = {m_type: NTI570427124, state0: null};
+    HEX3Aenv_570426776.state0 = state_p0;
+    var jobBusy_1879048221 = backendJobBusy__componentsZcomposer_u12(HEX3Aenv_570426776.state0);
+    var sendDisabled_1879048222 = ((((nsuStrip(HEX3Aenv_570426776.state0.composerDraft, true, true, ConstSet40)).length == 0) || ((HEX3Aenv_570426776.state0.currentChatId).length == 0)) || jobBusy_1879048221);
     if (sendDisabled_1879048222) {
     Temporary1 = "send-button";
     }
     else {
     Temporary1 = "send-button active";
     }
-    
+
     var sendClass_1879048223 = Temporary1;
     var tmp_1879048224 = tree__pkgZkaraxZvdom_u943(17, []);
     tmp_1879048224.class = "composer-container";
@@ -10287,12 +10419,12 @@ function renderComposer__componentsZcomposer_u26(state_p0) {
     tmp_1879048226.class = "composer-input";
     setAttr__pkgZkaraxZvdom_u772(tmp_1879048226, "placeholder", "Message Agentic...");
     setAttr__pkgZkaraxZvdom_u772(tmp_1879048226, "rows", "1");
-    valueHEX3D__pkgZkaraxZvdom_u477(tmp_1879048226, toJSStr(HEX3Aenv_570426765.state0.composerDraft));
-    setAttr__pkgZkaraxZvdom_u772(tmp_1879048226, "value", toJSStr(HEX3Aenv_570426765.state0.composerDraft));
+    valueHEX3D__pkgZkaraxZvdom_u477(tmp_1879048226, toJSStr(HEX3Aenv_570426776.state0.composerDraft));
+    setAttr__pkgZkaraxZvdom_u772(tmp_1879048226, "value", toJSStr(HEX3Aenv_570426776.state0.composerDraft));
     setAttr__pkgZkaraxZvdom_u817(tmp_1879048226, "disabled", jobBusy_1879048221);
-    Temporary2 = HEX3Aanonymous__componentsZcomposer_u39.bind(HEX3Aenv_570426765); Temporary2.ClP_0 = HEX3Aanonymous__componentsZcomposer_u39; Temporary2.ClE_0 = HEX3Aenv_570426765;
+    Temporary2 = HEX3Aanonymous__componentsZcomposer_u39.bind(HEX3Aenv_570426776); Temporary2.ClP_0 = HEX3Aanonymous__componentsZcomposer_u39; Temporary2.ClE_0 = HEX3Aenv_570426776;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1879048226, 25, Temporary2, kxi__);
-    Temporary3 = HEX3Aanonymous__componentsZcomposer_u42.bind(HEX3Aenv_570426765); Temporary3.ClP_0 = HEX3Aanonymous__componentsZcomposer_u42; Temporary3.ClE_0 = HEX3Aenv_570426765;
+    Temporary3 = HEX3Aanonymous__componentsZcomposer_u42.bind(HEX3Aenv_570426776); Temporary3.ClP_0 = HEX3Aanonymous__componentsZcomposer_u42; Temporary3.ClE_0 = HEX3Aenv_570426776;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1879048226, 4, Temporary3, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1879048225, tmp_1879048226);
     var tmp_1879048227 = tree__pkgZkaraxZvdom_u943(44, []);
@@ -10305,21 +10437,21 @@ function renderComposer__componentsZcomposer_u26(state_p0) {
     else {
     add__pkgZkaraxZvdom_u857(tmp_1879048228, text__pkgZkaraxZvdom_u1011([80,104,111,101,110,105,120,45,98,97,99,107,101,100,32,100,117,114,97,98,108,101,32,99,104,97,116]));
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_1879048227, tmp_1879048228);
     var tmp_1879048229 = tree__pkgZkaraxZvdom_u943(195, []);
     tmp_1879048229.class = sendClass_1879048223;
     setAttr__pkgZkaraxZvdom_u817(tmp_1879048229, "disabled", sendDisabled_1879048222);
     setAttr__pkgZkaraxZvdom_u772(tmp_1879048229, "title", "Send message");
     add__pkgZkaraxZvdom_u857(tmp_1879048229, text__pkgZkaraxZvdom_u1011([226,134,145]));
-    Temporary4 = HEX3Aanonymous__componentsZcomposer_u46.bind(HEX3Aenv_570426765); Temporary4.ClP_0 = HEX3Aanonymous__componentsZcomposer_u46; Temporary4.ClE_0 = HEX3Aenv_570426765;
+    Temporary4 = HEX3Aanonymous__componentsZcomposer_u46.bind(HEX3Aenv_570426776); Temporary4.ClP_0 = HEX3Aanonymous__componentsZcomposer_u46; Temporary4.ClE_0 = HEX3Aenv_570426776;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1879048229, 0, Temporary4, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1879048227, tmp_1879048229);
     add__pkgZkaraxZvdom_u857(tmp_1879048225, tmp_1879048227);
     add__pkgZkaraxZvdom_u857(tmp_1879048224, tmp_1879048225);
     var tmp_1879048230 = tree__pkgZkaraxZvdom_u943(71, []);
     tmp_1879048230.class = "composer-hint";
-    add__pkgZkaraxZvdom_u857(tmp_1879048230, text__pkgZkaraxZvdom_u1011(composerStatusText__componentsZcomposer_u15(HEX3Aenv_570426765.state0)));
+    add__pkgZkaraxZvdom_u857(tmp_1879048230, text__pkgZkaraxZvdom_u1011(composerStatusText__componentsZcomposer_u15(HEX3Aenv_570426776.state0)));
     add__pkgZkaraxZvdom_u857(tmp_1879048224, tmp_1879048230);
     result_1879048220 = tmp_1879048224;
 
@@ -10331,16 +10463,16 @@ function renderWorkspace__agentic70rontend_u425() {
     var Temporary1;
 
 function HEX3Aanonymous__agentic70rontend_u439(event_p0, node_p1) {
-    (refreshSystemStatus__appZbackend95bridge_u129(appState_570425362[0]));
+    (refreshSystemStatus__appZbackend95bridge_u184(appState_570425362[0]));
 
-  
+
 }
     var Temporary2;
 
 function HEX3Aanonymous__agentic70rontend_u442(event_p0, node_p1) {
-    toggleHeaderMenu__appZstate_u415(appState_570425362[0]);
+    toggleHeaderMenu__appZstate_u423(appState_570425362[0]);
 
-  
+
 }
 
   var result_570425770 = null;
@@ -10369,7 +10501,7 @@ function HEX3Aanonymous__agentic70rontend_u442(event_p0, node_p1) {
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_570425777, 0, Temporary1, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_570425776, tmp_570425777);
     }
-    
+
     var tmp_570425778 = tree__pkgZkaraxZvdom_u943(195, []);
     tmp_570425778.class = "header-action";
     setAttr__pkgZkaraxZvdom_u772(tmp_570425778, "title", "More");
@@ -10380,14 +10512,14 @@ function HEX3Aanonymous__agentic70rontend_u442(event_p0, node_p1) {
     if (appState_570425362[0].headerMenuOpen) {
     add__pkgZkaraxZvdom_u857(tmp_570425776, renderHeaderMenu__agentic70rontend_u402());
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_570425772, tmp_570425776);
     add__pkgZkaraxZvdom_u857(tmp_570425771, tmp_570425772);
     add__pkgZkaraxZvdom_u857(tmp_570425771, renderWorkspaceBody__agentic70rontend_u400());
     if ((appState_570425362[0].activeView == 0)) {
     add__pkgZkaraxZvdom_u857(tmp_570425771, renderComposer__componentsZcomposer_u26(appState_570425362[0]));
     }
-    
+
     result_570425770 = tmp_570425771;
 
   return result_570425770;
@@ -10395,9 +10527,9 @@ function HEX3Aanonymous__agentic70rontend_u442(event_p0, node_p1) {
 }
 
 function HEX3Aanonymous__componentsZinspector_u174(event_p0, node_p1) {
-    toggleInspector__appZstate_u413(this.state0);
+    toggleInspector__appZstate_u421(this.state0);
 
-  
+
 }
 
 function tabClass__componentsZinspector_u19(current_p0, target_p1) {
@@ -10411,41 +10543,41 @@ function tabClass__componentsZinspector_u19(current_p0, target_p1) {
     else {
     Temporary1 = "";
     }
-    
+
     result_1895825430 = Temporary1;
 
   return result_1895825430;
 
 }
 
-function setInspectorTab__appZstate_u410(state_p0, tab_p1) {
+function setInspectorTab__appZstate_u418(state_p0, tab_p1) {
     state_p0.inspectorTab = tab_p1;
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZinspector_u177(event_p0, node_p1) {
-    setInspectorTab__appZstate_u410(this.state0, 0);
+    setInspectorTab__appZstate_u418(this.state0, 0);
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZinspector_u180(event_p0, node_p1) {
-    setInspectorTab__appZstate_u410(this.state0, 1);
+    setInspectorTab__appZstate_u418(this.state0, 1);
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZinspector_u183(event_p0, node_p1) {
-    setInspectorTab__appZstate_u410(this.state0, 2);
+    setInspectorTab__appZstate_u418(this.state0, 2);
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZinspector_u186(event_p0, node_p1) {
-    setInspectorTab__appZstate_u410(this.state0, 3);
+    setInspectorTab__appZstate_u418(this.state0, 3);
 
-  
+
 }
 
 function indicatorClass__componentsZinspector_u16(status_p0) {
@@ -10467,7 +10599,7 @@ function indicatorClass__componentsZinspector_u16(status_p0) {
     case "waiting_approval":
       Temporary1 = "status-indicator waiting-approval";
       break;
-    default: 
+    default:
       Temporary1 = "status-indicator pending";
       break;
     }
@@ -10501,7 +10633,7 @@ function statusTitle__componentsZinspector_u10(status_p0) {
     case "waiting_approval":
       Temporary1 = [87,97,105,116,105,110,103,32,97,112,112,114,111,118,97,108];
       break;
-    default: 
+    default:
       Temporary1 = [73,100,108,101];
       break;
     }
@@ -10535,7 +10667,7 @@ function statusDescription__componentsZinspector_u13(status_p0) {
     case "waiting_approval":
       Temporary1 = [85,115,101,114,32,97,112,112,114,111,118,97,108,32,105,115,32,114,101,113,117,105,114,101,100];
       break;
-    default: 
+    default:
       Temporary1 = [78,111,32,97,99,116,105,118,101,32,114,117,110];
       break;
     }
@@ -10556,7 +10688,7 @@ function displayValue__componentsZinspector_u28(value_p0, fallback_p1) {
     else {
     Temporary1 = value_p0;
     }
-    
+
     result_1895825439 = nimCopy(null, Temporary1, NTI33554449);
 
   return result_1895825439;
@@ -10655,46 +10787,46 @@ function renderRunTab__componentsZinspector_u32(state_p0) {
       tmp_1895825468.class = "run-result-cards";
       Label1: {
         var card_1895825475 = ({schema: [], kind: [], title: [], status: [], fields: [], sections: []});
-        var i_570426839 = 0;
-        var L_570426840 = (state_p0.run.presentations).length;
+        var i_570426850 = 0;
+        var L_570426851 = (state_p0.run.presentations).length;
         Label2: {
             Label3: while (true) {
-            if (!(i_570426839 < L_570426840)) break Label3;
-              card_1895825475 = state_p0.run.presentations[chckIndx(i_570426839, 0, (state_p0.run.presentations).length - 1)];
+            if (!(i_570426850 < L_570426851)) break Label3;
+              card_1895825475 = state_p0.run.presentations[chckIndx(i_570426850, 0, (state_p0.run.presentations).length - 1)];
               add__pkgZkaraxZvdom_u857(tmp_1895825468, renderResultCard__componentsZresult95card_u27(card_1895825475));
-              i_570426839 += 1;
-              if (!(((state_p0.run.presentations).length == L_570426840))) {
+              i_570426850 += 1;
+              if (!(((state_p0.run.presentations).length == L_570426851))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
       add__pkgZkaraxZvdom_u857(tmp_1895825466, tmp_1895825468);
       add__pkgZkaraxZvdom_u857(tmp_1895825448, tmp_1895825466);
       }
-      
+
       add__pkgZkaraxZvdom_u857(tmp_1895825443, tmp_1895825448);
     }
-    
+
     result_1895825442 = tmp_1895825443;
 
   return result_1895825442;
 
 }
 
-function openToolView__appZstate_u479(state_p0, toolId_p1) {
+function openToolView__appZstate_u487(state_p0, toolId_p1) {
     state_p0.selectedToolId = nimCopy(null, toolId_p1, NTI33554449);
     state_p0.activeView = 6;
     state_p0.headerMenuOpen = false;
 
-  
+
 }
 
 function HEX3Aanonymous__componentsZinspector_u78(event_p0, node_p1) {
-    openToolView__appZstate_u479(this.state0, this.tool1.id);
+    openToolView__appZstate_u487(this.state0, this.tool1.id);
 
-  
+
 }
 
 function renderInspectorTool__componentsZinspector_u68(state_p0, tool_p1) {
@@ -10702,21 +10834,21 @@ function renderInspectorTool__componentsZinspector_u68(state_p0, tool_p1) {
 
   var result_1895825479 = null;
 
-    var HEX3Aenv_570426851 = null;
-    HEX3Aenv_570426851 = {m_type: NTI570427212, state0: null, tool1: ({id: [], name: [], enabled: false})};
-    HEX3Aenv_570426851.state0 = state_p0;
-    HEX3Aenv_570426851.tool1 = nimCopy(HEX3Aenv_570426851.tool1, tool_p1, NTI1426063375);
+    var HEX3Aenv_570426862 = null;
+    HEX3Aenv_570426862 = {m_type: NTI570427213, state0: null, tool1: ({id: [], name: [], enabled: false})};
+    HEX3Aenv_570426862.state0 = state_p0;
+    HEX3Aenv_570426862.tool1 = nimCopy(HEX3Aenv_570426862.tool1, tool_p1, NTI1426063375);
     var tmp_1895825480 = tree__pkgZkaraxZvdom_u943(195, []);
     tmp_1895825480.class = "tool-inspector-row";
     var tmp_1895825481 = tree__pkgZkaraxZvdom_u943(44, []);
     var tmp_1895825482 = tree__pkgZkaraxZvdom_u943(47, []);
-    add__pkgZkaraxZvdom_u857(tmp_1895825482, text__pkgZkaraxZvdom_u1011(HEX3Aenv_570426851.tool1.name));
+    add__pkgZkaraxZvdom_u857(tmp_1895825482, text__pkgZkaraxZvdom_u1011(HEX3Aenv_570426862.tool1.name));
     add__pkgZkaraxZvdom_u857(tmp_1895825481, tmp_1895825482);
     var tmp_1895825483 = tree__pkgZkaraxZvdom_u943(71, []);
-    add__pkgZkaraxZvdom_u857(tmp_1895825483, text__pkgZkaraxZvdom_u1011(HEX3Aenv_570426851.tool1.id));
+    add__pkgZkaraxZvdom_u857(tmp_1895825483, text__pkgZkaraxZvdom_u1011(HEX3Aenv_570426862.tool1.id));
     add__pkgZkaraxZvdom_u857(tmp_1895825481, tmp_1895825483);
     add__pkgZkaraxZvdom_u857(tmp_1895825480, tmp_1895825481);
-    if (HEX3Aenv_570426851.tool1.enabled) {
+    if (HEX3Aenv_570426862.tool1.enabled) {
     var tmp_1895825484 = tree__pkgZkaraxZvdom_u943(71, []);
     tmp_1895825484.class = "capability-badge enabled";
     add__pkgZkaraxZvdom_u857(tmp_1895825484, text__pkgZkaraxZvdom_u1011([69,110,97,98,108,101,100]));
@@ -10728,8 +10860,8 @@ function renderInspectorTool__componentsZinspector_u68(state_p0, tool_p1) {
       add__pkgZkaraxZvdom_u857(tmp_1895825485, text__pkgZkaraxZvdom_u1011([80,114,101,118,105,101,119]));
       add__pkgZkaraxZvdom_u857(tmp_1895825480, tmp_1895825485);
     }
-    
-    Temporary1 = HEX3Aanonymous__componentsZinspector_u78.bind(HEX3Aenv_570426851); Temporary1.ClP_0 = HEX3Aanonymous__componentsZinspector_u78; Temporary1.ClE_0 = HEX3Aenv_570426851;
+
+    Temporary1 = HEX3Aanonymous__componentsZinspector_u78.bind(HEX3Aenv_570426862); Temporary1.ClP_0 = HEX3Aanonymous__componentsZinspector_u78; Temporary1.ClE_0 = HEX3Aenv_570426862;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1895825480, 0, Temporary1, kxi__);
     result_1895825479 = tmp_1895825480;
 
@@ -10753,18 +10885,18 @@ function renderToolsTab__componentsZinspector_u81(state_p0) {
     add__pkgZkaraxZvdom_u857(tmp_1895825492, tmp_1895825493);
     Label1: {
       var tool_1895825499 = ({id: [], name: [], enabled: false});
-      var i_570426844 = 0;
-      var L_570426845 = (state_p0.tools).length;
+      var i_570426855 = 0;
+      var L_570426856 = (state_p0.tools).length;
       Label2: {
           Label3: while (true) {
-          if (!(i_570426844 < L_570426845)) break Label3;
-            tool_1895825499 = state_p0.tools[chckIndx(i_570426844, 0, (state_p0.tools).length - 1)];
+          if (!(i_570426855 < L_570426856)) break Label3;
+            tool_1895825499 = state_p0.tools[chckIndx(i_570426855, 0, (state_p0.tools).length - 1)];
             add__pkgZkaraxZvdom_u857(tmp_1895825492, renderInspectorTool__componentsZinspector_u68(state_p0, tool_1895825499));
-            i_570426844 += 1;
-            if (!(((state_p0.tools).length == L_570426845))) {
+            i_570426855 += 1;
+            if (!(((state_p0.tools).length == L_570426856))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
-            
+
           }
       };
     };
@@ -10799,12 +10931,12 @@ function renderEventsTab__componentsZinspector_u92(state_p0) {
       tmp_1895825508.class = "event-list";
       Label1: {
         var runEvent_1895825539 = ({id: 0, kind: [], message: []});
-        var i_570426888 = 0;
-        var L_570426889 = (state_p0.runEvents).length;
+        var i_570426899 = 0;
+        var L_570426900 = (state_p0.runEvents).length;
         Label2: {
             Label3: while (true) {
-            if (!(i_570426888 < L_570426889)) break Label3;
-              runEvent_1895825539 = state_p0.runEvents[chckIndx(i_570426888, 0, (state_p0.runEvents).length - 1)];
+            if (!(i_570426899 < L_570426900)) break Label3;
+              runEvent_1895825539 = state_p0.runEvents[chckIndx(i_570426899, 0, (state_p0.runEvents).length - 1)];
               var tmp_1895825509 = tree__pkgZkaraxZvdom_u943(44, []);
               tmp_1895825509.class = "event-row";
               var tmp_1895825510 = tree__pkgZkaraxZvdom_u943(44, []);
@@ -10820,17 +10952,17 @@ function renderEventsTab__componentsZinspector_u92(state_p0) {
               add__pkgZkaraxZvdom_u857(tmp_1895825511, tmp_1895825513);
               add__pkgZkaraxZvdom_u857(tmp_1895825509, tmp_1895825511);
               add__pkgZkaraxZvdom_u857(tmp_1895825508, tmp_1895825509);
-              i_570426888 += 1;
-              if (!(((state_p0.runEvents).length == L_570426889))) {
+              i_570426899 += 1;
+              if (!(((state_p0.runEvents).length == L_570426900))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
-              
+
             }
         };
       };
       add__pkgZkaraxZvdom_u857(tmp_1895825503, tmp_1895825508);
     }
-    
+
     result_1895825502 = tmp_1895825503;
 
   return result_1895825502;
@@ -10850,7 +10982,7 @@ function renderRawTab__componentsZinspector_u148(state_p0) {
     else {
     add__pkgZkaraxZvdom_u857(tmp_1895825560, text__pkgZkaraxZvdom_u1011(([123,10,32,32,34,97,99,116,105,118,101,34,58,32,116,114,117,101,44,10,32,32,34,106,111,98,95,105,100,34,58,32,34]).concat(state_p0.run.jobId,[34,44,10,32,32,34,115,116,97,116,117,115,34,58,32,34],state_p0.run.status,[34,44,10,32,32,34,97,103,101,110,116,34,58,32,34],state_p0.run.agent,[34,44,10,32,32,34,116,111,111,108,34,58,32,34],state_p0.run.tool,[34,44,10,32,32,34,112,114,101,115,101,110,116,97,116,105,111,110,115,34,58,32],HEX24__systemZdollars_u14((state_p0.run.presentations).length),[44,10,32,32,34,101,118,101,110,116,115,34,58,32],HEX24__systemZdollars_u14((state_p0.runEvents).length),[10,125])));
     }
-    
+
     add__pkgZkaraxZvdom_u857(tmp_1895825559, tmp_1895825560);
     result_1895825558 = tmp_1895825559;
 
@@ -10867,9 +10999,9 @@ function renderInspector__componentsZinspector_u159(state_p0) {
 
   var result_1895825569 = null;
 
-    var HEX3Aenv_570426805 = null;
-    HEX3Aenv_570426805 = {m_type: NTI570427150, state0: null};
-    HEX3Aenv_570426805.state0 = state_p0;
+    var HEX3Aenv_570426816 = null;
+    HEX3Aenv_570426816 = {m_type: NTI570427151, state0: null};
+    HEX3Aenv_570426816.state0 = state_p0;
     var tmp_1895825570 = tree__pkgZkaraxZvdom_u943(20, []);
     tmp_1895825570.class = "inspector";
     var tmp_1895825571 = tree__pkgZkaraxZvdom_u943(28, []);
@@ -10886,51 +11018,51 @@ function renderInspector__componentsZinspector_u159(state_p0) {
     tmp_1895825575.class = "inspector-close";
     setAttr__pkgZkaraxZvdom_u772(tmp_1895825575, "title", "Hide inspector");
     add__pkgZkaraxZvdom_u857(tmp_1895825575, text__pkgZkaraxZvdom_u1011([195,151]));
-    Temporary1 = HEX3Aanonymous__componentsZinspector_u174.bind(HEX3Aenv_570426805); Temporary1.ClP_0 = HEX3Aanonymous__componentsZinspector_u174; Temporary1.ClE_0 = HEX3Aenv_570426805;
+    Temporary1 = HEX3Aanonymous__componentsZinspector_u174.bind(HEX3Aenv_570426816); Temporary1.ClP_0 = HEX3Aanonymous__componentsZinspector_u174; Temporary1.ClE_0 = HEX3Aenv_570426816;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1895825575, 0, Temporary1, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1895825571, tmp_1895825575);
     add__pkgZkaraxZvdom_u857(tmp_1895825570, tmp_1895825571);
     var tmp_1895825576 = tree__pkgZkaraxZvdom_u943(44, []);
     tmp_1895825576.class = "inspector-tabs";
     var tmp_1895825577 = tree__pkgZkaraxZvdom_u943(195, []);
-    tmp_1895825577.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426805.state0.inspectorTab, 0);
+    tmp_1895825577.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426816.state0.inspectorTab, 0);
     add__pkgZkaraxZvdom_u857(tmp_1895825577, text__pkgZkaraxZvdom_u1011([82,117,110]));
-    Temporary2 = HEX3Aanonymous__componentsZinspector_u177.bind(HEX3Aenv_570426805); Temporary2.ClP_0 = HEX3Aanonymous__componentsZinspector_u177; Temporary2.ClE_0 = HEX3Aenv_570426805;
+    Temporary2 = HEX3Aanonymous__componentsZinspector_u177.bind(HEX3Aenv_570426816); Temporary2.ClP_0 = HEX3Aanonymous__componentsZinspector_u177; Temporary2.ClE_0 = HEX3Aenv_570426816;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1895825577, 0, Temporary2, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1895825576, tmp_1895825577);
     var tmp_1895825578 = tree__pkgZkaraxZvdom_u943(195, []);
-    tmp_1895825578.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426805.state0.inspectorTab, 1);
+    tmp_1895825578.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426816.state0.inspectorTab, 1);
     add__pkgZkaraxZvdom_u857(tmp_1895825578, text__pkgZkaraxZvdom_u1011([84,111,111,108,115]));
-    Temporary3 = HEX3Aanonymous__componentsZinspector_u180.bind(HEX3Aenv_570426805); Temporary3.ClP_0 = HEX3Aanonymous__componentsZinspector_u180; Temporary3.ClE_0 = HEX3Aenv_570426805;
+    Temporary3 = HEX3Aanonymous__componentsZinspector_u180.bind(HEX3Aenv_570426816); Temporary3.ClP_0 = HEX3Aanonymous__componentsZinspector_u180; Temporary3.ClE_0 = HEX3Aenv_570426816;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1895825578, 0, Temporary3, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1895825576, tmp_1895825578);
     var tmp_1895825579 = tree__pkgZkaraxZvdom_u943(195, []);
-    tmp_1895825579.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426805.state0.inspectorTab, 2);
+    tmp_1895825579.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426816.state0.inspectorTab, 2);
     add__pkgZkaraxZvdom_u857(tmp_1895825579, text__pkgZkaraxZvdom_u1011([69,118,101,110,116,115]));
-    Temporary4 = HEX3Aanonymous__componentsZinspector_u183.bind(HEX3Aenv_570426805); Temporary4.ClP_0 = HEX3Aanonymous__componentsZinspector_u183; Temporary4.ClE_0 = HEX3Aenv_570426805;
+    Temporary4 = HEX3Aanonymous__componentsZinspector_u183.bind(HEX3Aenv_570426816); Temporary4.ClP_0 = HEX3Aanonymous__componentsZinspector_u183; Temporary4.ClE_0 = HEX3Aenv_570426816;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1895825579, 0, Temporary4, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1895825576, tmp_1895825579);
     var tmp_1895825580 = tree__pkgZkaraxZvdom_u943(195, []);
-    tmp_1895825580.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426805.state0.inspectorTab, 3);
+    tmp_1895825580.class = tabClass__componentsZinspector_u19(HEX3Aenv_570426816.state0.inspectorTab, 3);
     add__pkgZkaraxZvdom_u857(tmp_1895825580, text__pkgZkaraxZvdom_u1011([82,97,119]));
-    Temporary5 = HEX3Aanonymous__componentsZinspector_u186.bind(HEX3Aenv_570426805); Temporary5.ClP_0 = HEX3Aanonymous__componentsZinspector_u186; Temporary5.ClE_0 = HEX3Aenv_570426805;
+    Temporary5 = HEX3Aanonymous__componentsZinspector_u186.bind(HEX3Aenv_570426816); Temporary5.ClP_0 = HEX3Aanonymous__componentsZinspector_u186; Temporary5.ClE_0 = HEX3Aenv_570426816;
     addEventHandler__pkgZkaraxZkarax_u1963(tmp_1895825580, 0, Temporary5, kxi__);
     add__pkgZkaraxZvdom_u857(tmp_1895825576, tmp_1895825580);
     add__pkgZkaraxZvdom_u857(tmp_1895825570, tmp_1895825576);
     var tmp_1895825581 = tree__pkgZkaraxZvdom_u943(17, []);
     tmp_1895825581.class = "inspector-content";
-    switch (HEX3Aenv_570426805.state0.inspectorTab) {
+    switch (HEX3Aenv_570426816.state0.inspectorTab) {
     case 0:
-      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderRunTab__componentsZinspector_u32(HEX3Aenv_570426805.state0));
+      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderRunTab__componentsZinspector_u32(HEX3Aenv_570426816.state0));
       break;
     case 1:
-      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderToolsTab__componentsZinspector_u81(HEX3Aenv_570426805.state0));
+      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderToolsTab__componentsZinspector_u81(HEX3Aenv_570426816.state0));
       break;
     case 2:
-      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderEventsTab__componentsZinspector_u92(HEX3Aenv_570426805.state0));
+      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderEventsTab__componentsZinspector_u92(HEX3Aenv_570426816.state0));
       break;
     case 3:
-      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderRawTab__componentsZinspector_u148(HEX3Aenv_570426805.state0));
+      add__pkgZkaraxZvdom_u857(tmp_1895825581, renderRawTab__componentsZinspector_u148(HEX3Aenv_570426816.state0));
       break;
     }
     add__pkgZkaraxZvdom_u857(tmp_1895825570, tmp_1895825581);
@@ -10950,14 +11082,14 @@ function renderApp__agentic70rontend_u449() {
     result_570425794 = renderAuthScreen__componentsZauth_u70(appState_570425362[0]);
     break BeforeRet;
     }
-    
+
     if (appState_570425362[0].inspectorOpen) {
     Temporary1 = "app-shell";
     }
     else {
     Temporary1 = "app-shell inspector-hidden";
     }
-    
+
     var shellClass_570425795 = Temporary1;
     var tmp_570425796 = tree__pkgZkaraxZvdom_u943(44, []);
     tmp_570425796.class = shellClass_570425795;
@@ -10966,7 +11098,7 @@ function renderApp__agentic70rontend_u449() {
     if (appState_570425362[0].inspectorOpen) {
     add__pkgZkaraxZvdom_u857(tmp_570425796, renderInspector__componentsZinspector_u159(appState_570425362[0]));
     }
-    
+
     result_570425794 = tmp_570425796;
   };
 
@@ -10984,7 +11116,7 @@ async function verifyEmail__apiZauth95client_u409(token_p0) {
     if (!(response_1509949884.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949884.status), responseBody_1509949889), "ValueError");
     }
-    
+
     result_1509949852 = undefined;
     break BeforeRet;
   };
@@ -11001,7 +11133,7 @@ async function me__apiZauth95client_u302() {
     if (!(response_1509949763.ok)) {
     raiseException(apiError__apiZauth95client_u115(HEX24__systemZdollars_u29(response_1509949763.status), responseBody_1509949768), "ValueError");
     }
-    
+
     result_1509949744 = parseAuthResponse__apiZauth95client_u81(parseJson__pureZjson_u5285(responseBody_1509949768));
 
   return result_1509949744;
@@ -11014,8 +11146,8 @@ async function bootstrapApplication__appZauth95bridge_u270(state_p0) {
     state_p0.auth.loading = true;
     state_p0.auth.error = nimCopy(null, [], NTI33554449);
     redraw__pkgZkaraxZkarax_u1550(kxi__);
-    var verifyToken_1459618071 = nsuStrip(cstrToNimstr(((new URLSearchParams(window.location.search)).get("verify_token") || '')), true, true, ConstSet41);
-    var resetToken_1459618072 = nsuStrip(cstrToNimstr(((new URLSearchParams(window.location.search)).get("reset_token") || '')), true, true, ConstSet42);
+    var verifyToken_1459618071 = nsuStrip(cstrToNimstr(((new URLSearchParams(window.location.search)).get("verify_token") || '')), true, true, ConstSet42);
+    var resetToken_1459618072 = nsuStrip(cstrToNimstr(((new URLSearchParams(window.location.search)).get("reset_token") || '')), true, true, ConstSet43);
     if ((0 < (verifyToken_1459618071).length)) {
 ++excHandler;
     try {
@@ -11038,12 +11170,12 @@ async function bootstrapApplication__appZauth95bridge_u270(state_p0) {
     } finally {
     }
     }
-    
+
     if ((0 < (resetToken_1459618072).length)) {
     state_p0.auth.mode = 3;
     state_p0.auth.resetToken = nimCopy(null, resetToken_1459618072, NTI33554449);
     }
-    
+
 ++excHandler;
     try {
     var auth_1459618082 = (await me__apiZauth95client_u302());
@@ -11074,8 +11206,8 @@ async function bootstrapApplication__appZauth95bridge_u270(state_p0) {
 
 }
 var Temporary3;
-var appState_570425362 = [initAppState__appZstate_u87()];
+var appState_570425362 = [initAppState__appZstate_u91()];
 Temporary3 = renderApp__agentic70rontend_u449.bind(null); Temporary3.ClP_0 = renderApp__agentic70rontend_u449; Temporary3.ClE_0 = null;
 setRenderer__pkgZkaraxZkarax_u1870(Temporary3, "app", null);
 (bootstrapApplication__appZauth95bridge_u270(appState_570425362[0]));
-(refreshSystemStatus__appZbackend95bridge_u129(appState_570425362[0]));
+(refreshSystemStatus__appZbackend95bridge_u184(appState_570425362[0]));
