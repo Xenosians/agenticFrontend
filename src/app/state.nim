@@ -177,6 +177,7 @@ proc initAppState*():
     ],
 
     plugins: @[
+      PluginItem(id: "openwrt", name: "OpenWrt networking (read-only)", connected: false),
       PluginItem(
         id:
           "palo-alto",
@@ -455,10 +456,10 @@ proc togglePluginConnection*(
   pluginId: string
 ) =
 
-  if pluginId == "palo-alto":
+  if pluginId in ["palo-alto", "openwrt"]:
     showToast(
       state,
-      "Palo Alto connection state is managed by the backend runtime."
+      "Network integration configuration is managed by the backend runtime."
     )
     return
 

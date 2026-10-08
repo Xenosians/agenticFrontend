@@ -494,7 +494,7 @@ proc getChatHistory*(
   let response = await fetch(
     (
       frontendConfig.backendBaseUrl &
-      "/api/v1/chats/" & chatId & "/history?limit=200"
+      "/api/v2/chats/" & chatId & "/history?limit=200"
     ).cstring,
     options
   )

@@ -103,6 +103,13 @@ proc finishFailedJob(
   )
 
 
+proc finishDeniedJob(state: AppState, job: JobResponse) =
+  let message = if job.error.len > 0: job.error else: "A requested operation was denied by policy."
+  addAssistantMessage(state, message)
+  addRunEvent(state, "denied", "Phoenix reported a policy denial. Review the request before trying again.")
+  showToast(state, "Request denied.")
+
+
 proc finishReconciliationRequired(
   state: AppState,
   job: JobResponse
@@ -210,6 +217,11 @@ proc pollBackendJob*(
         redraw(kxi)
         return
 
+      of "denied":
+        finishDeniedJob(state, job)
+        redraw(kxi)
+        return
+
       of "failed":
         finishFailedJob(
           state,
@@ -227,7 +239,7 @@ proc pollBackendJob*(
         redraw(kxi)
         return
 
-      of "reconciliation_required":
+      of "reconciliation_required", "outcome_unknown":
         finishReconciliationRequired(
           state,
           job
@@ -461,6 +473,9 @@ proc approvePendingJob*(
         job
       )
 
+    of "denied":
+      finishDeniedJob(state, job)
+
     of "failed":
       finishFailedJob(
         state,
@@ -474,7 +489,7 @@ proc approvePendingJob*(
         false
       )
 
-    of "reconciliation_required":
+    of "reconciliation_required", "outcome_unknown":
       finishReconciliationRequired(
         state,
         job
@@ -508,17 +523,23 @@ proc approvePendingJob*(
       )
 
   except CatchableError:
-    state.run.status = "waiting_approval"
+    # The browser cannot know whether Phoenix/AI/provider received
+    # the approval request. Keep the local state non-retryable.
+    #
+    # A later durable GET/reload is the authority. Never blindly
+    # restore waiting_approval after an ambiguous transport error.
+    state.run.status =
+      "approving"
 
     addRunEvent(
       state,
       "connection",
-      "The approval request could not be delivered."
+      "The approval response was interrupted. The durable outcome must be re-read before any retry."
     )
 
     showToast(
       state,
-      "Approval request failed. Try again."
+      "Approval response interrupted. Reload or reopen this chat before retrying."
     )
 
   redraw(kxi)
@@ -547,10 +568,11 @@ proc refreshIntegrationStatus(
       ""
 
     for i in 0 ..< state.plugins.len:
+      if state.plugins[i].id == "openwrt":
+        state.plugins[i].connected = integrations.openwrtConfigured
       if state.plugins[i].id == "palo-alto":
         state.plugins[i].connected =
           integrations.paloAltoConfigured
-        break
 
   except CatchableError as exc:
     state.system.integrationsError =

@@ -40,7 +40,7 @@ proc composerStatusText(
   of "waiting_approval":
     "Waiting for your approval."
 
-  of "reconciliation_required":
+  of "reconciliation_required", "outcome_unknown":
     "Execution outcome unresolved — trusted reconciliation required."
 
   of "approving":
@@ -48,6 +48,9 @@ proc composerStatusText(
 
   of "completed":
     "Completed."
+
+  of "denied":
+    "Request denied by policy."
 
   of "failed":
     "Request could not be completed."

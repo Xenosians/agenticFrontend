@@ -43,6 +43,7 @@ type
 
 
   IntegrationStatusResponse* = object
+    openwrtConfigured*: bool
     paloAltoConfigured*: bool
     paloAltoHost*: string
     paloAltoMode*: string
@@ -626,10 +627,13 @@ proc extractProposedTool(
   )
 
 
+import job_lifecycle
+
 proc parseJobResponse(
   data: JsonNode
 ): JobResponse =
 
+  validateJobV2(data)
   result =
     JobResponse(
       jobId:
@@ -833,6 +837,7 @@ proc getIntegrationStatus*():
 
   let data = parseJson(responseBody)
   var configured = false
+  var openwrtConfigured = false
   var host = ""
   var mode = ""
 
@@ -840,6 +845,8 @@ proc getIntegrationStatus*():
     let integrations = data["integrations"]
     if integrations.kind == JArray:
       for integration in integrations.items:
+        if integration.kind == JObject and jsonValueText(integration, "id") == "openwrt":
+          openwrtConfigured = jsonValueBool(integration, "configured")
         if integration.kind == JObject and
            jsonValueText(integration, "id") == "palo_alto":
           configured = jsonValueBool(integration, "configured")
@@ -847,6 +854,7 @@ proc getIntegrationStatus*():
           mode = jsonValueText(integration, "mode")
 
   result = IntegrationStatusResponse(
+    openwrtConfigured: openwrtConfigured,
     paloAltoConfigured: configured,
     paloAltoHost: host,
     paloAltoMode: mode
@@ -975,7 +983,7 @@ proc getJob*(
       (
         frontendConfig
         .backendBaseUrl &
-        "/api/v1/jobs/" &
+        "/api/v2/jobs/" &
         jobId
       ).cstring,
 
@@ -1046,7 +1054,7 @@ proc approveJob*(
       (
         frontendConfig
         .backendBaseUrl &
-        "/api/v1/jobs/" &
+        "/api/v2/jobs/" &
         jobId &
         "/approve"
       ).cstring,
