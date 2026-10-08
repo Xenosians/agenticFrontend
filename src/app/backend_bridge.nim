@@ -103,6 +103,34 @@ proc finishFailedJob(
   )
 
 
+proc finishReconciliationRequired(
+  state: AppState,
+  job: JobResponse
+) =
+
+  let message =
+    if job.error.len > 0:
+      job.error
+    else:
+      "The approved action has an unresolved execution outcome. Automatic retry is disabled; trusted reconciliation is required."
+
+  addAssistantMessage(
+    state,
+    message
+  )
+
+  addRunEvent(
+    state,
+    "reconciliation",
+    "Phoenix reported an unresolved approval outcome. Automatic retry is disabled."
+  )
+
+  showToast(
+    state,
+    "Reconciliation required."
+  )
+
+
 proc finishWaitingApproval(
   state: AppState,
   job: JobResponse,
@@ -195,6 +223,14 @@ proc pollBackendJob*(
           state,
           job,
           addWaitingMessage
+        )
+        redraw(kxi)
+        return
+
+      of "reconciliation_required":
+        finishReconciliationRequired(
+          state,
+          job
         )
         redraw(kxi)
         return
@@ -436,6 +472,12 @@ proc approvePendingJob*(
         state,
         job,
         false
+      )
+
+    of "reconciliation_required":
+      finishReconciliationRequired(
+        state,
+        job
       )
 
     of "pending", "processing", "approving":

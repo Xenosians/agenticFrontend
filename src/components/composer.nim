@@ -40,6 +40,9 @@ proc composerStatusText(
   of "waiting_approval":
     "Waiting for your approval."
 
+  of "reconciliation_required":
+    "Execution outcome unresolved — trusted reconciliation required."
+
   of "approving":
     "Executing the approved action…"
 
