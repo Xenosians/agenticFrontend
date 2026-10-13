@@ -22,7 +22,13 @@ var appState =
   initAppState()
 
 
+proc runWorkspaceCommand(action: string)
+
+
 proc activeViewTitle(): string =
+  if appState.commandPaletteOpen:
+    return "Commands"
+
   case appState.activeView
   of viewChat:
     "Chat"
@@ -43,6 +49,9 @@ proc activeViewTitle(): string =
 
 
 proc activeViewSubtitle(): string =
+  if appState.commandPaletteOpen:
+    return "Quick workspace actions and navigation"
+
   case appState.activeView
   of viewChat:
     "Durable governed assistant workspace"
@@ -641,7 +650,131 @@ proc renderAccountView(): VNode =
                     )
 
 
+proc renderCommandCenter(): VNode =
+  result = buildHtml(
+    section(class = "conversation")
+  ):
+    tdiv(class = "command-center"):
+      tdiv(class = "command-center-header"):
+        tdiv:
+          span(class = "command-center-eyebrow"):
+            text "Workspace"
+
+          h2:
+            text "Commands"
+
+          p:
+            text "Navigate and run workspace actions without opening an overlay."
+
+        button(class = "command-back-button"):
+          text "Back"
+
+          proc onclick(
+            event: Event,
+            node: VNode
+          ) =
+            runWorkspaceCommand(
+              "dismiss"
+            )
+
+      tdiv(class = "command-center-search"):
+        span:
+          text "⌕"
+
+        input(
+          id = "commandSearch",
+          `type` = "search",
+          placeholder = "Search commands",
+          value = cstring(
+            appState.commandQuery
+          )
+        ):
+          proc oninput(
+            event: Event,
+            node: VNode
+          ) =
+            appState.commandQuery =
+              $node.value
+
+            redraw(kxi)
+
+      tdiv(class = "command-center-section"):
+        tdiv(class = "command-section-heading"):
+          strong:
+            text "Quick actions"
+
+          span:
+            text "Ctrl/⌘ K"
+
+        tdiv(class = "command-center-list"):
+          for item in workspaceCommands:
+            if appState.commandQuery
+                 .toLowerAscii() in
+               item.label
+                 .toLowerAscii():
+
+              let command =
+                item
+
+              button(class = "command-center-row"):
+                span(class = "command-center-icon"):
+                  case command.id
+                  of "new_chat":
+                    text "+"
+                  of "search":
+                    text "⌕"
+                  of "connections":
+                    text "◇"
+                  of "inspector":
+                    text "I"
+                  of "refresh":
+                    text "↻"
+                  of "compose":
+                    text "✎"
+                  else:
+                    text "·"
+
+                tdiv(class = "command-center-copy"):
+                  strong:
+                    text command.label
+
+                  span:
+                    case command.id
+                    of "new_chat":
+                      text "Create a new durable conversation"
+                    of "search":
+                      text "Search the current chat"
+                    of "connections":
+                      text "Open plugins, models and datasets"
+                    of "inspector":
+                      text "Toggle developer diagnostics"
+                    of "refresh":
+                      text "Refresh service and connection state"
+                    of "compose":
+                      text "Return to the chat composer"
+                    else:
+                      text "Workspace action"
+
+                if command.shortcut.len > 0:
+                  kbd:
+                    text command.shortcut
+                else:
+                  span(class = "command-enter"):
+                    text "↵"
+
+                proc onclick(
+                  event: Event,
+                  node: VNode
+                ) =
+                  runWorkspaceCommand(
+                    command.id
+                  )
+
+
 proc renderWorkspaceBody(): VNode =
+  if appState.commandPaletteOpen:
+    return renderCommandCenter()
+
   case appState.activeView
   of viewChat:
     renderChat(
@@ -746,7 +879,22 @@ proc renderWorkspace(): VNode =
           text activeViewSubtitle()
 
       tdiv(class = "header-controls"):
-        if appState.activeView == viewSystem:
+        button(
+          class = "header-action command-header-action",
+          title = "Commands (Ctrl/Cmd+K)"
+        ):
+          text "⌘ K"
+
+          proc onclick(
+            event: Event,
+            node: VNode
+          ) =
+            runWorkspaceCommand(
+              "palette"
+            )
+
+        if appState.activeView == viewSystem and
+           not appState.commandPaletteOpen:
           button(
             class = "header-action",
             title = "Refresh system status"
@@ -780,10 +928,13 @@ proc renderWorkspace(): VNode =
 
     renderWorkspaceBody()
 
-    if appState.activeView == viewChat:
+    if appState.activeView == viewChat and
+       not appState.commandPaletteOpen:
       renderComposer(
         appState
       )
+
+
 
 
 proc focusComposer() {.importjs: "document.getElementById('messageInput')?.focus()".}
@@ -811,20 +962,7 @@ proc runWorkspaceCommand(action: string) =
   else: discard
   redraw(kxi)
 
-proc renderCommandPalette(): VNode =
-  result = buildHtml(tdiv(class = "command-palette", role = "dialog", ariaLabel = "Workspace commands")):
-    h2: text "Commands"
-    input(placeholder = "Filter commands", value = cstring(appState.commandQuery)):
-      proc oninput(event: Event, node: VNode) = appState.commandQuery = $node.value
-    for item in workspaceCommands:
-      if appState.commandQuery.toLowerAscii() in item.label.toLowerAscii():
-        let command = item
-        button:
-          text command.label & "  " & command.shortcut
-          proc onclick(event: Event, node: VNode) = runWorkspaceCommand(command.id)
-    button:
-      text "Close (Esc)"
-      proc onclick(event: Event, node: VNode) = runWorkspaceCommand("dismiss")
+
 
 proc installWorkspaceKeys(handler: proc(key: cstring, modifier, shift, composing, repeated, alt: bool): bool) {.importjs: "document.addEventListener('keydown', e => { if (#(e.key, e.ctrlKey || e.metaKey, e.shiftKey, e.isComposing, e.repeat, e.altKey)) e.preventDefault(); })".}
 
@@ -849,13 +987,6 @@ proc renderApp(): VNode =
     )
 
     renderWorkspace()
-
-    button(class = "commands-launcher", title = "Commands (Ctrl/Cmd+K)"):
-      text "Commands"
-      proc onclick(event: Event, node: VNode) = runWorkspaceCommand("palette")
-
-    if appState.commandPaletteOpen:
-      renderCommandPalette()
 
     if appState.inspectorOpen:
       renderInspector(

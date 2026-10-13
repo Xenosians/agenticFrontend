@@ -1,5 +1,5 @@
 include karax/prelude
-import std/[asyncjs, json]
+import std/[asyncjs, json, strutils]
 import types
 import ../api/extensions
 import ../config/runtime_config
@@ -7,18 +7,22 @@ import ../config/runtime_config
 proc sameSession(state: AppState, session: string): bool =
   state.auth.authenticated and state.auth.sessionId == session
 
+proc loadExtensions(state: AppState, session: string) {.async.} =
+  # The caller owns extensionBusy until its entire operation finishes.
+  let catalog = await extensionCatalog()
+  if not sameSession(state, session): return
+  state.extensionCatalog = catalog
+  state.tools.setLen(0)
+  for item in state.extensionCatalog["capabilities"]:
+    state.tools.add(ToolItem(id: item["id"].getStr, name: item["id"].getStr, enabled: true))
+  state.extensionError = ""
+
 proc refreshExtensions*(state: AppState) {.async.} =
-  if not state.auth.authenticated: return
+  if state.extensionBusy or not state.auth.authenticated: return
   let session = state.auth.sessionId
   state.extensionBusy = true
   try:
-    let catalog = await extensionCatalog()
-    if not sameSession(state, session): return
-    state.extensionCatalog = catalog
-    state.tools.setLen(0)
-    for item in state.extensionCatalog["capabilities"]:
-      state.tools.add(ToolItem(id: item["id"].getStr, name: item["id"].getStr, enabled: true))
-    state.extensionError = ""
+    await loadExtensions(state, session)
   except CatchableError as exc:
     if sameSession(state, session): state.extensionError = exc.msg
   finally:
@@ -37,7 +41,7 @@ proc changeExtension*(state: AppState, action: string, payload: JsonNode) {.asyn
     state.toastMessage = if action == "probe": $response else: "Saved. Changes apply to your next request."
     state.connectionKey = ""
     state.datasetApiKey = ""
-    await refreshExtensions(state)
+    await loadExtensions(state, session)
   except CatchableError as exc:
     if sameSession(state, session): state.extensionError = exc.msg
   finally:
@@ -59,12 +63,14 @@ proc saveDatasetFile*(state: AppState) {.async.} =
 proc uploadUserModel*(state: AppState) {.async.} =
   if state.extensionBusy or not state.auth.authenticated: return
   let session = state.auth.sessionId
+  let name = state.connectionName.strip()
+  let uploadName = if name.len > 0: name else: "Uploaded local model"
   state.extensionBusy = true
   try:
-    discard await uploadModelFiles(cstring(frontendConfig.backendBaseUrl), cstring(state.auth.csrfToken), cstring(state.connectionName))
+    discard await uploadModelFiles(cstring(frontendConfig.backendBaseUrl), cstring(state.auth.csrfToken), cstring(uploadName))
     if not sameSession(state, session): return
     state.toastMessage = "Model uploaded and format checked. Test its compatibility before relying on it."
-    await refreshExtensions(state)
+    await loadExtensions(state, session)
   except CatchableError as exc:
     if sameSession(state, session): state.extensionError = exc.msg
   finally:

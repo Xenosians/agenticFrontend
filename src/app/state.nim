@@ -74,6 +74,12 @@ proc initAppState*():
     activeView:
       viewChat,
 
+    pluginSection:
+      "public",
+
+    pluginSearchDraft:
+      "",
+
     inspectorTab:
       tabRun,
 

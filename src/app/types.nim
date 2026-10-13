@@ -134,6 +134,8 @@ type
     extensionCatalog*: JsonNode
     commandPaletteOpen*: bool
     commandQuery*: string
+    pluginSection*: string
+    pluginSearchDraft*: string
     extensionBusy*: bool
     extensionError*: string
     connectionName*: string

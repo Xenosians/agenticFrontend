@@ -1,456 +1,97 @@
 # Agentic Frontend
 
-Nim/Karax browser frontend for the **Agentic Developer Hub / ITSM Platform**.
+Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provides authenticated chat, durable job status, approval controls, structured results, and personal model/dataset connections.
 
-The frontend is a state-driven browser client that authenticates against Phoenix, owns the interactive chat experience, submits durable jobs, restores chat history, polls job lifecycle, renders real AI results, and exposes explicit approval controls for governed mutations.
+## Features
 
-> **Boundary rule:** the browser is a UI boundary, never an authorization or execution boundary.
+- Registration, email verification, login, password reset, and session management.
+- Saved chats and history, current-chat search, and a command palette.
+- Job submission and polling, explicit approval controls, and structured result cards.
+- Display of completed, failed, denied, and unknown-outcome jobs.
+- Run inspector, activity view, and backend/AI integration status.
+- A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
+- Per-account model selection, connection probes, local model folder uploads, reference datasets, and reviewed training-data exports.
 
----
+## How the repositories fit together
+
+```text
+agenticFrontend (this browser app)
+    -> agenticBackend / itsm_backend (Phoenix API + SurrealDB)
+        -> agenticaiPersonal / itsm-agent (inference and guarded tools)
+```
+
+The browser calls Phoenix only. Phoenix owns sessions, chats, jobs, and resource ownership; the AI runtime owns inference and guarded execution. Approval requests refer to a durable job, while the server retains the exact action and arguments.
 
 ## Stack
 
-- Nim `>= 2.2.10`
-- Karax `1.5.0`
-- JavaScript target
-- static HTML/CSS/JS
-- Phoenix REST API
+Nim `>= 2.2.10`, Karax `1.5.0`, and static HTML/CSS/JavaScript. Nim compiles [src/agenticFrontend.nim](src/agenticFrontend.nim) to `public/js/app.js`.
 
-Build output:
+## Build and run
 
-```text
-src/agenticFrontend.nim
-    |
-    v
-public/js/app.js
-```
-
----
-
-## Application architecture
-
-```text
-User
-  |
-  v
-Nim / Karax browser UI
-  |
-  | public REST + session cookie
-  v
-Phoenix / Elixir backend
-  |
-  +--> authentication / chats / durable jobs
-  |
-  +--> SurrealDB
-  |
-  +--> AI dispatch
-          |
-          v
-       FastAPI AI
-          |
-          v
-     governed tools/providers
-          |
-          v
-       Phoenix
-          |
-          v
-       Frontend
-```
-
-The browser never calls FastAPI, SurrealDB, LDAP, Jira, Git, or the host shell directly.
-
----
-
-## Current capabilities
-
-### Authentication
-
-The frontend currently supports:
-
-```text
-register
-email verification
-resend verification
-login
-session restore
-logout
-forgot password
-reset password
-session listing
-session revocation
-```
-
-Phoenix owns the actual identity/session policy.
-
-The browser receives a CSRF token for authenticated state-changing requests while the backend owns the HTTP-only session cookie.
-
-### Chats
-
-Current chat support includes:
-
-- durable authenticated chat creation;
-- remote chat listing;
-- chat selection;
-- durable chat-history loading;
-- new-chat creation;
-- conversation restore on application bootstrap.
-
-Phoenix job rows remain the source of chat turns.
-
-### Durable AI jobs
-
-The frontend submits:
-
-```http
-POST /api/v1/jobs
-```
-
-and polls:
-
-```http
-GET /api/v1/jobs/:id
-```
-
-Current rendered lifecycle includes:
-
-```text
-submitting
-pending
-processing
-waiting_approval
-approving
-completed
-failed
-```
-
-The frontend tracks the real Phoenix `job_id`.
-
-### Approval UX
-
-When Phoenix reports:
-
-```text
-waiting_approval
-```
-
-the UI renders an explicit approval control.
-
-Approval request:
-
-```http
-POST /api/v1/jobs/:job_id/approve
-```
-
-The browser sends the durable job ID and CSRF token.
-
-It does **not** send or invent privileged execution arguments and does not treat a model-generated approval identifier as authority.
-
-### Structured results
-
-Structured presentation cards returned through the AI -> Phoenix -> frontend contract are rendered alongside assistant messages.
-
-### System status
-
-The frontend can query and present backend/AI health/readiness state.
-
-### Inspector/run events
-
-The UI records bounded lifecycle/debug events such as:
-
-```text
-request submitted
-backend job created
-job status transition
-approval required
-approval execution
-completion
-backend error
-```
-
-These are UX/debug metadata, not execution authority.
-
----
-
-## Runtime configuration
-
-Frontend deployment values are loaded from:
-
-```text
-public/config.js
-```
-
-`src/config/runtime_config.nim` requires:
-
-```text
-AGENTIC_CONFIG.backendBaseUrl
-AGENTIC_CONFIG.pollIntervalMs
-```
-
-Example shape:
-
-```javascript
-globalThis.AGENTIC_CONFIG = {
-  backendBaseUrl: "http://127.0.0.1:4000",
-  pollIntervalMs: 1000
-};
-```
-
-The backend URL is therefore runtime-configurable rather than compiled as a fixed source-code constant.
-
----
-
-## Public backend calls
-
-Authentication:
-
-```text
-/api/v1/auth/*
-```
-
-Chats:
-
-```http
-POST /api/v1/chats
-GET  /api/v1/chats
-GET  /api/v1/chats/:id/history
-```
-
-Jobs:
-
-```http
-POST /api/v1/jobs
-GET  /api/v1/jobs/:id
-POST /api/v1/jobs/:id/approve
-```
-
-System health is queried through the Phoenix-facing client path.
-
----
-
-## State model
-
-Important application state includes:
-
-```text
-authentication/session
-chat list
-current chat
-messages
-current run/job
-structured presentations
-run events
-system health
-active view
-```
-
-Application behavior is kept in Karax state/VDOM rather than manual DOM mutation.
-
----
-
-## Real request flow
-
-```text
-user enters message
-        |
-        v
-frontend validates authenticated/current-chat state
-        |
-        v
-POST durable Phoenix job
-        |
-        v
-poll job
-        |
-        +--> pending
-        |
-        +--> processing
-        |
-        +--> waiting_approval
-        |        |
-        |        v
-        |     approval button
-        |        |
-        |        v
-        |   POST /approve
-        |
-        +--> completed
-        |        |
-        |        v
-        |   assistant message + result cards
-        |
-        +--> failed
-```
-
-Local mock behavior must not run alongside the real Phoenix-backed request path.
-
----
-
-## Authentication flow
-
-Startup:
-
-```text
-load public runtime config
-        |
-        v
-inspect verify/reset query tokens
-        |
-        v
-GET /api/v1/auth/me
-        |
-        +--> authenticated
-        |       |
-        |       v
-        |   load remote chats/history
-        |
-        +--> unauthenticated
-                |
-                v
-            auth screen
-```
-
-Verification/reset tokens are removed from the browser URL when their flow completes.
-
----
-
-## Build
+Install Nim/Nimble and run from this repository:
 
 ```bash
-cd /mnt/c/project/agenticFrontend
+nimble install -d
 nimble build
 ```
 
-Serve static assets locally:
+Set the public runtime values in [public/config.js](public/config.js):
+
+```javascript
+window.AGENTIC_CONFIG = Object.freeze({
+  backendBaseUrl: "http://127.0.0.1:4000",
+  pollIntervalMs: 1000
+});
+```
+
+Serve the `public` directory, for example:
 
 ```bash
-python3 -m http.server 8080 -d public
+python -m http.server 8080 -d public
 ```
 
-Then open:
+Open `http://127.0.0.1:8080`. Phoenix must be running with a matching allowed frontend origin and cookie policy. The AI service must be running for chat execution and connection management. Backend registration/verification requires its configured mail transport; the local development mailbox is available at `http://127.0.0.1:4000/dev/mailbox` when enabled.
 
-```text
-http://127.0.0.1:8080
+The generated `public/js/app.js` is tracked. Rebuild it when changing Nim source.
+
+## Models and datasets
+
+Open connections with **Ctrl/Cmd+,**, or use the command palette with **Ctrl/Cmd+K**.
+
+- Local models are the default. Selecting another model applies to future requests for your account.
+- Hosted APIs need valid provider access, credentials, and quota. A saved connection does not by itself prove connectivity; use its probe and then test the intended task.
+- Pi and OpenCode are available only when installed on the AI host. They supply inference while application tools remain governed by server policy and approvals.
+- Local model uploads accept supported safetensors folders. The AI service validates their format; this does not guarantee model quality or enough GPU memory.
+- Reference uploads use local full-text retrieval. Training JSONL requires provenance and review; exporting/importing data does not start training or promote a model.
+- The networking specialist keeps its existing model and does not receive the additional private dataset context.
+
+The AI repository's `docs/user-extensions.md` documents formats, limits, storage, and configuration. The frontend uses authenticated `/api/v1/extensions` requests; credentials are stored server-side and omitted from returned catalogs.
+
+## Tests
+
+With Node.js available for Nim's JavaScript test runner:
+
+```bash
+nim js -r tests/test_commands.nim
+nim js -r tests/test_job_lifecycle.nim
 ```
 
-Phoenix must allow the frontend origin through CORS and its auth cookie policy must match the deployment.
+These cover shortcut handling and versioned lifecycle validation. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approval, and result rendering after changes to those flows.
 
----
+## Current boundaries
 
-## Main source layout
+- Jobs update through polling; the composer allows one active job at a time.
+- Reconnect and in-flight recovery remain limited compared with a production collaboration client.
+- The node builder and simulator are design previews. n8n/workflow support is manifest validation only; it does not execute workflows or register webhooks.
+- Reference retrieval has no embedding/vector-provider connector yet, and user datasets do not replace the application database.
+- An unknown execution outcome requires server-side reconciliation; the UI does not automatically retry the mutation.
+- Live provider availability depends on the configured backend and AI services. Deployment still requires correct origin, cookie, and service configuration across all three repositories.
 
-```text
-src/
-├── agenticFrontend.nim
-├── api/
-│   ├── auth_client.nim
-│   └── client.nim
-├── app/
-│   ├── auth_bridge.nim
-│   ├── backend_bridge.nim
-│   ├── mock_agent.nim
-│   ├── state.nim
-│   └── types.nim
-├── components/
-│   ├── auth.nim
-│   ├── brand.nim
-│   ├── chat.nim
-│   ├── composer.nim
-│   ├── inspector.nim
-│   ├── result_card.nim
-│   └── sidebar.nim
-└── config/
-    └── runtime_config.nim
+## Source references
 
-public/
-├── config.js
-├── index.html
-├── css/
-├── assets/
-└── js/app.js
-```
-
----
-
-## Cross-repository project visibility
-
-Project planning/status reporting is currently handled by the separate local `projectOps` workspace rather than by the browser frontend.
-
-```text
-agenticFrontend Git history
-agenticBackend Git history
-agenticAI Git history
-        +
-explicit SDLC status catalog
-        |
-        v
-projectOps
-        |
-        +--> Notion board
-        +--> weekly Gmail brief
-```
-
-The frontend therefore remains focused on product interaction and durable job UX. The Notion SDLC board is an engineering/project-operations surface, not a browser authorization source.
-
----
-
-## Current deliberate limitations
-
-The frontend is already connected to the real backend flow, but it remains an MVP.
-
-Current gaps include:
-
-- job lifecycle updates use polling rather than server push/SSE/WebSocket;
-- the composer intentionally allows one active durable job at a time;
-- reconnect/in-flight recovery is still limited compared with a production collaboration client;
-- dynamic capability/plugin discovery is not yet fully driven by trusted server metadata;
-- some tool/plugin UI remains preview-oriented;
-- generated `public/js/app.js` is committed and that policy should remain consistent;
-- lifecycle does not yet have first-class rendering for future backend states such as `denied` or `outcome_unknown`;
-- deployment auth/cookie/CORS hardening still depends on correct environment configuration.
-
-Authentication itself is no longer only a mock/development UI; real backend registration, verification, sessions, chats, password reset, and ownership-aware API calls are implemented.
-
----
-
-## Development rules
-
-1. Frontend calls Phoenix only.
-2. Never call FastAPI directly from browser code.
-3. Never expose SurrealDB, LDAP, Jira, Git, shell, or AI SQLite directly to the browser.
-4. Never make frontend controls an authorization source.
-5. Keep state transitions in Karax state/VDOM.
-6. Preserve CSRF/session handling on state-changing authenticated requests.
-7. Treat the durable job ID as the browser-facing operation identity.
-8. Render server-owned result/presentation structures rather than reconstructing privileged tool state client-side.
-9. Keep unavailable/preview features explicit instead of pretending they execute.
-10. Verify cross-repository contracts whenever job/result/auth payloads change.
-
----
-
-## Before commit
-
-```text
-[ ] nimble build succeeds
-[ ] application loads public/config.js
-[ ] registration/login/session restore work
-[ ] chat list/history load
-[ ] one durable job is created per submitted message
-[ ] pending -> processing -> completed works
-[ ] waiting_approval -> approve -> completed works
-[ ] structured result cards render
-[ ] failed jobs render clearly
-[ ] no mock answer appears on the real path
-[ ] browser never sends privileged approval/tool authority
-```
-
----
-
-## Design summary
-
-```text
-The browser owns interaction.
-Phoenix owns durable application truth.
-The AI runtime owns reasoning.
-Trusted server-side policy owns authority.
-```
+- [Runtime configuration](src/config/runtime_config.nim)
+- [Backend client](src/api/client.nim) and [job lifecycle contract](src/api/job_lifecycle.nim)
+- [Chat/job state bridge](src/app/backend_bridge.nim)
+- [Model and dataset connections](src/components/connections.nim)
+- [Extension requests](src/api/extensions.nim)
+- [Workspace commands and shortcuts](src/app/commands.nim)
