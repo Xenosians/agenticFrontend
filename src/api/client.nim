@@ -42,6 +42,14 @@ type
     aiReady*: bool
 
 
+  IntegrationStatusResponse* = object
+    items*: JsonNode
+    openwrtConfigured*: bool
+    paloAltoConfigured*: bool
+    paloAltoHost*: string
+    paloAltoMode*: string
+
+
 proc jsonValueText(
   node: JsonNode,
   key: string
@@ -101,6 +109,66 @@ proc jsonValueBool(
 
 
   return false
+
+
+proc publicApiError(
+  responseStatus: string,
+  responseBody: string
+): ref ValueError =
+
+  var
+    code =
+      "request_failed"
+
+    message =
+      "The request could not be completed."
+
+
+  try:
+
+    let data =
+      parseJson(
+        responseBody
+      )
+
+
+    let parsedCode =
+      jsonValueText(
+        data,
+        "error"
+      )
+
+
+    let parsedMessage =
+      jsonValueText(
+        data,
+        "message"
+      )
+
+
+    if parsedCode.len > 0:
+      code =
+        parsedCode
+
+
+    if parsedMessage.len > 0:
+      message =
+        parsedMessage
+
+
+  except CatchableError:
+    discard
+
+
+  newException(
+    ValueError,
+    "HTTP " &
+    responseStatus &
+    " · " &
+    code &
+    " · " &
+    message
+  )
 
 
 proc parseResultField(
@@ -560,10 +628,13 @@ proc extractProposedTool(
   )
 
 
+import job_lifecycle
+
 proc parseJobResponse(
   data: JsonNode
 ): JobResponse =
 
+  validateJobV2(data)
   result =
     JobResponse(
       jobId:
@@ -739,6 +810,59 @@ proc getSystemHealth*():
     )
 
 
+proc getIntegrationStatus*():
+  Future[
+    IntegrationStatusResponse
+  ] {.async.} =
+
+  let options =
+    newFetchOptions(
+      metod = HttpGet,
+      mode = fmCors,
+      credentials = fcInclude
+    )
+
+  let response =
+    await fetch(
+      (frontendConfig.backendBaseUrl & "/api/v1/integrations").cstring,
+      options
+    )
+
+  let responseBody = $(await response.text())
+
+  if not response.ok:
+    raise newException(
+      ValueError,
+      "Integration status returned HTTP " & $response.status & ": " & responseBody
+    )
+
+  let data = parseJson(responseBody)
+  var configured = false
+  var openwrtConfigured = false
+  var host = ""
+  var mode = ""
+
+  if data.kind == JObject and data.hasKey("integrations"):
+    let integrations = data["integrations"]
+    if integrations.kind == JArray:
+      for integration in integrations.items:
+        if integration.kind == JObject and jsonValueText(integration, "id") == "openwrt":
+          openwrtConfigured = jsonValueBool(integration, "configured")
+        if integration.kind == JObject and
+           jsonValueText(integration, "id") == "palo_alto":
+          configured = jsonValueBool(integration, "configured")
+          host = jsonValueText(integration, "host")
+          mode = jsonValueText(integration, "mode")
+
+  result = IntegrationStatusResponse(
+    items: (if data.hasKey("integrations"): data["integrations"] else: newJArray()),
+    openwrtConfigured: openwrtConfigured,
+    paloAltoConfigured: configured,
+    paloAltoHost: host,
+    paloAltoMode: mode
+  )
+
+
 proc createJob*(
   chatId: string,
   message: string,
@@ -811,11 +935,8 @@ proc createJob*(
 
   if not response.ok:
 
-    raise newException(
-      ValueError,
-      "Backend returned HTTP " &
-      $response.status &
-      ": " &
+    raise publicApiError(
+      $response.status,
       responseBody
     )
 
@@ -864,7 +985,7 @@ proc getJob*(
       (
         frontendConfig
         .backendBaseUrl &
-        "/api/v1/jobs/" &
+        "/api/v2/jobs/" &
         jobId
       ).cstring,
 
@@ -880,11 +1001,8 @@ proc getJob*(
 
   if not response.ok:
 
-    raise newException(
-      ValueError,
-      "Backend returned HTTP " &
-      $response.status &
-      ": " &
+    raise publicApiError(
+      $response.status,
       responseBody
     )
 
@@ -938,7 +1056,7 @@ proc approveJob*(
       (
         frontendConfig
         .backendBaseUrl &
-        "/api/v1/jobs/" &
+        "/api/v2/jobs/" &
         jobId &
         "/approve"
       ).cstring,
@@ -955,11 +1073,8 @@ proc approveJob*(
 
   if not response.ok:
 
-    raise newException(
-      ValueError,
-      "Backend returned HTTP " &
-      $response.status &
-      ": " &
+    raise publicApiError(
+      $response.status,
       responseBody
     )
 

@@ -1,3 +1,5 @@
+import std/json
+
 type
   AppView* = enum
     viewChat,
@@ -7,7 +9,10 @@ type
     viewLogs,
     viewSystem,
     viewTool,
-    viewPlugin
+    viewPlugin,
+    viewNodeBuilder,
+    viewSimulator,
+    viewAccount
 
   InspectorTab* = enum
     tabRun,
@@ -75,6 +80,10 @@ type
     aiReachable*: bool
     aiHealthy*: bool
     aiReady*: bool
+    paloAltoConfigured*: bool
+    paloAltoHost*: string
+    paloAltoMode*: string
+    integrationsError*: string
     error*: string
 
   ToolItem* = object
@@ -122,6 +131,23 @@ type
     resetToken*: string
 
   AppState* = ref object
+    extensionCatalog*: JsonNode
+    commandPaletteOpen*: bool
+    commandQuery*: string
+    extensionBusy*: bool
+    extensionError*: string
+    connectionName*: string
+    connectionBackend*: string
+    connectionModel*: string
+    connectionUrl*: string
+    connectionKey*: string
+    datasetName*: string
+    datasetSource*: string
+    datasetLicense*: string
+    datasetPurpose*: string
+    datasetText*: string
+    datasetApiKey*: string
+    datasetReviewed*: bool
     activeView*: AppView
     inspectorTab*: InspectorTab
     composerPanel*: ComposerPanel
@@ -132,6 +158,7 @@ type
     composerSelectedToolId*: string
     selectedToolId*: string
     selectedPluginId*: string
+    pendingDeleteChatId*: string
     toastMessage*: string
     messages*: seq[ChatMessage]
     run*: RunState

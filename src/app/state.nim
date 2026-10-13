@@ -50,6 +50,18 @@ proc emptySystemState():
     aiReady:
       false,
 
+    paloAltoConfigured:
+      false,
+
+    paloAltoHost:
+      "",
+
+    paloAltoMode:
+      "",
+
+    integrationsError:
+      "",
+
     error:
       ""
   )
@@ -69,7 +81,7 @@ proc initAppState*():
       cpNone,
 
     inspectorOpen:
-      true,
+      false,
 
     headerMenuOpen:
       false,
@@ -89,6 +101,9 @@ proc initAppState*():
     selectedPluginId:
       "",
 
+    pendingDeleteChatId:
+      "",
+
     toastMessage:
       "",
 
@@ -104,97 +119,9 @@ proc initAppState*():
     system:
       emptySystemState(),
 
-    tools: @[
-      ToolItem(
-        id:
-          "shell",
+    tools: @[],
 
-        name:
-          "Shell",
-
-        enabled:
-          true
-      ),
-
-      ToolItem(
-        id:
-          "account",
-
-        name:
-          "Account",
-
-        enabled:
-          true
-      ),
-
-      ToolItem(
-        id:
-          "access",
-
-        name:
-          "Access",
-
-        enabled:
-          true
-      ),
-
-      ToolItem(
-        id:
-          "files",
-
-        name:
-          "Files",
-
-        enabled:
-          false
-      ),
-
-      ToolItem(
-        id:
-          "git",
-
-        name:
-          "Git",
-
-        enabled:
-          false
-      )
-    ],
-
-    plugins: @[
-      PluginItem(
-        id:
-          "github",
-
-        name:
-          "GitHub",
-
-        connected:
-          false
-      ),
-
-      PluginItem(
-        id:
-          "jira",
-
-        name:
-          "Jira",
-
-        connected:
-          false
-      ),
-
-      PluginItem(
-        id:
-          "slack",
-
-        name:
-          "Slack",
-
-        connected:
-          false
-      )
-    ],
+    plugins: @[],
 
     nextMessageId:
       1,
@@ -417,6 +344,14 @@ proc togglePluginConnection*(
   state: AppState,
   pluginId: string
 ) =
+
+  if pluginId in ["palo-alto", "openwrt"]:
+    showToast(
+      state,
+      "Network integration configuration is managed by the backend runtime."
+    )
+    return
+
 
   for i in 0 ..<
       state.plugins.len:

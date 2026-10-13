@@ -510,3 +510,977 @@ button:focus-visible {
 .auth-session-panel { margin-top: 14px; }
 .auth-session-panel .secondary-action { width: auto; }
 
+
+/* ==========================================================
+   Core application sidebar cleanup
+   ========================================================== */
+
+.chat-nav-section {
+  min-height: 0;
+}
+
+.chat-nav-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 4px;
+}
+
+.chat-nav-main {
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chat-nav-main.active {
+  background: var(--surface-active, rgba(255, 255, 255, 0.06));
+}
+
+.chat-nav-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-delete {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.45;
+  cursor: pointer;
+}
+
+.chat-delete:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.plugin-card {
+  cursor: default;
+}
+
+/* ==========================================================
+   Inline application feedback
+   ========================================================== */
+
+.workspace-status {
+  flex: 0 0 auto;
+  min-height: 24px;
+  padding: 4px 24px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  opacity: 0.68;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-delete-confirm {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+}
+
+.chat-delete-confirm button {
+  border: 0;
+  border-radius: 6px;
+  padding: 4px 7px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.chat-delete-confirm-yes {
+  background: rgba(220, 70, 70, 0.16);
+  color: inherit;
+}
+
+.chat-delete-confirm-no {
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+}
+
+/* ==========================================================
+   Presentable application baseline
+   ========================================================== */
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+.app-shell {
+  height: 100vh;
+  min-height: 0;
+}
+
+.app-shell.inspector-hidden {
+  grid-template-columns: 260px minmax(0, 1fr);
+}
+
+
+/* ----------------------------------------------------------
+   Sidebar
+   ---------------------------------------------------------- */
+
+.sidebar {
+  min-width: 0;
+  padding: 16px 12px;
+  overflow: hidden;
+}
+
+.brand {
+  padding: 4px 8px 16px;
+}
+
+.brand-logo {
+  width: 32px;
+  height: 32px;
+}
+
+.brand-copy strong {
+  font-size: 15px;
+}
+
+.brand-copy span {
+  font-size: 11px;
+  opacity: 0.58;
+}
+
+.new-session {
+  width: 100%;
+  min-height: 40px;
+  margin-bottom: 18px;
+  border-radius: 10px;
+}
+
+.nav-section {
+  gap: 3px;
+  margin-bottom: 18px;
+}
+
+.section-label {
+  padding: 0 8px 7px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.48;
+}
+
+.nav-item,
+.chat-nav-main {
+  min-height: 36px;
+  padding: 7px 9px;
+  border-radius: 8px;
+}
+
+.chat-nav-row {
+  min-width: 0;
+}
+
+.chat-nav-main {
+  overflow: hidden;
+}
+
+.chat-nav-title {
+  min-width: 0;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  min-height: 52px;
+  border-radius: 10px;
+}
+
+
+/* ----------------------------------------------------------
+   Workspace
+   ---------------------------------------------------------- */
+
+.workspace {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.workspace-header {
+  min-height: 58px;
+  padding: 0 22px;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.14);
+}
+
+.workspace-title h1 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.workspace-title span {
+  font-size: 11px;
+  opacity: 0.52;
+}
+
+.header-controls {
+  gap: 7px;
+}
+
+.header-controls button,
+.secondary-action,
+.inspector-toggle {
+  border-radius: 8px;
+}
+
+
+/* ----------------------------------------------------------
+   Conversation
+   ---------------------------------------------------------- */
+
+.conversation {
+  box-sizing: border-box;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: 30px 28px 150px;
+}
+
+.welcome {
+  max-width: 620px;
+  margin: 10vh auto 0;
+  text-align: center;
+}
+
+.welcome-icon {
+  margin: 0 auto 18px;
+}
+
+.welcome h2 {
+  margin-bottom: 8px;
+  font-size: clamp(24px, 3vw, 34px);
+}
+
+.welcome p {
+  line-height: 1.6;
+  opacity: 0.66;
+}
+
+.welcome-hints {
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.message-row {
+  margin-bottom: 20px;
+}
+
+.message-column {
+  max-width: min(78%, 680px);
+}
+
+.message-bubble {
+  padding: 11px 14px;
+  border-radius: 14px;
+  line-height: 1.55;
+}
+
+.message-row.user {
+  justify-content: flex-end;
+}
+
+.message-bubble.user {
+  border-bottom-right-radius: 5px;
+}
+
+.message-bubble.assistant {
+  border-bottom-left-radius: 5px;
+}
+
+.assistant-avatar {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+}
+
+
+/* ----------------------------------------------------------
+   Composer
+   ---------------------------------------------------------- */
+
+.composer-container {
+  box-sizing: border-box;
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  bottom: 0;
+  width: min(100%, 920px);
+  transform: translateX(-50%);
+  padding: 12px 28px 16px;
+}
+
+.composer {
+  border: 1px solid rgba(128, 128, 128, 0.22);
+  border-radius: 16px;
+  box-shadow:
+    0 12px 38px rgba(0, 0, 0, 0.14);
+}
+
+.composer-input {
+  box-sizing: border-box;
+  min-height: 50px;
+  max-height: 180px;
+  padding: 14px 14px 8px;
+  line-height: 1.5;
+}
+
+.composer-footer {
+  padding: 6px 8px 8px;
+}
+
+.send-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+}
+
+.composer-hint {
+  display: block;
+  min-height: 17px;
+  padding: 6px 4px 0;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0.55;
+}
+
+/* Legacy floating feedback should never obscure the composer. */
+.toast,
+.workspace-status {
+  display: none !important;
+}
+
+
+/* ----------------------------------------------------------
+   Generic pages
+   ---------------------------------------------------------- */
+
+.developer-view {
+  box-sizing: border-box;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: 30px 28px 90px;
+}
+
+.developer-view-header {
+  margin-bottom: 22px;
+}
+
+.developer-view-header h2 {
+  margin: 0 0 5px;
+  font-size: 22px;
+}
+
+.developer-view-header p {
+  margin: 0;
+  opacity: 0.58;
+}
+
+.developer-card,
+.detail-card,
+.empty-card,
+.system-row,
+.search-result {
+  border-radius: 12px;
+}
+
+.developer-grid {
+  gap: 12px;
+}
+
+
+/* ----------------------------------------------------------
+   Plugins
+   ---------------------------------------------------------- */
+
+.plugin-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(220px, 1fr)
+    );
+  gap: 12px;
+}
+
+.plugin-card {
+  min-height: 138px;
+  padding: 16px;
+  border-radius: 14px;
+}
+
+
+/* ----------------------------------------------------------
+   Search
+   ---------------------------------------------------------- */
+
+.search-box {
+  min-height: 44px;
+  border-radius: 11px;
+}
+
+.search-input {
+  min-width: 0;
+}
+
+
+/* ----------------------------------------------------------
+   Auth
+   ---------------------------------------------------------- */
+
+.auth-shell {
+  box-sizing: border-box;
+  min-height: 100vh;
+  padding: 32px 20px;
+}
+
+.auth-card {
+  box-sizing: border-box;
+  width: min(100%, 420px);
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow:
+    0 24px 70px rgba(0, 0, 0, 0.18);
+}
+
+.auth-brand {
+  margin-bottom: 28px;
+}
+
+.auth-card h1 {
+  margin-bottom: 7px;
+  font-size: 26px;
+}
+
+.auth-subtitle {
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.auth-field {
+  margin-bottom: 14px;
+}
+
+.auth-field input {
+  box-sizing: border-box;
+  min-height: 42px;
+  border-radius: 9px;
+}
+
+.auth-primary {
+  min-height: 42px;
+  border-radius: 9px;
+}
+
+.auth-actions {
+  margin-top: 15px;
+}
+
+
+/* ----------------------------------------------------------
+   Inline delete confirmation
+   ---------------------------------------------------------- */
+
+.chat-delete-confirm {
+  position: relative;
+  z-index: 2;
+}
+
+.chat-delete-confirm button {
+  white-space: nowrap;
+}
+
+
+/* ----------------------------------------------------------
+   Responsive baseline
+   ---------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  .app-shell,
+  .app-shell.inspector-hidden {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .inspector {
+    display: none;
+  }
+
+  .conversation,
+  .developer-view {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .composer-container {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+@media (max-width: 680px) {
+  .app-shell,
+  .app-shell.inspector-hidden {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
+  .message-column {
+    max-width: 88%;
+  }
+
+  .workspace-title span {
+    display: none;
+  }
+}
+
+
+/* ==========================================================
+   PRODUCT IA + E2E FRONTEND COMPLETION
+   ========================================================== */
+
+.nav-preview {
+  margin-left: auto;
+  padding: 2px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  color: #777;
+  font-size: 8px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.composer-context {
+  padding-left: 5px;
+  color: #686868;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.composer-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.activity-summary,
+.account-profile-grid,
+.simulation-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.activity-summary .wide,
+.account-session-panel {
+  grid-column: 1 / -1;
+}
+
+.activity-section {
+  margin-top: 22px;
+}
+
+.section-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.section-heading-row h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.section-heading-row span {
+  color: #666;
+  font-size: 10px;
+}
+
+.activity-timeline {
+  overflow: hidden;
+  border: 1px solid #252525;
+  border-radius: 12px;
+  background: #121212;
+}
+
+.activity-event {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid #202020;
+}
+
+.activity-event:last-child {
+  border-bottom: 0;
+}
+
+.activity-dot {
+  width: 7px;
+  height: 7px;
+  margin-top: 5px;
+  border-radius: 50%;
+  background: #777;
+}
+
+.activity-event strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #cfcfcf;
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.activity-event p {
+  margin: 0;
+  color: #818181;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.system-warning {
+  margin-top: 14px;
+}
+
+.integration-card {
+  min-height: 170px;
+}
+
+.integration-card p,
+.integration-note p {
+  margin: 10px 0 0;
+  color: #858585;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.integration-note {
+  margin-top: 14px;
+}
+
+.integration-note strong {
+  display: block;
+  color: #c8c8c8;
+  font-size: 11px;
+}
+
+.build-preview-page {
+  padding-bottom: 80px;
+}
+
+.preview-banner {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid #2b2b2b;
+  border-radius: 12px;
+  background: #151515;
+}
+
+.preview-banner strong {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+}
+
+.preview-banner p {
+  margin: 0;
+  color: #858585;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.node-builder-shell {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  min-height: 440px;
+  overflow: hidden;
+  border: 1px solid #272727;
+  border-radius: 14px;
+  background: #101010;
+}
+
+.node-palette {
+  padding: 14px 12px;
+  border-right: 1px solid #242424;
+  background: #141414;
+}
+
+.node-palette .section-label {
+  display: block;
+  padding-left: 2px;
+}
+
+.palette-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 7px;
+  padding: 9px 10px;
+  border: 1px solid #272727;
+  border-radius: 9px;
+  background: #171717;
+}
+
+.palette-item strong {
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.palette-item span {
+  color: #696969;
+  font-size: 9px;
+}
+
+.node-canvas-preview,
+.simulation-canvas {
+  position: relative;
+  min-height: 440px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  overflow: hidden;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.workflow-node {
+  width: 136px;
+  min-height: 86px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid #323232;
+  border-radius: 11px;
+  background: #181818;
+  box-shadow: 0 12px 28px rgba(0,0,0,.2);
+}
+
+.workflow-node > span {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: #242424;
+  color: #888;
+  font-size: 9px;
+}
+
+.workflow-node strong {
+  font-size: 11px;
+}
+
+.workflow-node small {
+  color: #727272;
+  font-size: 9px;
+}
+
+.workflow-arrow {
+  color: #555;
+  font-size: 18px;
+}
+
+.canvas-watermark {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  color: #505050;
+  font-size: 9px;
+  text-align: center;
+}
+
+.preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.preview-actions button:disabled,
+.simulation-tab:disabled {
+  cursor: default;
+  opacity: .55;
+}
+
+.simulation-layout {
+  overflow: hidden;
+  border: 1px solid #272727;
+  border-radius: 14px;
+  background: #101010;
+}
+
+.simulation-toolbar {
+  min-height: 44px;
+  padding: 7px 10px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  border-bottom: 1px solid #242424;
+  background: #141414;
+}
+
+.simulation-tab {
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #747474;
+  font-size: 10px;
+}
+
+.simulation-tab.active {
+  background: #202020;
+  color: #bdbdbd;
+}
+
+.infra-node {
+  position: absolute;
+  width: 126px;
+  padding: 11px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid #323232;
+  border-radius: 10px;
+  background: #181818;
+}
+
+.infra-node strong {
+  font-size: 11px;
+}
+
+.infra-node span {
+  color: #707070;
+  font-size: 9px;
+}
+
+.infra-node-a {
+  left: 16%;
+  top: 27%;
+}
+
+.infra-node-b {
+  left: 43%;
+  top: 47%;
+}
+
+.infra-node-c {
+  right: 14%;
+  top: 25%;
+}
+
+.simulation-cards {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.simulation-cards p {
+  margin: 8px 0 0;
+  color: #777;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.account-profile-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 14px;
+}
+
+.account-session-panel {
+  margin-top: 0;
+}
+
+.developer-view-header.compact {
+  margin-bottom: 12px;
+}
+
+.developer-view-header.compact h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.account-session-row {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+@media (max-width: 980px) {
+  .node-builder-shell {
+    grid-template-columns: 150px minmax(0, 1fr);
+  }
+
+  .workflow-node {
+    width: 112px;
+  }
+
+  .simulation-cards,
+  .account-profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .activity-summary,
+  .account-profile-grid,
+  .simulation-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .node-builder-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .node-palette {
+    display: none;
+  }
+
+  .node-canvas-preview {
+    gap: 8px;
+  }
+
+  .workflow-node {
+    width: 96px;
+    min-height: 76px;
+    padding: 9px;
+  }
+
+  .workflow-arrow {
+    font-size: 13px;
+  }
+}
