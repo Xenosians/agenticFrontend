@@ -1,12 +1,13 @@
 include karax/prelude
 
-import std/asyncjs
+import std/[asyncjs, json]
 
 import ../api/client
 import ../config/runtime_config
 
 import types
 import state
+import extension_bridge
 
 
 proc sleepMs(
@@ -550,10 +551,12 @@ proc approvePendingJob*(
 proc refreshIntegrationStatus(
   state: AppState
 ) {.async.} =
-
+  let session = state.auth.sessionId
   try:
     let integrations =
       await getIntegrationStatus()
+
+    if not state.auth.authenticated or state.auth.sessionId != session: return
 
     state.system.paloAltoConfigured =
       integrations.paloAltoConfigured
@@ -567,16 +570,15 @@ proc refreshIntegrationStatus(
     state.system.integrationsError =
       ""
 
-    for i in 0 ..< state.plugins.len:
-      if state.plugins[i].id == "openwrt":
-        state.plugins[i].connected = integrations.openwrtConfigured
-      if state.plugins[i].id == "palo-alto":
-        state.plugins[i].connected =
-          integrations.paloAltoConfigured
+    state.plugins.setLen(0)
+    for item in integrations.items:
+      state.plugins.add(PluginItem(id: item["id"].getStr,
+        name: (if item.hasKey("name"): item["name"].getStr else: item["id"].getStr),
+        connected: item.hasKey("configured") and item["configured"].getBool))
 
   except CatchableError as exc:
-    state.system.integrationsError =
-      exc.msg
+    if state.auth.authenticated and state.auth.sessionId == session:
+      state.system.integrationsError = exc.msg
 
 proc refreshSystemStatusBase(
   state: AppState
@@ -625,6 +627,8 @@ proc refreshSystemStatus*(
   await refreshIntegrationStatus(
     state
   )
+
+  await refreshExtensions(state)
 
   redraw(
     kxi

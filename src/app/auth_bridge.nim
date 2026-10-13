@@ -57,6 +57,15 @@ proc clearAuthenticatedState(
   state: AppState
 ) =
   state.auth.authenticated = false
+  state.extensionCatalog = nil
+  state.extensionBusy = false
+  state.extensionError = ""
+  state.plugins.setLen(0)
+  state.connectionKey = ""
+  state.datasetText = ""
+  state.datasetApiKey = ""
+  state.tools.setLen(0)
+  state.commandPaletteOpen = false
   state.auth.userId = ""
   state.auth.email = ""
   state.auth.displayName = ""
@@ -113,7 +122,10 @@ proc applyHistory(
         "pending",
         "processing",
         "waiting_approval",
-        "approving"
+        "approving",
+        "denied",
+        "outcome_unknown",
+        "reconciliation_required"
       ] and
       latest.jobId.len > 0
     ):
@@ -149,7 +161,10 @@ proc loadChatHistory*(
       state.run.status in [
         "pending",
         "processing",
-        "approving"
+        "approving",
+        "denied",
+        "outcome_unknown",
+        "reconciliation_required"
       ]
     ):
       discard resumeBackendJob(

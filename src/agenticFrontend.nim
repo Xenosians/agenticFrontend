@@ -2,11 +2,14 @@ include karax/prelude
 
 import std/strutils
 
+import app/commands
 import app/types
 import app/state
 import app/auth_bridge
 import app/backend_bridge
 
+import components/connections
+import app/extension_bridge
 import components/auth
 import components/sidebar
 import components/chat
@@ -355,45 +358,6 @@ proc pluginDescription(
     "Server-managed integration surface."
 
 
-proc renderPluginView(): VNode =
-  result = buildHtml(
-    section(class = "conversation")
-  ):
-    tdiv(class = "developer-view"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2:
-            text "Plugins"
-          p:
-            text "Integration catalog. Provider credentials and authorization remain server-side."
-
-      tdiv(class = "plugin-grid"):
-        for plugin in appState.plugins:
-          let currentPlugin = plugin
-
-          tdiv(class = "plugin-card integration-card"):
-            tdiv(class = "plugin-card-header"):
-              tdiv(class = "plugin-icon"):
-                text currentPlugin.name[0 .. 0]
-
-              span(class = "capability-badge preview"):
-                text "Server managed"
-
-            strong:
-              text currentPlugin.name
-
-            p:
-              text pluginDescription(
-                currentPlugin.id
-              )
-
-      tdiv(class = "empty-card integration-note"):
-        strong:
-          text "Connection controls are intentionally not simulated."
-        p:
-          text "When a public plugin registry/status contract exists, this page can render real availability without moving secrets or authority into the browser."
-
-
 proc renderNodeBuilderView(): VNode =
   result = buildHtml(
     section(class = "conversation")
@@ -690,7 +654,7 @@ proc renderWorkspaceBody(): VNode =
   of viewSystem:
     renderSystemView()
   of viewPlugin, viewTool:
-    renderPluginView()
+    renderConnections(appState)
   of viewNodeBuilder:
     renderNodeBuilderView()
   of viewSimulator:
@@ -822,6 +786,48 @@ proc renderWorkspace(): VNode =
       )
 
 
+proc focusComposer() {.importjs: "document.getElementById('messageInput')?.focus()".}
+
+proc runWorkspaceCommand(action: string) =
+  if not appState.auth.authenticated: return
+  appState.commandPaletteOpen = false
+  case action
+  of "palette":
+    appState.commandQuery = ""
+    appState.commandPaletteOpen = true
+  of "dismiss":
+    appState.headerMenuOpen = false
+    appState.composerPanel = cpNone
+  of "new_chat": discard createNewChat(appState)
+  of "search": setActiveView(appState, viewSearch)
+  of "connections":
+    setActiveView(appState, viewPlugin)
+    discard refreshExtensions(appState)
+  of "inspector": appState.inspectorOpen = not appState.inspectorOpen
+  of "refresh": discard refreshSystemStatus(appState)
+  of "compose":
+    setActiveView(appState, viewChat)
+    focusComposer()
+  else: discard
+  redraw(kxi)
+
+proc renderCommandPalette(): VNode =
+  result = buildHtml(tdiv(class = "command-palette", role = "dialog", ariaLabel = "Workspace commands")):
+    h2: text "Commands"
+    input(placeholder = "Filter commands", value = cstring(appState.commandQuery)):
+      proc oninput(event: Event, node: VNode) = appState.commandQuery = $node.value
+    for item in workspaceCommands:
+      if appState.commandQuery.toLowerAscii() in item.label.toLowerAscii():
+        let command = item
+        button:
+          text command.label & "  " & command.shortcut
+          proc onclick(event: Event, node: VNode) = runWorkspaceCommand(command.id)
+    button:
+      text "Close (Esc)"
+      proc onclick(event: Event, node: VNode) = runWorkspaceCommand("dismiss")
+
+proc installWorkspaceKeys(handler: proc(key: cstring, modifier, shift, composing, repeated, alt: bool): bool) {.importjs: "document.addEventListener('keydown', e => { if (#(e.key, e.ctrlKey || e.metaKey, e.shiftKey, e.isComposing, e.repeat, e.altKey)) e.preventDefault(); })".}
+
 proc renderApp(): VNode =
   if not appState.auth.checked or
      not appState.auth.authenticated:
@@ -844,6 +850,13 @@ proc renderApp(): VNode =
 
     renderWorkspace()
 
+    button(class = "commands-launcher", title = "Commands (Ctrl/Cmd+K)"):
+      text "Commands"
+      proc onclick(event: Event, node: VNode) = runWorkspaceCommand("palette")
+
+    if appState.commandPaletteOpen:
+      renderCommandPalette()
+
     if appState.inspectorOpen:
       renderInspector(
         appState
@@ -863,4 +876,12 @@ discard bootstrapApplication(
 
 discard refreshSystemStatus(
   appState
+)
+
+installWorkspaceKeys(proc(key: cstring, modifier, shift, composing, repeated, alt: bool): bool =
+  if not appState.auth.authenticated: return false
+  let action = shortcutAction($key, modifier, shift, composing, repeated, alt)
+  if action.len == 0: return false
+  runWorkspaceCommand(action)
+  return true
 )

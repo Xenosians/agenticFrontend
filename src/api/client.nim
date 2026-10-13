@@ -43,6 +43,7 @@ type
 
 
   IntegrationStatusResponse* = object
+    items*: JsonNode
     openwrtConfigured*: bool
     paloAltoConfigured*: bool
     paloAltoHost*: string
@@ -854,6 +855,7 @@ proc getIntegrationStatus*():
           mode = jsonValueText(integration, "mode")
 
   result = IntegrationStatusResponse(
+    items: (if data.hasKey("integrations"): data["integrations"] else: newJArray()),
     openwrtConfigured: openwrtConfigured,
     paloAltoConfigured: configured,
     paloAltoHost: host,

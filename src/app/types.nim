@@ -1,3 +1,5 @@
+import std/json
+
 type
   AppView* = enum
     viewChat,
@@ -129,6 +131,23 @@ type
     resetToken*: string
 
   AppState* = ref object
+    extensionCatalog*: JsonNode
+    commandPaletteOpen*: bool
+    commandQuery*: string
+    extensionBusy*: bool
+    extensionError*: string
+    connectionName*: string
+    connectionBackend*: string
+    connectionModel*: string
+    connectionUrl*: string
+    connectionKey*: string
+    datasetName*: string
+    datasetSource*: string
+    datasetLicense*: string
+    datasetPurpose*: string
+    datasetText*: string
+    datasetApiKey*: string
+    datasetReviewed*: bool
     activeView*: AppView
     inspectorTab*: InspectorTab
     composerPanel*: ComposerPanel

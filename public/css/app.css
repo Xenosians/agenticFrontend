@@ -2176,3 +2176,10 @@ textarea:focus-visible {
     width: 100%;
   }
 }
+/* Keyboard command palette and connection forms. */
+.command-palette { position: fixed; top: 15vh; left: 50%; transform: translateX(-50%); width: min(90vw, 560px); max-height: 70vh; overflow: auto; padding: 24px; background: var(--panel, #18212f); color: var(--text, #edf2f7); border: 1px solid #64748b; border-radius: 14px; box-shadow: 0 24px 80px #0008; z-index: 100; }
+.command-palette button, .command-palette input { display: block; width: 100%; padding: 12px; margin: 8px 0; }
+.form-field { display: grid; gap: 6px; margin: 12px 0; }
+.form-field input { width: 100%; padding: 10px; }
+.developer-view select { max-width: 100%; padding: 10px; margin: 8px 0; }
+.commands-launcher { position: fixed; bottom: 16px; left: 16px; z-index: 40; }

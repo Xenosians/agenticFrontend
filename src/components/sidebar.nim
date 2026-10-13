@@ -4,6 +4,7 @@ include karax/prelude
 
 import ../app/types
 import ../app/state
+import ../app/extension_bridge
 import ../app/auth_bridge
 
 
@@ -53,6 +54,8 @@ proc renderViewButton(
         state,
         target
       )
+      if target in [viewPlugin, viewTool]:
+        discard refreshExtensions(state)
 
 
 proc renderSidebar*(
