@@ -2,6 +2,70 @@ import std/[asyncjs, jsfetch, jsheaders, json]
 from std/httpcore import HttpGet, HttpPost
 import ../config/runtime_config
 
+proc extensionErrorMessage(
+  body: string,
+  status: string
+): string =
+
+  try:
+    let parsed =
+      parseJson(body)
+
+    if parsed.kind == JObject and
+       parsed.hasKey("detail"):
+
+      let detail =
+        parsed["detail"]
+
+      if detail.kind == JObject:
+
+        var
+          message = ""
+          code = ""
+
+        if detail.hasKey("message") and
+           detail["message"].kind == JString:
+
+          message =
+            detail["message"].getStr
+
+        if detail.hasKey("code") and
+           detail["code"].kind == JString:
+
+          code =
+            detail["code"].getStr
+
+        if message.len > 0:
+
+          if code.len > 0:
+            return (
+              message &
+              " (" &
+              code &
+              ")"
+            )
+
+          return message
+
+      elif detail.kind == JString:
+
+        let message =
+          detail.getStr
+
+        if message.len > 0:
+          return message
+
+  except CatchableError:
+    discard
+
+  return (
+    "Connection request failed (HTTP " &
+    status &
+    "). Check access, input fields and " &
+    "server availability."
+  )
+
+
 proc extensionRequest*(action: string, payload: JsonNode, csrf: string): Future[JsonNode] {.async.} =
   let headers = newHeaders()
   headers["Content-Type"] = "application/json"
@@ -11,7 +75,13 @@ proc extensionRequest*(action: string, payload: JsonNode, csrf: string): Future[
   let response = await fetch((frontendConfig.backendBaseUrl & "/api/v1/extensions").cstring, options)
   let body = $(await response.text())
   if not response.ok:
-    raise newException(ValueError, "Connection request failed (HTTP " & $response.status & "). Check access, input fields and server availability.")
+    raise newException(
+      ValueError,
+      extensionErrorMessage(
+        body,
+        $response.status
+      )
+    )
   return parseJson(body)
 
 proc extensionCatalog*(): Future[JsonNode] {.async.} =

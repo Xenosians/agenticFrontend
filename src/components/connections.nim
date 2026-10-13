@@ -978,9 +978,225 @@ proc renderPersonal(
             text "Add a provider, local model, or dataset to create a personal resource."
 
 
+proc connectionPresetId(
+  state: AppState
+): string =
+
+  if state.extensionCatalog == nil or
+     state.extensionCatalog.kind != JObject or
+     not state.extensionCatalog.hasKey(
+       "connection_presets"
+     ):
+
+    return ""
+
+  for row in
+      state.extensionCatalog[
+        "connection_presets"
+      ]:
+
+    if nodeText(
+         row,
+         "backend"
+       ) != state.connectionBackend:
+
+      continue
+
+    if nodeText(
+         row,
+         "model"
+       ) != state.connectionModel:
+
+      continue
+
+    if state.connectionBackend == "http" and
+       nodeText(
+         row,
+         "url"
+       ) != state.connectionUrl:
+
+      continue
+
+    return nodeText(
+      row,
+      "id"
+    )
+
+  return ""
+
+
+proc applyConnectionPreset(
+  state: AppState,
+  presetId: string
+) =
+
+  if presetId.len == 0:
+    return
+
+  if state.extensionCatalog == nil or
+     state.extensionCatalog.kind != JObject or
+     not state.extensionCatalog.hasKey(
+       "connection_presets"
+     ):
+
+    return
+
+  for row in
+      state.extensionCatalog[
+        "connection_presets"
+      ]:
+
+    if nodeText(
+         row,
+         "id"
+       ) != presetId:
+
+      continue
+
+    state.connectionName =
+      nodeText(
+        row,
+        "name"
+      )
+
+    state.connectionBackend =
+      nodeText(
+        row,
+        "backend"
+      )
+
+    state.connectionModel =
+      nodeText(
+        row,
+        "model"
+      )
+
+    state.connectionUrl =
+      nodeText(
+        row,
+        "url"
+      )
+
+    # Never carry a credential from one provider
+    # selection into another provider selection.
+    state.connectionKey =
+      ""
+
+    redraw(kxi)
+
+    return
+
+
+proc connectionRequiresCredential(
+  state: AppState
+): bool =
+
+  let presetId =
+    connectionPresetId(
+      state
+    )
+
+  if presetId.len > 0 and
+     state.extensionCatalog != nil and
+     state.extensionCatalog.hasKey(
+       "connection_presets"
+     ):
+
+    for row in
+        state.extensionCatalog[
+          "connection_presets"
+        ]:
+
+      if nodeText(
+           row,
+           "id"
+         ) == presetId:
+
+        return nodeBool(
+          row,
+          "requires_api_key"
+        )
+
+  if state.connectionBackend in [
+    "pi",
+    "opencode"
+  ]:
+
+    return true
+
+  if state.connectionBackend == "http":
+
+    return not (
+      state.connectionUrl.startsWith(
+        "http://127.0.0.1:"
+      )
+    )
+
+  return false
+
+
+proc connectionCredentialLabel(
+  state: AppState
+): string =
+
+  let presetId =
+    connectionPresetId(
+      state
+    )
+
+  if presetId.len > 0 and
+     state.extensionCatalog != nil and
+     state.extensionCatalog.hasKey(
+       "connection_presets"
+     ):
+
+    for row in
+        state.extensionCatalog[
+          "connection_presets"
+        ]:
+
+      if nodeText(
+           row,
+           "id"
+         ) == presetId:
+
+        let label =
+          nodeText(
+            row,
+            "credential_label"
+          )
+
+        if label.len > 0:
+          return label
+
+  return "Provider API key"
+
+
 proc renderConnectionForm(
   state: AppState
 ): VNode =
+
+  let
+    presetId =
+      connectionPresetId(
+        state
+      )
+
+    credentialRequired =
+      connectionRequiresCredential(
+        state
+      )
+
+    credentialLabel =
+      connectionCredentialLabel(
+        state
+      )
+
+    missingCredential =
+      credentialRequired and
+      state.connectionKey
+        .strip()
+        .len == 0
 
   result = buildHtml(
     tdiv(class = "plugin-setup")
@@ -1010,11 +1226,85 @@ proc renderConnectionForm(
           text "Add model connection"
 
         p:
-          text "Connect a hosted model API, local model, or supported external harness."
+          text "Choose a known provider path or configure one manually."
 
     tdiv(class = "plugin-setup-card"):
 
+      tdiv(class = "plugin-provider-callout"):
+
+        strong:
+          text "Provider path"
+
+        span:
+          text "Pi and OpenCode are isolated inference harnesses. Their API credential still belongs to the underlying provider."
+
       tdiv(class = "plugin-form-grid"):
+
+        tdiv(class = "plugin-field plugin-field-wide"):
+
+          label:
+            text "Connection preset"
+
+          select(
+            class = "plugin-select",
+            value = cstring(
+              presetId
+            )
+          ):
+
+            option(
+              value = "",
+              selected =
+                presetId.len == 0
+            ):
+              text "Custom / manual"
+
+            if state.extensionCatalog != nil and
+               state.extensionCatalog.hasKey(
+                 "connection_presets"
+               ):
+
+              for row in
+                  state.extensionCatalog[
+                    "connection_presets"
+                  ]:
+
+                let preset =
+                  row
+
+                option(
+                  value = cstring(
+                    nodeText(
+                      preset,
+                      "id"
+                    )
+                  ),
+                  selected =
+                    nodeText(
+                      preset,
+                      "id"
+                    ) == presetId
+                ):
+
+                  text nodeText(
+                    preset,
+                    "name"
+                  )
+
+            proc onchange(
+              event: Event,
+              node: VNode
+            ) =
+
+              let selected =
+                $node.value
+
+              if selected.len > 0:
+
+                applyConnectionPreset(
+                  state,
+                  selected
+                )
 
         textField(
           "Name",
@@ -1042,7 +1332,7 @@ proc renderConnectionForm(
               text "Choose connection type"
 
             option(value = "http"):
-              text "Model API"
+              text "Direct model API"
 
             option(value = "local"):
               text "Installed local model"
@@ -1057,19 +1347,24 @@ proc renderConnectionForm(
                    "available"
                  ):
 
-                option(
-                  value = cstring(
-                    nodeText(
-                      row,
-                      "id"
-                    )
-                  )
-                ):
-
-                  text nodeText(
+                let harnessId =
+                  nodeText(
                     row,
                     "id"
                   )
+
+                option(
+                  value = cstring(
+                    harnessId
+                  )
+                ):
+
+                  if harnessId == "pi":
+                    text "Pi harness"
+                  elif harnessId == "opencode":
+                    text "OpenCode harness"
+                  else:
+                    text harnessId
 
             proc onchange(
               event: Event,
@@ -1079,9 +1374,11 @@ proc renderConnectionForm(
               state.connectionBackend =
                 $node.value
 
+              redraw(kxi)
+
         if state.connectionBackend == "local":
 
-          tdiv(class = "plugin-field"):
+          tdiv(class = "plugin-field plugin-field-wide"):
 
             label:
               text "Installed model"
@@ -1125,27 +1422,74 @@ proc renderConnectionForm(
 
         else:
 
-          textField(
-            "Model identifier",
-            state.connectionModel,
-            proc(value: string) =
-              state.connectionModel =
-                value,
-            placeholder =
-              "Provider model identifier"
-          )
+          tdiv(class = "plugin-field"):
+
+            label:
+              text "Model identifier"
+
+            input(
+              `type` = "text",
+              value = cstring(
+                state.connectionModel
+              ),
+              placeholder =
+                if state.connectionBackend in [
+                  "pi",
+                  "opencode"
+                ]:
+                  "provider/model-id"
+                else:
+                  "Provider model identifier"
+            ):
+
+              proc oninput(
+                event: Event,
+                node: VNode
+              ) =
+
+                state.connectionModel =
+                  $node.value
+
+          if state.connectionBackend in [
+            "pi",
+            "opencode"
+          ]:
+
+            tdiv(class = "plugin-field-hint"):
+
+              if state.connectionBackend == "pi":
+
+                text "Stored form: provider/model. Example: openrouter/openrouter/free → Pi receives provider=openrouter and model=openrouter/free."
+
+              else:
+
+                text "OpenCode uses provider-prefixed model IDs such as openrouter/openrouter/free."
 
         if state.connectionBackend == "http":
 
-          textField(
-            "API base URL",
-            state.connectionUrl,
-            proc(value: string) =
-              state.connectionUrl =
-                value,
-            placeholder =
-              "https://provider.example/v1"
-          )
+          tdiv(class = "plugin-field plugin-field-wide"):
+
+            label:
+              text "API base URL"
+
+            input(
+              `type` = "text",
+              value = cstring(
+                state.connectionUrl
+              ),
+              placeholder =
+                "https://provider.example/v1"
+            ):
+
+              proc oninput(
+                event: Event,
+                node: VNode
+              ) =
+
+                state.connectionUrl =
+                  $node.value
+
+                redraw(kxi)
 
         if state.connectionBackend in [
           "http",
@@ -1153,16 +1497,64 @@ proc renderConnectionForm(
           "opencode"
         ]:
 
-          textField(
-            "API key",
-            state.connectionKey,
-            proc(value: string) =
-              state.connectionKey =
-                value,
-            secret = true,
-            placeholder =
-              "Stored server-side"
-          )
+          tdiv(class = "plugin-field plugin-field-wide"):
+
+            label:
+
+              if credentialRequired:
+                text credentialLabel & " · required"
+              else:
+                text credentialLabel & " · optional"
+
+            input(
+              `type` = "password",
+              value = cstring(
+                state.connectionKey
+              ),
+              placeholder =
+                if credentialRequired:
+                  "Paste provider API key"
+                else:
+                  "No credential required"
+            ):
+
+              proc oninput(
+                event: Event,
+                node: VNode
+              ) =
+
+                state.connectionKey =
+                  $node.value
+
+                redraw(kxi)
+
+            tdiv(class = "plugin-field-hint"):
+
+              if state.connectionBackend == "pi":
+
+                text "Pi receives only this provider credential inside its temporary isolated process. No Pi-specific key is needed."
+
+              elif state.connectionBackend == "opencode":
+
+                text "OpenCode receives only this provider credential inside its isolated temporary HOME. Your normal OpenCode login is not reused."
+
+              elif credentialRequired:
+
+                text "The key is sent to Phoenix and stored encrypted in the owner-scoped extension store. It is not returned by catalog/list requests."
+
+              else:
+
+                text "Local OpenAI-compatible endpoints can remain credential-free."
+
+      if missingCredential:
+
+        tdiv(class = "plugin-credential-warning"):
+
+          strong:
+            text "Credential required"
+
+          span:
+            text "This hosted provider cannot be saved until its API key is supplied."
 
       tdiv(class = "plugin-form-footer"):
 
@@ -1172,11 +1564,13 @@ proc renderConnectionForm(
             text "Governed inference"
 
           span:
-            text "This connection supplies model output only. Application tools remain behind Agentic policy and approvals."
+            text "The external model supplies inference only. SemanticGuard, approvals and ToolGateway remain authoritative."
 
         button(
           class = "plugin-primary",
-          disabled = state.extensionBusy
+          disabled =
+            state.extensionBusy or
+            missingCredential
         ):
 
           if state.extensionBusy:

@@ -1315,3 +1315,65 @@
     padding-left: 40px;
   }
 }
+
+
+/* =========================================================
+   EXTERNAL CONNECTION INPUTS
+   ========================================================= */
+
+.plugin-provider-callout {
+  margin-bottom: 15px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid #292929;
+  border-radius: 9px;
+  background: #111;
+}
+
+.plugin-provider-callout strong {
+  color: #aaa;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.plugin-provider-callout span {
+  color: #666;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.plugin-field-wide {
+  grid-column: 1 / -1;
+}
+
+.plugin-field-hint {
+  margin-top: -4px;
+  grid-column: 1 / -1;
+  color: #666;
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.plugin-credential-warning {
+  margin-top: 13px;
+  padding: 9px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid #443131;
+  border-radius: 8px;
+  background: #191313;
+}
+
+.plugin-credential-warning strong {
+  color: #c99;
+  font-size: 9px;
+}
+
+.plugin-credential-warning span {
+  color: #876d6d;
+  font-size: 8px;
+  line-height: 1.5;
+}
