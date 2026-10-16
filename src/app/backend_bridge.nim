@@ -3,10 +3,13 @@ include karax/prelude
 import std/[asyncjs, json]
 
 import ../api/client
+import ../api/chat_history
+import ../api/tool_proposal
 import ../config/runtime_config
 
 import types
 import state
+import job_decision
 import extension_bridge
 
 
@@ -28,6 +31,8 @@ proc applyJobState(
   state.run.status = job.status
   state.run.agent = job.selectedAgent
   state.run.tool = job.proposedTool
+  state.run.proposal = job.proposal
+  state.run.decisionError = ""
   state.run.presentations = job.presentations
 
 
@@ -43,7 +48,8 @@ proc jobFailureMessage(
 
 proc finishCompletedJob(
   state: AppState,
-  job: JobResponse
+  job: JobResponse,
+  restoreHistory: bool = false
 ) =
 
   let answer =
@@ -52,11 +58,10 @@ proc finishCompletedJob(
     else:
       "Job completed successfully."
 
-  addAssistantMessage(
-    state,
-    answer,
-    job.presentations
-  )
+  if restoreHistory:
+    restoreAssistantJobMessage(state, job.jobId, answer, job.presentations)
+  else:
+    addAssistantMessage(state, answer, job.presentations, job.jobId)
 
   if job.presentations.len > 0:
     addRunEvent(
@@ -79,7 +84,8 @@ proc finishCompletedJob(
 
 proc finishFailedJob(
   state: AppState,
-  job: JobResponse
+  job: JobResponse,
+  restoreHistory: bool = false
 ) =
 
   let failureMessage =
@@ -87,10 +93,10 @@ proc finishFailedJob(
       job
     )
 
-  addAssistantMessage(
-    state,
-    failureMessage
-  )
+  if restoreHistory:
+    restoreAssistantJobMessage(state, job.jobId, failureMessage, job.presentations)
+  else:
+    addAssistantMessage(state, failureMessage, job.presentations, job.jobId)
 
   addRunEvent(
     state,
@@ -104,16 +110,23 @@ proc finishFailedJob(
   )
 
 
-proc finishDeniedJob(state: AppState, job: JobResponse) =
-  let message = if job.error.len > 0: job.error else: "A requested operation was denied by policy."
-  addAssistantMessage(state, message)
-  addRunEvent(state, "denied", "Phoenix reported a policy denial. Review the request before trying again.")
-  showToast(state, "Request denied.")
+proc finishDeniedJob(state: AppState, job: JobResponse, restoreHistory: bool = false) =
+  let message =
+    if job.error.len > 0: job.error
+    elif job.answer.len > 0: job.answer
+    else: "The requested action did not proceed."
+  if restoreHistory:
+    restoreAssistantJobMessage(state, job.jobId, message, job.presentations)
+  else:
+    addAssistantMessage(state, message, job.presentations, job.jobId)
+  addRunEvent(state, "denied", "Phoenix reported that the action did not proceed. The saved response contains the reason.")
+  showToast(state, "Action did not proceed.")
 
 
 proc finishReconciliationRequired(
   state: AppState,
-  job: JobResponse
+  job: JobResponse,
+  restoreHistory: bool = false
 ) =
 
   let message =
@@ -122,10 +135,10 @@ proc finishReconciliationRequired(
     else:
       "The approved action has an unresolved execution outcome. Automatic retry is disabled; trusted reconciliation is required."
 
-  addAssistantMessage(
-    state,
-    message
-  )
+  if restoreHistory:
+    restoreAssistantJobMessage(state, job.jobId, message, job.presentations)
+  else:
+    addAssistantMessage(state, message, job.presentations, job.jobId)
 
   addRunEvent(
     state,
@@ -155,7 +168,8 @@ proc finishWaitingApproval(
     addAssistantMessage(
       state,
       approvalMessage,
-      job.presentations
+      job.presentations,
+      job.jobId
     )
 
   addRunEvent(
@@ -173,14 +187,22 @@ proc finishWaitingApproval(
 proc pollBackendJob*(
   state: AppState,
   jobId: string,
-  addWaitingMessage: bool = true
+  addWaitingMessage: bool = true,
+  restoreHistory: bool = false
 ) {.async.} =
 
   if jobId.len == 0:
     return
 
+  let sessionId = state.auth.sessionId
+  let chatId = state.currentChatId
+
   try:
     while true:
+      if not state.auth.authenticated or state.auth.sessionId != sessionId or
+          state.currentChatId != chatId or state.run.jobId != jobId:
+        return
+
       let previousStatus =
         state.run.status
 
@@ -188,6 +210,11 @@ proc pollBackendJob*(
         await getJob(
           jobId
         )
+
+      # A delayed response belongs to its original account, chat and job.
+      if not state.auth.authenticated or state.auth.sessionId != sessionId or
+          state.currentChatId != chatId or state.run.jobId != jobId:
+        return
 
       applyJobState(
         state,
@@ -213,20 +240,22 @@ proc pollBackendJob*(
       of "completed":
         finishCompletedJob(
           state,
-          job
+          job,
+          restoreHistory
         )
         redraw(kxi)
         return
 
       of "denied":
-        finishDeniedJob(state, job)
+        finishDeniedJob(state, job, restoreHistory)
         redraw(kxi)
         return
 
       of "failed":
         finishFailedJob(
           state,
-          job
+          job,
+          restoreHistory
         )
         redraw(kxi)
         return
@@ -243,7 +272,8 @@ proc pollBackendJob*(
       of "reconciliation_required", "outcome_unknown":
         finishReconciliationRequired(
           state,
-          job
+          job,
+          restoreHistory
         )
         redraw(kxi)
         return
@@ -271,6 +301,10 @@ proc pollBackendJob*(
       )
 
   except CatchableError:
+    if not state.auth.authenticated or state.auth.sessionId != sessionId or
+        state.currentChatId != chatId or state.run.jobId != jobId:
+      return
+
     addRunEvent(
       state,
       "connection",
@@ -293,12 +327,12 @@ proc resumeBackendJob*(
      state.run.jobId.len == 0:
     return
 
-  if state.run.status notin [
-    "pending",
-    "processing",
-    "approving"
-  ]:
+  if state.run.status notin restorableJobStates:
     return
+
+  # Saved history locates the job; its current GET is the authority for
+  # approval controls and execution outcome, including after a reload.
+  state.run.status = "restoring"
 
   addRunEvent(
     state,
@@ -309,7 +343,8 @@ proc resumeBackendJob*(
   await pollBackendJob(
     state,
     state.run.jobId,
-    false
+    false,
+    restoreHistory = true
   )
 
 
@@ -417,133 +452,57 @@ proc submitBackendJob*(
     redraw(kxi)
 
 
-proc approvePendingJob*(
-  state: AppState
-) {.async.} =
-
-  if not state.run.active or
-     state.run.jobId.len == 0:
-    showToast(
-      state,
-      "There is no backend job to approve."
-    )
+proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
+  if not canDecideJob(state):
+    showToast(state, "A saved action with reviewable details must be waiting for your decision.")
+    redraw(kxi)
     return
 
-  if state.run.status != "waiting_approval":
-    showToast(
-      state,
-      "The current job is not waiting for approval."
-    )
-    return
-
-  let jobId =
-    state.run.jobId
-
-  state.run.status = "approving"
-
-  addRunEvent(
-    state,
-    "approval",
-    "Submitting explicit approval to Phoenix."
-  )
-
-  showToast(
-    state,
-    "Approving…"
-  )
-
+  let context = captureDecisionContext(state)
+  let eventKind = if decision == jdApprove: "approval" else: "rejection"
+  state.run.status = decisionStatus(decision)
+  state.run.decisionError = ""
+  addRunEvent(state, eventKind, "Submitting your explicit action decision to Phoenix.")
   redraw(kxi)
 
   try:
-    let job =
-      await approveJob(
-        jobId,
-        state.auth.csrfToken
-      )
+    let job = await decideJob(context.jobId, state.auth.csrfToken, decision)
+    if not matchesDecisionContext(state, context):
+      return
+    if job.jobId != context.jobId:
+      raise newException(ValueError, "Decision response belongs to another job.")
 
-    applyJobState(
-      state,
-      job
-    )
-
+    applyJobState(state, job)
     case job.status
-
-    of "completed":
-      finishCompletedJob(
-        state,
-        job
-      )
-
-    of "denied":
-      finishDeniedJob(state, job)
-
-    of "failed":
-      finishFailedJob(
-        state,
-        job
-      )
-
-    of "waiting_approval":
-      finishWaitingApproval(
-        state,
-        job,
-        false
-      )
-
-    of "reconciliation_required", "outcome_unknown":
-      finishReconciliationRequired(
-        state,
-        job
-      )
-
+    of "completed": finishCompletedJob(state, job, restoreHistory = true)
+    of "denied": finishDeniedJob(state, job, restoreHistory = true)
+    of "failed": finishFailedJob(state, job, restoreHistory = true)
+    of "waiting_approval": finishWaitingApproval(state, job, false)
+    of "reconciliation_required", "outcome_unknown": finishReconciliationRequired(state, job, restoreHistory = true)
     of "pending", "processing", "approving":
-      addRunEvent(
-        state,
-        "approval",
-        "Approval was accepted; waiting for durable execution to finish."
-      )
-
+      addRunEvent(state, eventKind, "The backend accepted the decision; observing its durable result.")
       redraw(kxi)
-
-      await pollBackendJob(
-        state,
-        jobId,
-        false
-      )
-
+      await pollBackendJob(state, context.jobId, false, restoreHistory = true)
     else:
-      addRunEvent(
-        state,
-        "approval",
-        "Approval returned a job state this frontend does not yet render."
-      )
-
-      showToast(
-        state,
-        "Approval state changed. Refresh the chat to continue."
-      )
-
+      showToast(state, "The saved decision state changed. Reload this chat to check its result.")
   except CatchableError:
-    # The browser cannot know whether Phoenix/AI/provider received
-    # the approval request. Keep the local state non-retryable.
-    #
-    # A later durable GET/reload is the authority. Never blindly
-    # restore waiting_approval after an ambiguous transport error.
-    state.run.status =
-      "approving"
-
-    addRunEvent(
-      state,
-      "connection",
-      "The approval response was interrupted. The durable outcome must be re-read before any retry."
-    )
-
-    showToast(
-      state,
-      "Approval response interrupted. Reload or reopen this chat before retrying."
-    )
-
+    if not matchesDecisionContext(state, context):
+      return
+    # No local cancellation or retry: an interrupted response cannot reveal
+    # whether either decision reached the server. A later GET is authoritative.
+    state.run.status = decisionStatus(decision)
+    state.run.decisionError = "The decision response was interrupted. Reload this chat to check the saved outcome before trying again."
+    addRunEvent(state, "connection", state.run.decisionError)
+    showToast(state, state.run.decisionError)
   redraw(kxi)
+
+
+proc approvePendingJob*(state: AppState) {.async.} =
+  await decidePendingJob(state, jdApprove)
+
+
+proc rejectPendingJob*(state: AppState) {.async.} =
+  await decidePendingJob(state, jdReject)
 
 
 
@@ -616,7 +575,6 @@ proc refreshSystemStatusBase(
   redraw(kxi)
 
 
-# SRS18_PALO_ALTO_REFRESH_WRAPPER_V1
 proc refreshSystemStatus*(
   state: AppState
 ) {.async.} =

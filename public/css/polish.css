@@ -1019,6 +1019,66 @@ body {
    Responsive baseline
    ---------------------------------------------------------- */
 
+.saved-chat-row.active {
+  border-color: #666;
+}
+
+.status-indicator.unresolved {
+  background: #d5a24a;
+}
+
+.chats-header-action {
+  width: auto;
+  padding-inline: 10px;
+}
+
+.approval-action-button {
+  margin-top: 12px;
+  padding: 9px 14px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #242424;
+  color: #eee;
+  cursor: pointer;
+}
+
+.approval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.approval-action-button:disabled {
+  opacity: .55;
+  cursor: default;
+}
+
+.rejection-action-button {
+  background: transparent;
+}
+
+.approval-decision-error {
+  color: #e2bc7c;
+}
+
+.approval-arguments {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+  max-height: 280px;
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid #333;
+  border-radius: 7px;
+  background: #141414;
+  font-size: 12px;
+}
+
+.approval-action-button:focus-visible,
+.saved-chat-row:focus-visible {
+  outline: 2px solid #aaa;
+  outline-offset: 3px;
+}
+
 @media (max-width: 900px) {
   .app-shell,
   .app-shell.inspector-hidden {
@@ -1041,7 +1101,7 @@ body {
   }
 }
 
-@media (max-width: 680px) {
+@media (max-width: 760px) {
   .app-shell,
   .app-shell.inspector-hidden {
     grid-template-columns: 1fr;

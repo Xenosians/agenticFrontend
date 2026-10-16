@@ -505,7 +505,8 @@ proc addAssistantMessage*(
   content: string,
   cards: seq[
     ResultCard
-  ] = @[]
+  ] = @[],
+  jobId: string = ""
 ) =
 
   var cleanContent =
@@ -526,6 +527,8 @@ proc addAssistantMessage*(
       role:
         mrAssistant,
 
+      jobId: jobId,
+
       content:
         cleanContent,
 
@@ -535,6 +538,19 @@ proc addAssistantMessage*(
   )
 
   inc state.nextMessageId
+
+
+proc restoreAssistantJobMessage*(state: AppState, jobId, content: string,
+                                 cards: seq[ResultCard]) =
+  ## Replace the saved response for this exact job, preserving other turns.
+  ## If history has only its request, append the newly observed response.
+  if jobId.len > 0:
+    for index in countdown(state.messages.high, 0):
+      if state.messages[index].role == mrAssistant and state.messages[index].jobId == jobId:
+        state.messages[index].content = content
+        state.messages[index].cards = cards
+        return
+  addAssistantMessage(state, content, cards, jobId)
 
 
 proc startLocalRun*(

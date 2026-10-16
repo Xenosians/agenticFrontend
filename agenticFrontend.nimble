@@ -20,3 +20,6 @@ namedBin["agenticFrontend"] = "app"
 
 requires "nim >= 2.2.10"
 requires "karax == 1.5.0"
+
+after build:
+  exec "nim e --hints:off scripts/stamp_assets.nims"

@@ -3,6 +3,7 @@ type WorkspaceCommand* = object
 
 const workspaceCommands* = [
   WorkspaceCommand(id: "new_chat", label: "New chat", shortcut: "Ctrl/Meta+Alt+N"),
+  WorkspaceCommand(id: "chats", label: "Browse saved chats", shortcut: "Ctrl/Meta+Alt+C"),
   WorkspaceCommand(id: "search", label: "Search current chat", shortcut: "Ctrl/Meta+Shift+F"),
   WorkspaceCommand(id: "connections", label: "Models, harnesses and datasets", shortcut: "Ctrl/Meta+,"),
   WorkspaceCommand(id: "inspector", label: "Toggle run inspector", shortcut: "Ctrl/Meta+Alt+I"),
@@ -14,6 +15,7 @@ proc shortcutAction*(key: string, modifier, shift, composing, repeated: bool, al
   if key == "Escape": return "dismiss"
   if not modifier: return ""
   if alt:
+    if key in ["c", "C"]: return "chats"
     if key in ["n", "N"]: return "new_chat"
     if key in ["i", "I"]: return "inspector"
     return ""

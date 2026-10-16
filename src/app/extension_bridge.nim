@@ -2,6 +2,7 @@ include karax/prelude
 import std/[asyncjs, json, strutils]
 import types
 import ../api/extensions
+import ../api/connection_options
 import ../config/runtime_config
 
 proc sameSession(state: AppState, session: string): bool =
@@ -46,6 +47,24 @@ proc changeExtension*(state: AppState, action: string, payload: JsonNode) {.asyn
     if sameSession(state, session): state.extensionError = exc.msg
   finally:
     if sameSession(state, session): state.extensionBusy = false
+    redraw(kxi)
+
+proc saveConnectionOptions*(state: AppState, existing = false) {.async.} =
+  try:
+    let payload = connectionOptionsPayload(state.connectionTpm, state.connectionRpm,
+      state.connectionMaxWait, state.connectionReasoning, clearEmpty = existing)
+    if existing:
+      payload["id"] = %state.connectionOptionsId
+      await changeExtension(state, "model_options", payload)
+    else:
+      payload["name"] = %state.connectionName
+      payload["backend"] = %state.connectionBackend
+      payload["model"] = %state.connectionModel
+      payload["url"] = %state.connectionUrl
+      payload["api_key"] = %state.connectionKey
+      await changeExtension(state, "model", payload)
+  except CatchableError:
+    state.extensionError = "Check the usage limits and queue wait, then save again."
     redraw(kxi)
 
 proc saveDatasetFile*(state: AppState) {.async.} =

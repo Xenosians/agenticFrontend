@@ -10,6 +10,7 @@ import ../api/auth_client
 import types
 import state
 import backend_bridge
+import connection_draft
 
 
 proc browserQueryParam(
@@ -62,6 +63,7 @@ proc clearAuthenticatedState(
   state.extensionError = ""
   state.plugins.setLen(0)
   state.connectionKey = ""
+  state.clearExtensionDrafts()
   state.datasetText = ""
   state.datasetApiKey = ""
   state.tools.setLen(0)
@@ -106,6 +108,7 @@ proc applyHistory(
     state.messages.add(
       ChatMessage(
         id: state.nextMessageId,
+        jobId: item.jobId,
         role: role,
         content: item.content,
         cards: @[]
@@ -114,30 +117,17 @@ proc applyHistory(
 
     inc state.nextMessageId
 
-  if history.len > 0:
-    let latest = history[^1]
-
-    if (
-      latest.status in [
-        "pending",
-        "processing",
-        "waiting_approval",
-        "approving",
-        "denied",
-        "outcome_unknown",
-        "reconciliation_required"
-      ] and
-      latest.jobId.len > 0
-    ):
-      state.run = RunState(
-        active: true,
-        request: "",
-        jobId: latest.jobId,
-        status: latest.status,
-        agent: "",
-        tool: "",
-        presentations: @[]
-      )
+  let outstanding = historyJobForRestore(history)
+  if outstanding.jobId.len > 0:
+    state.run = RunState(
+      active: true,
+      request: "",
+      jobId: outstanding.jobId,
+      status: outstanding.status,
+      agent: "",
+      tool: "",
+      presentations: @[]
+    )
 
 
 proc loadChatHistory*(
@@ -147,25 +137,22 @@ proc loadChatHistory*(
   if not state.auth.authenticated or chatId.len == 0:
     return
 
+  let sessionId = state.auth.sessionId
+
   state.auth.loading = true
   state.auth.error = ""
   redraw(kxi)
 
   try:
     let history = await getChatHistory(chatId)
+    if not state.auth.authenticated or state.auth.sessionId != sessionId:
+      return
     applyHistory(state, chatId, history)
 
     if (
       state.run.active and
       state.run.jobId.len > 0 and
-      state.run.status in [
-        "pending",
-        "processing",
-        "approving",
-        "denied",
-        "outcome_unknown",
-        "reconciliation_required"
-      ]
+      state.run.status in restorableJobStates
     ):
       discard resumeBackendJob(
         state
@@ -434,10 +421,12 @@ proc createNewChat*(
     state.run.active and
     state.run.status in [
       "submitting",
+      "restoring",
       "pending",
       "processing",
       "waiting_approval",
-      "approving"
+      "approving",
+      "rejecting"
     ]
   ):
     showToast(
@@ -507,10 +496,12 @@ proc deleteChatApplication*(
     state.run.active and
     state.run.status in [
       "submitting",
+      "restoring",
       "pending",
       "processing",
       "waiting_approval",
-      "approving"
+      "approving",
+      "rejecting"
     ]
   ):
     showToast(
@@ -603,10 +594,12 @@ proc selectChat*(
     state.run.active and
     state.run.status in [
       "submitting",
+      "restoring",
       "pending",
       "processing",
       "waiting_approval",
-      "approving"
+      "approving",
+      "rejecting"
     ]
   ):
     showToast(

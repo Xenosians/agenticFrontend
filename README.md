@@ -5,12 +5,13 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 ## Features
 
 - Registration, email verification, login, password reset, and session management.
-- Saved chats and history, current-chat search, and a command palette.
-- Job submission and polling, explicit approval controls, and structured result cards.
+- Saved chats and history, current-chat search, and a command palette with saved-chat navigation at every screen size.
+- Job submission and polling, explicit approve/reject decisions with saved action details, and structured result cards.
 - Display of completed, failed, denied, and unknown-outcome jobs.
 - Run inspector, activity view, and backend/AI integration status.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
 - Per-account model selection, connection probes, local model folder uploads, reference datasets, and reviewed training-data exports.
+- Provider usage settings for shared request/token queues and supported reasoning controls, editable without re-entering the saved API key.
 
 ## How the repositories fit together
 
@@ -21,6 +22,7 @@ agenticFrontend (this browser app)
 ```
 
 The browser calls Phoenix only. Phoenix owns sessions, chats, jobs, and resource ownership; the AI runtime owns inference and guarded execution. Approval requests refer to a durable job, while the server retains the exact action and arguments.
+The approval card displays that saved action before offering **Approve action** or **Reject action**. Both decisions go through Phoenix and remain disabled while their outcome is pending. An interrupted response requires reading the saved job again; the browser does not retry a mutation or assume a rejection succeeded. Completed decisions restore the saved tool result or rejection reason on reload.
 
 ## Stack
 
@@ -53,10 +55,12 @@ python -m http.server 8080 -d public
 Open `http://127.0.0.1:8080`. Phoenix must be running with a matching allowed frontend origin and cookie policy. The AI service must be running for chat execution and connection management. Backend registration/verification requires its configured mail transport; the local development mailbox is available at `http://127.0.0.1:4000/dev/mailbox` when enabled.
 
 The generated `public/js/app.js` is tracked. Rebuild it when changing Nim source.
+`nimble build` also stamps the JavaScript, runtime configuration and stylesheet URLs with their content hashes, so browsers fetch changed assets. After compiling the bundle directly, run `nim e scripts/stamp_assets.nims` before serving or deploying it.
 
 ## Models and datasets
 
 Open connections with **Ctrl/Cmd+,**, or use the command palette with **Ctrl/Cmd+K**.
+Open saved chats with the header's **Chats** button or **Ctrl/Cmd+Alt+C**. Reopening a conversation checks its outstanding saved job with the server before showing approval controls.
 
 - Local models are the default. Selecting another model applies to future requests for your account.
 - Hosted APIs need valid provider access, credentials, and quota. A saved connection does not by itself prove connectivity; use its probe and then test the intended task.
@@ -74,9 +78,16 @@ With Node.js available for Nim's JavaScript test runner:
 ```bash
 nim js -r tests/test_commands.nim
 nim js -r tests/test_job_lifecycle.nim
+nim js -r tests/test_chat_history.nim
+nim js -r tests/test_chat_projection.nim
+nim js -r tests/test_job_status.nim
+nim js -r tests/test_tool_proposal.nim
+nim js -r tests/test_job_decision.nim
+nim js -r tests/test_approval_result.nim
+nim js -r tests/test_connection_options.nim
 ```
 
-These cover shortcut handling and versioned lifecycle validation. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approval, and result rendering after changes to those flows.
+These cover shortcuts, versioned lifecycle validation, job/history restoration, approval details and outcomes, stale decision responses, and connection settings. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approve/reject decisions, and result rendering after changes to those flows.
 
 ## Current boundaries
 

@@ -3,6 +3,7 @@ import std/json
 type
   AppView* = enum
     viewChat,
+    viewChats,
     viewSearch,
     viewJobs,
     viewRuns,
@@ -55,6 +56,7 @@ type
 
   ChatMessage* = object
     id*: int
+    jobId*: string
     role*: MessageRole
     content*: string
     cards*: seq[ResultCard]
@@ -64,6 +66,11 @@ type
     kind*: string
     message*: string
 
+  ToolProposal* = object
+    tool*: string
+    arguments*: JsonNode
+    approvalId*: string
+
   RunState* = object
     active*: bool
     request*: string
@@ -71,6 +78,8 @@ type
     status*: string
     agent*: string
     tool*: string
+    proposal*: ToolProposal
+    decisionError*: string
     presentations*: seq[ResultCard]
 
   SystemState* = object
@@ -143,6 +152,11 @@ type
     connectionModel*: string
     connectionUrl*: string
     connectionKey*: string
+    connectionOptionsId*: string
+    connectionTpm*: string
+    connectionRpm*: string
+    connectionMaxWait*: string
+    connectionReasoning*: string
     datasetName*: string
     datasetSource*: string
     datasetLicense*: string

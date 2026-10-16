@@ -10,6 +10,9 @@ from std/httpcore import
   HttpPost
 
 import ../app/types
+import ../app/job_decision
+import tool_proposal
+import approval_result
 import ../config/runtime_config
 
 
@@ -25,6 +28,7 @@ type
 
     selectedAgent*: string
     proposedTool*: string
+    proposal*: ToolProposal
 
     answer*: string
     error*: string
@@ -479,6 +483,11 @@ proc extractPresentations(
   result =
     @[]
 
+  # A persisted approval decision supersedes the earlier proposal's
+  # specialist presentation. Its execution result is the authority.
+  if hasApprovalExecution(data):
+    return approvalResultPresentations(data)
+
 
   if data.kind != JObject:
     return
@@ -599,35 +608,6 @@ proc extractAnswer(
   )
 
 
-proc extractProposedTool(
-  data: JsonNode
-): string =
-
-  if data.kind != JObject:
-    return ""
-
-  if not data.hasKey(
-    "proposed_tool"
-  ):
-    return ""
-
-
-  let proposedTool =
-    data[
-      "proposed_tool"
-    ]
-
-
-  if proposedTool.kind != JObject:
-    return ""
-
-
-  return jsonValueText(
-    proposedTool,
-    "tool"
-  )
-
-
 import job_lifecycle
 
 proc parseJobResponse(
@@ -635,6 +615,7 @@ proc parseJobResponse(
 ): JobResponse =
 
   validateJobV2(data)
+  let proposal = parseToolProposal(data)
   result =
     JobResponse(
       jobId:
@@ -656,9 +637,9 @@ proc parseJobResponse(
         ),
 
       proposedTool:
-        extractProposedTool(
-          data
-        ),
+        proposal.tool,
+
+      proposal: proposal,
 
       answer:
         extractAnswer(
@@ -1019,9 +1000,10 @@ proc getJob*(
     )
 
 
-proc approveJob*(
+proc decideJob*(
   jobId: string,
-  csrfToken: string
+  csrfToken: string,
+  decision: JobDecision
 ): Future[
   JobResponse
 ] {.async.} =
@@ -1056,9 +1038,7 @@ proc approveJob*(
       (
         frontendConfig
         .backendBaseUrl &
-        "/api/v2/jobs/" &
-        jobId &
-        "/approve"
+        decisionPath(jobId, decision)
       ).cstring,
 
       options

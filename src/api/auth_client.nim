@@ -11,6 +11,8 @@ from std/httpcore import
   HttpPost
 
 import ../config/runtime_config
+import chat_history
+export chat_history
 
 
 type
@@ -32,12 +34,6 @@ type
     title*: string
     createdAt*: string
     updatedAt*: string
-
-  ChatHistoryMessage* = object
-    role*: string
-    content*: string
-    jobId*: string
-    status*: string
 
   SessionSummary* = object
     sessionId*: string

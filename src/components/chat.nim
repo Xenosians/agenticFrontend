@@ -1,7 +1,11 @@
 include karax/prelude
 
+import std/json
+
 import ../app/types
 import ../app/backend_bridge
+import ../api/tool_proposal
+import ../app/job_decision
 
 import result_card
 
@@ -72,31 +76,51 @@ proc renderApprovalAction(
     tdiv(class = "message-column assistant"):
 
       span(class = "message-author"):
-        text "Approval required"
+        if state.run.status == "waiting_approval":
+          text "Approval required"
+        else:
+          text "Saving your decision"
 
       tdiv(class = "message-bubble assistant"):
 
-        p:
-          text (
-            "This action is ready to execute. " &
-            "Approve it to continue."
-          )
-
-        button(
-          class = "inspector-toggle",
-          title = "Approve and execute this governed action"
-        ):
-
-          text "Approve action"
-
-          proc onclick(
-            event: Event,
-            node: VNode
-          ) =
-
-            discard approvePendingJob(
-              state
-            )
+        if reviewableProposal(state.run.proposal):
+          p:
+            text "Review these saved action details. Approve to execute them, or reject to stop this proposal."
+          strong:
+            text "Action details"
+          p:
+            text state.run.proposal.tool
+          pre(class = "approval-arguments"):
+            text pretty(state.run.proposal.arguments)
+          if state.run.decisionError.len > 0:
+            p(class = "approval-decision-error"):
+              text state.run.decisionError
+          tdiv(class = "approval-actions"):
+            button(
+              class = "approval-action-button",
+              title = "Approve and execute this governed action",
+              disabled = not canDecideJob(state)
+            ):
+              if state.run.status == "approving":
+                text "Approving…"
+              else:
+                text "Approve action"
+              proc onclick(event: Event, node: VNode) =
+                discard approvePendingJob(state)
+            button(
+              class = "approval-action-button rejection-action-button",
+              title = "Reject this saved proposal without executing it",
+              disabled = not canDecideJob(state)
+            ):
+              if state.run.status == "rejecting":
+                text "Rejecting…"
+              else:
+                text "Reject action"
+              proc onclick(event: Event, node: VNode) =
+                discard rejectPendingJob(state)
+        else:
+          p:
+            text "The saved action details are unavailable. Reload this chat to check its job before approving."
 
 
 proc renderChat*(
@@ -148,10 +172,5 @@ connected tools and plugins.
         )
 
 
-      if state.run.active and
-         state.run.status ==
-         "waiting_approval":
-
-        renderApprovalAction(
-          state
-        )
+    if state.run.active and state.run.status in ["waiting_approval", "approving", "rejecting"]:
+      renderApprovalAction(state)

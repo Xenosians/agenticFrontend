@@ -32,6 +32,8 @@ proc activeViewTitle(): string =
   case appState.activeView
   of viewChat:
     "Chat"
+  of viewChats:
+    "Chats"
   of viewSearch:
     "Search"
   of viewJobs, viewRuns, viewLogs:
@@ -55,6 +57,8 @@ proc activeViewSubtitle(): string =
   case appState.activeView
   of viewChat:
     "Durable governed assistant workspace"
+  of viewChats:
+    "Your saved conversations"
   of viewSearch:
     "Search the loaded chat"
   of viewJobs, viewRuns, viewLogs:
@@ -650,6 +654,54 @@ proc renderAccountView(): VNode =
                     )
 
 
+proc renderChatList(query: string = ""): VNode =
+  let search = query.strip().toLowerAscii()
+  result = buildHtml(tdiv(class = "command-center-list")):
+    if appState.chats.len == 0:
+      p:
+        text "No saved chats yet."
+    else:
+      for chat in appState.chats:
+        if search in chat.title.toLowerAscii():
+          let savedChat = chat
+          button(
+            class =
+              if savedChat.chatId == appState.currentChatId:
+                cstring"command-center-row saved-chat-row active"
+              else:
+                cstring"command-center-row saved-chat-row"
+          ):
+            span(class = "command-center-icon"):
+              text "◇"
+            tdiv(class = "command-center-copy"):
+              strong:
+                text savedChat.title
+              span:
+                if savedChat.chatId == appState.currentChatId:
+                  text "Current chat"
+                else:
+                  text "Open conversation"
+            proc onclick(event: Event, node: VNode) =
+              appState.commandPaletteOpen = false
+              discard selectChat(appState, savedChat.chatId)
+
+
+proc renderChatsView(): VNode =
+  result = buildHtml(section(class = "conversation")):
+    tdiv(class = "command-center"):
+      tdiv(class = "command-center-header"):
+        tdiv:
+          h2:
+            text "Saved chats"
+          p:
+            text "Open a conversation to restore its messages and saved job."
+        button(class = "command-back-button"):
+          text "New chat"
+          proc onclick(event: Event, node: VNode) =
+            discard createNewChat(appState)
+      renderChatList()
+
+
 proc renderCommandCenter(): VNode =
   result = buildHtml(
     section(class = "conversation")
@@ -684,7 +736,7 @@ proc renderCommandCenter(): VNode =
         input(
           id = "commandSearch",
           `type` = "search",
-          placeholder = "Search commands",
+          placeholder = "Search commands and chats",
           value = cstring(
             appState.commandQuery
           )
@@ -721,6 +773,8 @@ proc renderCommandCenter(): VNode =
                   case command.id
                   of "new_chat":
                     text "+"
+                  of "chats":
+                    text "◇"
                   of "search":
                     text "⌕"
                   of "connections":
@@ -742,6 +796,8 @@ proc renderCommandCenter(): VNode =
                     case command.id
                     of "new_chat":
                       text "Create a new durable conversation"
+                    of "chats":
+                      text "Browse your saved conversations"
                     of "search":
                       text "Search the current chat"
                     of "connections":
@@ -770,6 +826,12 @@ proc renderCommandCenter(): VNode =
                     command.id
                   )
 
+      tdiv(class = "command-center-section"):
+        tdiv(class = "command-section-heading"):
+          strong:
+            text "Saved chats"
+        renderChatList(appState.commandQuery)
+
 
 proc renderWorkspaceBody(): VNode =
   if appState.commandPaletteOpen:
@@ -780,6 +842,8 @@ proc renderWorkspaceBody(): VNode =
     renderChat(
       appState
     )
+  of viewChats:
+    renderChatsView()
   of viewSearch:
     renderSearchView()
   of viewJobs, viewRuns, viewLogs:
@@ -880,6 +944,14 @@ proc renderWorkspace(): VNode =
 
       tdiv(class = "header-controls"):
         button(
+          class = "header-action chats-header-action",
+          title = "Saved chats (Ctrl/Cmd+Alt+C)"
+        ):
+          text "Chats"
+          proc onclick(event: Event, node: VNode) =
+            runWorkspaceCommand("chats")
+
+        button(
           class = "header-action command-header-action",
           title = "Commands (Ctrl/Cmd+K)"
         ):
@@ -950,6 +1022,7 @@ proc runWorkspaceCommand(action: string) =
     appState.headerMenuOpen = false
     appState.composerPanel = cpNone
   of "new_chat": discard createNewChat(appState)
+  of "chats": setActiveView(appState, viewChats)
   of "search": setActiveView(appState, viewSearch)
   of "connections":
     setActiveView(appState, viewPlugin)

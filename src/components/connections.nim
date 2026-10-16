@@ -3,6 +3,8 @@ include karax/prelude
 import std/[json, strutils]
 
 import ../app/[types, extension_bridge]
+import ../app/connection_draft
+import ../api/connection_options
 
 
 proc nodeText(
@@ -185,6 +187,59 @@ proc textField(
           $node.value
         )
 
+
+proc resetConnectionOptions(state: AppState) =
+  state.clearUsageDraft()
+
+proc optionText(item: JsonNode, key: string): string =
+  if item != nil and item.kind == JObject and item.hasKey(key):
+    case item[key].kind
+    of JString: return item[key].getStr
+    of JInt, JFloat: return $item[key]
+    else: discard
+  return ""
+
+proc renderUsageControls(state: AppState): VNode =
+  result = buildHtml(tdiv(class = "plugin-form-grid")):
+    textField("Provider tokens per minute", state.connectionTpm,
+      proc(value: string) = state.connectionTpm = value,
+      placeholder = "Optional: your account's limit")
+    textField("Provider requests per minute", state.connectionRpm,
+      proc(value: string) = state.connectionRpm = value,
+      placeholder = "Optional: your account's limit")
+    textField("Maximum queue wait (seconds)", state.connectionMaxWait,
+      proc(value: string) = state.connectionMaxWait = value,
+      placeholder = "Leave empty for the server default")
+    let efforts = reasoningEffortsFor(state.extensionCatalog, state.connectionBackend,
+                                      state.connectionModel, state.connectionUrl)
+    if efforts.len > 0:
+      tdiv(class = "plugin-field"):
+        label:
+          text "Reasoning effort"
+        select(class = "plugin-select", value = cstring(state.connectionReasoning)):
+          option(value = ""): text "Provider default"
+          for effort in efforts:
+            option(value = cstring(effort)): text effort.capitalizeAscii()
+          proc onchange(event: Event, node: VNode) =
+            state.connectionReasoning = $node.value
+      tdiv(class = "plugin-field-hint plugin-field-wide"):
+        text "Reasoning effort is optional and must be supported by this model and connection."
+    tdiv(class = "plugin-field-hint plugin-field-wide"):
+      text "Use the limits from your provider account. Connections sharing a credential and model share the queue. Leave limits empty when unknown."
+
+proc renderUsageSettings(state: AppState): VNode =
+  result = buildHtml(tdiv(class = "plugin-content-section")):
+    h3: text "Usage settings: " & state.connectionName
+    p: text "Adjust provider limits without entering your API key again."
+    renderUsageControls(state)
+    button(class = "plugin-primary", disabled = state.extensionBusy):
+      text (if state.extensionBusy: "Saving…" else: "Save settings")
+      proc onclick(event: Event, node: VNode) =
+        discard saveConnectionOptions(state, existing = true)
+    button(class = "plugin-action-button", disabled = state.extensionBusy):
+      text "Back to connections"
+      proc onclick(event: Event, node: VNode) =
+        setPluginSection(state, "personal")
 
 proc providerGlyph(
   id: string
@@ -715,6 +770,8 @@ proc renderPublicProviders(
                     state.connectionKey =
                       ""
 
+                    resetConnectionOptions(state)
+
                     state.pluginSection =
                       "add"
 
@@ -764,6 +821,22 @@ proc renderResourceActions(
                 )
             }
           )
+
+      if nodeText(item, "backend") in ["http", "pi", "opencode"]:
+        button(class = "plugin-action-button", disabled = state.extensionBusy):
+          text "Usage settings"
+          proc onclick(event: Event, node: VNode) =
+            state.connectionOptionsId = nodeText(item, "id")
+            state.connectionName = nodeText(item, "name")
+            state.connectionBackend = nodeText(item, "backend")
+            state.connectionModel = nodeText(item, "model")
+            state.connectionUrl = nodeText(item, "url")
+            state.connectionTpm = optionText(item, "provider_tokens_per_minute")
+            state.connectionRpm = optionText(item, "provider_requests_per_minute")
+            state.connectionMaxWait = optionText(item, "admission_max_wait_seconds")
+            state.connectionReasoning = optionText(item, "reasoning_effort")
+            state.connectionKey = ""
+            setPluginSection(state, "limits")
 
       button(
         class = "plugin-action-button",
@@ -1082,6 +1155,8 @@ proc applyConnectionPreset(
     state.connectionKey =
       ""
 
+    resetConnectionOptions(state)
+
     redraw(kxi)
 
     return
@@ -1374,6 +1449,9 @@ proc renderConnectionForm(
               state.connectionBackend =
                 $node.value
 
+              state.connectionKey = ""
+              resetConnectionOptions(state)
+
               redraw(kxi)
 
         if state.connectionBackend == "local":
@@ -1420,6 +1498,11 @@ proc renderConnectionForm(
                 state.connectionModel =
                   $node.value
 
+                if reasoningEffortsFor(state.extensionCatalog, state.connectionBackend,
+                    state.connectionModel, state.connectionUrl).len == 0:
+                  state.connectionReasoning = ""
+                redraw(kxi)
+
         else:
 
           tdiv(class = "plugin-field"):
@@ -1437,9 +1520,9 @@ proc renderConnectionForm(
                   "pi",
                   "opencode"
                 ]:
-                  "provider/model-id"
+                  cstring"provider/model-id"
                 else:
-                  "Provider model identifier"
+                  cstring"Provider model identifier"
             ):
 
               proc oninput(
@@ -1447,8 +1530,18 @@ proc renderConnectionForm(
                 node: VNode
               ) =
 
+                let previousProvider = state.connectionModel.split('/')[0]
+                let nextModel = $node.value
+                if state.connectionBackend in ["pi", "opencode"] and
+                   previousProvider != nextModel.split('/')[0]:
+                  state.connectionKey = ""
+                  resetConnectionOptions(state)
                 state.connectionModel =
-                  $node.value
+                  nextModel
+                if reasoningEffortsFor(state.extensionCatalog, state.connectionBackend,
+                    state.connectionModel, state.connectionUrl).len == 0:
+                  state.connectionReasoning = ""
+                redraw(kxi)
 
           if state.connectionBackend in [
             "pi",
@@ -1489,6 +1582,8 @@ proc renderConnectionForm(
                 state.connectionUrl =
                   $node.value
 
+                state.connectionKey = ""
+                resetConnectionOptions(state)
                 redraw(kxi)
 
         if state.connectionBackend in [
@@ -1513,9 +1608,9 @@ proc renderConnectionForm(
               ),
               placeholder =
                 if credentialRequired:
-                  "Paste provider API key"
+                  cstring"Paste provider API key"
                 else:
-                  "No credential required"
+                  cstring"No credential required"
             ):
 
               proc oninput(
@@ -1545,6 +1640,11 @@ proc renderConnectionForm(
               else:
 
                 text "Local OpenAI-compatible endpoints can remain credential-free."
+
+      if state.connectionBackend in ["http", "pi", "opencode"]:
+        tdiv(class = "plugin-setup-card"):
+          h4: text "Optional usage settings"
+          renderUsageControls(state)
 
       if missingCredential:
 
@@ -1583,26 +1683,7 @@ proc renderConnectionForm(
             node: VNode
           ) =
 
-            discard changeExtension(
-              state,
-              "model",
-              %*{
-                "name":
-                  state.connectionName,
-
-                "backend":
-                  state.connectionBackend,
-
-                "model":
-                  state.connectionModel,
-
-                "url":
-                  state.connectionUrl,
-
-                "api_key":
-                  state.connectionKey
-              }
-            )
+            discard saveConnectionOptions(state)
 
 
 proc renderLocalModelUpload(
@@ -2001,6 +2082,9 @@ proc renderMainContent(
         state
       )
 
+    of "limits":
+      renderUsageSettings(state)
+
     else:
 
       renderPublicProviders(
@@ -2088,6 +2172,7 @@ proc renderConnections*(
               node: VNode
             ) =
 
+              state.clearConnectionDraft()
               setPluginSection(
                 state,
                 "add"

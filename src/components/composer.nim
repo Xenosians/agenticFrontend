@@ -15,10 +15,12 @@ proc backendJobBusy(
 
   return state.run.active and (
     state.run.status == "submitting" or
+    state.run.status == "restoring" or
     state.run.status == "pending" or
     state.run.status == "processing" or
     state.run.status == "waiting_approval" or
-    state.run.status == "approving"
+    state.run.status == "approving" or
+    state.run.status == "rejecting"
   )
 
 
@@ -30,6 +32,9 @@ proc composerStatusText(
 
   of "submitting":
     "Submitting request…"
+
+  of "restoring":
+    "Checking the saved job…"
 
   of "pending":
     "Queued — waiting for backend dispatch…"
@@ -44,13 +49,16 @@ proc composerStatusText(
     "Execution outcome unresolved — trusted reconciliation required."
 
   of "approving":
-    "Executing the approved action…"
+    "Submitting approval and checking the saved outcome…"
+
+  of "rejecting":
+    "Submitting your rejection…"
 
   of "completed":
     "Completed."
 
   of "denied":
-    "Request denied by policy."
+    "The action did not proceed."
 
   of "failed":
     "Request could not be completed."

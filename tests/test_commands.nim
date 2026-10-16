@@ -9,5 +9,6 @@ suite "workspace shortcuts":
     check shortcutAction("K", true, false, false, false) == "palette"
     check shortcutAction("N", true, false, false, false, true) == "new_chat"
     check shortcutAction("I", true, false, false, false, true) == "inspector"
+    check shortcutAction("C", true, false, false, false, true) == "chats"
     check shortcutAction("N", true, true, false, false) == ""
     check shortcutAction(",", true, false, false, false) == "connections"
