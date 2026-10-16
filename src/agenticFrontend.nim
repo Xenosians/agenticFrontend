@@ -41,7 +41,7 @@ proc activeViewTitle(): string =
   of viewSystem:
     "System"
   of viewPlugin, viewTool:
-    "Plugins"
+    "Connections"
   of viewNodeBuilder:
     "AI Node Builder"
   of viewSimulator:
@@ -66,7 +66,7 @@ proc activeViewSubtitle(): string =
   of viewSystem:
     "Safe service health and application state"
   of viewPlugin, viewTool:
-    "Server-managed integrations"
+    "Models, harnesses, datasets and governed integrations"
   of viewNodeBuilder:
     "Design preview — execution is not enabled"
   of viewSimulator:
@@ -801,7 +801,7 @@ proc renderCommandCenter(): VNode =
                     of "search":
                       text "Search the current chat"
                     of "connections":
-                      text "Open plugins, models and datasets"
+                      text "Open models, harnesses, datasets and integrations"
                     of "inspector":
                       text "Toggle developer diagnostics"
                     of "refresh":
@@ -858,6 +858,35 @@ proc renderWorkspaceBody(): VNode =
     renderSimulatorView()
   of viewAccount:
     renderAccountView()
+
+
+proc runStatusLabel(status: string): string =
+  case status
+  of "submitting": "Submitting"
+  of "restoring": "Checking saved state"
+  of "pending": "Queued"
+  of "processing": "Working"
+  of "waiting_approval": "Approval needed"
+  of "approving": "Approving"
+  of "rejecting": "Rejecting"
+  of "completed": "Completed"
+  of "denied": "Stopped"
+  of "outcome_unknown", "reconciliation_required": "Needs review"
+  of "failed": "Failed"
+  else:
+    if status.len > 0: status.replace("_", " ")
+    else: "Activity"
+
+proc runStatusClass(status: string): cstring =
+  case status
+  of "submitting", "restoring", "pending", "processing", "approving", "rejecting":
+    cstring"run-status-chip working"
+  of "waiting_approval": cstring"run-status-chip attention"
+  of "completed": cstring"run-status-chip success"
+  of "outcome_unknown", "reconciliation_required": cstring"run-status-chip warning"
+  of "failed": cstring"run-status-chip error"
+  of "denied": cstring"run-status-chip neutral"
+  else: cstring"run-status-chip"
 
 
 proc renderHeaderMenu(): VNode =
@@ -943,6 +972,19 @@ proc renderWorkspace(): VNode =
           text activeViewSubtitle()
 
       tdiv(class = "header-controls"):
+        if appState.run.active and appState.run.status.len > 0:
+          button(
+            class = runStatusClass(appState.run.status),
+            `aria-label` = cstring(runStatusLabel(appState.run.status)),
+            title = "Open durable job activity"
+          ):
+            span(class = "run-status-dot"):
+              text ""
+            span(class = "run-status-label"):
+              text runStatusLabel(appState.run.status)
+            proc onclick(event: Event, node: VNode) =
+              setActiveView(appState, viewJobs)
+
         button(
           class = "header-action chats-header-action",
           title = "Saved chats (Ctrl/Cmd+Alt+C)"

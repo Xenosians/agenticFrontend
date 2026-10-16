@@ -83,7 +83,7 @@ proc renderAuthScreen*(
 
           button(class = "auth-primary", disabled = state.auth.loading):
             if state.auth.loading:
-              text "Signing in..."
+              text "Please wait…"
             else:
               text "Sign in"
 
@@ -91,19 +91,19 @@ proc renderAuthScreen*(
               discard loginApplication(state)
 
           tdiv(class = "auth-actions"):
-            button:
+            button(disabled = state.auth.loading):
               text "Create account"
               proc onclick(event: Event, node: VNode) =
                 state.auth.error = ""
                 state.auth.mode = amRegister
 
-            button:
+            button(disabled = state.auth.loading):
               text "Forgot password"
               proc onclick(event: Event, node: VNode) =
                 state.auth.error = ""
                 state.auth.mode = amForgotPassword
 
-            button:
+            button(disabled = state.auth.loading):
               text "Resend verification"
               proc onclick(event: Event, node: VNode) =
                 discard resendVerificationApplication(state)
@@ -145,7 +145,7 @@ proc renderAuthScreen*(
               discard registerApplication(state)
 
           tdiv(class = "auth-actions"):
-            button:
+            button(disabled = state.auth.loading):
               text "Back to sign in"
               proc onclick(event: Event, node: VNode) =
                 state.auth.error = ""
@@ -172,7 +172,7 @@ proc renderAuthScreen*(
               discard forgotPasswordApplication(state)
 
           tdiv(class = "auth-actions"):
-            button:
+            button(disabled = state.auth.loading):
               text "Back to sign in"
               proc onclick(event: Event, node: VNode) =
                 state.auth.error = ""

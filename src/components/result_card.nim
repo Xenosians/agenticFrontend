@@ -3,6 +3,15 @@ include karax/prelude
 import ../app/types
 
 
+proc resultStatusClass(status: string): cstring =
+  case status
+  of "completed", "success", "succeeded": cstring"result-card-status success"
+  of "failed", "error": cstring"result-card-status error"
+  of "outcome_unknown", "unresolved", "reconciliation_required": cstring"result-card-status warning"
+  of "denied", "rejected": cstring"result-card-status neutral"
+  else: cstring"result-card-status"
+
+
 proc renderField(
   field: ResultCardField
 ): VNode =
@@ -73,7 +82,7 @@ proc renderResultCard*(
           text card.title
 
 
-      span(class = "result-card-status"):
+      span(class = resultStatusClass(card.status)):
         text card.status
 
 

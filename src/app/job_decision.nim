@@ -1,4 +1,4 @@
-import std/uri
+import std/[json, uri]
 import types
 import ../api/tool_proposal
 
@@ -16,6 +16,11 @@ proc decisionPath*(jobId: string, decision: JobDecision): string =
 
 proc decisionStatus*(decision: JobDecision): string =
   if decision == jdApprove: "approving" else: "rejecting"
+
+proc decisionPayload*(approvalId: string): JsonNode =
+  if approvalId.len == 0:
+    raise newException(ValueError, "The displayed saved proposal is required.")
+  %*{"approval_id": approvalId}
 
 proc canDecideJob*(state: AppState): bool =
   state.auth.authenticated and state.auth.sessionId.len > 0 and

@@ -80,6 +80,8 @@ type
     tool*: string
     proposal*: ToolProposal
     decisionError*: string
+    observationMode*: string
+    progressStage*: string
     presentations*: seq[ResultCard]
 
   SystemState* = object
@@ -185,6 +187,9 @@ type
     auth*: AuthState
     chats*: seq[ChatItem]
     currentChatId*: string
+    jobObservationEpoch*: int
+    chatNavigationEpoch*: int
+    authRequestEpoch*: int
     sessions*: seq[AuthSessionItem]
     sessionsLoaded*: bool
     nextMessageId*: int

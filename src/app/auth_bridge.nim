@@ -11,6 +11,7 @@ import types
 import state
 import backend_bridge
 import connection_draft
+import request_context
 
 
 proc browserQueryParam(
@@ -57,6 +58,8 @@ proc applyAuth(
 proc clearAuthenticatedState(
   state: AppState
 ) =
+  inc state.chatNavigationEpoch
+  inc state.jobObservationEpoch
   state.auth.authenticated = false
   state.extensionCatalog = nil
   state.extensionBusy = false
@@ -75,6 +78,9 @@ proc clearAuthenticatedState(
   state.auth.csrfToken = ""
   state.auth.sessionId = ""
   state.auth.expiresAt = ""
+  state.auth.passwordDraft = ""
+  state.auth.newPasswordDraft = ""
+  state.auth.resetToken = ""
   state.chats.setLen(0)
   state.sessions.setLen(0)
   state.sessionsLoaded = false
@@ -137,7 +143,7 @@ proc loadChatHistory*(
   if not state.auth.authenticated or chatId.len == 0:
     return
 
-  let sessionId = state.auth.sessionId
+  let context = beginNavigation(state)
 
   state.auth.loading = true
   state.auth.error = ""
@@ -145,7 +151,7 @@ proc loadChatHistory*(
 
   try:
     let history = await getChatHistory(chatId)
-    if not state.auth.authenticated or state.auth.sessionId != sessionId:
+    if not matchesNavigation(state, context):
       return
     applyHistory(state, chatId, history)
 
@@ -159,9 +165,11 @@ proc loadChatHistory*(
       )
 
   except CatchableError:
-    state.auth.error = "Could not load this chat right now."
+    if matchesNavigation(state, context):
+      state.auth.error = "Could not load this chat right now."
   finally:
-    state.auth.loading = false
+    if matchesNavigation(state, context):
+      state.auth.loading = false
 
   redraw(kxi)
 
@@ -172,7 +180,10 @@ proc loadChats*(
   if not state.auth.authenticated:
     return
 
+  let context = navigationContext(state)
   let remoteChats = await listChats()
+  if not matchesNavigation(state, context):
+    return
 
   state.chats.setLen(0)
 
@@ -190,6 +201,8 @@ proc loadChats*(
       await loadChatHistory(state, state.chats[0].chatId)
     else:
       let created = await createChat(state.auth.csrfToken)
+      if not matchesNavigation(state, context):
+        return
 
       state.chats.add(
         ChatItem(
@@ -205,6 +218,7 @@ proc loadChats*(
 proc bootstrapApplication*(
   state: AppState
 ) {.async.} =
+  let requestEpoch = beginAuthRequest(state)
   state.auth.loading = true
   state.auth.error = ""
   redraw(kxi)
@@ -215,10 +229,11 @@ proc bootstrapApplication*(
   if verifyToken.len > 0:
     try:
       await verifyEmail(verifyToken)
+      if not matchesAuthRequest(state, requestEpoch): return
       state.auth.notice = "Email verified. You can sign in now."
       clearBrowserQuery()
     except CatchableError as exc:
-      state.auth.error = exc.msg
+      if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
 
   if resetToken.len > 0:
     state.auth.mode = amResetPassword
@@ -226,11 +241,13 @@ proc bootstrapApplication*(
 
   try:
     let auth = await me()
+    if not matchesAuthRequest(state, requestEpoch): return
     applyAuth(state, auth)
     await loadChats(state)
   except CatchableError:
-    clearAuthenticatedState(state)
+    if matchesAuthRequest(state, requestEpoch): clearAuthenticatedState(state)
 
+  if not matchesAuthRequest(state, requestEpoch): return
   state.auth.checked = true
   state.auth.loading = false
   redraw(kxi)
@@ -239,6 +256,7 @@ proc bootstrapApplication*(
 proc loginApplication*(
   state: AppState
 ) {.async.} =
+  if state.auth.loading: return
   let email = state.auth.emailDraft.strip()
   let password = state.auth.passwordDraft
 
@@ -249,18 +267,20 @@ proc loginApplication*(
 
   state.auth.loading = true
   state.auth.error = ""
+  let requestEpoch = beginAuthRequest(state)
   redraw(kxi)
 
   try:
     let auth = await login(email, password)
+    if not matchesAuthRequest(state, requestEpoch): return
     applyAuth(state, auth)
     state.auth.passwordDraft = ""
     state.auth.notice = ""
     await loadChats(state)
   except CatchableError as exc:
-    state.auth.error = exc.msg
+    if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
   finally:
-    state.auth.loading = false
+    if matchesAuthRequest(state, requestEpoch): state.auth.loading = false
 
   redraw(kxi)
 
@@ -268,6 +288,7 @@ proc loginApplication*(
 proc registerApplication*(
   state: AppState
 ) {.async.} =
+  if state.auth.loading: return
   let displayName = state.auth.displayNameDraft.strip()
   let email = state.auth.emailDraft.strip()
   let password = state.auth.passwordDraft
@@ -279,17 +300,19 @@ proc registerApplication*(
 
   state.auth.loading = true
   state.auth.error = ""
+  let requestEpoch = beginAuthRequest(state)
   redraw(kxi)
 
   try:
     await register(displayName, email, password)
+    if not matchesAuthRequest(state, requestEpoch): return
     state.auth.notice = "Registration created. Check your email for the verification link."
     state.auth.passwordDraft = ""
     state.auth.mode = amLogin
   except CatchableError as exc:
-    state.auth.error = exc.msg
+    if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
   finally:
-    state.auth.loading = false
+    if matchesAuthRequest(state, requestEpoch): state.auth.loading = false
 
   redraw(kxi)
 
@@ -297,6 +320,7 @@ proc registerApplication*(
 proc resendVerificationApplication*(
   state: AppState
 ) {.async.} =
+  if state.auth.loading: return
   let email = state.auth.emailDraft.strip()
 
   if email.len == 0:
@@ -306,15 +330,17 @@ proc resendVerificationApplication*(
 
   state.auth.loading = true
   state.auth.error = ""
+  let requestEpoch = beginAuthRequest(state)
   redraw(kxi)
 
   try:
     await resendVerification(email)
+    if not matchesAuthRequest(state, requestEpoch): return
     state.auth.notice = "If the account still needs verification, a new email was sent."
   except CatchableError as exc:
-    state.auth.error = exc.msg
+    if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
   finally:
-    state.auth.loading = false
+    if matchesAuthRequest(state, requestEpoch): state.auth.loading = false
 
   redraw(kxi)
 
@@ -322,6 +348,7 @@ proc resendVerificationApplication*(
 proc forgotPasswordApplication*(
   state: AppState
 ) {.async.} =
+  if state.auth.loading: return
   let email = state.auth.emailDraft.strip()
 
   if email.len == 0:
@@ -331,16 +358,18 @@ proc forgotPasswordApplication*(
 
   state.auth.loading = true
   state.auth.error = ""
+  let requestEpoch = beginAuthRequest(state)
   redraw(kxi)
 
   try:
     await forgotPassword(email)
+    if not matchesAuthRequest(state, requestEpoch): return
     state.auth.notice = "If the account exists, a password reset email was sent."
     state.auth.mode = amLogin
   except CatchableError as exc:
-    state.auth.error = exc.msg
+    if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
   finally:
-    state.auth.loading = false
+    if matchesAuthRequest(state, requestEpoch): state.auth.loading = false
 
   redraw(kxi)
 
@@ -348,6 +377,7 @@ proc forgotPasswordApplication*(
 proc resetPasswordApplication*(
   state: AppState
 ) {.async.} =
+  if state.auth.loading: return
   if state.auth.resetToken.len == 0 or state.auth.newPasswordDraft.len == 0:
     state.auth.error = "A reset token and new password are required."
     redraw(kxi)
@@ -355,19 +385,21 @@ proc resetPasswordApplication*(
 
   state.auth.loading = true
   state.auth.error = ""
+  let requestEpoch = beginAuthRequest(state)
   redraw(kxi)
 
   try:
     await resetPassword(state.auth.resetToken, state.auth.newPasswordDraft)
+    if not matchesAuthRequest(state, requestEpoch): return
     state.auth.notice = "Password reset complete. Sign in with your new password."
     state.auth.resetToken = ""
     state.auth.newPasswordDraft = ""
     state.auth.mode = amLogin
     clearBrowserQuery()
   except CatchableError as exc:
-    state.auth.error = exc.msg
+    if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
   finally:
-    state.auth.loading = false
+    if matchesAuthRequest(state, requestEpoch): state.auth.loading = false
 
   redraw(kxi)
 
@@ -375,25 +407,36 @@ proc resetPasswordApplication*(
 proc logoutApplication*(
   state: AppState
 ) {.async.} =
-  if not state.auth.authenticated:
-    clearAuthenticatedState(state)
-    state.auth.checked = true
+  let requestEpoch = beginAuthRequest(state)
+  let csrfToken = state.auth.csrfToken
+  let wasAuthenticated = state.auth.authenticated
+  # Hide private state and invalidate all observers before the network wait.
+  # A delayed response cannot repopulate the workspace during sign-out.
+  clearAuthenticatedState(state)
+  state.auth.checked = true
+  state.auth.mode = amLogin
+  if not wasAuthenticated:
+    state.auth.loading = false
     redraw(kxi)
     return
 
   state.auth.loading = true
   redraw(kxi)
 
+  var logoutConfirmed = true
   try:
-    await logout(state.auth.csrfToken)
+    await logout(csrfToken)
   except CatchableError:
-    discard
+    logoutConfirmed = false
 
-  clearAuthenticatedState(state)
-  state.auth.checked = true
+  if not matchesAuthRequest(state, requestEpoch): return
   state.auth.loading = false
   state.auth.mode = amLogin
-  state.auth.notice = "Signed out."
+  if logoutConfirmed:
+    state.auth.notice = "Signed out."
+  else:
+    state.auth.notice = ""
+    state.auth.error = "The local workspace was cleared, but server sign-out could not be confirmed. Check your connection before signing in again."
   redraw(kxi)
 
 
@@ -409,6 +452,8 @@ proc createNewChat*(
     state.messages.len == 0 and
     not state.run.active
   ):
+    discard beginNavigation(state)
+    state.auth.loading = false
     state.activeView =
       viewChat
 
@@ -437,11 +482,14 @@ proc createNewChat*(
     redraw(kxi)
     return
 
+  let context = beginNavigation(state)
+  state.auth.loading = true
   try:
     let created =
       await createChat(
         state.auth.csrfToken
       )
+    if not matchesNavigation(state, context): return
 
     state.chats.insert(
       ChatItem(
@@ -472,10 +520,10 @@ proc createNewChat*(
     )
 
   except CatchableError:
-    showToast(
-      state,
-      "Could not create a new chat right now."
-    )
+    if matchesNavigation(state, context):
+      showToast(state, "Could not create a new chat right now.")
+  finally:
+    if matchesNavigation(state, context): state.auth.loading = false
 
   redraw(kxi)
 
@@ -512,11 +560,13 @@ proc deleteChatApplication*(
     redraw(kxi)
     return
 
+  let context = accountContext(state)
   try:
     await deleteChat(
       chatId,
       state.auth.csrfToken
     )
+    if not matchesAccount(state, context): return
 
     let wasCurrent =
       chatId ==
@@ -543,10 +593,12 @@ proc deleteChatApplication*(
         )
 
       else:
+        let navigation = beginNavigation(state)
         let created =
           await createChat(
             state.auth.csrfToken
           )
+        if not matchesNavigation(state, navigation): return
 
         state.chats.add(
           ChatItem(
@@ -566,6 +618,7 @@ proc deleteChatApplication*(
           created.chatId,
           @[]
         )
+        state.auth.loading = false
 
     showToast(
       state,
@@ -573,10 +626,8 @@ proc deleteChatApplication*(
     )
 
   except CatchableError:
-    showToast(
-      state,
-      "Could not delete this chat right now."
-    )
+    if matchesAccount(state, context):
+      showToast(state, "Could not delete this chat right now.")
 
   redraw(kxi)
 
@@ -585,7 +636,10 @@ proc selectChat*(
   state: AppState,
   chatId: string
 ) {.async.} =
+  if not state.auth.authenticated: return
   if chatId == state.currentChatId:
+    discard beginNavigation(state)
+    state.auth.loading = false
     state.activeView = viewChat
     redraw(kxi)
     return
@@ -609,7 +663,9 @@ proc selectChat*(
     redraw(kxi)
     return
 
+  let context = accountContext(state)
   await loadChatHistory(state, chatId)
+  if not matchesAccount(state, context) or state.currentChatId != chatId: return
   state.activeView = viewChat
   redraw(kxi)
 
@@ -620,8 +676,10 @@ proc loadAuthSessions*(
   if not state.auth.authenticated:
     return
 
+  let context = accountContext(state)
   try:
     let remoteSessions = await listSessions()
+    if not matchesAccount(state, context): return
     state.sessions.setLen(0)
 
     for remote in remoteSessions:
@@ -639,7 +697,8 @@ proc loadAuthSessions*(
 
     state.sessionsLoaded = true
   except CatchableError as exc:
-    showToast(state, "Session history failed: " & exc.msg)
+    if matchesAccount(state, context):
+      showToast(state, "Session history failed: " & exc.msg)
 
   redraw(kxi)
 
@@ -651,8 +710,10 @@ proc revokeAuthSession*(
   if not state.auth.authenticated or sessionId.len == 0:
     return
 
+  let context = accountContext(state)
   try:
     await revokeSession(state.auth.csrfToken, sessionId)
+    if not matchesAccount(state, context): return
 
     if sessionId == state.auth.sessionId:
       clearAuthenticatedState(state)
@@ -662,6 +723,7 @@ proc revokeAuthSession*(
     else:
       await loadAuthSessions(state)
   except CatchableError as exc:
-    showToast(state, "Could not revoke session: " & exc.msg)
+    if matchesAccount(state, context):
+      showToast(state, "Could not revoke session: " & exc.msg)
 
   redraw(kxi)

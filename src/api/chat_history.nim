@@ -12,7 +12,7 @@ const observableJobStates* = [
 ]
 
 const restorableJobStates* = [
-  "pending", "processing", "waiting_approval", "approving",
+  "pending", "processing", "waiting_approval", "approving", "rejecting",
   "outcome_unknown", "reconciliation_required", "completed", "failed", "denied"
 ]
 

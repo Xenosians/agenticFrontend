@@ -1,5 +1,4 @@
 import types
-import std/strutils
 
 proc emptyRunState():
   RunState =
@@ -346,112 +345,6 @@ proc openPluginCatalog*(
     false
 
 
-proc togglePluginConnection*(
-  state: AppState,
-  pluginId: string
-) =
-
-  if pluginId in ["palo-alto", "openwrt"]:
-    showToast(
-      state,
-      "Network integration configuration is managed by the backend runtime."
-    )
-    return
-
-
-  for i in 0 ..<
-      state.plugins.len:
-
-    if state.plugins[
-         i
-       ].id ==
-       pluginId:
-
-      state.plugins[
-        i
-      ].connected =
-        not state.plugins[
-          i
-        ].connected
-
-
-      if state.plugins[
-           i
-         ].connected:
-
-        showToast(
-          state,
-          state.plugins[
-            i
-          ].name &
-          " connected in frontend preview mode."
-        )
-
-      else:
-
-        showToast(
-          state,
-          state.plugins[
-            i
-          ].name &
-          " disconnected."
-        )
-
-
-      return
-
-
-proc addPreviewPlugin*(
-  state: AppState
-) =
-
-  let previewId =
-    "custom-preview"
-
-
-  for plugin in state.plugins:
-
-    if plugin.id ==
-       previewId:
-
-      openPluginView(
-        state,
-        previewId
-      )
-
-      showToast(
-        state,
-        "Custom Plugin already exists in the preview registry."
-      )
-
-      return
-
-
-  state.plugins.add(
-    PluginItem(
-      id:
-        previewId,
-
-      name:
-        "Custom Plugin",
-
-      connected:
-        false
-    )
-  )
-
-
-  state.selectedPluginId =
-    previewId
-
-  state.activeView =
-    viewPlugin
-
-
-  showToast(
-    state,
-    "Custom Plugin added to the local frontend registry."
-  )
 
 
 proc addRunEvent*(
@@ -509,16 +402,6 @@ proc addAssistantMessage*(
   jobId: string = ""
 ) =
 
-  var cleanContent =
-    content
-
-  cleanContent =
-    cleanContent.replace(
-      "**",
-      ""
-    )
-
-
   state.messages.add(
     ChatMessage(
       id:
@@ -530,7 +413,7 @@ proc addAssistantMessage*(
       jobId: jobId,
 
       content:
-        cleanContent,
+        content,
 
       cards:
         cards
@@ -553,96 +436,6 @@ proc restoreAssistantJobMessage*(state: AppState, jobId, content: string,
   addAssistantMessage(state, content, cards, jobId)
 
 
-proc startLocalRun*(
-  state: AppState,
-  request: string
-) =
-
-  state.run =
-    RunState(
-      active:
-        true,
-
-      request:
-        request,
-
-      jobId:
-        "local-preview",
-
-      status:
-        "processing",
-
-      agent:
-        "",
-
-      tool:
-        "",
-
-      presentations:
-        @[]
-    )
-
-
-  state.runEvents.setLen(
-    0
-  )
-
-  state.inspectorTab =
-    tabRun
-
-
-  addRunEvent(
-    state,
-    "request",
-    "Request accepted by frontend runtime."
-  )
-
-
-  addRunEvent(
-    state,
-    "run",
-    "Local preview run started."
-  )
-
-
-proc completeLocalRun*(
-  state: AppState,
-  agent: string,
-  tool: string
-) =
-
-  state.run.agent =
-    agent
-
-  state.run.tool =
-    tool
-
-
-  addRunEvent(
-    state,
-    "routing",
-    "Selected agent: " &
-    agent
-  )
-
-
-  addRunEvent(
-    state,
-    "tool",
-    "Selected tool: " &
-    tool
-  )
-
-
-  state.run.status =
-    "completed"
-
-
-  addRunEvent(
-    state,
-    "run",
-    "Local preview run completed."
-  )
 
 
 proc clearRun*(

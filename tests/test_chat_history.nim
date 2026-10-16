@@ -35,6 +35,9 @@ suite "durable job restoration from saved history":
     check outstandingHistoryJob([ChatHistoryMessage(status: "waiting_approval")]).jobId == ""
     check outstandingHistoryJob(newSeq[ChatHistoryMessage]()).jobId == ""
 
+  test "an interrupted local rejection can be reread without resubmitting it":
+    check "rejecting" in restorableJobStates
+
   test "latest completed job is reread to hydrate its result when no job is outstanding":
     let selected = historyJobForRestore([
       ChatHistoryMessage(jobId: "older", status: "completed"),

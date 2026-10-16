@@ -8,6 +8,48 @@ import ../api/tool_proposal
 import ../app/job_decision
 
 import result_card
+import message_body
+
+
+proc progressLabel(state: AppState): string =
+  case state.run.progressStage
+  of "routing": "Choosing the right tools"
+  of "planning": "Preparing the next action"
+  of "executing": "Running the requested tools"
+  of "synthesizing": "Preparing the result"
+  of "waiting_provider": "Waiting for the model provider"
+  else:
+    case state.run.status
+    of "submitting": "Submitting your request"
+    of "restoring": "Checking the saved task"
+    of "pending": "Your task is queued"
+    else: "Working on your request"
+
+
+proc observationLabel(state: AppState): string =
+  case state.run.observationMode
+  of "live": "Live updates"
+  of "connecting": "Connecting to live updates"
+  of "reconnecting": "Reconnecting · checking for updates"
+  of "polling": "Checking for updates"
+  of "interrupted": "Connection interrupted"
+  else: "Checking saved progress"
+
+
+proc renderJobProgress(state: AppState): VNode =
+  result = buildHtml(tdiv(class = "job-progress", role = "status", `aria-live` = "polite")):
+    span(class = "job-progress-dot"):
+      text ""
+    tdiv(class = "job-progress-copy"):
+      strong:
+        text progressLabel(state)
+      span:
+        text observationLabel(state)
+    if state.run.observationMode == "interrupted":
+      button(class = "approval-recovery-button"):
+        text "Check saved task"
+        proc onclick(event: Event, node: VNode) =
+          discard resumeBackendJob(state)
 
 
 proc renderMessage(
@@ -48,7 +90,7 @@ proc renderMessage(
         if message.content.len > 0:
 
           tdiv(class = "message-bubble assistant"):
-            text message.content
+            renderMessageBody(message.content)
 
 
         if message.cards.len > 0:
@@ -78,6 +120,8 @@ proc renderApprovalAction(
       span(class = "message-author"):
         if state.run.status == "waiting_approval":
           text "Approval required"
+        elif state.run.status == "restoring":
+          text "Checking saved outcome"
         else:
           text "Saving your decision"
 
@@ -95,6 +139,14 @@ proc renderApprovalAction(
           if state.run.decisionError.len > 0:
             p(class = "approval-decision-error"):
               text state.run.decisionError
+            button(
+              class = "approval-recovery-button",
+              title = "Read the durable job again without resubmitting the decision"
+            ):
+              text "Check saved outcome"
+              proc onclick(event: Event, node: VNode) =
+                discard resumeBackendJob(state)
+
           tdiv(class = "approval-actions"):
             button(
               class = "approval-action-button",
@@ -174,3 +226,6 @@ connected tools and plugins.
 
     if state.run.active and state.run.status in ["waiting_approval", "approving", "rejecting"]:
       renderApprovalAction(state)
+
+    if state.run.active and state.run.status in ["submitting", "restoring", "pending", "processing"]:
+      renderJobProgress(state)

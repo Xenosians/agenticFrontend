@@ -9,6 +9,12 @@ import ../app/state
 import ../app/backend_bridge
 
 
+proc resizeComposerInput() {.
+  importjs: "requestAnimationFrame(() => { const el = document.getElementById('messageInput'); if (!el) return; el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 180) + 'px'; })"
+.}
+
+proc isComposing(event: Event): bool {.importjs: "Boolean(#.isComposing)".}
+
 proc backendJobBusy(
   state: AppState
 ): bool =
@@ -116,6 +122,8 @@ proc submitDraft(
   if textareaNode != nil:
     textareaNode.value = cstring""
 
+  resizeComposerInput()
+
 
 proc renderComposer*(
   state: AppState
@@ -147,9 +155,9 @@ proc renderComposer*(
         id = "messageInput",
         class = "composer-input",
         placeholder = "Message Agentic...",
+        `aria-label` = "Message Agentic",
         rows = "1",
-        value = cstring(state.composerDraft),
-        disabled = jobBusy
+        value = cstring(state.composerDraft)
       ):
         proc oninput(
           event: Event,
@@ -163,6 +171,8 @@ proc renderComposer*(
             state,
             $node.value
           )
+
+          resizeComposerInput()
 
         proc onkeydown(
           event: Event,
@@ -179,7 +189,7 @@ proc renderComposer*(
           )
 
           if keyboardEvent.key == "Enter" and
-             not keyboardEvent.shiftKey:
+             not keyboardEvent.shiftKey and not isComposing(event):
             event.preventDefault()
             submitDraft(
               state,
@@ -189,13 +199,14 @@ proc renderComposer*(
       tdiv(class = "composer-footer"):
         span(class = "composer-context"):
           if jobBusy:
-            text "One foreground job at a time"
+            text "Task in progress · you can draft your next message"
           else:
-            text "Phoenix-backed durable chat"
+            text "Tools selected automatically"
 
         button(
           class = sendClass,
           disabled = sendDisabled,
+          `aria-label` = "Send message",
           title = "Send message"
         ):
           text "↑"

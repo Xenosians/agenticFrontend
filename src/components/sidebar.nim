@@ -194,7 +194,7 @@ proc renderSidebar*(
       renderViewButton(
         state,
         "◇",
-        "Plugins",
+        "Connections",
         viewPlugin
       )
 
@@ -215,7 +215,7 @@ proc renderSidebar*(
 
     nav(class = "nav-section"):
       span(class = "section-label"):
-        text "Build"
+        text "Labs"
 
       renderViewButton(
         state,

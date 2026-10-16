@@ -1544,3 +1544,115 @@ body {
     font-size: 13px;
   }
 }
+
+/* ==========================================================
+   WORKSPACE LIVE STATE
+   ========================================================== */
+
+.workspace-header {
+  background: rgba(13, 13, 13, 0.86);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.conversation { scroll-behavior: smooth; }
+.composer-input { resize: none; overflow-y: auto; }
+.composer:focus-within { border-color: #626262; box-shadow: 0 0 0 2px rgba(190,190,190,.06); }
+.workspace-title { min-width: 0; }
+.workspace-title h1, .workspace-title > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.message-column.assistant { min-width: 0; max-width: min(100%, 700px); }
+.message-body { white-space: normal; overflow-wrap: anywhere; }
+.message-body p { margin: 0 0 12px; white-space: pre-wrap; }
+.message-body h3 { margin: 18px 0 9px; font-size: 14px; line-height: 1.5; }
+.message-body > :first-child { margin-top: 0; }
+.message-body > :last-child { margin-bottom: 0; }
+.message-body ul, .message-body ol { margin: 8px 0 14px; padding-left: 21px; }
+.message-body li { padding-left: 2px; margin: 5px 0; }
+.message-body strong { color: #e3e3e3; font-weight: 650; }
+.message-body code { border: 1px solid #303030; border-radius: 4px; padding: 1px 4px; background: #191919; font-size: .92em; }
+.message-body pre { max-width: 100%; margin: 12px 0; padding: 12px; overflow-x: auto; border: 1px solid #303030; border-radius: 9px; background: #111; white-space: pre; }
+.message-body pre code { border: 0; padding: 0; background: transparent; }
+.job-progress { display: flex; align-items: center; gap: 11px; margin: 24px 0 24px 44px; color: #a3a3a3; }
+.job-progress-dot { width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%; background: #bcbcbc; animation: agentic-status-pulse 1.4s ease-in-out infinite; }
+.job-progress-copy { display: flex; flex-direction: column; gap: 4px; }
+.job-progress-copy strong { font-size: 12px; font-weight: 500; color: #c8c8c8; }
+.job-progress-copy > span { font-size: 10px; color: #808080; }
+.job-progress .approval-recovery-button { margin: 0 0 0 auto; }
+.result-card-status.success { border-color: #365344; color: #a9d1b7; }
+.result-card-status.error { border-color: #603b3b; color: #dda0a0; }
+.result-card-status.warning { border-color: #665631; color: #e0bd72; }
+.result-card-status.neutral { color: #a3a3a3; }
+
+.header-action, .run-status-chip, .new-session, .nav-item, .chat-nav-main,
+.command-center-row, .approval-action-button, .approval-recovery-button,
+.result-card, .composer {
+  transition: background-color 140ms ease, border-color 140ms ease,
+              color 140ms ease, opacity 140ms ease, transform 140ms ease,
+              box-shadow 140ms ease;
+}
+
+.run-status-chip {
+  min-height: 30px;
+  max-width: 180px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #303030;
+  border-radius: 999px;
+  background: #171717;
+  color: #a9a9a9;
+  cursor: pointer;
+}
+.run-status-chip:hover { border-color: #454545; background: #1d1d1d; color: #ededed; }
+.run-status-dot {
+  width: 7px; height: 7px; flex: 0 0 7px; border-radius: 50%;
+  background: currentColor; opacity: .72;
+}
+.run-status-label {
+  overflow: hidden; font-size: 10px; font-weight: 650;
+  text-overflow: ellipsis; white-space: nowrap;
+}
+.run-status-chip.working { color: #bdbdbd; }
+.run-status-chip.working .run-status-dot { animation: agentic-status-pulse 1.4s ease-in-out infinite; }
+.run-status-chip.attention { border-color: #5d5138; color: #ddc488; }
+.run-status-chip.success { border-color: #365344; color: #9fc9ae; }
+.run-status-chip.warning { border-color: #665631; color: #e0bd72; }
+.run-status-chip.error { border-color: #603b3b; color: #dda0a0; }
+.run-status-chip.neutral { color: #8d8d8d; }
+
+.approval-recovery-button {
+  margin-top: 8px; padding: 8px 11px;
+  border: 1px solid #4b4b4b; border-radius: 8px;
+  background: #1d1d1d; color: #d2d2d2; cursor: pointer;
+}
+.approval-recovery-button:hover { border-color: #666; background: #252525; }
+.approval-decision-error { line-height: 1.55; }
+
+@keyframes agentic-status-pulse {
+  0%, 100% { opacity: .35; transform: scale(.85); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@media (max-width: 760px) {
+  .run-status-chip { max-width: 100px; padding-inline: 8px; gap: 5px; }
+  .run-status-label { display: block; }
+  .header-controls { flex-shrink: 0; gap: 4px; }
+  .workspace-header { padding-inline: 14px; gap: 8px; }
+  .workspace-title { flex: 1; }
+  .command-header-action { width: 35px; font-size: 10px; }
+  .message-column.user { max-width: 90%; }
+  .message-column.assistant { max-width: calc(100% - 40px); }
+  .composer-container { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+  .composer-context { max-width: calc(100% - 45px); line-height: 1.4; }
+  .approval-action-button { min-height: 42px; flex: 1; }
+  .job-progress { margin-left: 8px; }
+  .job-progress .approval-recovery-button { max-width: 118px; }
+}
+@supports (height: 100dvh) { #app, .app-shell { height: 100dvh; } }
+@media (prefers-reduced-motion: reduce) {
+  .conversation { scroll-behavior: auto; }
+  .run-status-chip.working .run-status-dot { animation: none; }
+  .job-progress-dot { animation: none; }
+  .header-action, .run-status-chip, .new-session, .nav-item, .chat-nav-main,
+  .command-center-row, .approval-action-button, .approval-recovery-button,
+  .result-card, .composer { transition: none; }
+}

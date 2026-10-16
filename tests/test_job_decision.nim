@@ -32,6 +32,15 @@ suite "governed action decisions":
     app.auth.csrfToken = "csrf"
     app.run.proposal.arguments = nil
     check not canDecideJob(app)
+  test "decisions bind the exact displayed proposal rather than the job's later step":
+    let app = awaitingDecision()
+    let original = captureDecisionContext(app)
+    check decisionPayload(original.approvalId) == %*{"approval_id": "approval"}
+    app.run.proposal.approvalId = "next-jira-approval"
+    check not matchesDecisionContext(app, original)
+    check decisionPayload(app.run.proposal.approvalId) == %*{"approval_id": "next-jira-approval"}
+    expect ValueError:
+      discard decisionPayload("")
   test "late decision responses cannot cross account chat job or proposal boundaries":
     let app = awaitingDecision()
     let context = captureDecisionContext(app)

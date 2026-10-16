@@ -4,21 +4,13 @@ import std/[asyncjs, json]
 
 import ../api/client
 import ../api/chat_history
-import ../api/tool_proposal
+import ../api/job_socket
 import ../config/runtime_config
 
 import types
 import state
 import job_decision
 import extension_bridge
-
-
-proc sleepMs(
-  milliseconds: int
-): Future[void] {.
-  importjs:
-    "new Promise((resolve) => setTimeout(resolve, #))"
-.}
 
 
 proc applyJobState(
@@ -155,22 +147,21 @@ proc finishReconciliationRequired(
 proc finishWaitingApproval(
   state: AppState,
   job: JobResponse,
-  addMessage: bool
+  addMessage: bool,
+  restoreHistory: bool = false
 ) =
 
-  if addMessage:
+  if addMessage or restoreHistory:
     let approvalMessage =
       if job.answer.len > 0:
         job.answer
       else:
         "This action requires your approval before it can continue."
 
-    addAssistantMessage(
-      state,
-      approvalMessage,
-      job.presentations,
-      job.jobId
-    )
+    if restoreHistory:
+      restoreAssistantJobMessage(state, job.jobId, approvalMessage, job.presentations)
+    else:
+      addAssistantMessage(state, approvalMessage, job.presentations, job.jobId)
 
   addRunEvent(
     state,
@@ -196,15 +187,37 @@ proc pollBackendJob*(
 
   let sessionId = state.auth.sessionId
   let chatId = state.currentChatId
+  inc state.jobObservationEpoch
+  let observationEpoch = state.jobObservationEpoch
+  var waitingPresented = false
+
+  proc isCurrent(): bool =
+    state.auth.authenticated and state.auth.sessionId == sessionId and
+      state.currentChatId == chatId and state.run.jobId == jobId and
+      state.jobObservationEpoch == observationEpoch
+
+  proc updateMode(mode: cstring) =
+    if isCurrent():
+      state.run.observationMode = $mode
+      redraw(kxi)
+
+  proc updateProgress(stage: cstring) =
+    if isCurrent() and state.run.status in ["pending", "processing"]:
+      state.run.progressStage = $stage
+      redraw(kxi)
+
+  let observer = observeJob(cstring(frontendConfig.backendBaseUrl), cstring(jobId),
+    cstring(state.auth.csrfToken), frontendConfig.pollIntervalMs,
+    isCurrent, updateMode, updateProgress)
 
   try:
     while true:
-      if not state.auth.authenticated or state.auth.sessionId != sessionId or
-          state.currentChatId != chatId or state.run.jobId != jobId:
+      if not isCurrent():
         return
 
       let previousStatus =
         state.run.status
+      let previousApprovalId = state.run.proposal.approvalId
 
       let job =
         await getJob(
@@ -212,8 +225,7 @@ proc pollBackendJob*(
         )
 
       # A delayed response belongs to its original account, chat and job.
-      if not state.auth.authenticated or state.auth.sessionId != sessionId or
-          state.currentChatId != chatId or state.run.jobId != jobId:
+      if not isCurrent():
         return
 
       applyJobState(
@@ -222,6 +234,7 @@ proc pollBackendJob*(
       )
 
       if job.status != previousStatus:
+        state.run.progressStage = ""
         addRunEvent(
           state,
           "status",
@@ -241,13 +254,13 @@ proc pollBackendJob*(
         finishCompletedJob(
           state,
           job,
-          restoreHistory
+          restoreHistory or waitingPresented
         )
         redraw(kxi)
         return
 
       of "denied":
-        finishDeniedJob(state, job, restoreHistory)
+        finishDeniedJob(state, job, restoreHistory or waitingPresented)
         redraw(kxi)
         return
 
@@ -255,25 +268,23 @@ proc pollBackendJob*(
         finishFailedJob(
           state,
           job,
-          restoreHistory
+          restoreHistory or waitingPresented
         )
         redraw(kxi)
         return
 
       of "waiting_approval":
-        finishWaitingApproval(
-          state,
-          job,
-          addWaitingMessage
-        )
-        redraw(kxi)
-        return
+        if not waitingPresented or previousStatus != job.status or previousApprovalId != job.proposal.approvalId:
+          finishWaitingApproval(state, job, addWaitingMessage and not waitingPresented,
+            restoreHistory = restoreHistory or waitingPresented)
+          waitingPresented = true
+          redraw(kxi)
 
       of "reconciliation_required", "outcome_unknown":
         finishReconciliationRequired(
           state,
           job,
-          restoreHistory
+          restoreHistory or waitingPresented
         )
         redraw(kxi)
         return
@@ -296,19 +307,16 @@ proc pollBackendJob*(
         redraw(kxi)
         return
 
-      await sleepMs(
-        frontendConfig.pollIntervalMs
-      )
+      await observer.waitForUpdate()
 
   except CatchableError:
-    if not state.auth.authenticated or state.auth.sessionId != sessionId or
-        state.currentChatId != chatId or state.run.jobId != jobId:
+    if not isCurrent():
       return
 
     addRunEvent(
       state,
       "connection",
-      "Polling was interrupted before the durable job reached a terminal state."
+      "Observation was interrupted before the durable job reached a terminal state."
     )
 
     showToast(
@@ -316,7 +324,14 @@ proc pollBackendJob*(
       "Connection interrupted. Reload or reopen this chat to resume."
     )
 
+    state.run.observationMode = "interrupted"
+
     redraw(kxi)
+
+  finally:
+    observer.closeObservation()
+    if isCurrent() and state.run.observationMode != "interrupted":
+      state.run.observationMode = ""
 
 
 proc resumeBackendJob*(
@@ -332,7 +347,11 @@ proc resumeBackendJob*(
 
   # Saved history locates the job; its current GET is the authority for
   # approval controls and execution outcome, including after a reload.
+  # Reading durable state is safe after an interrupted approve/reject response:
+  # it never resubmits the mutation decision.
+  state.run.decisionError = ""
   state.run.status = "restoring"
+  redraw(kxi)
 
   addRunEvent(
     state,
@@ -385,6 +404,14 @@ proc submitBackendJob*(
 
   state.runEvents.setLen(0)
   state.inspectorTab = tabRun
+  inc state.jobObservationEpoch
+  let submissionEpoch = state.jobObservationEpoch
+  let submissionSession = state.auth.sessionId
+  let submissionChat = state.currentChatId
+
+  proc submissionIsCurrent(): bool =
+    state.auth.authenticated and state.auth.sessionId == submissionSession and
+      state.currentChatId == submissionChat and state.jobObservationEpoch == submissionEpoch
 
   addRunEvent(
     state,
@@ -402,10 +429,13 @@ proc submitBackendJob*(
   try:
     let response =
       await createJob(
-        chatId = state.currentChatId,
+        chatId = submissionChat,
         message = message,
         csrfToken = state.auth.csrfToken
       )
+
+    if not submissionIsCurrent():
+      return
 
     state.run.jobId = response.jobId
     state.run.status = response.status
@@ -430,6 +460,8 @@ proc submitBackendJob*(
     )
 
   except CatchableError:
+    if not submissionIsCurrent():
+      return
     if state.run.jobId.len == 0:
       state.run.status = "failed"
 
@@ -459,6 +491,11 @@ proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
     return
 
   let context = captureDecisionContext(state)
+  # An in-flight observation must not restore waiting_approval over a decision
+  # being submitted. Only its response or a new authorized GET may resolve it.
+  inc state.jobObservationEpoch
+  state.run.observationMode = ""
+  state.run.progressStage = ""
   let eventKind = if decision == jdApprove: "approval" else: "rejection"
   state.run.status = decisionStatus(decision)
   state.run.decisionError = ""
@@ -466,7 +503,7 @@ proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
   redraw(kxi)
 
   try:
-    let job = await decideJob(context.jobId, state.auth.csrfToken, decision)
+    let job = await decideJob(context.jobId, state.auth.csrfToken, decision, context.approvalId)
     if not matchesDecisionContext(state, context):
       return
     if job.jobId != context.jobId:
@@ -477,7 +514,8 @@ proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
     of "completed": finishCompletedJob(state, job, restoreHistory = true)
     of "denied": finishDeniedJob(state, job, restoreHistory = true)
     of "failed": finishFailedJob(state, job, restoreHistory = true)
-    of "waiting_approval": finishWaitingApproval(state, job, false)
+    of "waiting_approval":
+      await pollBackendJob(state, context.jobId, false, restoreHistory = true)
     of "reconciliation_required", "outcome_unknown": finishReconciliationRequired(state, job, restoreHistory = true)
     of "pending", "processing", "approving":
       addRunEvent(state, eventKind, "The backend accepted the decision; observing its durable result.")
