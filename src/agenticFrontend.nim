@@ -14,6 +14,7 @@ import components/auth
 import components/sidebar
 import components/chat
 import components/composer
+import components/brand
 import components/inspector
 import components/result_card
 
@@ -150,7 +151,7 @@ proc renderSearchView(): VNode =
                   of mrUser:
                     text "You"
                   of mrAssistant:
-                    text "Agentic"
+                    text productName
 
                 p:
                   text message.content

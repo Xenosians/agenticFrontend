@@ -6,6 +6,7 @@ import ../app/types
 import ../app/state
 import ../app/extension_bridge
 import ../app/auth_bridge
+import brand
 
 
 proc viewNavClass(
@@ -69,15 +70,15 @@ proc renderSidebar*(
     tdiv(class = "brand"):
       img(
         class = "brand-logo",
-        src = "./assets/hydra.svg",
-        alt = "Agentic Hydra"
+        src = productMark,
+        alt = productName
       )
 
       tdiv(class = "brand-copy"):
         strong:
-          text "Agentic"
+          text productName
         span:
-          text "ITSM workspace"
+          text productTagline
 
 
     button(class = "new-session"):

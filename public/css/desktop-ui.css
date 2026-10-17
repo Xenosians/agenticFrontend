@@ -1,5 +1,5 @@
 /*
- * Agentic desktop workspace UI.
+ * Desktop workspace UI.
  *
  * Plugin library + inline command center.
  */
@@ -429,6 +429,52 @@
   border: 1px solid #292929;
   border-radius: 11px;
   background: #141414;
+}
+
+.plugin-role-section {
+  margin-bottom: 18px;
+  padding: 12px;
+  border: 1px solid #292929;
+  border-radius: 11px;
+  background: #141414;
+}
+
+.plugin-role-heading {
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.plugin-role-heading span,
+.plugin-role-copy span {
+  color: #8a8a8a;
+  font-size: 12px;
+}
+
+.plugin-role-grid {
+  display: grid;
+  gap: 6px;
+}
+
+.plugin-role-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+}
+
+.plugin-role-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.plugin-role-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .selection-heading {
@@ -1354,6 +1400,10 @@
   color: #666;
   font-size: 8px;
   line-height: 1.5;
+}
+
+.plugin-field-warning {
+  color: #c98b5b;
 }
 
 .plugin-credential-warning {

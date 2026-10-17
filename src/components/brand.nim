@@ -1,21 +1,8 @@
-include karax/prelude
+## Product identity. Renaming the product is an edit to this file and
+## the <title> in public/index.html.
 
-
-proc renderHydraMark*(
-  className: cstring = cstring"hydra-mark"
-): VNode =
-
-  result = buildHtml(
-    tdiv(class = className)
-  ):
-
-    span(class = "hydra-body")
-
-    span(class = "hydra-neck hydra-neck-left"):
-      span(class = "hydra-head")
-
-    span(class = "hydra-neck hydra-neck-center"):
-      span(class = "hydra-head")
-
-    span(class = "hydra-neck hydra-neck-right"):
-      span(class = "hydra-head")
+const
+  productName* = "Janus"
+  productTagline* = "ITSM workspace"
+  # An arched double door split down the middle: Janus, god of gates.
+  productMark* = "./assets/janus.svg"

@@ -108,7 +108,9 @@
         const address = new URL(baseUrl + "/socket/websocket");
         address.protocol = address.protocol === "https:" ? "wss:" : "ws:";
         address.search = "?vsn=2.0.0";
-        const encoded = env.btoa(data.token).replace(/\+/g, "-").replace(/\//g, "_").replace(/=/g, "");
+        // Phoenix's bearer subprotocol uses standard Base64 without padding,
+        // despite the "base64url" name. Match its installed decoder/client.
+        const encoded = env.btoa(data.token).replace(/=/g, "");
         const connection = new env.WebSocket(address.href, ["phoenix", "base64url.bearer.phx." + encoded]);
         socket = connection;
         joinRef = String(++reference);

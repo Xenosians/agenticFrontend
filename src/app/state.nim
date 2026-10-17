@@ -49,15 +49,6 @@ proc emptySystemState():
     aiReady:
       false,
 
-    paloAltoConfigured:
-      false,
-
-    paloAltoHost:
-      "",
-
-    paloAltoMode:
-      "",
-
     integrationsError:
       "",
 

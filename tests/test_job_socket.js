@@ -13,7 +13,7 @@ function fixture(options = {}) {
     AbortController,
     async fetch(url, init) {
       requests.push({url, init});
-      return {ok: options.ok !== false, json: async () => ({token: "private-token-" + requests.length})};
+      return {ok: options.ok !== false, json: async () => ({token: options.token || "private-token-" + requests.length})};
     },
     WebSocket: class {
       constructor(url, protocols) { this.url = url; this.protocols = protocols; this.sent = []; this.readyState = 0; sockets.push(this); }
@@ -62,8 +62,15 @@ test("uses cookie and CSRF for a short-lived token, never a credential URL", asy
   assert.equal(f.requests[0].init.credentials, "include");
   assert.equal(f.requests[0].init.headers["X-CSRF-Token"], "csrf-secret");
   assert.equal(socket.url, "wss://example.test/socket/websocket?vsn=2.0.0");
-  assert.deepEqual(socket.protocols, ["phoenix", "base64url.bearer.phx." + Buffer.from("private-token-1").toString("base64url")]);
+  assert.deepEqual(socket.protocols, ["phoenix", "base64url.bearer.phx." + Buffer.from("private-token-1").toString("base64").replace(/=/g, "")]);
   assert.deepEqual(socket.sent[0].slice(2), ["job:job-123", "phx_join", {}]);
+  f.observer.close();
+});
+
+test("matches Phoenix's standard Base64 decoder even for URL-sensitive bytes", async () => {
+  const f = fixture({token: "???~~~"});
+  const {socket} = await f.join();
+  assert.equal(socket.protocols[1], "base64url.bearer.phx.Pz8/fn5+");
   f.observer.close();
 });
 

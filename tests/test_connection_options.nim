@@ -7,7 +7,7 @@ suite "connection usage settings":
     check connectionOptionsPayload("", "", "", "").len == 0
     let cleared = connectionOptionsPayload("", "", "", "", clearEmpty = true)
     for key in ["provider_tokens_per_minute", "provider_requests_per_minute",
-                "admission_max_wait_seconds", "reasoning_effort"]:
+                "admission_max_wait_seconds", "reasoning_effort", "thinking_mode"]:
       check cleared[key].kind == JNull
     check not cleared.hasKey("api_key")
     check not cleared.hasKey("model")
@@ -43,11 +43,29 @@ suite "connection usage settings":
     check reasoningEffortsFor(catalog, "pi", "example/model", "") == @["low", "medium"]
     check reasoningEffortsFor(nil, "http", "example-model", "https://example.test/v1").len == 0
 
+  test "endpoint-wide rows apply to every model on that exact endpoint":
+    let catalog = %*{"inference_option_support": [
+      {"backend": "http", "url": "https://api.anthropic.com",
+       "reasoning_efforts": ["low", "medium", "high", "unlimited"],
+       "thinking_modes": ["adaptive", "disabled", "enabled"]}]}
+    for model in ["claude-sonnet-5-5", "claude-haiku-5-5"]:
+      check reasoningEffortsFor(catalog, "http", model, "https://api.anthropic.com/") == @["low", "medium", "high"]
+      check thinkingModesFor(catalog, "http", model, "https://api.anthropic.com") == @["adaptive", "disabled"]
+    check thinkingModesFor(catalog, "http", "claude-sonnet-5-5", "https://api.anthropic.com.evil.test").len == 0
+    check thinkingModesFor(catalog, "pi", "anthropic/claude-sonnet-5-5", "").len == 0
+
+  test "thinking mode is an explicit, validated option":
+    check connectionOptionsPayload("", "", "", "", thinking = "disabled")["thinking_mode"].getStr == "disabled"
+    check connectionOptionsPayload("", "", "", "", clearEmpty = true)["thinking_mode"].kind == JNull
+    check not connectionOptionsPayload("", "", "", "").hasKey("thinking_mode")
+    expect ValueError:
+      discard connectionOptionsPayload("", "", "", "", thinking = "enabled")
+
   test "new connection and logout cannot retain another connection or account draft":
     let state = AppState(connectionOptionsId: "old-resource", connectionName: "Old account model",
       connectionBackend: "pi", connectionModel: "old/model", connectionUrl: "https://old.test",
       connectionKey: "private-draft", connectionTpm: "8000", connectionRpm: "20",
-      connectionMaxWait: "65", connectionReasoning: "low", pluginSection: "limits",
+      connectionMaxWait: "65", connectionReasoning: "low", connectionNetworkingInference: "selected_model", pluginSection: "limits",
       datasetName: "Private dataset", datasetSource: "Private source", datasetLicense: "Owned",
       datasetPurpose: "training", datasetText: "Private draft", datasetApiKey: "private", datasetReviewed: true)
     state.clearConnectionDraft()
@@ -55,7 +73,50 @@ suite "connection usage settings":
     check state.connectionKey == "" and state.connectionName == ""
     check state.connectionModel == "" and state.connectionUrl == ""
     check state.connectionReasoning == "" and state.connectionTpm == ""
+    check state.connectionNetworkingInference == ""
     state.clearExtensionDrafts()
     check state.pluginSection == "public"
     check state.datasetName == "" and state.datasetText == "" and state.datasetApiKey == ""
     check state.datasetSource == "" and state.datasetLicense == "" and not state.datasetReviewed
+
+  test "networking choices come from server metadata without inventing unsupported entries":
+    let catalog = %*{"networking_inference_options": {
+      "default": "dedicated_local", "choices": [
+        {"id": "dedicated_local", "label": "Dedicated networking model"},
+        {"id": "selected_model", "label": "Use this connection for networking"},
+        {"id": "selected_model", "label": "Duplicate"},
+        {"id": "unsafe_override", "label": "Not supported"}]}}
+    check networkingInferenceChoices(catalog) == @[
+      ("dedicated_local", "Dedicated networking model"),
+      ("selected_model", "Use this connection for networking")]
+    check networkingInferenceDefault(catalog) == "dedicated_local"
+    check networkingInferenceChoices(nil).len == 0
+    check networkingInferenceChoices(%*{"networking_inference_options": {"choices": "invalid"}}).len == 0
+
+  test "restoring a saved model defaults safely and clears credential drafts across all backends":
+    for backend in ["http", "pi", "opencode", "local", "uploaded"]:
+      let state = AppState(connectionKey: "private-draft", connectionNetworkingInference: "selected_model")
+      state.loadConnectionOptions(%*{"id": "connection-1", "backend": backend, "name": "Model"})
+      check state.connectionNetworkingInference == "dedicated_local"
+      check state.connectionOptionsId == "connection-1"
+      check state.connectionBackend == backend
+      check state.connectionKey == ""
+      state.loadConnectionOptions(%*{"id": "connection-1", "backend": backend, "networking_inference": "selected_model"})
+      check state.connectionNetworkingInference == "selected_model"
+      state.loadConnectionOptions(%*{"id": "connection-1", "backend": backend, "networking_inference": nil})
+      check state.connectionNetworkingInference == "dedicated_local"
+
+  test "networking options update every model type without credentials or provider-only options on local models":
+    for backend in ["http", "pi", "opencode", "local", "uploaded"]:
+      let payload = connectionOptionsPayload("", "", "", "", clearEmpty = true,
+                                             networking = "selected_model", backend = backend)
+      check payload["networking_inference"].getStr == "selected_model"
+      check not payload.hasKey("api_key") and not payload.hasKey("model")
+      if backend in ["local", "uploaded"]:
+        check payload.len == 1
+      else:
+        check payload["provider_tokens_per_minute"].kind == JNull
+      let reset = connectionOptionsPayload("", "", "", "", networking = "dedicated_local", backend = backend)
+      check reset["networking_inference"].getStr == "dedicated_local"
+    expect ValueError:
+      discard connectionOptionsPayload("", "", "", "", networking = "all_tools_without_policy")

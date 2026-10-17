@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>Janus</title>
+  <rect width="64" height="64" rx="16" fill="#E8E8E8"/>
+  <rect x="0.5" y="0.5" width="63" height="63" rx="15.5" stroke="#000000" stroke-opacity="0.12"/>
+  <path id="half" d="M16 54V26A16 16 0 0 1 30 10.13V54Z" fill="#111111"/>
+  <use href="#half" transform="matrix(-1 0 0 1 64 0)"/>
+</svg>

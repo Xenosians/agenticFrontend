@@ -210,6 +210,12 @@ proc pollBackendJob*(
     cstring(state.auth.csrfToken), frontendConfig.pollIntervalMs,
     isCurrent, updateMode, updateProgress)
 
+  # A durable job outlives one failed read (a brief backend or storage
+  # outage). Retry at the observer's pace; give up only after repeated
+  # failures so a real outage still surfaces.
+  const maxReadFailures = 6
+  var readFailures = 0
+
   try:
     while true:
       if not isCurrent():
@@ -219,10 +225,20 @@ proc pollBackendJob*(
         state.run.status
       let previousApprovalId = state.run.proposal.approvalId
 
-      let job =
-        await getJob(
-          jobId
-        )
+      var job: JobResponse
+      try:
+        job = await getJob(jobId)
+        readFailures = 0
+      except CatchableError:
+        inc readFailures
+        if readFailures >= maxReadFailures:
+          raise
+        if not isCurrent():
+          return
+        addRunEvent(state, "connection",
+          "Reading the job failed; retrying (" & $readFailures & "/" & $maxReadFailures & ").")
+        await observer.waitForUpdate()
+        continue
 
       # A delayed response belongs to its original account, chat and job.
       if not isCurrent():
@@ -554,15 +570,6 @@ proc refreshIntegrationStatus(
       await getIntegrationStatus()
 
     if not state.auth.authenticated or state.auth.sessionId != session: return
-
-    state.system.paloAltoConfigured =
-      integrations.paloAltoConfigured
-
-    state.system.paloAltoHost =
-      integrations.paloAltoHost
-
-    state.system.paloAltoMode =
-      integrations.paloAltoMode
 
     state.system.integrationsError =
       ""

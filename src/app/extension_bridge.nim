@@ -52,7 +52,9 @@ proc changeExtension*(state: AppState, action: string, payload: JsonNode) {.asyn
 proc saveConnectionOptions*(state: AppState, existing = false) {.async.} =
   try:
     let payload = connectionOptionsPayload(state.connectionTpm, state.connectionRpm,
-      state.connectionMaxWait, state.connectionReasoning, clearEmpty = existing)
+      state.connectionMaxWait, state.connectionReasoning, clearEmpty = existing,
+      networking = state.connectionNetworkingInference, backend = state.connectionBackend,
+      thinking = state.connectionThinking)
     if existing:
       payload["id"] = %state.connectionOptionsId
       await changeExtension(state, "model_options", payload)
@@ -61,10 +63,41 @@ proc saveConnectionOptions*(state: AppState, existing = false) {.async.} =
       payload["backend"] = %state.connectionBackend
       payload["model"] = %state.connectionModel
       payload["url"] = %state.connectionUrl
+      if state.connectionBackend == "http" and state.connectionApiFormat.len > 0:
+        payload["api_format"] = %state.connectionApiFormat
+      if state.connectionBackend == "http" and state.connectionProviderId.strip().len > 0:
+        payload["provider_id"] = %state.connectionProviderId.strip().toLowerAscii()
       payload["api_key"] = %state.connectionKey
       await changeExtension(state, "model", payload)
   except CatchableError:
-    state.extensionError = "Check the usage limits and queue wait, then save again."
+    state.extensionError = "Check the model settings, usage limits and queue wait, then save again."
+    redraw(kxi)
+
+proc loadProviderModels*(state: AppState) {.async.} =
+  ## Ask the provider which models this key can use. The key is sent once for
+  ## the lookup and is not stored; saving the connection stores it encrypted.
+  if state.extensionBusy or not state.auth.authenticated: return
+  let session = state.auth.sessionId
+  state.extensionBusy = true
+  state.extensionError = ""
+  try:
+    var payload = %*{"url": state.connectionUrl, "api_key": state.connectionKey}
+    if state.connectionApiFormat.len > 0:
+      payload["api_format"] = %state.connectionApiFormat
+    let response = await extensionRequest("models", payload, state.auth.csrfToken)
+    if not sameSession(state, session): return
+    state.connectionModelChoices.setLen(0)
+    if response.kind == JObject and response.hasKey("models") and response["models"].kind == JArray:
+      for row in response["models"]:
+        if row.kind == JObject and row.hasKey("id") and row["id"].kind == JString:
+          let name = if row.hasKey("name") and row["name"].kind == JString: row["name"].getStr else: row["id"].getStr
+          state.connectionModelChoices.add((row["id"].getStr, name))
+    if state.connectionModelChoices.len == 0:
+      state.extensionError = "The provider returned no models for this key."
+  except CatchableError as exc:
+    if sameSession(state, session): state.extensionError = exc.msg
+  finally:
+    if sameSession(state, session): state.extensionBusy = false
     redraw(kxi)
 
 proc saveDatasetFile*(state: AppState) {.async.} =

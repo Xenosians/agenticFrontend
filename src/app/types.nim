@@ -91,9 +91,6 @@ type
     aiReachable*: bool
     aiHealthy*: bool
     aiReady*: bool
-    paloAltoConfigured*: bool
-    paloAltoHost*: string
-    paloAltoMode*: string
     integrationsError*: string
     error*: string
 
@@ -159,6 +156,11 @@ type
     connectionRpm*: string
     connectionMaxWait*: string
     connectionReasoning*: string
+    connectionThinking*: string
+    connectionApiFormat*: string
+    connectionProviderId*: string
+    connectionModelChoices*: seq[tuple[id, name: string]]
+    connectionNetworkingInference*: string
     datasetName*: string
     datasetSource*: string
     datasetLicense*: string

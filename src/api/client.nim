@@ -49,9 +49,6 @@ type
   IntegrationStatusResponse* = object
     items*: JsonNode
     openwrtConfigured*: bool
-    paloAltoConfigured*: bool
-    paloAltoHost*: string
-    paloAltoMode*: string
 
 
 proc jsonValueText(
@@ -818,10 +815,7 @@ proc getIntegrationStatus*():
     )
 
   let data = parseJson(responseBody)
-  var configured = false
   var openwrtConfigured = false
-  var host = ""
-  var mode = ""
 
   if data.kind == JObject and data.hasKey("integrations"):
     let integrations = data["integrations"]
@@ -829,18 +823,10 @@ proc getIntegrationStatus*():
       for integration in integrations.items:
         if integration.kind == JObject and jsonValueText(integration, "id") == "openwrt":
           openwrtConfigured = jsonValueBool(integration, "configured")
-        if integration.kind == JObject and
-           jsonValueText(integration, "id") == "palo_alto":
-          configured = jsonValueBool(integration, "configured")
-          host = jsonValueText(integration, "host")
-          mode = jsonValueText(integration, "mode")
 
   result = IntegrationStatusResponse(
     items: (if data.hasKey("integrations"): data["integrations"] else: newJArray()),
-    openwrtConfigured: openwrtConfigured,
-    paloAltoConfigured: configured,
-    paloAltoHost: host,
-    paloAltoMode: mode
+    openwrtConfigured: openwrtConfigured
   )
 
 

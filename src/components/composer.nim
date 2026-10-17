@@ -7,6 +7,7 @@ import std/strutils
 import ../app/types
 import ../app/state
 import ../app/backend_bridge
+import brand
 
 
 proc resizeComposerInput() {.
@@ -46,7 +47,7 @@ proc composerStatusText(
     "Queued — waiting for backend dispatch…"
 
   of "processing":
-    "Agentic is processing your request…"
+    productName & " is processing your request…"
 
   of "waiting_approval":
     "Waiting for your approval."
@@ -154,8 +155,8 @@ proc renderComposer*(
       textarea(
         id = "messageInput",
         class = "composer-input",
-        placeholder = "Message Agentic...",
-        `aria-label` = "Message Agentic",
+        placeholder = cstring("Message " & productName & "..."),
+        `aria-label` = cstring("Message " & productName),
         rows = "1",
         value = cstring(state.composerDraft)
       ):

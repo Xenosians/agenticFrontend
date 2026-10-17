@@ -2,7 +2,7 @@
 
 version       = "0.1.0"
 author        = "Xenosians"
-description   = "Agentic AI / ITSM developer hub frontend"
+description   = "Janus ITSM workspace frontend"
 license       = "MIT"
 
 srcDir        = "src"

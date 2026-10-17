@@ -2,19 +2,18 @@
 
 Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provides authenticated chat, durable job status, approval controls, structured results, and personal model/dataset connections.
 
-> **Project status:** SRS 1.8 MVP candidate. The frontend represents durable server state and never treats an interrupted mutation decision as success.
-
 ## Features
 
 - Registration, email verification, login, password reset, and session management.
 - Saved chats and history, current-chat search, and a command palette with saved-chat navigation at every screen size.
-- Live job updates over authenticated WebSockets, durable state recovery, explicit approve/reject decisions with saved action details, and structured result cards.
+- Live job status and AI progress over authenticated WebSockets, with reconnect recovery and polling fallback.
+- Explicit approve/reject decisions bound to the displayed saved action, separate approval for each workflow step, and structured result cards.
+- Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
 - Display of completed, failed, denied, and unknown-outcome jobs.
 - Run inspector, activity view, and backend/AI integration status.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
 - Per-account model selection, connection probes, local model folder uploads, reference datasets, and reviewed training-data exports.
 - Provider usage settings for shared request/token queues and supported reasoning controls, editable without re-entering the saved API key.
-- Responsive dark workspace, growing message input, keyboard commands, readable text/code results, and live task progress.
 
 ## How the repositories fit together
 
@@ -26,10 +25,6 @@ agenticFrontend (this browser app)
 
 The browser calls Phoenix only. Phoenix owns sessions, chats, jobs, and resource ownership; the AI runtime owns inference and guarded execution. Approval requests refer to a durable job, while the server retains the exact action and arguments.
 The approval card displays that saved action before offering **Approve action** or **Reject action**. Both decisions go through Phoenix and remain disabled while their outcome is pending. An interrupted response requires reading the saved job again; the browser does not retry a mutation or assume a rejection succeeded. Completed decisions restore the saved tool result or rejection reason on reload.
-
-Job observation uses Phoenix's read-only `job:<id>` channel. The browser obtains a short-lived token through the session/CSRF-protected `/api/v2/jobs/socket-token` endpoint and sends it in the WebSocket subprotocol, never in its URL. A join or `job_updated` event triggers an authorized `/api/v2/jobs/:id` read; socket messages cannot supply a result or execute an action. The client checks its account, chat, job, and observation generation before applying a response. Heartbeats and reconnects recover live updates, with polling while unavailable and periodic reads to catch missed events. Trusted `job_progress` stages describe work in progress; the saved job determines its outcome.
-
-Assistant messages support headings, lists, emphasis, inline code, and fenced code through text nodes. Uploaded or generated HTML remains literal text. The composer stays available for drafting during a task; sending another task remains disabled until the current action is resolved.
 
 ## Stack
 
@@ -51,7 +46,7 @@ window.AGENTIC_CONFIG = Object.freeze({
   backendBaseUrl: "http://127.0.0.1:4000",
   pollIntervalMs: 1000
 });
-```
+```limit
 
 Serve the `public` directory, for example:
 
@@ -74,7 +69,7 @@ Open saved chats with the header's **Chats** button or **Ctrl/Cmd+Alt+C**. Reope
 - Pi and OpenCode are available only when installed on the AI host. They supply inference while application tools remain governed by server policy and approvals.
 - Local model uploads accept supported safetensors folders. The AI service validates their format; this does not guarantee model quality or enough GPU memory.
 - Reference uploads use local full-text retrieval. Training JSONL requires provenance and review; exporting/importing data does not start training or promote a model.
-- The networking specialist keeps its existing model and does not receive the additional private dataset context.
+- Networking uses the existing dedicated model by default. Each saved model's **Settings** can explicitly choose **Use this connection for networking**, including local and uploaded models. For an external connection, networking requests and device details go to that provider. Private datasets remain excluded from networking in either mode.
 
 The AI repository's `docs/user-extensions.md` documents formats, limits, storage, and configuration. The frontend uses authenticated `/api/v1/extensions` requests; credentials are stored server-side and omitted from returned catalogs.
 
@@ -92,17 +87,14 @@ nim js -r tests/test_tool_proposal.nim
 nim js -r tests/test_job_decision.nim
 nim js -r tests/test_approval_result.nim
 nim js -r tests/test_connection_options.nim
-nim js -r tests/test_message_format.nim
-nim js -r tests/test_request_context.nim
-node --test tests/test_job_socket.js
 ```
 
-These cover shortcuts, versioned lifecycle validation, job/history restoration, approval details and outcomes, stale decision responses, connection settings, safe message formatting, and the WebSocket protocol/reconnect lifecycle. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approve/reject decisions, and result rendering after changes to those flows.
+These cover shortcuts, versioned lifecycle validation, job/history restoration, approval details and outcomes, stale decision responses, and connection settings. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approve/reject decisions, and result rendering after changes to those flows.
 
 ## Current boundaries
 
-- The composer allows one active job at a time. Closing the browser does not cancel its saved server task.
-- WebSockets deliver progress and state-change notifications rather than a durable event log; reconnects recover the current saved job through HTTP.
+- The composer allows one active job at a time. A reconnect reads saved server state and never repeats inference, a tool, or an approval.
+- WebSockets carry progress and status notifications; creation and approval stay on the authenticated REST API.
 - The node builder and simulator are design previews. n8n/workflow support is manifest validation only; it does not execute workflows or register webhooks.
 - Reference retrieval has no embedding/vector-provider connector yet, and user datasets do not replace the application database.
 - An unknown execution outcome requires server-side reconciliation; the UI does not automatically retry the mutation.
@@ -113,7 +105,7 @@ These cover shortcuts, versioned lifecycle validation, job/history restoration, 
 - [Runtime configuration](src/config/runtime_config.nim)
 - [Backend client](src/api/client.nim) and [job lifecycle contract](src/api/job_lifecycle.nim)
 - [Chat/job state bridge](src/app/backend_bridge.nim)
-- [WebSocket observer](public/js/job_socket.js) and [safe message formatting](src/api/message_format.nim)
+- [WebSocket observer](public/js/job_socket.js)
 - [Model and dataset connections](src/components/connections.nim)
 - [Extension requests](src/api/extensions.nim)
 - [Workspace commands and shortcuts](src/app/commands.nim)

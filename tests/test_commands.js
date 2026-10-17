@@ -897,13 +897,13 @@ function addChars__stdZprivateZdigitsutils_u202(result_p0, result_p0_Idx, x_p1, 
          else {result_p0[result_p0_Idx].length = Temporary1; };
     Label2: {
       var iHEX60gensym4_335544542 = 0;
-      var i_553648430 = 0;
+      var i_553648445 = 0;
       Label3: {
           Label4: while (true) {
-          if (!(i_553648430 < n_p3)) break Label4;
-            iHEX60gensym4_335544542 = i_553648430;
+          if (!(i_553648445 < n_p3)) break Label4;
+            iHEX60gensym4_335544542 = i_553648445;
             result_p0[result_p0_Idx][(old_335544528 + iHEX60gensym4_335544542)] = x_p1.charCodeAt((start_p2 + iHEX60gensym4_335544542));
-            i_553648430 += 1;
+            i_553648445 += 1;
           }
       };
     };
@@ -979,13 +979,13 @@ function auxWriteStackTrace__system_u2116(f_p0) {
     
     Label5: {
       var j_33556594 = 0;
-      var colontmp__553648422 = 0;
-      colontmp__553648422 = (i_33556559 - 1);
-      var res_553648424 = colontmp__553648422;
+      var colontmp__553648437 = 0;
+      colontmp__553648437 = (i_33556559 - 1);
+      var res_553648439 = colontmp__553648437;
       Label6: {
           Label7: while (true) {
-          if (!(0 <= res_553648424)) break Label7;
-            j_33556594 = res_553648424;
+          if (!(0 <= res_553648439)) break Label7;
+            j_33556594 = res_553648439;
             nimAddStrStr(result_33556550[0], cstrToNimstr(tempFrames_33556561[j_33556594].Field2));;
             if ((0 < tempFrames_33556561[j_33556594].Field1)) {
             nimAddStrStr(result_33556550[0], [40]);;
@@ -1001,7 +1001,7 @@ function auxWriteStackTrace__system_u2116(f_p0) {
             nimAddStrStr(result_33556550[0], [32,97,116,32]);;
             add__system_u1972(result_33556550, 0, tempFrames_33556561[j_33556594].Field0);
             nimAddStrStr(result_33556550[0], [10]);;
-            res_553648424 -= 1;
+            res_553648439 -= 1;
           }
       };
     };
@@ -1405,19 +1405,19 @@ function substr__system_u3775(s_p0, first_p1, last_p2) {
       var i_33558224 = 0;
       F.line = 128;
       F.filename = "iterators_1.nim";
-      var i_553648457 = 0;
+      var i_553648472 = 0;
       Label2: {
         F.line = 129;
           Label3: while (true) {
-          if (!(i_553648457 < L_33558214)) break Label3;
+          if (!(i_553648472 < L_33558214)) break Label3;
             F.line = 2954;
             F.filename = "system.nim";
-            i_33558224 = i_553648457;
+            i_33558224 = i_553648472;
             F.line = 2955;
             result_33558211[chckIndx(i_33558224, 0, (result_33558211).length - 1)] = s_p0[chckIndx(addInt(i_33558224, first_33558212), 0, (s_p0).length - 1)];
             F.line = 131;
             F.filename = "iterators_1.nim";
-            i_553648457 = addInt(i_553648457, 1);
+            i_553648472 = addInt(i_553648472, 1);
           }
       };
     };
@@ -1448,44 +1448,44 @@ function nsuSplitString(s_p0, sep_p1, maxsplit_p2) {
       Temporary2 = (sep_p1).length;
       }
       
-      var sepLen_553648446 = Temporary2;
+      var sepLen_553648461 = Temporary2;
       F.line = 390;
-      var lastHEX60gensym41_553648447 = 0;
+      var lastHEX60gensym41_553648462 = 0;
       F.line = 391;
-      var splitsHEX60gensym41_553648448 = maxsplit_p2;
+      var splitsHEX60gensym41_553648463 = maxsplit_p2;
       Label3: {
         F.line = 538;
           Label4: while (true) {
-          if (!(lastHEX60gensym41_553648447 <= (s_p0).length)) break Label4;
+          if (!(lastHEX60gensym41_553648462 <= (s_p0).length)) break Label4;
             F.line = 394;
-            var firstHEX60gensym41_553648450 = lastHEX60gensym41_553648447;
+            var firstHEX60gensym41_553648465 = lastHEX60gensym41_553648462;
             Label5: {
               F.line = 395;
                 Label6: while (true) {
-                if (!((lastHEX60gensym41_553648447 < (s_p0).length) && !(substrEq__pureZstrutils_u256(s_p0, lastHEX60gensym41_553648447, sep_p1)))) break Label6;
+                if (!((lastHEX60gensym41_553648462 < (s_p0).length) && !(substrEq__pureZstrutils_u256(s_p0, lastHEX60gensym41_553648462, sep_p1)))) break Label6;
                   F.line = 396;
-                  lastHEX60gensym41_553648447 = addInt(lastHEX60gensym41_553648447, 1);
+                  lastHEX60gensym41_553648462 = addInt(lastHEX60gensym41_553648462, 1);
                 }
             };
-            if ((splitsHEX60gensym41_553648448 == 0)) {
+            if ((splitsHEX60gensym41_553648463 == 0)) {
             F.line = 397;
-            lastHEX60gensym41_553648447 = (s_p0).length;
+            lastHEX60gensym41_553648462 = (s_p0).length;
             }
             
             F.line = 804;
-            xHEX60gensym69_771752521 = substr__system_u3775(s_p0, firstHEX60gensym41_553648450, subInt(lastHEX60gensym41_553648447, 1));
+            xHEX60gensym69_771752521 = substr__system_u3775(s_p0, firstHEX60gensym41_553648465, subInt(lastHEX60gensym41_553648462, 1));
             F.line = 419;
             var Temporary7 = nimCopy(null, xHEX60gensym69_771752521, NTI33554449);
             result_771752515.push(Temporary7);;
-            if ((splitsHEX60gensym41_553648448 == 0)) {
+            if ((splitsHEX60gensym41_553648463 == 0)) {
             F.line = 399;
             break Label3;
             }
             
             F.line = 400;
-            splitsHEX60gensym41_553648448 = subInt(splitsHEX60gensym41_553648448, 1);
+            splitsHEX60gensym41_553648463 = subInt(splitsHEX60gensym41_553648463, 1);
             F.line = 401;
-            lastHEX60gensym41_553648447 = addInt(lastHEX60gensym41_553648447, sepLen_553648446);
+            lastHEX60gensym41_553648462 = addInt(lastHEX60gensym41_553648462, sepLen_553648461);
           }
       };
     };
@@ -1509,14 +1509,14 @@ function find__pureZunittest_u555(a_p0, item_p1) {
       var i_687866420 = 0;
       F.line = 28;
       F.filename = "iterators.nim";
-      var i_553648461 = 0;
+      var i_553648476 = 0;
       Label2: {
         F.line = 29;
           Label3: while (true) {
-          if (!(i_553648461 < (a_p0).length)) break Label3;
+          if (!(i_553648476 < (a_p0).length)) break Label3;
             F.line = 1919;
             F.filename = "system.nim";
-            i_687866420 = a_p0[chckIndx(i_553648461, 0, (a_p0).length - 1)];
+            i_687866420 = a_p0[chckIndx(i_553648476, 0, (a_p0).length - 1)];
             if ((i_687866420 == item_p1)) {
             F.line = 1920;
             break BeforeRet;
@@ -1526,7 +1526,7 @@ function find__pureZunittest_u555(a_p0, item_p1) {
             result_687866416 = addInt(result_687866416, 1);
             F.line = 13;
             F.filename = "iterators.nim";
-            i_553648461 += 1;
+            i_553648476 += 1;
           }
       };
     };
@@ -1569,42 +1569,42 @@ function nsuSplitChar(s_p0, sep_p1, maxsplit_p2) {
       F.line = 419;
       var xHEX60gensym67_771752491 = [];
       F.line = 390;
-      var lastHEX60gensym34_553648466 = 0;
+      var lastHEX60gensym34_553648481 = 0;
       F.line = 391;
-      var splitsHEX60gensym34_553648467 = maxsplit_p2;
+      var splitsHEX60gensym34_553648482 = maxsplit_p2;
       Label2: {
         F.line = 450;
           Label3: while (true) {
-          if (!(lastHEX60gensym34_553648466 <= (s_p0).length)) break Label3;
+          if (!(lastHEX60gensym34_553648481 <= (s_p0).length)) break Label3;
             F.line = 394;
-            var firstHEX60gensym34_553648469 = lastHEX60gensym34_553648466;
+            var firstHEX60gensym34_553648484 = lastHEX60gensym34_553648481;
             Label4: {
               F.line = 395;
                 Label5: while (true) {
-                if (!((lastHEX60gensym34_553648466 < (s_p0).length) && !((s_p0[chckIndx(lastHEX60gensym34_553648466, 0, (s_p0).length - 1)] == sep_p1)))) break Label5;
+                if (!((lastHEX60gensym34_553648481 < (s_p0).length) && !((s_p0[chckIndx(lastHEX60gensym34_553648481, 0, (s_p0).length - 1)] == sep_p1)))) break Label5;
                   F.line = 396;
-                  lastHEX60gensym34_553648466 = addInt(lastHEX60gensym34_553648466, 1);
+                  lastHEX60gensym34_553648481 = addInt(lastHEX60gensym34_553648481, 1);
                 }
             };
-            if ((splitsHEX60gensym34_553648467 == 0)) {
+            if ((splitsHEX60gensym34_553648482 == 0)) {
             F.line = 397;
-            lastHEX60gensym34_553648466 = (s_p0).length;
+            lastHEX60gensym34_553648481 = (s_p0).length;
             }
             
             F.line = 760;
-            xHEX60gensym67_771752491 = substr__system_u3775(s_p0, firstHEX60gensym34_553648469, subInt(lastHEX60gensym34_553648466, 1));
+            xHEX60gensym67_771752491 = substr__system_u3775(s_p0, firstHEX60gensym34_553648484, subInt(lastHEX60gensym34_553648481, 1));
             F.line = 419;
             var Temporary6 = nimCopy(null, xHEX60gensym67_771752491, NTI33554449);
             result_771752485.push(Temporary6);;
-            if ((splitsHEX60gensym34_553648467 == 0)) {
+            if ((splitsHEX60gensym34_553648482 == 0)) {
             F.line = 399;
             break Label2;
             }
             
             F.line = 400;
-            splitsHEX60gensym34_553648467 = subInt(splitsHEX60gensym34_553648467, 1);
+            splitsHEX60gensym34_553648482 = subInt(splitsHEX60gensym34_553648482, 1);
             F.line = 401;
-            lastHEX60gensym34_553648466 = addInt(lastHEX60gensym34_553648466, 1);
+            lastHEX60gensym34_553648481 = addInt(lastHEX60gensym34_553648481, 1);
           }
       };
     };
@@ -1804,37 +1804,37 @@ function shouldRun__pureZunittest_u584(currentSuiteName_p0, testName_p1) {
       var f_687866555 = [];
       F.line = 269;
       F.filename = "sets.nim";
-      var length_553648437 = len__pureZunittest_u603(testsFilters_687865906[0]);
+      var length_553648452 = len__pureZunittest_u603(testsFilters_687865906[0]);
       Label2: {
         F.line = 270;
-        var h_553648439 = 0;
+        var h_553648454 = 0;
         F.line = 81;
         F.filename = "iterators_1.nim";
-        var colontmp__553648440 = 0;
+        var colontmp__553648455 = 0;
         F.line = 270;
         F.filename = "sets.nim";
-        colontmp__553648440 = (testsFilters_687865906[0].data).length - 1;
+        colontmp__553648455 = (testsFilters_687865906[0].data).length - 1;
         F.line = 96;
         F.filename = "iterators_1.nim";
-        var res_553648441 = 0;
+        var res_553648456 = 0;
         Label3: {
           F.line = 97;
             Label4: while (true) {
-            if (!(res_553648441 <= colontmp__553648440)) break Label4;
+            if (!(res_553648456 <= colontmp__553648455)) break Label4;
               F.line = 270;
               F.filename = "sets.nim";
-              h_553648439 = res_553648441;
-              if (isFilled__pureZcollectionsZsets_u39(testsFilters_687865906[0].data[chckIndx(h_553648439, 0, (testsFilters_687865906[0].data).length - 1)].Field0)) {
+              h_553648454 = res_553648456;
+              if (isFilled__pureZcollectionsZsets_u39(testsFilters_687865906[0].data[chckIndx(h_553648454, 0, (testsFilters_687865906[0].data).length - 1)].Field0)) {
               F.line = 442;
               F.filename = "unittest.nim";
-              f_687866555 = testsFilters_687865906[0].data[chckIndx(h_553648439, 0, (testsFilters_687865906[0].data).length - 1)].Field1;
+              f_687866555 = testsFilters_687865906[0].data[chckIndx(h_553648454, 0, (testsFilters_687865906[0].data).length - 1)].Field1;
               if (matchFilter__pureZunittest_u574(currentSuiteName_p0, testName_p1, f_687866555)) {
               F.line = 444;
               result_687866443 = true;
               break BeforeRet;
               }
               
-              if (!((len__pureZunittest_u603(testsFilters_687865906[0]) == length_553648437))) {
+              if (!((len__pureZunittest_u603(testsFilters_687865906[0]) == length_553648452))) {
               F.line = 273;
               F.filename = "sets.nim";
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/pure/collections/sets.nim(273, 13) `len(s) == length` the length of the HashSet changed while iterating over it"));
@@ -1844,7 +1844,7 @@ function shouldRun__pureZunittest_u584(currentSuiteName_p0, testName_p1) {
               
               F.line = 102;
               F.filename = "iterators_1.nim";
-              res_553648441 = addInt(res_553648441, 1);
+              res_553648456 = addInt(res_553648456, 1);
             }
         };
       };
@@ -1929,60 +1929,66 @@ function shortcutAction__OOZsrcZappZcommands_u6(key_p0, modifier_p1, shift_p2, c
   framePtr = F;
   BeforeRet: {
     if ((composing_p3 || repeated_p4)) {
-    F.line = 13;
+    F.line = 14;
     F.filename = "commands.nim";
     result_1207959565 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
     
     if (eqStrings(key_p0, [69,115,99,97,112,101])) {
-    F.line = 14;
+    F.line = 15;
     result_1207959565 = nimCopy(null, [100,105,115,109,105,115,115], NTI33554449);
     break BeforeRet;
     }
     
     if (!(modifier_p1)) {
-    F.line = 15;
+    F.line = 16;
     result_1207959565 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
     
     if (alt_p5) {
+    if (contains__stdZenumutils_u50([[99], [67]], key_p0)) {
+    F.line = 18;
+    result_1207959565 = nimCopy(null, [99,104,97,116,115], NTI33554449);
+    break BeforeRet;
+    }
+    
     if (contains__stdZenumutils_u50([[110], [78]], key_p0)) {
-    F.line = 17;
+    F.line = 19;
     result_1207959565 = nimCopy(null, [110,101,119,95,99,104,97,116], NTI33554449);
     break BeforeRet;
     }
     
     if (contains__stdZenumutils_u50([[105], [73]], key_p0)) {
-    F.line = 18;
+    F.line = 20;
     result_1207959565 = nimCopy(null, [105,110,115,112,101,99,116,111,114], NTI33554449);
     break BeforeRet;
     }
     
-    F.line = 19;
+    F.line = 21;
     result_1207959565 = nimCopy(null, [], NTI33554449);
     break BeforeRet;
     }
     
     if ((contains__stdZenumutils_u50([[107], [75]], key_p0) && !(shift_p2))) {
-    F.line = 20;
+    F.line = 22;
     result_1207959565 = nimCopy(null, [112,97,108,101,116,116,101], NTI33554449);
     break BeforeRet;
     }
     
     if ((eqStrings(key_p0, [44]) && !(shift_p2))) {
-    F.line = 21;
+    F.line = 23;
     result_1207959565 = nimCopy(null, [99,111,110,110,101,99,116,105,111,110,115], NTI33554449);
     break BeforeRet;
     }
     
     if (shift_p2) {
-    F.line = 23;
+    F.line = 25;
     switch (toJSStr(key_p0)) {
     case "f":
     case "F":
-      F.line = 24;
+      F.line = 26;
       result_1207959565 = nimCopy(null, [115,101,97,114,99,104], NTI33554449);
       break BeforeRet;
       break;
@@ -2095,22 +2101,22 @@ function testEnded__pureZunittest_u780(testResult_p0) {
       var formatter_687866641 = null;
       F.line = 249;
       F.filename = "iterators.nim";
-      var i_553648474 = 0;
+      var i_553648489 = 0;
       F.line = 250;
-      var L_553648475 = (formatters_687865900[0]).length;
+      var L_553648490 = (formatters_687865900[0]).length;
       Label2: {
         F.line = 251;
           Label3: while (true) {
-          if (!(i_553648474 < L_553648475)) break Label3;
+          if (!(i_553648489 < L_553648490)) break Label3;
             F.line = 465;
             F.filename = "unittest.nim";
-            formatter_687866641 = formatters_687865900[0][chckIndx(i_553648474, 0, (formatters_687865900[0]).length - 1)];
+            formatter_687866641 = formatters_687865900[0][chckIndx(i_553648489, 0, (formatters_687865900[0]).length - 1)];
             F.line = 466;
             testEnded__pureZunittest_u76(formatter_687866641, testResult_p0);
             F.line = 13;
             F.filename = "iterators.nim";
-            i_553648474 += 1;
-            if (!(((formatters_687865900[0]).length == L_553648475))) {
+            i_553648489 += 1;
+            if (!(((formatters_687865900[0]).length == L_553648490))) {
             F.line = 254;
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
@@ -2132,22 +2138,22 @@ function suiteEnded__pureZunittest_u741() {
       var formatter_687866619 = null;
       F.line = 249;
       F.filename = "iterators.nim";
-      var i_553648478 = 0;
+      var i_553648493 = 0;
       F.line = 250;
-      var L_553648479 = (formatters_687865900[0]).length;
+      var L_553648494 = (formatters_687865900[0]).length;
       Label2: {
         F.line = 251;
           Label3: while (true) {
-          if (!(i_553648478 < L_553648479)) break Label3;
+          if (!(i_553648493 < L_553648494)) break Label3;
             F.line = 461;
             F.filename = "unittest.nim";
-            formatter_687866619 = formatters_687865900[0][chckIndx(i_553648478, 0, (formatters_687865900[0]).length - 1)];
+            formatter_687866619 = formatters_687865900[0][chckIndx(i_553648493, 0, (formatters_687865900[0]).length - 1)];
             F.line = 462;
             suiteEnded__pureZunittest_u79(formatter_687866619);
             F.line = 13;
             F.filename = "iterators.nim";
-            i_553648478 += 1;
-            if (!(((formatters_687865900[0]).length == L_553648479))) {
+            i_553648493 += 1;
+            if (!(((formatters_687865900[0]).length == L_553648494))) {
             F.line = 254;
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
@@ -2174,22 +2180,22 @@ Label1: {
     var formatter_553648139 = [null];
     F.line = 249;
     F.filename = "iterators.nim";
-    var i_553648349 = 0;
+    var i_553648359 = 0;
     F.line = 250;
-    var L_553648350 = (formatters_687865900[0]).length;
+    var L_553648360 = (formatters_687865900[0]).length;
     Label4: {
       F.line = 251;
         Label5: while (true) {
-        if (!(i_553648349 < L_553648350)) break Label5;
+        if (!(i_553648359 < L_553648360)) break Label5;
           F.line = 511;
           F.filename = "unittest.nim";
-          formatter_553648139[0] = formatters_687865900[0][chckIndx(i_553648349, 0, (formatters_687865900[0]).length - 1)];
+          formatter_553648139[0] = formatters_687865900[0][chckIndx(i_553648359, 0, (formatters_687865900[0]).length - 1)];
           F.line = 512;
           suiteStarted__pureZunittest_u63(formatter_553648139[0], [119,111,114,107,115,112,97,99,101,32,115,104,111,114,116,99,117,116,115]);
           F.line = 13;
           F.filename = "iterators.nim";
-          i_553648349 += 1;
-          if (!(((formatters_687865900[0]).length == L_553648350))) {
+          i_553648359 += 1;
+          if (!(((formatters_687865900[0]).length == L_553648360))) {
           F.line = 254;
           failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
           }
@@ -2210,22 +2216,22 @@ Label1: {
     var formatter_553648148 = [null];
     F.line = 249;
     F.filename = "iterators.nim";
-    var i_553648353 = 0;
+    var i_553648363 = 0;
     F.line = 250;
-    var L_553648354 = (formatters_687865900[0]).length;
+    var L_553648364 = (formatters_687865900[0]).length;
     Label7: {
       F.line = 251;
         Label8: while (true) {
-        if (!(i_553648353 < L_553648354)) break Label8;
+        if (!(i_553648363 < L_553648364)) break Label8;
           F.line = 547;
           F.filename = "unittest.nim";
-          formatter_553648148[0] = formatters_687865900[0][chckIndx(i_553648353, 0, (formatters_687865900[0]).length - 1)];
+          formatter_553648148[0] = formatters_687865900[0][chckIndx(i_553648363, 0, (formatters_687865900[0]).length - 1)];
           F.line = 548;
           testStarted__pureZunittest_u67(formatter_553648148[0], [111,114,100,105,110,97,114,121,32,116,121,112,105,110,103,44,32,73,77,69,32,97,110,100,32,104,101,108,100,32,107,101,121,115,32,100,111,32,110,111,116,32,100,105,115,112,97,116,99,104,32,99,111,109,109,97,110,100,115]);
           F.line = 13;
           F.filename = "iterators.nim";
-          i_553648353 += 1;
-          if (!(((formatters_687865900[0]).length == L_553648354))) {
+          i_553648363 += 1;
+          if (!(((formatters_687865900[0]).length == L_553648364))) {
           F.line = 254;
           failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
           }
@@ -2258,22 +2264,22 @@ Label1: {
         var formatterHEX60gensym4_553648168 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648358 = 0;
+        var i_553648368 = 0;
         F.line = 250;
-        var L_553648359 = (formatters_687865900[0]).length;
+        var L_553648369 = (formatters_687865900[0]).length;
         Label12: {
           F.line = 251;
             Label13: while (true) {
-            if (!(i_553648358 < L_553648359)) break Label13;
+            if (!(i_553648368 < L_553648369)) break Label13;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym4_553648168[0] = formatters_687865900[0][chckIndx(i_553648358, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym4_553648168[0] = formatters_687865900[0][chckIndx(i_553648368, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym4_553648168[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648358 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648359))) {
+              i_553648368 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648369))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2313,22 +2319,22 @@ Label1: {
         var formatterHEX60gensym7_553648178 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648363 = 0;
+        var i_553648373 = 0;
         F.line = 250;
-        var L_553648364 = (formatters_687865900[0]).length;
+        var L_553648374 = (formatters_687865900[0]).length;
         Label16: {
           F.line = 251;
             Label17: while (true) {
-            if (!(i_553648363 < L_553648364)) break Label17;
+            if (!(i_553648373 < L_553648374)) break Label17;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym7_553648178[0] = formatters_687865900[0][chckIndx(i_553648363, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym7_553648178[0] = formatters_687865900[0][chckIndx(i_553648373, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym7_553648178[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648363 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648364))) {
+              i_553648373 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648374))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2368,22 +2374,22 @@ Label1: {
         var formatterHEX60gensym10_553648188 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648368 = 0;
+        var i_553648378 = 0;
         F.line = 250;
-        var L_553648369 = (formatters_687865900[0]).length;
+        var L_553648379 = (formatters_687865900[0]).length;
         Label20: {
           F.line = 251;
             Label21: while (true) {
-            if (!(i_553648368 < L_553648369)) break Label21;
+            if (!(i_553648378 < L_553648379)) break Label21;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym10_553648188[0] = formatters_687865900[0][chckIndx(i_553648368, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym10_553648188[0] = formatters_687865900[0][chckIndx(i_553648378, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym10_553648188[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648368 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648369))) {
+              i_553648378 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648379))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2426,22 +2432,22 @@ Label1: {
     var formatterHEX60gensym11_553648200 = [null];
     F.line = 249;
     F.filename = "iterators.nim";
-    var i_553648372 = 0;
+    var i_553648382 = 0;
     F.line = 250;
-    var L_553648373 = (formatters_687865900[0]).length;
+    var L_553648383 = (formatters_687865900[0]).length;
     Label23: {
       F.line = 251;
         Label24: while (true) {
-        if (!(i_553648372 < L_553648373)) break Label24;
+        if (!(i_553648382 < L_553648383)) break Label24;
           F.line = 614;
           F.filename = "unittest.nim";
-          formatterHEX60gensym11_553648200[0] = formatters_687865900[0][chckIndx(i_553648372, 0, (formatters_687865900[0]).length - 1)];
+          formatterHEX60gensym11_553648200[0] = formatters_687865900[0][chckIndx(i_553648382, 0, (formatters_687865900[0]).length - 1)];
           F.line = 616;
           failureOccurred__pureZunittest_u72(formatterHEX60gensym11_553648200[0], checkpoints_687865899[0], stackTrace_553648195[0]);
           F.line = 13;
           F.filename = "iterators.nim";
-          i_553648372 += 1;
-          if (!(((formatters_687865900[0]).length == L_553648373))) {
+          i_553648382 += 1;
+          if (!(((formatters_687865900[0]).length == L_553648383))) {
           F.line = 254;
           failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
           }
@@ -2472,22 +2478,22 @@ Label1: {
     var formatterHEX60gensym12_553648209 = [null];
     F.line = 249;
     F.filename = "iterators.nim";
-    var i_553648376 = 0;
+    var i_553648386 = 0;
     F.line = 250;
-    var L_553648377 = (formatters_687865900[0]).length;
+    var L_553648387 = (formatters_687865900[0]).length;
     Label26: {
       F.line = 251;
         Label27: while (true) {
-        if (!(i_553648376 < L_553648377)) break Label27;
+        if (!(i_553648386 < L_553648387)) break Label27;
           F.line = 614;
           F.filename = "unittest.nim";
-          formatterHEX60gensym12_553648209[0] = formatters_687865900[0][chckIndx(i_553648376, 0, (formatters_687865900[0]).length - 1)];
+          formatterHEX60gensym12_553648209[0] = formatters_687865900[0][chckIndx(i_553648386, 0, (formatters_687865900[0]).length - 1)];
           F.line = 618;
           failureOccurred__pureZunittest_u72(formatterHEX60gensym12_553648209[0], checkpoints_687865899[0], []);
           F.line = 13;
           F.filename = "iterators.nim";
-          i_553648376 += 1;
-          if (!(((formatters_687865900[0]).length == L_553648377))) {
+          i_553648386 += 1;
+          if (!(((formatters_687865900[0]).length == L_553648387))) {
           F.line = 254;
           failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
           }
@@ -2533,22 +2539,22 @@ Label1: {
     var formatter_553648231 = [null];
     F.line = 249;
     F.filename = "iterators.nim";
-    var i_553648380 = 0;
+    var i_553648390 = 0;
     F.line = 250;
-    var L_553648381 = (formatters_687865900[0]).length;
+    var L_553648391 = (formatters_687865900[0]).length;
     Label29: {
       F.line = 251;
         Label30: while (true) {
-        if (!(i_553648380 < L_553648381)) break Label30;
+        if (!(i_553648390 < L_553648391)) break Label30;
           F.line = 547;
           F.filename = "unittest.nim";
-          formatter_553648231[0] = formatters_687865900[0][chckIndx(i_553648380, 0, (formatters_687865900[0]).length - 1)];
+          formatter_553648231[0] = formatters_687865900[0][chckIndx(i_553648390, 0, (formatters_687865900[0]).length - 1)];
           F.line = 548;
           testStarted__pureZunittest_u67(formatter_553648231[0], [115,104,111,114,116,99,117,116,32,100,105,115,112,97,116,99,104,32,109,97,116,99,104,101,115,32,99,111,109,109,97,110,100,32,112,97,108,101,116,116,101,32,97,99,116,105,111,110,115]);
           F.line = 13;
           F.filename = "iterators.nim";
-          i_553648380 += 1;
-          if (!(((formatters_687865900[0]).length == L_553648381))) {
+          i_553648390 += 1;
+          if (!(((formatters_687865900[0]).length == L_553648391))) {
           F.line = 254;
           failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
           }
@@ -2581,22 +2587,22 @@ Label1: {
         var formatterHEX60gensym16_553648237 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648385 = 0;
+        var i_553648395 = 0;
         F.line = 250;
-        var L_553648386 = (formatters_687865900[0]).length;
+        var L_553648396 = (formatters_687865900[0]).length;
         Label34: {
           F.line = 251;
             Label35: while (true) {
-            if (!(i_553648385 < L_553648386)) break Label35;
+            if (!(i_553648395 < L_553648396)) break Label35;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym16_553648237[0] = formatters_687865900[0][chckIndx(i_553648385, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym16_553648237[0] = formatters_687865900[0][chckIndx(i_553648395, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym16_553648237[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648385 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648386))) {
+              i_553648395 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648396))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2636,22 +2642,22 @@ Label1: {
         var formatterHEX60gensym19_553648247 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648390 = 0;
+        var i_553648400 = 0;
         F.line = 250;
-        var L_553648391 = (formatters_687865900[0]).length;
+        var L_553648401 = (formatters_687865900[0]).length;
         Label38: {
           F.line = 251;
             Label39: while (true) {
-            if (!(i_553648390 < L_553648391)) break Label39;
+            if (!(i_553648400 < L_553648401)) break Label39;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym19_553648247[0] = formatters_687865900[0][chckIndx(i_553648390, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym19_553648247[0] = formatters_687865900[0][chckIndx(i_553648400, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym19_553648247[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648390 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648391))) {
+              i_553648400 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648401))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2691,22 +2697,22 @@ Label1: {
         var formatterHEX60gensym22_553648257 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648395 = 0;
+        var i_553648405 = 0;
         F.line = 250;
-        var L_553648396 = (formatters_687865900[0]).length;
+        var L_553648406 = (formatters_687865900[0]).length;
         Label42: {
           F.line = 251;
             Label43: while (true) {
-            if (!(i_553648395 < L_553648396)) break Label43;
+            if (!(i_553648405 < L_553648406)) break Label43;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym22_553648257[0] = formatters_687865900[0][chckIndx(i_553648395, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym22_553648257[0] = formatters_687865900[0][chckIndx(i_553648405, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym22_553648257[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648395 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648396))) {
+              i_553648405 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648406))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2728,15 +2734,15 @@ Label1: {
   Label44: {
     F.line = 12;
     F.filename = "test_commands.nim";
-    var HEX3Ac1_553648262 = [shortcutAction__OOZsrcZappZcommands_u6([78], true, true, false, false, false)];
-    if (eqStrings(HEX3Ac1_553648262[0], [])) {
+    var HEX3Ac1_553648262 = [shortcutAction__OOZsrcZappZcommands_u6([67], true, false, false, false, true)];
+    if (eqStrings(HEX3Ac1_553648262[0], [99,104,97,116,115])) {
     }
     else {
       F.line = 745;
       F.filename = "unittest.nim";
-      checkpoint__pureZunittest_u799(makeNimstrLit("/mnt/c/project/agenticFrontend/tests/test_commands.nim(12, 56): Check failed: shortcutAction(\"N\", true, true, false, false) == \"\""));
+      checkpoint__pureZunittest_u799(makeNimstrLit("/mnt/c/project/agenticFrontend/tests/test_commands.nim(12, 63): Check failed: shortcutAction(\"C\", true, false, false, false, true) == \"chats\""));
       F.line = 658;
-      checkpoint__pureZunittest_u799(([115,104,111,114,116,99,117,116,65,99,116,105,111,110,40,34,78,34,44,32,116,114,117,101,44,32,116,114,117,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,41,32,119,97,115,32]).concat(HEX3Ac1_553648262[0]));
+      checkpoint__pureZunittest_u799(([115,104,111,114,116,99,117,116,65,99,116,105,111,110,40,34,67,34,44,32,116,114,117,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,44,32,116,114,117,101,41,32,119,97,115,32]).concat(HEX3Ac1_553648262[0]));
       F.line = 607;
       testStatusIMPL_553648227[0] = 1;
       F.line = 611;
@@ -2746,22 +2752,22 @@ Label1: {
         var formatterHEX60gensym25_553648267 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648400 = 0;
+        var i_553648410 = 0;
         F.line = 250;
-        var L_553648401 = (formatters_687865900[0]).length;
+        var L_553648411 = (formatters_687865900[0]).length;
         Label46: {
           F.line = 251;
             Label47: while (true) {
-            if (!(i_553648400 < L_553648401)) break Label47;
+            if (!(i_553648410 < L_553648411)) break Label47;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym25_553648267[0] = formatters_687865900[0][chckIndx(i_553648400, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym25_553648267[0] = formatters_687865900[0][chckIndx(i_553648410, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym25_553648267[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648400 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648401))) {
+              i_553648410 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648411))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2783,15 +2789,15 @@ Label1: {
   Label48: {
     F.line = 13;
     F.filename = "test_commands.nim";
-    var HEX3Ac1_553648272 = [shortcutAction__OOZsrcZappZcommands_u6([44], true, false, false, false, false)];
-    if (eqStrings(HEX3Ac1_553648272[0], [99,111,110,110,101,99,116,105,111,110,115])) {
+    var HEX3Ac1_553648272 = [shortcutAction__OOZsrcZappZcommands_u6([78], true, true, false, false, false)];
+    if (eqStrings(HEX3Ac1_553648272[0], [])) {
     }
     else {
       F.line = 745;
       F.filename = "unittest.nim";
-      checkpoint__pureZunittest_u799(makeNimstrLit("/mnt/c/project/agenticFrontend/tests/test_commands.nim(13, 57): Check failed: shortcutAction(\",\", true, false, false, false) == \"connections\""));
+      checkpoint__pureZunittest_u799(makeNimstrLit("/mnt/c/project/agenticFrontend/tests/test_commands.nim(13, 56): Check failed: shortcutAction(\"N\", true, true, false, false) == \"\""));
       F.line = 658;
-      checkpoint__pureZunittest_u799(([115,104,111,114,116,99,117,116,65,99,116,105,111,110,40,34,44,34,44,32,116,114,117,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,41,32,119,97,115,32]).concat(HEX3Ac1_553648272[0]));
+      checkpoint__pureZunittest_u799(([115,104,111,114,116,99,117,116,65,99,116,105,111,110,40,34,78,34,44,32,116,114,117,101,44,32,116,114,117,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,41,32,119,97,115,32]).concat(HEX3Ac1_553648272[0]));
       F.line = 607;
       testStatusIMPL_553648227[0] = 1;
       F.line = 611;
@@ -2801,22 +2807,77 @@ Label1: {
         var formatterHEX60gensym28_553648277 = [null];
         F.line = 249;
         F.filename = "iterators.nim";
-        var i_553648405 = 0;
+        var i_553648415 = 0;
         F.line = 250;
-        var L_553648406 = (formatters_687865900[0]).length;
+        var L_553648416 = (formatters_687865900[0]).length;
         Label50: {
           F.line = 251;
             Label51: while (true) {
-            if (!(i_553648405 < L_553648406)) break Label51;
+            if (!(i_553648415 < L_553648416)) break Label51;
               F.line = 614;
               F.filename = "unittest.nim";
-              formatterHEX60gensym28_553648277[0] = formatters_687865900[0][chckIndx(i_553648405, 0, (formatters_687865900[0]).length - 1)];
+              formatterHEX60gensym28_553648277[0] = formatters_687865900[0][chckIndx(i_553648415, 0, (formatters_687865900[0]).length - 1)];
               F.line = 618;
               failureOccurred__pureZunittest_u72(formatterHEX60gensym28_553648277[0], checkpoints_687865899[0], []);
               F.line = 13;
               F.filename = "iterators.nim";
-              i_553648405 += 1;
-              if (!(((formatters_687865900[0]).length == L_553648406))) {
+              i_553648415 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648416))) {
+              F.line = 254;
+              failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
+              }
+              
+            }
+        };
+      };
+      if (abortOnError_687865898[0]) {
+      F.line = 620;
+      F.filename = "unittest.nim";
+      process.exit(1);
+      }
+      
+      F.line = 622;
+      checkpoints_687865899[0] = nimCopy(null, [], NTI687865871);
+    }
+    
+  };
+  Label52: {
+    F.line = 14;
+    F.filename = "test_commands.nim";
+    var HEX3Ac1_553648282 = [shortcutAction__OOZsrcZappZcommands_u6([44], true, false, false, false, false)];
+    if (eqStrings(HEX3Ac1_553648282[0], [99,111,110,110,101,99,116,105,111,110,115])) {
+    }
+    else {
+      F.line = 745;
+      F.filename = "unittest.nim";
+      checkpoint__pureZunittest_u799(makeNimstrLit("/mnt/c/project/agenticFrontend/tests/test_commands.nim(14, 57): Check failed: shortcutAction(\",\", true, false, false, false) == \"connections\""));
+      F.line = 658;
+      checkpoint__pureZunittest_u799(([115,104,111,114,116,99,117,116,65,99,116,105,111,110,40,34,44,34,44,32,116,114,117,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,44,32,102,97,108,115,101,41,32,119,97,115,32]).concat(HEX3Ac1_553648282[0]));
+      F.line = 607;
+      testStatusIMPL_553648227[0] = 1;
+      F.line = 611;
+      ensureInitialized__pureZunittest_u717();
+      Label53: {
+        F.line = 614;
+        var formatterHEX60gensym31_553648287 = [null];
+        F.line = 249;
+        F.filename = "iterators.nim";
+        var i_553648420 = 0;
+        F.line = 250;
+        var L_553648421 = (formatters_687865900[0]).length;
+        Label54: {
+          F.line = 251;
+            Label55: while (true) {
+            if (!(i_553648420 < L_553648421)) break Label55;
+              F.line = 614;
+              F.filename = "unittest.nim";
+              formatterHEX60gensym31_553648287[0] = formatters_687865900[0][chckIndx(i_553648420, 0, (formatters_687865900[0]).length - 1)];
+              F.line = 618;
+              failureOccurred__pureZunittest_u72(formatterHEX60gensym31_553648287[0], checkpoints_687865899[0], []);
+              F.line = 13;
+              F.filename = "iterators.nim";
+              i_553648420 += 1;
+              if (!(((formatters_687865900[0]).length == L_553648421))) {
               F.line = 254;
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
               }
@@ -2843,38 +2904,38 @@ Label1: {
   framePtr = F;
   if (lastJSError && (isObj(lastJSError.m_type, NTI33555183))) {
   F.line = 557;
-  var e_553648282 = getCurrentException();
+  var e_553648292 = getCurrentException();
   F.line = 558;
-  var eTypeDesc_553648283 = ([91]).concat(exceptionTypeName__pureZunittest_u789(e_553648282),[93]);
+  var eTypeDesc_553648293 = ([91]).concat(exceptionTypeName__pureZunittest_u789(e_553648292),[93]);
   F.line = 559;
-  checkpoint__pureZunittest_u799(([85,110,104,97,110,100,108,101,100,32,101,120,99,101,112,116,105,111,110,58,32]).concat(getCurrentExceptionMsg__system_u2067(),[32],eTypeDesc_553648283));
+  checkpoint__pureZunittest_u799(([85,110,104,97,110,100,108,101,100,32,101,120,99,101,112,116,105,111,110,58,32]).concat(getCurrentExceptionMsg__system_u2067(),[32],eTypeDesc_553648293));
   F.line = 560;
-  var stackTrace_553648284 = [getStackTrace__system_u2255(e_553648282)];
+  var stackTrace_553648294 = [getStackTrace__system_u2255(e_553648292)];
   F.line = 607;
   testStatusIMPL_553648227[0] = 1;
   F.line = 611;
   ensureInitialized__pureZunittest_u717();
-  Label52: {
+  Label56: {
     F.line = 614;
-    var formatterHEX60gensym29_553648289 = [null];
+    var formatterHEX60gensym32_553648299 = [null];
     F.line = 249;
     F.filename = "iterators.nim";
-    var i_553648409 = 0;
+    var i_553648424 = 0;
     F.line = 250;
-    var L_553648410 = (formatters_687865900[0]).length;
-    Label53: {
+    var L_553648425 = (formatters_687865900[0]).length;
+    Label57: {
       F.line = 251;
-        Label54: while (true) {
-        if (!(i_553648409 < L_553648410)) break Label54;
+        Label58: while (true) {
+        if (!(i_553648424 < L_553648425)) break Label58;
           F.line = 614;
           F.filename = "unittest.nim";
-          formatterHEX60gensym29_553648289[0] = formatters_687865900[0][chckIndx(i_553648409, 0, (formatters_687865900[0]).length - 1)];
+          formatterHEX60gensym32_553648299[0] = formatters_687865900[0][chckIndx(i_553648424, 0, (formatters_687865900[0]).length - 1)];
           F.line = 616;
-          failureOccurred__pureZunittest_u72(formatterHEX60gensym29_553648289[0], checkpoints_687865899[0], stackTrace_553648284[0]);
+          failureOccurred__pureZunittest_u72(formatterHEX60gensym32_553648299[0], checkpoints_687865899[0], stackTrace_553648294[0]);
           F.line = 13;
           F.filename = "iterators.nim";
-          i_553648409 += 1;
-          if (!(((formatters_687865900[0]).length == L_553648410))) {
+          i_553648424 += 1;
+          if (!(((formatters_687865900[0]).length == L_553648425))) {
           F.line = 254;
           failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
           }
@@ -2900,27 +2961,27 @@ Label1: {
   testStatusIMPL_553648227[0] = 1;
   F.line = 611;
   ensureInitialized__pureZunittest_u717();
-  Label55: {
+  Label59: {
     F.line = 614;
-    var formatterHEX60gensym30_553648298 = [null];
+    var formatterHEX60gensym33_553648308 = [null];
     F.line = 249;
     F.filename = "iterators.nim";
-    var i_553648413 = 0;
+    var i_553648428 = 0;
     F.line = 250;
-    var L_553648414 = (formatters_687865900[0]).length;
-    Label56: {
+    var L_553648429 = (formatters_687865900[0]).length;
+    Label60: {
       F.line = 251;
-        Label57: while (true) {
-        if (!(i_553648413 < L_553648414)) break Label57;
+        Label61: while (true) {
+        if (!(i_553648428 < L_553648429)) break Label61;
           F.line = 614;
           F.filename = "unittest.nim";
-          formatterHEX60gensym30_553648298[0] = formatters_687865900[0][chckIndx(i_553648413, 0, (formatters_687865900[0]).length - 1)];
+          formatterHEX60gensym33_553648308[0] = formatters_687865900[0][chckIndx(i_553648428, 0, (formatters_687865900[0]).length - 1)];
           F.line = 618;
-          failureOccurred__pureZunittest_u72(formatterHEX60gensym30_553648298[0], checkpoints_687865899[0], []);
+          failureOccurred__pureZunittest_u72(formatterHEX60gensym33_553648308[0], checkpoints_687865899[0], []);
           F.line = 13;
           F.filename = "iterators.nim";
-          i_553648413 += 1;
-          if (!(((formatters_687865900[0]).length == L_553648414))) {
+          i_553648428 += 1;
+          if (!(((formatters_687865900[0]).length == L_553648429))) {
           F.line = 254;
           failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
           }
@@ -2946,9 +3007,9 @@ Label1: {
   }
   
   F.line = 570;
-  var testResult_553648307 = {suiteName: nimCopy(null, testSuiteName_553648135, NTI33554449), testName: [115,104,111,114,116,99,117,116,32,100,105,115,112,97,116,99,104,32,109,97,116,99,104,101,115,32,99,111,109,109,97,110,100,32,112,97,108,101,116,116,101,32,97,99,116,105,111,110,115], status: testStatusIMPL_553648227[0]};
+  var testResult_553648317 = {suiteName: nimCopy(null, testSuiteName_553648135, NTI33554449), testName: [115,104,111,114,116,99,117,116,32,100,105,115,112,97,116,99,104,32,109,97,116,99,104,101,115,32,99,111,109,109,97,110,100,32,112,97,108,101,116,116,101,32,97,99,116,105,111,110,115], status: testStatusIMPL_553648227[0]};
   F.line = 575;
-  testEnded__pureZunittest_u780(testResult_553648307);
+  testEnded__pureZunittest_u780(testResult_553648317);
   F.line = 576;
   checkpoints_687865899[0] = nimCopy(null, [], NTI939524122);
   }
@@ -3021,19 +3082,19 @@ function writeLine__pureZstreams_u266(s_p0, args_p1) {
       var str_1040187664 = [];
       F.line = 18;
       F.filename = "iterators.nim";
-      var i_553648482 = 0;
+      var i_553648497 = 0;
       Label2: {
         F.line = 19;
           Label3: while (true) {
-          if (!(i_553648482 < (args_p1).length)) break Label3;
+          if (!(i_553648497 < (args_p1).length)) break Label3;
             F.line = 411;
             F.filename = "streams.nim";
-            str_1040187664 = args_p1[chckIndx(i_553648482, 0, (args_p1).length - 1)];
+            str_1040187664 = args_p1[chckIndx(i_553648497, 0, (args_p1).length - 1)];
             F.line = 411;
             write__pureZstreams_u239(s_p0, str_1040187664);
             F.line = 13;
             F.filename = "iterators.nim";
-            i_553648482 += 1;
+            i_553648497 += 1;
           }
       };
     };
@@ -3594,16 +3655,16 @@ function xmlEscape__pureZunittest_u400(s_p0) {
       var c_687866259 = 0;
       F.line = 267;
       F.filename = "iterators.nim";
-      var i_553648493 = 0;
+      var i_553648508 = 0;
       F.line = 268;
-      var L_553648494 = (s_p0).length;
+      var L_553648509 = (s_p0).length;
       Label2: {
         F.line = 269;
           Label3: while (true) {
-          if (!(i_553648493 < L_553648494)) break Label3;
+          if (!(i_553648508 < L_553648509)) break Label3;
             F.line = 308;
             F.filename = "unittest.nim";
-            c_687866259 = s_p0[chckIndx(i_553648493, 0, (s_p0).length - 1)];
+            c_687866259 = s_p0[chckIndx(i_553648508, 0, (s_p0).length - 1)];
             F.line = 309;
             switch (c_687866259) {
             case 60:
@@ -3640,8 +3701,8 @@ function xmlEscape__pureZunittest_u400(s_p0) {
             }
             F.line = 13;
             F.filename = "iterators.nim";
-            i_553648493 += 1;
-            if (!(((s_p0).length == L_553648494))) {
+            i_553648508 += 1;
+            if (!(((s_p0).length == L_553648509))) {
             F.line = 272;
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(272, 11) `len(a) == L` the length of the string changed while iterating over it"));
             }
@@ -3835,25 +3896,25 @@ function add__pureZunittest_u468(x_p0, x_p0_Idx, y_p1) {
       var i_687866346 = 0;
       F.line = 81;
       F.filename = "iterators_1.nim";
-      var colontmp__553648497 = 0;
+      var colontmp__553648512 = 0;
       F.line = 1216;
       F.filename = "system.nim";
-      colontmp__553648497 = (y_p1).length - 1;
+      colontmp__553648512 = (y_p1).length - 1;
       F.line = 96;
       F.filename = "iterators_1.nim";
-      var res_553648498 = 0;
+      var res_553648513 = 0;
       Label3: {
         F.line = 97;
           Label4: while (true) {
-          if (!(res_553648498 <= colontmp__553648497)) break Label4;
+          if (!(res_553648513 <= colontmp__553648512)) break Label4;
             F.line = 1216;
             F.filename = "system.nim";
-            i_687866346 = res_553648498;
+            i_687866346 = res_553648513;
             F.line = 1216;
             x_p0[x_p0_Idx][chckIndx(addInt(xl_687866331, i_687866346), 0, (x_p0[x_p0_Idx]).length - 1)] = nimCopy(null, y_p1[chckIndx(i_687866346, 0, (y_p1).length - 1)], NTI33554449);
             F.line = 102;
             F.filename = "iterators_1.nim";
-            res_553648498 = addInt(res_553648498, 1);
+            res_553648513 = addInt(res_553648513, 1);
           }
       };
     };
@@ -3903,22 +3964,22 @@ function failureOccurred__pureZunittest_u333(formatter_p0, checkpoints_p1, stack
       var msg_687866215 = [];
       F.line = 249;
       F.filename = "iterators.nim";
-      var i_553648502 = 0;
+      var i_553648517 = 0;
       F.line = 250;
-      var L_553648503 = (checkpoints_p1).length;
+      var L_553648518 = (checkpoints_p1).length;
       Label3: {
         F.line = 251;
           Label4: while (true) {
-          if (!(i_553648502 < L_553648503)) break Label4;
+          if (!(i_553648517 < L_553648518)) break Label4;
             F.line = 279;
             F.filename = "unittest.nim";
-            msg_687866215 = checkpoints_p1[chckIndx(i_553648502, 0, (checkpoints_p1).length - 1)];
+            msg_687866215 = checkpoints_p1[chckIndx(i_553648517, 0, (checkpoints_p1).length - 1)];
             F.line = 280;
             rawEcho(prefix_687866193, msg_687866215);
             F.line = 13;
             F.filename = "iterators.nim";
-            i_553648502 += 1;
-            if (!(((checkpoints_p1).length == L_553648503))) {
+            i_553648517 += 1;
+            if (!(((checkpoints_p1).length == L_553648518))) {
             F.line = 254;
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("/home/xenos/.asdf/installs/nim/2.2.10/lib/system/iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
             }
@@ -4008,20 +4069,20 @@ function nsuformatBiggestFloat(f_p0, format_p1, precision_p2, decimalSep_p3) {
       var i_771754161 = 0;
       F.line = 126;
       F.filename = "iterators_1.nim";
-      var colontmp__553648509 = 0;
+      var colontmp__553648524 = 0;
       F.line = 2544;
       F.filename = "strutils.nim";
-      colontmp__553648509 = (result_771754154).length;
+      colontmp__553648524 = (result_771754154).length;
       F.line = 128;
       F.filename = "iterators_1.nim";
-      var i_553648510 = 0;
+      var i_553648525 = 0;
       Label2: {
         F.line = 129;
           Label3: while (true) {
-          if (!(i_553648510 < colontmp__553648509)) break Label3;
+          if (!(i_553648525 < colontmp__553648524)) break Label3;
             F.line = 2544;
             F.filename = "strutils.nim";
-            i_771754161 = i_553648510;
+            i_771754161 = i_553648525;
             if ((ConstSet8[result_771754154[chckIndx(i_771754161, 0, (result_771754154).length - 1)]] != undefined)) {
             F.line = 2547;
             result_771754154[chckIndx(i_771754161, 0, (result_771754154).length - 1)] = decimalSep_p3;
@@ -4029,7 +4090,7 @@ function nsuformatBiggestFloat(f_p0, format_p1, precision_p2, decimalSep_p3) {
             
             F.line = 131;
             F.filename = "iterators_1.nim";
-            i_553648510 = addInt(i_553648510, 1);
+            i_553648525 = addInt(i_553648525, 1);
           }
       };
     };
@@ -4147,14 +4208,14 @@ function testEnded__pureZunittest_u491(formatter_p0, testResult_p1) {
         var errIdx_687866399 = 0;
         F.line = 96;
         F.filename = "iterators_1.nim";
-        var res_553648506 = startIdx_687866387;
+        var res_553648521 = startIdx_687866387;
         Label6: {
           F.line = 97;
             Label7: while (true) {
-            if (!(res_553648506 <= endIdx_687866394)) break Label7;
+            if (!(res_553648521 <= endIdx_687866394)) break Label7;
               F.line = 382;
               F.filename = "unittest.nim";
-              errIdx_687866399 = res_553648506;
+              errIdx_687866399 = res_553648521;
               if ((0 < (errs_687866383).length)) {
               F.line = 384;
               nimAddStrStr(errs_687866383, [10]);;
@@ -4164,7 +4225,7 @@ function testEnded__pureZunittest_u491(formatter_p0, testResult_p1) {
               nimAddStrStr(errs_687866383, xmlEscape__pureZunittest_u400(formatter_p0.testErrors[chckIndx(errIdx_687866399, 0, (formatter_p0.testErrors).length - 1)]));;
               F.line = 102;
               F.filename = "iterators_1.nim";
-              res_553648506 = addInt(res_553648506, 1);
+              res_553648521 = addInt(res_553648521, 1);
             }
         };
       };

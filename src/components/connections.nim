@@ -5,6 +5,7 @@ import std/[json, strutils]
 import ../app/[types, extension_bridge]
 import ../app/connection_draft
 import ../api/connection_options
+import brand
 
 
 proc nodeText(
@@ -191,25 +192,37 @@ proc textField(
 proc resetConnectionOptions(state: AppState) =
   state.clearUsageDraft()
 
-proc optionText(item: JsonNode, key: string): string =
-  if item != nil and item.kind == JObject and item.hasKey(key):
-    case item[key].kind
-    of JString: return item[key].getStr
-    of JInt, JFloat: return $item[key]
-    else: discard
-  return ""
-
 proc renderUsageControls(state: AppState): VNode =
   result = buildHtml(tdiv(class = "plugin-form-grid")):
-    textField("Provider tokens per minute", state.connectionTpm,
-      proc(value: string) = state.connectionTpm = value,
-      placeholder = "Optional: your account's limit")
-    textField("Provider requests per minute", state.connectionRpm,
-      proc(value: string) = state.connectionRpm = value,
-      placeholder = "Optional: your account's limit")
-    textField("Maximum queue wait (seconds)", state.connectionMaxWait,
-      proc(value: string) = state.connectionMaxWait = value,
-      placeholder = "Leave empty for the server default")
+    let networkingChoices = networkingInferenceChoices(state.extensionCatalog)
+    if networkingChoices.len > 0:
+      tdiv(class = "plugin-field plugin-field-wide"):
+        label: text "Networking model"
+        select(class = "plugin-select", `aria-label` = "Networking model", value = cstring(
+          if state.connectionNetworkingInference.len > 0: state.connectionNetworkingInference
+          else: networkingInferenceDefault(state.extensionCatalog))):
+          for choice in networkingChoices:
+            option(value = cstring(choice.id)): text choice.label
+          proc onchange(event: Event, node: VNode) =
+            state.connectionNetworkingInference = $node.value
+        tdiv(class = "plugin-field-hint"):
+          if state.connectionNetworkingInference == "selected_model":
+            if state.connectionBackend in ["local", "uploaded"]:
+              text "Networking uses this local connection. Private datasets remain excluded from networking."
+            else:
+              text "Networking requests and device details will be sent to this provider. Private datasets remain excluded from networking."
+          else:
+            text "Uses the existing dedicated networking model. Private datasets remain excluded from networking."
+    if state.connectionBackend in ["http", "pi", "opencode"]:
+      textField("Provider tokens per minute", state.connectionTpm,
+        proc(value: string) = state.connectionTpm = value,
+        placeholder = "Optional: your account's limit")
+      textField("Provider requests per minute", state.connectionRpm,
+        proc(value: string) = state.connectionRpm = value,
+        placeholder = "Optional: your account's limit")
+      textField("Maximum queue wait (seconds)", state.connectionMaxWait,
+        proc(value: string) = state.connectionMaxWait = value,
+        placeholder = "Leave empty for the server default")
     let efforts = reasoningEffortsFor(state.extensionCatalog, state.connectionBackend,
                                       state.connectionModel, state.connectionUrl)
     if efforts.len > 0:
@@ -224,13 +237,28 @@ proc renderUsageControls(state: AppState): VNode =
             state.connectionReasoning = $node.value
       tdiv(class = "plugin-field-hint plugin-field-wide"):
         text "Reasoning effort is optional and must be supported by this model and connection."
-    tdiv(class = "plugin-field-hint plugin-field-wide"):
-      text "Use the limits from your provider account. Connections sharing a credential and model share the queue. Leave limits empty when unknown."
+    let thinkingModes = thinkingModesFor(state.extensionCatalog, state.connectionBackend,
+                                         state.connectionModel, state.connectionUrl)
+    if thinkingModes.len > 0:
+      tdiv(class = "plugin-field"):
+        label:
+          text "Thinking"
+        select(class = "plugin-select", value = cstring(state.connectionThinking)):
+          option(value = ""): text "Automatic"
+          for mode in thinkingModes:
+            option(value = cstring(mode)): text mode.capitalizeAscii()
+          proc onchange(event: Event, node: VNode) =
+            state.connectionThinking = $node.value
+      tdiv(class = "plugin-field-hint plugin-field-wide"):
+        text "Automatic turns thinking off when the model allows it, for fast structured proposals. Hidden reasoning is never shown or trusted."
+    if state.connectionBackend in ["http", "pi", "opencode"]:
+      tdiv(class = "plugin-field-hint plugin-field-wide"):
+        text "Use the limits from your provider account. Connections sharing a credential and model share the queue. Leave limits empty when unknown."
 
 proc renderUsageSettings(state: AppState): VNode =
   result = buildHtml(tdiv(class = "plugin-content-section")):
-    h3: text "Usage settings: " & state.connectionName
-    p: text "Adjust provider limits without entering your API key again."
+    h3: text "Model settings: " & state.connectionName
+    p: text "Choose how this connection is used. You do not need to enter its credentials again."
     renderUsageControls(state)
     button(class = "plugin-primary", disabled = state.extensionBusy):
       text (if state.extensionBusy: "Saving…" else: "Save settings")
@@ -246,6 +274,9 @@ proc providerGlyph(
 ): string =
 
   case id
+
+  of "anthropic":
+    "A"
 
   of "groq":
     "G"
@@ -428,6 +459,12 @@ proc renderInstalledRail(
                   nodeText(
                     item,
                     "state"
+                  ) &
+                  (
+                    if nodeBool(item, "insecure_transport"):
+                      " · unencrypted"
+                    else:
+                      ""
                   )
                 )
 
@@ -630,6 +667,129 @@ proc renderCurrentSelection(
           )
 
 
+proc roleAssignment(
+  state: AppState,
+  role: string
+): string =
+  ## "" follows the active model; "local" pins the specialist's own model.
+
+  if state.extensionCatalog != nil and
+     state.extensionCatalog.kind == JObject and
+     state.extensionCatalog.hasKey("role_assignments") and
+     state.extensionCatalog["role_assignments"].kind == JObject:
+
+    return nodeText(
+      state.extensionCatalog["role_assignments"],
+      role
+    )
+
+  return ""
+
+
+proc roleLabel(
+  role: string
+): string =
+
+  result = role.replace("-specialist", "").replace("-", " ")
+  if result.len > 0:
+    result[0] = result[0].toUpperAscii()
+
+
+proc renderRoleRow(
+  state: AppState,
+  role: JsonNode
+): VNode =
+  ## One specialist row. Kept in its own proc so each change handler captures
+  ## this row's role; closures created inside a loop would share the last one.
+
+  let
+    roleId = nodeText(role, "id")
+    assigned = roleAssignment(state, roleId)
+    localModel = nodeText(role, "local_model")
+
+  result = buildHtml(
+    tdiv(class = "plugin-role-row")
+  ):
+
+    tdiv(class = "plugin-role-copy"):
+
+      strong:
+        text roleLabel(roleId)
+
+      span:
+        text nodeText(role, "description")
+
+    select(
+      class = "plugin-select",
+      disabled = state.extensionBusy
+    ):
+
+      option(
+        value = "",
+        selected = assigned == ""
+      ):
+        text "Same as active model"
+
+      option(
+        value = "local",
+        selected = assigned == "local"
+      ):
+        text "Local · " & localModel
+
+      for row in state.extensionCatalog["resources"]:
+
+        if nodeText(row, "kind") == "model" and
+           nodeText(row, "state") == "ready":
+
+          option(
+            value = cstring(nodeText(row, "id")),
+            selected = nodeText(row, "id") == assigned
+          ):
+            text nodeText(row, "name")
+
+      proc onchange(
+        event: Event,
+        node: VNode
+      ) =
+
+        discard changeExtension(
+          state,
+          "assign_role",
+          %*{
+            "role": roleId,
+            "model_id": $node.value
+          }
+        )
+
+
+proc renderSpecialistModels(
+  state: AppState
+): VNode =
+  ## The active model runs the hub (routing and answers); each specialist can
+  ## follow it, use its own local model, or use another saved connection.
+
+  result = buildHtml(
+    tdiv(class = "plugin-role-section")
+  ):
+
+    tdiv(class = "plugin-role-heading"):
+
+      strong:
+        text "Specialist models"
+
+      span:
+        text "The active model routes requests. Each specialist can follow it or use its own connection."
+
+    tdiv(class = "plugin-role-grid"):
+
+      for role in state.extensionCatalog["specialist_roles"]:
+
+        renderRoleRow(
+          state,
+          role
+        )
+
+
 proc renderPublicProviders(
   state: AppState
 ): VNode =
@@ -822,21 +982,11 @@ proc renderResourceActions(
             }
           )
 
-      if nodeText(item, "backend") in ["http", "pi", "opencode"]:
-        button(class = "plugin-action-button", disabled = state.extensionBusy):
-          text "Usage settings"
-          proc onclick(event: Event, node: VNode) =
-            state.connectionOptionsId = nodeText(item, "id")
-            state.connectionName = nodeText(item, "name")
-            state.connectionBackend = nodeText(item, "backend")
-            state.connectionModel = nodeText(item, "model")
-            state.connectionUrl = nodeText(item, "url")
-            state.connectionTpm = optionText(item, "provider_tokens_per_minute")
-            state.connectionRpm = optionText(item, "provider_requests_per_minute")
-            state.connectionMaxWait = optionText(item, "admission_max_wait_seconds")
-            state.connectionReasoning = optionText(item, "reasoning_effort")
-            state.connectionKey = ""
-            setPluginSection(state, "limits")
+      button(class = "plugin-action-button", disabled = state.extensionBusy):
+        text "Settings"
+        proc onclick(event: Event, node: VNode) =
+          state.loadConnectionOptions(item)
+          setPluginSection(state, "limits")
 
       button(
         class = "plugin-action-button",
@@ -973,6 +1123,11 @@ proc renderPersonal(
       state
     )
 
+    if arrayLength(state, "specialist_roles") > 0:
+      renderSpecialistModels(
+        state
+      )
+
     tdiv(class = "personal-resource-list"):
 
       var visible =
@@ -1090,6 +1245,14 @@ proc connectionPresetId(
 
       continue
 
+    if state.connectionBackend == "http" and
+       nodeText(
+         row,
+         "api_format"
+       ) != state.connectionApiFormat:
+
+      continue
+
     return nodeText(
       row,
       "id"
@@ -1150,6 +1313,15 @@ proc applyConnectionPreset(
         "url"
       )
 
+    state.connectionApiFormat =
+      nodeText(
+        row,
+        "api_format"
+      )
+
+    state.connectionProviderId =
+      ""
+
     # Never carry a credential from one provider
     # selection into another provider selection.
     state.connectionKey =
@@ -1160,6 +1332,40 @@ proc applyConnectionPreset(
     redraw(kxi)
 
     return
+
+
+proc connectionIsPlainHttp(
+  state: AppState
+): bool =
+
+  let url =
+    state.connectionUrl.strip().toLowerAscii()
+
+  return state.connectionBackend == "http" and
+    url.startsWith("http://") and
+    not url.startsWith("http://127.0.0.1:") and
+    not url.startsWith("http://127.0.0.1/")
+
+
+proc connectionUsesMessagesApi(
+  state: AppState
+): bool =
+
+  if state.connectionBackend != "http":
+    return false
+
+  if state.connectionApiFormat.len > 0:
+    return state.connectionApiFormat == "anthropic"
+
+  let base =
+    state.connectionUrl.strip().strip(
+      leading = false,
+      trailing = true,
+      chars = {'/'}
+    )
+
+  return base == "https://api.anthropic.com" or
+    base == "https://api.anthropic.com/v1"
 
 
 proc connectionRequiresCredential(
@@ -1586,6 +1792,72 @@ proc renderConnectionForm(
                 resetConnectionOptions(state)
                 redraw(kxi)
 
+          if connectionIsPlainHttp(state):
+
+            tdiv(class = "plugin-field-hint plugin-field-warning"):
+              text "Unencrypted: the API key and every prompt travel in plain text. Use only for testing with non-sensitive data, and only if the server administrator has allowed this exact address."
+
+          tdiv(class = "plugin-field"):
+
+            label:
+              text "Provider ID (optional)"
+
+            input(
+              `type` = "text",
+              value = cstring(
+                state.connectionProviderId
+              ),
+              placeholder =
+                "e.g. 9router"
+            ):
+
+              proc oninput(
+                event: Event,
+                node: VNode
+              ) =
+
+                state.connectionProviderId =
+                  $node.value
+
+                redraw(kxi)
+
+        if state.connectionBackend == "http":
+
+          tdiv(class = "plugin-field plugin-field-wide"):
+
+            label:
+              text "API protocol"
+
+            select(
+              class = "plugin-select",
+              value = cstring(
+                state.connectionApiFormat
+              )
+            ):
+
+              option(value = ""):
+                text "Detect from URL"
+
+              option(value = "anthropic"):
+                text "Anthropic Messages API"
+
+              option(value = "openai"):
+                text "OpenAI-compatible chat completions"
+
+              proc onchange(
+                event: Event,
+                node: VNode
+              ) =
+
+                state.connectionApiFormat =
+                  $node.value
+
+                resetConnectionOptions(state)
+                redraw(kxi)
+
+            tdiv(class = "plugin-field-hint"):
+              text "Gateways that serve Claude in Anthropic's format need Anthropic Messages API. The server must allow the gateway's origin."
+
         if state.connectionBackend in [
           "http",
           "pi",
@@ -1641,10 +1913,71 @@ proc renderConnectionForm(
 
                 text "Local OpenAI-compatible endpoints can remain credential-free."
 
-      if state.connectionBackend in ["http", "pi", "opencode"]:
+      if connectionUsesMessagesApi(state):
+
         tdiv(class = "plugin-setup-card"):
-          h4: text "Optional usage settings"
-          renderUsageControls(state)
+
+          h4:
+            text "Available models"
+
+          tdiv(class = "plugin-form-grid"):
+
+            tdiv(class = "plugin-field plugin-field-wide"):
+
+              label:
+                text "Model"
+
+              if state.connectionModelChoices.len > 0:
+
+                select(
+                  class = "plugin-select",
+                  value = cstring(
+                    state.connectionModel
+                  )
+                ):
+
+                  for choice in state.connectionModelChoices:
+
+                    option(
+                      value = cstring(choice.id),
+                      selected = choice.id == state.connectionModel
+                    ):
+                      text choice.name & "  ·  " & choice.id
+
+                  proc onchange(
+                    event: Event,
+                    node: VNode
+                  ) =
+
+                    state.connectionModel =
+                      $node.value
+
+                    redraw(kxi)
+
+              else:
+
+                tdiv(class = "plugin-field-hint"):
+                  text "Paste the API key, then load the models it can use."
+
+            button(
+              class = "plugin-action-button",
+              disabled =
+                state.extensionBusy or
+                state.connectionKey.strip().len == 0
+            ):
+
+              text "Load models"
+
+              proc onclick(
+                event: Event,
+                node: VNode
+              ) =
+
+                discard loadProviderModels(state)
+
+      tdiv(class = "plugin-setup-card"):
+        h4: text "Model settings"
+        renderUsageControls(state)
 
       if missingCredential:
 
@@ -2113,7 +2446,7 @@ proc renderConnections*(
             text "Plugins"
 
           p:
-            text "Connect models, data sources and automation services to your Agentic workspace."
+            text "Connect models, data sources and automation services to your " & productName & " workspace."
 
         tdiv(class = "plugin-header-actions"):
 

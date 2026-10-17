@@ -2,6 +2,7 @@ include karax/prelude
 
 import ../app/types
 import ../app/auth_bridge
+import brand
 
 
 proc authInput(
@@ -41,15 +42,15 @@ proc renderAuthScreen*(
       tdiv(class = "auth-brand"):
         img(
           class = "brand-logo",
-          src = "./assets/hydra.svg",
-          alt = "Agentic Hydra"
+          src = productMark,
+          alt = productName
         )
 
         tdiv:
           strong:
-            text "Agentic"
+            text productName
           span:
-            text "Developer Hub"
+            text productTagline
 
       if not state.auth.checked:
         tdiv(class = "auth-status"):

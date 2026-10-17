@@ -9,6 +9,7 @@ import ../app/job_decision
 
 import result_card
 import message_body
+import brand
 
 
 proc progressLabel(state: AppState): string =
@@ -80,12 +81,12 @@ proc renderMessage(
     ):
 
       tdiv(class = "assistant-avatar"):
-        text "A"
+        text productName[0 .. 0]
 
       tdiv(class = "message-column assistant"):
 
         span(class = "message-author"):
-          text "Agentic"
+          text productName
 
         if message.content.len > 0:
 
@@ -113,7 +114,7 @@ proc renderApprovalAction(
   ):
 
     tdiv(class = "assistant-avatar"):
-      text "A"
+      text productName[0 .. 0]
 
     tdiv(class = "message-column assistant"):
 
@@ -187,8 +188,11 @@ proc renderChat*(
 
       tdiv(class = "welcome"):
 
-        tdiv(class = "welcome-icon"):
-          text "A"
+        img(
+          class = "welcome-icon",
+          src = productMark,
+          alt = ""
+        )
 
         h2:
           text "What do you want to work on?"
