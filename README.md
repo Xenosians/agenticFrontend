@@ -90,9 +90,12 @@ nim js -r tests/test_tool_proposal.nim
 nim js -r tests/test_job_decision.nim
 nim js -r tests/test_approval_result.nim
 nim js -r tests/test_connection_options.nim
+nim js -r tests/test_logout_outcome.nim
 nim js -o:.runtime/job_submission_client_driver.js tests/job_submission_client_driver.nim
 node --test tests/test_job_submission.js tests/test_job_submission_client.js tests/test_job_socket.js
 ```
+
+Sign-out clears the workspace only after Phoenix confirms that the session ended (401 means it already had). If the answer is lost or the server cannot confirm revocation, the user stays signed in and is asked to sign out again.
 
 These cover shortcuts, versioned lifecycle validation, job/history restoration, approval details and outcomes, stale decision responses, and connection settings. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approve/reject decisions, and result rendering after changes to those flows.
 

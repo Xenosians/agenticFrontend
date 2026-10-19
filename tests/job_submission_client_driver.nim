@@ -1,6 +1,7 @@
 ## Test driver for the production HTTP client; injected fetch stays inside Node.
 import std/[asyncjs, json]
 import ../src/api/client
+import ../src/api/auth_client
 import ../src/api/job_submission
 
 proc submitJobForTest(chat, message, csrf, identity: cstring): Future[cstring] {.async, exportc.} =
@@ -19,6 +20,12 @@ proc prepareJobForTest(owner, chat, message: cstring): cstring {.exportc.} =
     return cstring($(%*{"kind": "prepared", "submission_id": saved.identity}))
   except CatchableError:
     return cstring("{\"kind\":\"storage_error\"}")
+
+proc logoutForTest(csrf: cstring): Future[cstring] {.async, exportc.} =
+  try:
+    return cstring($(await logout($csrf)))
+  except CatchableError:
+    return cstring("raised")
 
 proc readJobForTest(identity: cstring): Future[cstring] {.async, exportc.} =
   try:

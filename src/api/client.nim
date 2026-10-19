@@ -13,6 +13,7 @@ import ../app/types
 import ../app/job_decision
 import tool_proposal
 import approval_result
+import http_call
 import ../config/runtime_config
 
 
@@ -131,7 +132,7 @@ proc publicApiError(
   try:
 
     let data =
-      parseJson(
+      decodeJson(
         responseBody
       )
 
@@ -160,7 +161,7 @@ proc publicApiError(
         parsedMessage
 
 
-  except:
+  except CatchableError:
     discard
 
 
@@ -678,20 +679,9 @@ proc getSystemHealth*():
 
 
   let response =
-    await fetch(
-      (
-        frontendConfig
-        .backendBaseUrl &
-        "/api/health"
-      ).cstring,
-
+    await sendRequest(
+      frontendConfig.backendBaseUrl & "/api/health",
       options
-    )
-
-
-  let responseBody =
-    $(
-      await response.text()
     )
 
 
@@ -702,13 +692,13 @@ proc getSystemHealth*():
       "Backend health returned HTTP " &
       $response.status &
       ": " &
-      responseBody
+      response.body
     )
 
 
   let data =
-    parseJson(
-      responseBody
+    decodeJson(
+      response.body
     )
 
 
@@ -804,20 +794,18 @@ proc getIntegrationStatus*():
     )
 
   let response =
-    await fetch(
-      (frontendConfig.backendBaseUrl & "/api/v1/integrations").cstring,
+    await sendRequest(
+      frontendConfig.backendBaseUrl & "/api/v1/integrations",
       options
     )
-
-  let responseBody = $(await response.text())
 
   if not response.ok:
     raise newException(
       ValueError,
-      "Integration status returned HTTP " & $response.status & ": " & responseBody
+      "Integration status returned HTTP " & $response.status & ": " & response.body
     )
 
-  let data = parseJson(responseBody)
+  let data = decodeJson(response.body)
   var openwrtConfigured = false
 
   if data.kind == JObject and data.hasKey("integrations"):
@@ -833,7 +821,7 @@ proc getIntegrationStatus*():
   )
 
 
-proc requestJob(
+proc createJob*(
   chatId: string,
   message: string,
   csrfToken: string,
@@ -841,6 +829,9 @@ proc requestJob(
 ): Future[
   JobCreateResponse
 ] {.async.} =
+  ## Any error other than JobCreateRejectedError leaves the submission's
+  ## outcome unknown: the job may exist even though no acknowledgement
+  ## arrived.
 
   let headers =
     newHeaders()
@@ -889,35 +880,24 @@ proc requestJob(
 
 
   let response =
-    await fetch(
-      (
-        frontendConfig
-        .backendBaseUrl &
-        "/api/v1/jobs"
-      ).cstring,
-
+    await sendRequest(
+      frontendConfig.backendBaseUrl & "/api/v1/jobs",
       options
-    )
-
-
-  let responseBody =
-    $(
-      await response.text()
     )
 
 
   if not response.ok:
     if response.status >= 400 and response.status < 500 and response.status != 408:
-      raise newException(JobCreateRejectedError, publicApiError($response.status, responseBody).msg)
+      raise newException(JobCreateRejectedError, publicApiError($response.status, response.body).msg)
     raise publicApiError(
       $response.status,
-      responseBody
+      response.body
     )
 
 
   let data =
-    parseJson(
-      responseBody
+    decodeJson(
+      response.body
     )
 
 
@@ -941,21 +921,7 @@ proc requestJob(
     )
 
 
-proc createJob*(chatId, message, csrfToken, submissionId: string): Future[JobCreateResponse] {.async.} =
-  try:
-    return await requestJob(chatId, message, csrfToken, submissionId)
-  except JobCreateRejectedError:
-    raise
-  except CatchableError:
-    raise
-  except:
-    # Native fetch / response decoding exceptions are JavaScript Errors,
-    # not Nim CatchableErrors. Normalize them before the UI decides whether
-    # the durable submission has been acknowledged.
-    raise newException(ValueError, "The submission acknowledgement was interrupted.")
-
-
-proc requestJobRead(
+proc getJob*(
   jobId: string
 ): Future[
   JobResponse
@@ -975,21 +941,9 @@ proc requestJobRead(
 
 
   let response =
-    await fetch(
-      (
-        frontendConfig
-        .backendBaseUrl &
-        "/api/v2/jobs/" &
-        jobId
-      ).cstring,
-
+    await sendRequest(
+      frontendConfig.backendBaseUrl & "/api/v2/jobs/" & jobId,
       options
-    )
-
-
-  let responseBody =
-    $(
-      await response.text()
     )
 
 
@@ -997,13 +951,13 @@ proc requestJobRead(
 
     raise publicApiError(
       $response.status,
-      responseBody
+      response.body
     )
 
 
   let data =
-    parseJson(
-      responseBody
+    decodeJson(
+      response.body
     )
 
 
@@ -1011,15 +965,6 @@ proc requestJobRead(
     parseJobResponse(
       data
     )
-
-
-proc getJob*(jobId: string): Future[JobResponse] {.async.} =
-  try:
-    return await requestJobRead(jobId)
-  except CatchableError:
-    raise
-  except:
-    raise newException(ValueError, "Reading the saved job was interrupted.")
 
 
 proc decideJob*(
@@ -1057,20 +1002,9 @@ proc decideJob*(
 
 
   let response =
-    await fetch(
-      (
-        frontendConfig
-        .backendBaseUrl &
-        decisionPath(jobId, decision)
-      ).cstring,
-
+    await sendRequest(
+      frontendConfig.backendBaseUrl & decisionPath(jobId, decision),
       options
-    )
-
-
-  let responseBody =
-    $(
-      await response.text()
     )
 
 
@@ -1078,13 +1012,13 @@ proc decideJob*(
 
     raise publicApiError(
       $response.status,
-      responseBody
+      response.body
     )
 
 
   let data =
-    parseJson(
-      responseBody
+    decodeJson(
+      response.body
     )
 
 

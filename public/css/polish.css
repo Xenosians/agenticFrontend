@@ -1056,6 +1056,19 @@ body {
   grid-column: 1 / -1;
 }
 
+/* Monochrome alert: a strong border and text weight, not a colour. */
+.account-error {
+  margin: 0 0 12px;
+  padding: 9px 10px;
+  border: 1px solid #8a8a8a;
+  border-radius: 8px;
+  background: #141414;
+  color: #e6e6e6;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
 .activity-section {
   margin-top: 22px;
 }

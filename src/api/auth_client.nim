@@ -12,7 +12,8 @@ from std/httpcore import
 
 import ../config/runtime_config
 import chat_history
-export chat_history
+import http_call
+export chat_history, http_call
 
 
 type
@@ -123,7 +124,7 @@ proc apiError(
     message = "The request could not be completed."
 
   try:
-    let data = parseJson(responseBody)
+    let data = decodeJson(responseBody)
 
     let parsedCode =
       jsonText(
@@ -171,17 +172,15 @@ proc login*(
     headers = jsonHeaders()
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/login").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/login",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
-  result = parseAuthResponse(parseJson(responseBody))
+  result = parseAuthResponse(decodeJson(response.body))
 
 
 proc me*(): Future[AuthResponse] {.async.} =
@@ -191,17 +190,15 @@ proc me*(): Future[AuthResponse] {.async.} =
     credentials = fcInclude
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/me").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/me",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
-  result = parseAuthResponse(parseJson(responseBody))
+  result = parseAuthResponse(decodeJson(response.body))
 
 
 proc register*(
@@ -223,15 +220,13 @@ proc register*(
     headers = jsonHeaders()
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/register").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/register",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
 
 proc verifyEmail*(
@@ -249,15 +244,13 @@ proc verifyEmail*(
     headers = jsonHeaders()
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/verify-email").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/verify-email",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
 
 proc resendVerification*(
@@ -275,15 +268,13 @@ proc resendVerification*(
     headers = jsonHeaders()
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/resend-verification").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/resend-verification",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
 
 proc forgotPassword*(
@@ -301,15 +292,13 @@ proc forgotPassword*(
     headers = jsonHeaders()
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/forgot-password").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/forgot-password",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
 
 proc resetPassword*(
@@ -329,20 +318,18 @@ proc resetPassword*(
     headers = jsonHeaders()
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/reset-password").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/reset-password",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
 
 proc logout*(
   csrfToken: string
-): Future[void] {.async.} =
+): Future[LogoutOutcome] {.async.} =
   let options = newFetchOptions(
     metod = HttpPost,
     body = cstring"{}",
@@ -351,15 +338,12 @@ proc logout*(
     headers = jsonHeaders(csrfToken)
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/logout").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/logout",
     options
   )
 
-  let responseBody = $(await response.text())
-
-  if not response.ok:
-    raise apiError($response.status, responseBody)
+  result = logoutOutcome(response.status)
 
 
 proc listChats*(): Future[seq[ChatSummary]] {.async.} =
@@ -369,17 +353,15 @@ proc listChats*(): Future[seq[ChatSummary]] {.async.} =
     credentials = fcInclude
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/chats").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/chats",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
-  let data = parseJson(responseBody)
+  let data = decodeJson(response.body)
   var items = newSeq[ChatSummary]()
 
   if data.kind == JObject and data.hasKey("chats") and data["chats"].kind == JArray:
@@ -412,17 +394,15 @@ proc createChat*(
     headers = jsonHeaders(csrfToken)
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/chats").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/chats",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
-  let data = parseJson(responseBody)
+  let data = decodeJson(response.body)
 
   if data.kind != JObject or not data.hasKey("chat"):
     raise newException(ValueError, "Backend chat response is invalid.")
@@ -459,22 +439,17 @@ proc deleteChat*(
     )
 
   let response =
-    await fetch(
-      (
-        frontendConfig.backendBaseUrl &
-        "/api/v1/chats/" &
-        chatId
-      ).cstring,
+    await sendRequest(
+      frontendConfig.backendBaseUrl &
+      "/api/v1/chats/" &
+      chatId,
       options
     )
-
-  let responseBody =
-    $(await response.text())
 
   if not response.ok:
     raise apiError(
       $response.status,
-      responseBody
+      response.body
     )
 
 
@@ -487,20 +462,16 @@ proc getChatHistory*(
     credentials = fcInclude
   )
 
-  let response = await fetch(
-    (
-      frontendConfig.backendBaseUrl &
-      "/api/v2/chats/" & chatId & "/history?limit=200"
-    ).cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl &
+    "/api/v2/chats/" & chatId & "/history?limit=200",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
-  let data = parseJson(responseBody)
+  let data = decodeJson(response.body)
   var items = newSeq[ChatHistoryMessage]()
 
   if data.kind == JObject and data.hasKey("messages") and data["messages"].kind == JArray:
@@ -524,17 +495,15 @@ proc listSessions*(): Future[seq[SessionSummary]] {.async.} =
     credentials = fcInclude
   )
 
-  let response = await fetch(
-    (frontendConfig.backendBaseUrl & "/api/v1/auth/sessions").cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/sessions",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)
 
-  let data = parseJson(responseBody)
+  let data = decodeJson(response.body)
   var items = newSeq[SessionSummary]()
 
   if data.kind == JObject and data.hasKey("sessions") and data["sessions"].kind == JArray:
@@ -566,15 +535,11 @@ proc revokeSession*(
     headers = jsonHeaders(csrfToken)
   )
 
-  let response = await fetch(
-    (
-      frontendConfig.backendBaseUrl &
-      "/api/v1/auth/sessions/" & sessionId & "/revoke"
-    ).cstring,
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl &
+    "/api/v1/auth/sessions/" & sessionId & "/revoke",
     options
   )
 
-  let responseBody = $(await response.text())
-
   if not response.ok:
-    raise apiError($response.status, responseBody)
+    raise apiError($response.status, response.body)

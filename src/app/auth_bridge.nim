@@ -248,8 +248,11 @@ proc bootstrapApplication*(
     if not matchesAuthRequest(state, requestEpoch): return
     applyAuth(state, auth)
     await loadChats(state)
-  except CatchableError:
-    if matchesAuthRequest(state, requestEpoch): clearAuthenticatedState(state)
+  except CatchableError as exc:
+    if matchesAuthRequest(state, requestEpoch):
+      clearAuthenticatedState(state)
+      if not exc.msg.startsWith("HTTP 401"):
+        state.auth.error = "Your session could not be checked right now. Check the connection and reload."
 
   if not matchesAuthRequest(state, requestEpoch): return
   state.auth.checked = true
@@ -411,40 +414,48 @@ proc resetPasswordApplication*(
 proc logoutApplication*(
   state: AppState
 ) {.async.} =
-  let requestEpoch = beginAuthRequest(state)
-  let csrfToken = state.auth.csrfToken
-  let wasAuthenticated = state.auth.authenticated
-  try:
-    clearOwnerSubmissions(state.auth.userId)
-  except CatchableError:
-    discard # Clearing the authenticated in-memory workspace must still proceed.
-  # Hide private state and invalidate all observers before the network wait.
-  # A delayed response cannot repopulate the workspace during sign-out.
-  clearAuthenticatedState(state)
-  state.auth.checked = true
-  state.auth.mode = amLogin
-  if not wasAuthenticated:
-    state.auth.loading = false
+  ## The workspace is cleared only after the server confirms the session
+  ## ended. Otherwise the user stays signed in and can retry: clearing the
+  ## screen would hide a session that may still be valid.
+  if state.auth.loading: return
+  if not state.auth.authenticated:
+    clearAuthenticatedState(state)
+    state.auth.checked = true
+    state.auth.mode = amLogin
     redraw(kxi)
     return
 
+  let requestEpoch = beginAuthRequest(state)
+  let csrfToken = state.auth.csrfToken
+  let ownerId = state.auth.userId
   state.auth.loading = true
+  state.auth.error = ""
   redraw(kxi)
 
-  var logoutConfirmed = true
+  var outcome = loUnconfirmed
   try:
-    await logout(csrfToken)
+    outcome = await logout(csrfToken)
   except CatchableError:
-    logoutConfirmed = false
+    outcome = loUnconfirmed
 
   if not matchesAuthRequest(state, requestEpoch): return
   state.auth.loading = false
+
+  if outcome == loUnconfirmed:
+    state.auth.error = "Sign-out was not confirmed by the server, so this session may still be active. Check the connection and sign out again."
+    showToast(state, state.auth.error)
+    redraw(kxi)
+    return
+
+  try:
+    clearOwnerSubmissions(ownerId)
+  except CatchableError:
+    discard # Clearing the in-memory workspace must still proceed.
+  clearAuthenticatedState(state)
+  state.auth.checked = true
   state.auth.mode = amLogin
-  if logoutConfirmed:
-    state.auth.notice = "Signed out."
-  else:
-    state.auth.notice = ""
-    state.auth.error = "The local workspace was cleared, but server sign-out could not be confirmed. Check your connection before signing in again."
+  state.auth.error = ""
+  state.auth.notice = "Signed out."
   redraw(kxi)
 
 

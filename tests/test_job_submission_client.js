@@ -18,7 +18,8 @@ function fixture(fetch) {
   vm.runInContext(driver, context);
   const identity = webcrypto.randomUUID();
   return {requests, identity, submit: async () => JSON.parse(await context.submitJobForTest("chat-a", "Read status", "test-csrf", identity)),
-    read: async () => JSON.parse(await context.readJobForTest("saved-job"))};
+    read: async () => JSON.parse(await context.readJobForTest("saved-job")),
+    logout: async () => String(await context.logoutForTest("test-csrf"))};
 }
 
 test("production client sends the pinned identity and accepts an existing terminal job honestly", async () => {
@@ -66,6 +67,22 @@ test("server errors and request timeouts are uncertain; confirmed input or acces
     const f = fixture(async () => ({ok: false, status, text: async () => '{"error":"request_rejected"}'}));
     assert.equal((await f.submit()).kind, "rejected");
   }
+});
+
+test("sign-out is confirmed only by the server; a lost connection is never reported as signed out", async () => {
+  const answer = status => fixture(async () => ({ok: status >= 200 && status < 300, status, text: async () => "{}"}));
+  assert.equal(await answer(200).logout(), "loSignedOut");
+  assert.equal(await answer(401).logout(), "loAlreadyEnded");
+  for (const status of [403, 500, 503]) assert.equal(await answer(status).logout(), "loUnconfirmed");
+  const lost = fixture(async () => { throw new TypeError("Failed to fetch"); });
+  assert.equal(await lost.logout(), "raised");
+  assert.equal(lost.requests[0].options.headers.get("X-CSRF-Token"), "test-csrf");
+});
+
+test("a rejected fetch becomes a handled error, never a silent failure", async () => {
+  const f = fixture(async () => { throw new TypeError("Failed to fetch"); });
+  assert.equal((await f.submit()).kind, "unknown");
+  assert.equal((await f.read()).kind, "read_interrupted");
 });
 
 test("HTTP 200 alone cannot acknowledge a job with a missing or mismatched submission identity", async () => {

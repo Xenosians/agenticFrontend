@@ -554,8 +554,8 @@ proc renderAccountView(): VNode =
           p:
             text "Application identity and server-side sessions."
 
-        button(class = "secondary-action"):
-          text "Sign out"
+        button(class = "secondary-action", disabled = appState.auth.loading):
+          text (if appState.auth.loading: "Signing out…" else: "Sign out")
 
           proc onclick(
             event: Event,
@@ -564,6 +564,10 @@ proc renderAccountView(): VNode =
             discard logoutApplication(
               appState
             )
+
+      if appState.auth.error.len > 0:
+        p(class = "account-error", role = "alert"):
+          text appState.auth.error
 
       tdiv(class = "account-profile-grid"):
         tdiv(class = "developer-card"):

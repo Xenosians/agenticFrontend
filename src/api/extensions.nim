@@ -1,6 +1,7 @@
 import std/[asyncjs, jsfetch, jsheaders, json]
 from std/httpcore import HttpGet, HttpPost
 import ../config/runtime_config
+import http_call
 
 proc extensionErrorMessage(
   body: string,
@@ -9,7 +10,7 @@ proc extensionErrorMessage(
 
   try:
     let parsed =
-      parseJson(body)
+      decodeJson(body)
 
     if parsed.kind == JObject and
        parsed.hasKey("detail"):
@@ -72,24 +73,23 @@ proc extensionRequest*(action: string, payload: JsonNode, csrf: string): Future[
   headers["X-CSRF-Token"] = csrf
   let options = newFetchOptions(metod = HttpPost, credentials = fcInclude,
     mode = fmCors, headers = headers, body = cstring($(%*{"action": action, "payload": payload})))
-  let response = await fetch((frontendConfig.backendBaseUrl & "/api/v1/extensions").cstring, options)
-  let body = $(await response.text())
+  let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/extensions", options)
   if not response.ok:
     raise newException(
       ValueError,
       extensionErrorMessage(
-        body,
+        response.body,
         $response.status
       )
     )
-  return parseJson(body)
+  return decodeJson(response.body)
 
 proc extensionCatalog*(): Future[JsonNode] {.async.} =
-  let response = await fetch((frontendConfig.backendBaseUrl & "/api/v1/extensions").cstring,
+  let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/extensions",
     newFetchOptions(metod = HttpGet, credentials = fcInclude, mode = fmCors))
   if not response.ok:
     raise newException(ValueError, "Connections could not be loaded.")
-  return parseJson($(await response.text()))
+  return decodeJson(response.body)
 
 proc datasetFileText*(): Future[cstring] {.importjs: "(async () => { const f=document.getElementById('datasetFile').files[0]; if(!f || f.size>2000000) throw new Error('Choose a text or JSONL file under 2 MB.'); return await f.text(); })()".}
 
