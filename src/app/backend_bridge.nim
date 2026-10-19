@@ -5,6 +5,7 @@ import std/[asyncjs, json]
 import ../api/client
 import ../api/chat_history
 import ../api/job_socket
+import ../api/job_submission
 import ../config/runtime_config
 
 import types
@@ -385,7 +386,8 @@ proc resumeBackendJob*(
 
 proc submitBackendJob*(
   state: AppState,
-  message: string
+  message: string,
+  recovering: bool = false
 ) {.async.} =
 
   if not state.auth.authenticated:
@@ -402,10 +404,19 @@ proc submitBackendJob*(
     )
     return
 
-  addUserMessage(
-    state,
-    message
-  )
+  let submissionOwner = state.auth.userId
+  let submissionChat = state.currentChatId
+  var submission: PendingSubmission
+  try:
+    submission = prepareSubmission(submissionOwner, submissionChat, message)
+  except CatchableError as exc:
+    showToast(state, "No new request was sent. " & exc.msg)
+    redraw(kxi)
+    return
+
+  if not recovering or state.messages.len == 0 or
+      state.messages[^1].role != mrUser or state.messages[^1].content != message:
+    addUserMessage(state, message)
 
   state.run =
     RunState(
@@ -423,7 +434,6 @@ proc submitBackendJob*(
   inc state.jobObservationEpoch
   let submissionEpoch = state.jobObservationEpoch
   let submissionSession = state.auth.sessionId
-  let submissionChat = state.currentChatId
 
   proc submissionIsCurrent(): bool =
     state.auth.authenticated and state.auth.sessionId == submissionSession and
@@ -447,11 +457,15 @@ proc submitBackendJob*(
       await createJob(
         chatId = submissionChat,
         message = message,
-        csrfToken = state.auth.csrfToken
+        csrfToken = state.auth.csrfToken,
+        submissionId = submission.identity
       )
 
     if not submissionIsCurrent():
       return
+
+    acknowledgeSubmission(submissionOwner, submissionChat, response.jobId,
+      response.status, response.submissionId)
 
     state.run.jobId = response.jobId
     state.run.status = response.status
@@ -464,7 +478,7 @@ proc submitBackendJob*(
 
     showToast(
       state,
-      "Queued."
+      (if response.status == "pending": "Queued." else: "Saved submission recovered. Checking its current result.")
     )
 
     redraw(kxi)
@@ -472,32 +486,59 @@ proc submitBackendJob*(
     await pollBackendJob(
       state,
       response.jobId,
-      true
+      true,
+      restoreHistory = recovering
     )
+
+  except JobCreateRejectedError as exc:
+    if not submissionIsCurrent(): return
+    try:
+      rejectSubmission(submissionOwner, submissionChat, submission.identity)
+    except CatchableError:
+      discard # A confirmed rejection stays rejected even if tab storage is unavailable.
+    state.run.status = "failed"
+    addRunEvent(state, "submission", "Phoenix rejected this submission before acknowledging a job.")
+    addAssistantMessage(state, "The request was rejected. " & exc.msg)
+    showToast(state, "Request rejected. Check the saved response.")
+    redraw(kxi)
 
   except CatchableError:
     if not submissionIsCurrent():
       return
     if state.run.jobId.len == 0:
-      state.run.status = "failed"
+      state.run.status = "submission_unknown"
 
     addRunEvent(
       state,
       "connection",
-      "The request could not be submitted to the backend."
+      "The submission acknowledgement was interrupted. Its durable outcome has not been confirmed."
     )
 
     addAssistantMessage(
       state,
-      "The request could not be submitted. Check the backend connection and try again."
+      "The submission outcome is not yet confirmed. Use Check saved submission or reopen this chat to recover the same request. Do not submit a new copy."
     )
 
     showToast(
       state,
-      "Could not submit the request."
+      "Submission not confirmed. Check the saved submission."
     )
 
     redraw(kxi)
+
+
+proc recoverPendingSubmission*(state: AppState): bool =
+  if not state.auth.authenticated or state.currentChatId.len == 0: return false
+  try:
+    let submission = pendingSubmission(state.auth.userId, state.currentChatId)
+    if submission.identity.len == 0: return false
+    discard submitBackendJob(state, submission.message, recovering = true)
+    return true
+  except CatchableError as exc:
+    state.run = RunState(active: true, status: "submission_unknown")
+    showToast(state, "The saved submission cannot be checked. " & exc.msg)
+    redraw(kxi)
+    return true
 
 
 proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =

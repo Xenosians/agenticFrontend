@@ -6,6 +6,7 @@ import std/[
 ]
 
 import ../api/auth_client
+import ../api/job_submission
 
 import types
 import state
@@ -154,6 +155,9 @@ proc loadChatHistory*(
     if not matchesNavigation(state, context):
       return
     applyHistory(state, chatId, history)
+
+    if recoverPendingSubmission(state):
+      return
 
     if (
       state.run.active and
@@ -410,6 +414,10 @@ proc logoutApplication*(
   let requestEpoch = beginAuthRequest(state)
   let csrfToken = state.auth.csrfToken
   let wasAuthenticated = state.auth.authenticated
+  try:
+    clearOwnerSubmissions(state.auth.userId)
+  except CatchableError:
+    discard # Clearing the authenticated in-memory workspace must still proceed.
   # Hide private state and invalidate all observers before the network wait.
   # A delayed response cannot repopulate the workspace during sign-out.
   clearAuthenticatedState(state)

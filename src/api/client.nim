@@ -17,9 +17,12 @@ import ../config/runtime_config
 
 
 type
+  JobCreateRejectedError* = object of ValueError
+
   JobCreateResponse* = object
     jobId*: string
     status*: string
+    submissionId*: string
 
 
   JobResponse* = object
@@ -157,7 +160,7 @@ proc publicApiError(
         parsedMessage
 
 
-  except CatchableError:
+  except:
     discard
 
 
@@ -830,10 +833,11 @@ proc getIntegrationStatus*():
   )
 
 
-proc createJob*(
+proc requestJob(
   chatId: string,
   message: string,
-  csrfToken: string
+  csrfToken: string,
+  submissionId: string
 ): Future[
   JobCreateResponse
 ] {.async.} =
@@ -853,7 +857,9 @@ proc createJob*(
       chatId,
 
     "message":
-      message
+      message,
+
+    "submission_id": submissionId
   }
 
 
@@ -901,7 +907,8 @@ proc createJob*(
 
 
   if not response.ok:
-
+    if response.status >= 400 and response.status < 500 and response.status != 408:
+      raise newException(JobCreateRejectedError, publicApiError($response.status, responseBody).msg)
     raise publicApiError(
       $response.status,
       responseBody
@@ -914,6 +921,10 @@ proc createJob*(
     )
 
 
+  if data.kind != JObject or jsonValueText(data, "submission_id") != submissionId or
+      jsonValueText(data, "job_id").len == 0 or jsonValueText(data, "status") notin publicJobStates:
+    raise newException(ValueError, "The response did not confirm this saved submission.")
+
   result =
     JobCreateResponse(
       jobId:
@@ -924,11 +935,27 @@ proc createJob*(
       status:
         data[
           "status"
-        ].getStr()
+        ].getStr(),
+
+      submissionId: submissionId
     )
 
 
-proc getJob*(
+proc createJob*(chatId, message, csrfToken, submissionId: string): Future[JobCreateResponse] {.async.} =
+  try:
+    return await requestJob(chatId, message, csrfToken, submissionId)
+  except JobCreateRejectedError:
+    raise
+  except CatchableError:
+    raise
+  except:
+    # Native fetch / response decoding exceptions are JavaScript Errors,
+    # not Nim CatchableErrors. Normalize them before the UI decides whether
+    # the durable submission has been acknowledged.
+    raise newException(ValueError, "The submission acknowledgement was interrupted.")
+
+
+proc requestJobRead(
   jobId: string
 ): Future[
   JobResponse
@@ -984,6 +1011,15 @@ proc getJob*(
     parseJobResponse(
       data
     )
+
+
+proc getJob*(jobId: string): Future[JobResponse] {.async.} =
+  try:
+    return await requestJobRead(jobId)
+  except CatchableError:
+    raise
+  except:
+    raise newException(ValueError, "Reading the saved job was interrupted.")
 
 
 proc decideJob*(

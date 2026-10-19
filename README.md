@@ -7,6 +7,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Registration, email verification, login, password reset, and session management.
 - Saved chats and history, current-chat search, and a command palette with saved-chat navigation at every screen size.
 - Live job status and AI progress over authenticated WebSockets, with reconnect recovery and polling fallback.
+- Durable submission identities prevent duplicate jobs when an acknowledgement is lost; the same request can be recovered after reopening its chat.
 - Explicit approve/reject decisions bound to the displayed saved action, separate approval for each workflow step, and structured result cards.
 - Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
 - Display of completed, failed, denied, and unknown-outcome jobs.
@@ -25,6 +26,8 @@ agenticFrontend (this browser app)
 
 The browser calls Phoenix only. Phoenix owns sessions, chats, jobs, and resource ownership; the AI runtime owns inference and guarded execution. Approval requests refer to a durable job, while the server retains the exact action and arguments.
 The approval card displays that saved action before offering **Approve action** or **Reject action**. Both decisions go through Phoenix and remain disabled while their outcome is pending. An interrupted response requires reading the saved job again; the browser does not retry a mutation or assume a rejection succeeded. Completed decisions restore the saved tool result or rejection reason on reload.
+
+Before creating a job, the browser pins its submission UUID and request text in this tab's session storage, scoped to the backend, account and chat. It removes that temporary record after the exact submission is acknowledged, or on explicit sign-out. If the acknowledgement is interrupted, **Check saved submission** and reopening the chat use the same identity. Phoenix atomically creates one job for that owner and identity and rejects a changed chat or message. Recovering a submission does not replay its tools or reset its existing job state. Browser storage and secure UUID generation must be available before a new request can be sent.
 
 ## Stack
 
@@ -87,6 +90,8 @@ nim js -r tests/test_tool_proposal.nim
 nim js -r tests/test_job_decision.nim
 nim js -r tests/test_approval_result.nim
 nim js -r tests/test_connection_options.nim
+nim js -o:.runtime/job_submission_client_driver.js tests/job_submission_client_driver.nim
+node --test tests/test_job_submission.js tests/test_job_submission_client.js tests/test_job_socket.js
 ```
 
 These cover shortcuts, versioned lifecycle validation, job/history restoration, approval details and outcomes, stale decision responses, and connection settings. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approve/reject decisions, and result rendering after changes to those flows.

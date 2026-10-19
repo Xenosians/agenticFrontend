@@ -1,6 +1,7 @@
 proc statusTitle*(status: string): string =
   case status
   of "submitting": "Submitting"
+  of "submission_unknown": "Submission not confirmed"
   of "restoring": "Checking saved job"
   of "pending": "Pending"
   of "processing": "Processing"
@@ -16,6 +17,7 @@ proc statusTitle*(status: string): string =
 proc statusDescription*(status: string): string =
   case status
   of "submitting": "Submitting the request to the backend"
+  of "submission_unknown": "The acknowledgement was interrupted; recover the same saved request before submitting another"
   of "restoring": "Checking the authoritative saved job state"
   of "pending": "Waiting for backend dispatch"
   of "processing": "Agent is processing the request"
@@ -36,5 +38,5 @@ proc indicatorClass*(status: string): cstring =
   of "completed": cstring"status-indicator completed"
   of "failed", "denied": cstring"status-indicator failed"
   of "waiting_approval": cstring"status-indicator waiting-approval"
-  of "outcome_unknown", "reconciliation_required": cstring"status-indicator unresolved"
+  of "outcome_unknown", "reconciliation_required", "submission_unknown": cstring"status-indicator unresolved"
   else: cstring"status-indicator pending"

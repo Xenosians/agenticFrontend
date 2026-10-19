@@ -22,6 +22,7 @@ proc backendJobBusy(
 
   return state.run.active and (
     state.run.status == "submitting" or
+    state.run.status == "submission_unknown" or
     state.run.status == "restoring" or
     state.run.status == "pending" or
     state.run.status == "processing" or
@@ -42,6 +43,9 @@ proc composerStatusText(
 
   of "restoring":
     "Checking the saved job…"
+
+  of "submission_unknown":
+    "Submission not confirmed. Check the saved request before sending another."
 
   of "pending":
     "Queued — waiting for backend dispatch…"
@@ -224,3 +228,9 @@ proc renderComposer*(
       text composerStatusText(
         state
       )
+
+    if state.run.status == "submission_unknown":
+      button(class = "secondary-action"):
+        text "Check saved submission"
+        proc onclick(event: Event, node: VNode) =
+          discard recoverPendingSubmission(state)

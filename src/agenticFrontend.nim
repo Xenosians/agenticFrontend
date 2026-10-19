@@ -864,6 +864,7 @@ proc renderWorkspaceBody(): VNode =
 proc runStatusLabel(status: string): string =
   case status
   of "submitting": "Submitting"
+  of "submission_unknown": "Submission not confirmed"
   of "restoring": "Checking saved state"
   of "pending": "Queued"
   of "processing": "Working"
@@ -884,7 +885,7 @@ proc runStatusClass(status: string): cstring =
     cstring"run-status-chip working"
   of "waiting_approval": cstring"run-status-chip attention"
   of "completed": cstring"run-status-chip success"
-  of "outcome_unknown", "reconciliation_required": cstring"run-status-chip warning"
+  of "outcome_unknown", "reconciliation_required", "submission_unknown": cstring"run-status-chip warning"
   of "failed": cstring"run-status-chip error"
   of "denied": cstring"run-status-chip neutral"
   else: cstring"run-status-chip"
