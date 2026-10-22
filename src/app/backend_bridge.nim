@@ -397,6 +397,14 @@ proc submitBackendJob*(
     )
     return
 
+  # History/create-chat navigation retains the old chat until its response
+  # arrives. New work must wait rather than target that previous chat.
+  # Recovery is different: history has already applied its authoritative
+  # chat and is replaying a pinned submission identity, not starting work.
+  if state.auth.loading and not recovering:
+    showToast(state, "Wait for your workspace to finish loading before sending.")
+    return
+
   if state.currentChatId.len == 0:
     showToast(
       state,

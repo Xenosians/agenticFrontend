@@ -36,6 +36,9 @@ proc composerStatusText(
   state: AppState
 ): string =
 
+  if state.auth.loading:
+    return "Checking your workspace…"
+
   case state.run.status
 
   of "submitting":
@@ -87,6 +90,10 @@ proc submitDraft(
   state: AppState,
   textareaNode: VNode = nil
 ) =
+
+  if state.auth.loading:
+    showToast(state, "Wait for your workspace to finish loading before sending.")
+    return
 
   let message =
     state.composerDraft.strip()
@@ -142,6 +149,7 @@ proc renderComposer*(
 
     sendDisabled =
       state.composerDraft.strip().len == 0 or
+      state.auth.loading or
       state.currentChatId.len == 0 or
       jobBusy
 
@@ -203,7 +211,9 @@ proc renderComposer*(
 
       tdiv(class = "composer-footer"):
         span(class = "composer-context"):
-          if jobBusy:
+          if state.auth.loading:
+            text "Checking your workspace · your draft is kept"
+          elif jobBusy:
             text "Task in progress · you can draft your next message"
           else:
             text "Tools selected automatically"

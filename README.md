@@ -99,6 +99,19 @@ Sign-out clears the workspace only after Phoenix confirms that the session ended
 
 These cover shortcuts, versioned lifecycle validation, job/history restoration, approval details and outcomes, stale decision responses, and connection settings. They do not replace browser checks against running services. Check login/session restore, chat history, job completion, approve/reject decisions, and result rendering after changes to those flows.
 
+After rebuilding, the isolated browser navigation regression can run with Python,
+Playwright and its Chromium browser installed:
+
+```bash
+python tests/test_chat_navigation.py
+```
+
+It delays chat-history responses to verify that clicking Send or pressing Enter
+cannot submit into the previous chat, keeps the draft, and preserves recovery of
+the original submission identity. It serves the built frontend on a temporary
+loopback port and uses test-only API fixtures; it needs no app credentials or live
+providers and does not certify provider execution.
+
 ## Current boundaries
 
 - The composer allows one active job at a time. A reconnect reads saved server state and never repeats inference, a tool, or an approval.

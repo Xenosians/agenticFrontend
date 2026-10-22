@@ -8018,6 +8018,12 @@ async function submitBackendJob__appZbackend95bridge_u152(state_p0, message_p1, 
     break BeforeRet;
     }
     
+    if ((HEX3Aenv_570426627.state0.auth.loading && !(recovering_p2))) {
+    showToast__appZstate_u411(HEX3Aenv_570426627.state0, [87,97,105,116,32,102,111,114,32,121,111,117,114,32,119,111,114,107,115,112,97,99,101,32,116,111,32,102,105,110,105,115,104,32,108,111,97,100,105,110,103,32,98,101,102,111,114,101,32,115,101,110,100,105,110,103,46]);
+    result_1879048349 = undefined;
+    break BeforeRet;
+    }
+    
     if (((HEX3Aenv_570426627.state0.currentChatId).length == 0)) {
     showToast__appZstate_u411(HEX3Aenv_570426627.state0, [67,114,101,97,116,101,32,111,114,32,115,101,108,101,99,116,32,97,32,99,104,97,116,32,98,101,102,111,114,101,32,115,117,98,109,105,116,116,105,110,103,32,97,32,114,101,113,117,101,115,116,46]);
     result_1879048349 = undefined;
@@ -18260,6 +18266,11 @@ function HEX3Aanonymous__componentsZcomposer_u44(event_p0, node_p1) {
 
 function submitDraft__componentsZcomposer_u22(state_p0, textareaNode_p1) {
   BeforeRet: {
+    if (state_p0.auth.loading) {
+    showToast__appZstate_u411(state_p0, [87,97,105,116,32,102,111,114,32,121,111,117,114,32,119,111,114,107,115,112,97,99,101,32,116,111,32,102,105,110,105,115,104,32,108,111,97,100,105,110,103,32,98,101,102,111,114,101,32,115,101,110,100,105,110,103,46]);
+    break BeforeRet;
+    }
+    
     var message_2264924185 = nsuStrip(state_p0.composerDraft, true, true, ConstSet120);
     if (((message_2264924185).length == 0)) {
     break BeforeRet;
@@ -18312,6 +18323,12 @@ function composerStatusText__componentsZcomposer_u19(state_p0) {
 
   var result_2264924181 = [];
 
+  BeforeRet: {
+    if (state_p0.auth.loading) {
+    result_2264924181 = nimCopy(null, [67,104,101,99,107,105,110,103,32,121,111,117,114,32,119,111,114,107,115,112,97,99,101,226,128,166], NTI33554449);
+    break BeforeRet;
+    }
+    
     switch (toJSStr(state_p0.run.status)) {
     case "submitting":
       Temporary1 = [83,117,98,109,105,116,116,105,110,103,32,114,101,113,117,101,115,116,226,128,166];
@@ -18366,6 +18383,7 @@ function composerStatusText__componentsZcomposer_u19(state_p0) {
       break;
     }
     result_2264924181 = nimCopy(null, Temporary1, NTI33554449);
+  };
 
   return result_2264924181;
 
@@ -18390,7 +18408,7 @@ function renderComposer__componentsZcomposer_u30(state_p0) {
     HEX3Aenv_570427956 = {m_type: NTI570428032, state0: null};
     HEX3Aenv_570427956.state0 = state_p0;
     var jobBusy_2264924193 = backendJobBusy__componentsZcomposer_u16(HEX3Aenv_570427956.state0);
-    var sendDisabled_2264924194 = ((((nsuStrip(HEX3Aenv_570427956.state0.composerDraft, true, true, ConstSet119)).length == 0) || ((HEX3Aenv_570427956.state0.currentChatId).length == 0)) || jobBusy_2264924193);
+    var sendDisabled_2264924194 = (((((nsuStrip(HEX3Aenv_570427956.state0.composerDraft, true, true, ConstSet119)).length == 0) || HEX3Aenv_570427956.state0.auth.loading) || ((HEX3Aenv_570427956.state0.currentChatId).length == 0)) || jobBusy_2264924193);
     if (sendDisabled_2264924194) {
     Temporary1 = "send-button";
     }
@@ -18420,13 +18438,17 @@ function renderComposer__componentsZcomposer_u30(state_p0) {
     tmp_2264924199.class = "composer-footer";
     var tmp_2264924200 = tree__pkgZkaraxZvdom_u943(71, []);
     tmp_2264924200.class = "composer-context";
+    if (HEX3Aenv_570427956.state0.auth.loading) {
+    add__pkgZkaraxZvdom_u857(tmp_2264924200, text__pkgZkaraxZvdom_u1011([67,104,101,99,107,105,110,103,32,121,111,117,114,32,119,111,114,107,115,112,97,99,101,32,194,183,32,121,111,117,114,32,100,114,97,102,116,32,105,115,32,107,101,112,116]));
+    }
+    else {
     if (jobBusy_2264924193) {
     add__pkgZkaraxZvdom_u857(tmp_2264924200, text__pkgZkaraxZvdom_u1011([84,97,115,107,32,105,110,32,112,114,111,103,114,101,115,115,32,194,183,32,121,111,117,32,99,97,110,32,100,114,97,102,116,32,121,111,117,114,32,110,101,120,116,32,109,101,115,115,97,103,101]));
     }
     else {
     add__pkgZkaraxZvdom_u857(tmp_2264924200, text__pkgZkaraxZvdom_u1011([84,111,111,108,115,32,115,101,108,101,99,116,101,100,32,97,117,116,111,109,97,116,105,99,97,108,108,121]));
     }
-    
+    }
     add__pkgZkaraxZvdom_u857(tmp_2264924199, tmp_2264924200);
     var tmp_2264924201 = tree__pkgZkaraxZvdom_u943(195, []);
     tmp_2264924201.class = sendClass_2264924195;
