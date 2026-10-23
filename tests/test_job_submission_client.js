@@ -17,7 +17,7 @@ function fixture(fetch) {
     fetch: async (url, options) => { requests.push({url, options}); return fetch(url, options); }});
   vm.runInContext(driver, context);
   const identity = webcrypto.randomUUID();
-  return {requests, identity, submit: async () => JSON.parse(await context.submitJobForTest("chat-a", "Read status", "test-csrf", identity)),
+  return {requests, identity, submit: async (contract = null) => JSON.parse(await context.submitJobForTest("chat-a", "Read status", "test-csrf", identity, JSON.stringify(contract))),
     read: async () => JSON.parse(await context.readJobForTest("saved-job")),
     logout: async () => String(await context.logoutForTest("test-csrf"))};
 }
@@ -30,6 +30,33 @@ test("production client sends the pinned identity and accepts an existing termin
   assert.deepEqual(await f.submit(), {kind: "acknowledged", job_id: "saved-job", status: "failed", submission_id: f.identity});
   assert.deepEqual(JSON.parse(f.requests[0].options.body), {chat_id: "chat-a", message: "Read status", submission_id: f.identity});
   assert.equal(f.requests[0].options.credentials, "include");
+});
+
+test("production client submits the reviewed obligations unchanged under the same durable identity", async () => {
+  const workflow = {version: 1, steps: [{id: "one", capability: "read_files",
+    grounded_arguments: {paths: [" Exact path "]}, after_success_of: null}]};
+  const f = fixture(async (_url, options) => {
+    const request = JSON.parse(options.body);
+    return {ok: true, status: 202, text: async () => JSON.stringify({job_id: "saved-job", status: "pending", submission_id: request.submission_id,
+      workflow_contract: request.workflow_contract, workflow_contract_hash: "a".repeat(64)})};
+  });
+  assert.equal((await f.submit(workflow)).kind, "acknowledged");
+  assert.deepEqual(JSON.parse(f.requests[0].options.body).workflow_contract, workflow);
+});
+
+test("a missing or changed workflow acknowledgement remains unknown even with the matching submission id", async () => {
+  const workflow = {version: 1, steps: [{id: "one", capability: "read_files",
+    grounded_arguments: {paths: [" Exact path "]}, after_success_of: null}]};
+  for (const override of [{}, {workflow_contract: workflow}, {workflow_contract_hash: "a".repeat(64)},
+    {workflow_contract: {...workflow, steps: []}, workflow_contract_hash: "a".repeat(64)},
+    {workflow_contract: workflow, workflow_contract_hash: "A".repeat(64)},
+    {workflow_contract: workflow, workflow_contract_hash: "a".repeat(63)}]) {
+    const f = fixture(async (_url, options) => {
+      const request = JSON.parse(options.body);
+      return {ok: true, status: 202, text: async () => JSON.stringify({job_id: "saved-job", status: "pending", submission_id: request.submission_id, ...override})};
+    });
+    assert.equal((await f.submit(workflow)).kind, "unknown");
+  }
 });
 
 test("native browser storage exceptions become handled Nim errors before any POST", () => {

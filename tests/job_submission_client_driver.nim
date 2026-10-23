@@ -4,9 +4,9 @@ import ../src/api/client
 import ../src/api/auth_client
 import ../src/api/job_submission
 
-proc submitJobForTest(chat, message, csrf, identity: cstring): Future[cstring] {.async, exportc.} =
+proc submitJobForTest(chat, message, csrf, identity: cstring, workflow: cstring = "null"): Future[cstring] {.async, exportc.} =
   try:
-    let response = await createJob($chat, $message, $csrf, $identity)
+    let response = await createJob($chat, $message, $csrf, $identity, parseJson($workflow))
     return cstring($(%*{"kind": "acknowledged", "job_id": response.jobId,
       "status": response.status, "submission_id": response.submissionId}))
   except JobCreateRejectedError:

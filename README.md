@@ -8,6 +8,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Saved chats and history, current-chat search, and a command palette with saved-chat navigation at every screen size.
 - Live job status and AI progress over authenticated WebSockets, with reconnect recovery and polling fallback.
 - Durable submission identities prevent duplicate jobs when an acknowledgement is lost; the same request can be recovered after reopening its chat.
+- Optional, reviewed required operations pin the intended capabilities, exact targets and supported success dependencies to the saved request.
 - Explicit approve/reject decisions bound to the displayed saved action, separate approval for each workflow step, and structured result cards.
 - Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
 - Display of completed, failed, denied, and unknown-outcome jobs.
@@ -28,6 +29,8 @@ The browser calls Phoenix only. Phoenix owns sessions, chats, jobs, and resource
 The approval card displays that saved action before offering **Approve action** or **Reject action**. Both decisions go through Phoenix and remain disabled while their outcome is pending. An interrupted response requires reading the saved job again; the browser does not retry a mutation or assume a rejection succeeded. Completed decisions restore the saved tool result or rejection reason on reload.
 
 Before creating a job, the browser pins its submission UUID and request text in this tab's session storage, scoped to the backend, account and chat. It removes that temporary record after the exact submission is acknowledged, or on explicit sign-out. If the acknowledgement is interrupted, **Check saved submission** and reopening the chat use the same identity. Phoenix atomically creates one job for that owner and identity and rejects a changed chat or message. Recovering a submission does not replay its tools or reset its existing job state. Browser storage and secure UUID generation must be available before a new request can be sent.
+
+For a request that must include specific operations, open **Required operations** above the composer. Choose registered capabilities, optionally enter exact target values and select a supported success dependency. Review the list before sending. Only capabilities with a registered specialist are offered, and two steps cannot share a possible specialist. A capability that several specialists own (such as a provider-specific and a provider-neutral one) stays available; the server chooses which of them carries the step. Success dependencies currently support one pair; unsupported workflow graphs are rejected by the servers. A supplied target field pins its entire exact value list; omitted fields still need normal grounding from the message. Empty selection leaves normal chat unchanged. The original selection is pinned with the submission and recovered unchanged after a lost acknowledgement. A contract-bearing acknowledgement must echo the exact saved selection and its server-issued hash before the browser clears recovery state. Selection does not grant permission or approve an action. The Activity view restores the saved operation list from the durable job.
 
 ## Stack
 
@@ -91,6 +94,7 @@ nim js -r tests/test_job_decision.nim
 nim js -r tests/test_approval_result.nim
 nim js -r tests/test_connection_options.nim
 nim js -r tests/test_logout_outcome.nim
+nim js -r tests/test_workflow_request.nim
 nim js -o:.runtime/job_submission_client_driver.js tests/job_submission_client_driver.nim
 node --test tests/test_job_submission.js tests/test_job_submission_client.js tests/test_job_socket.js
 ```
@@ -108,7 +112,8 @@ python tests/test_chat_navigation.py
 
 It delays chat-history responses to verify that clicking Send or pressing Enter
 cannot submit into the previous chat, keeps the draft, and preserves recovery of
-the original submission identity. It serves the built frontend on a temporary
+the original submission identity and reviewed required operations. It also checks
+the metadata picker, exact targets, dependencies and chat draft isolation. It serves the built frontend on a temporary
 loopback port and uses test-only API fixtures; it needs no app credentials or live
 providers and does not certify provider execution.
 

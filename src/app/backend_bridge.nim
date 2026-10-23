@@ -6,6 +6,7 @@ import ../api/client
 import ../api/chat_history
 import ../api/job_socket
 import ../api/job_submission
+import workflow_request
 import ../config/runtime_config
 
 import types
@@ -27,6 +28,8 @@ proc applyJobState(
   state.run.proposal = job.proposal
   state.run.decisionError = ""
   state.run.presentations = job.presentations
+  state.run.workflowContract = job.workflowContract
+  state.run.workflowContractHash = job.workflowContractHash
 
 
 proc jobFailureMessage(
@@ -416,7 +419,13 @@ proc submitBackendJob*(
   let submissionChat = state.currentChatId
   var submission: PendingSubmission
   try:
-    submission = prepareSubmission(submissionOwner, submissionChat, message)
+    if recovering:
+      submission = pendingSubmission(submissionOwner, submissionChat)
+      if submission.identity.len == 0 or submission.message != message:
+        raise newException(ValueError, "The saved request no longer matches this recovery.")
+    else:
+      submission = prepareSubmission(submissionOwner, submissionChat, message,
+        workflowContract(state.workflowSteps))
   except CatchableError as exc:
     showToast(state, "No new request was sent. " & exc.msg)
     redraw(kxi)
@@ -434,6 +443,7 @@ proc submitBackendJob*(
       status: "submitting",
       agent: "",
       tool: "",
+      workflowContract: submission.workflowContract,
       presentations: @[]
     )
 
@@ -466,14 +476,17 @@ proc submitBackendJob*(
         chatId = submissionChat,
         message = message,
         csrfToken = state.auth.csrfToken,
-        submissionId = submission.identity
+        submissionId = submission.identity,
+        workflowContract = submission.workflowContract
       )
 
     if not submissionIsCurrent():
       return
 
     acknowledgeSubmission(submissionOwner, submissionChat, response.jobId,
-      response.status, response.submissionId)
+      response.status, response.submissionId, response.workflowContract, response.workflowContractHash)
+    clearWorkflowDraft(state)
+    state.run.workflowContractHash = response.workflowContractHash
 
     state.run.jobId = response.jobId
     state.run.status = response.status

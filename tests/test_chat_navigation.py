@@ -49,6 +49,7 @@ class ChatNavigationTests(unittest.TestCase):
         self.pending_history = []
         self.submissions = []
         self.errors = []
+        self.omit_workflow_ack_once = False
         self.page.on("pageerror", lambda error: self.errors.append(str(error)))
         self.page.route("**/*", self.route)
 
@@ -87,7 +88,16 @@ class ChatNavigationTests(unittest.TestCase):
         elif path == "/api/v1/integrations":
             data = {"integrations": []}
         elif path == "/api/v1/extensions":
-            data = {"resources": [], "selected": {}, "role_assignments": {}, "local_profiles": []}
+            data = {"resources": [], "selected": {}, "role_assignments": {}, "local_profiles": [],
+                    "capabilities": [
+                        {"id": "fixture_identity_create", "agent_names": ["fixture-identity"],
+                         "grounded_arguments": ["login"], "success_continuations": ["fixture_issue_create"]},
+                        {"id": "fixture_identity_read", "agent_names": ["fixture-identity"],
+                         "grounded_arguments": ["login"], "success_continuations": []},
+                        {"id": "fixture_issue_create", "agent_names": ["fixture-issues", "fixture-provider-issues"],
+                         "grounded_arguments": ["project", "issue_type"], "success_continuations": []},
+                        {"id": "fixture_unowned", "agent_names": [], "grounded_arguments": []},
+                    ]}
         elif path == "/api/v1/chats":
             data = {"chats": [
                 {"chat_id": "fixture-first", "title": "First fixture chat"},
@@ -103,9 +113,18 @@ class ChatNavigationTests(unittest.TestCase):
             payload = request.post_data_json
             self.submissions.append(payload)
             data = {"job_id": "fixture-job", "status": "completed", "submission_id": payload["submission_id"]}
+            if "workflow_contract" in payload:
+                if self.omit_workflow_ack_once:
+                    self.omit_workflow_ack_once = False
+                else:
+                    data["workflow_contract"] = payload["workflow_contract"]
+                    data["workflow_contract_hash"] = "f" * 64
         elif path == "/api/v2/jobs/fixture-job":
             data = {"contract_version": 2, "job_id": "fixture-job", "status": "completed",
                     "result": {"answer": "Fixture job response"}}
+            if self.submissions and "workflow_contract" in self.submissions[-1]:
+                data["workflow_contract"] = self.submissions[-1]["workflow_contract"]
+                data["workflow_contract_hash"] = "f" * 64
         else:
             route.fulfill(status=404, json={"error": "unexpected_fixture_request"})
             return
@@ -166,6 +185,93 @@ class ChatNavigationTests(unittest.TestCase):
         expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
         self.assertEqual(self.submissions, [{"chat_id": "fixture-second", "message": record["message"],
                                              "submission_id": identity}])
+        self.assertIsNone(self.page.evaluate("key => sessionStorage.getItem(key)", key))
+        self.assertEqual(self.errors, [])
+
+    def add_required_identity(self):
+        self.page.get_by_role("button", name="Required operations", exact=True).click()
+        operation = self.page.get_by_role("combobox", name="Required operation", exact=True)
+        operation.select_option("fixture_identity_create")
+        self.page.get_by_role("textbox", name="Exact login", exact=True).fill(" Exact account ")
+        self.page.get_by_role("button", name="Add required operation", exact=True).click()
+        expect(self.page.locator(".required-operation-target")).to_have_text("login:  Exact account ")
+
+    def test_reviewed_operations_and_dependencies_survive_keyboard_submission(self):
+        self.open_first_chat()
+        self.add_required_identity()
+        operation = self.page.get_by_role("combobox", name="Required operation", exact=True)
+        self.assertEqual(operation.locator('option[value="fixture_identity_read"]').count(), 0)
+        self.assertEqual(operation.locator('option[value="fixture_unowned"]').count(), 0)
+        operation.select_option("fixture_issue_create")
+        self.page.get_by_role("textbox", name="Exact project", exact=True).fill("ALPHA")
+        self.page.get_by_role("textbox", name="Exact issue_type", exact=True).fill("Task")
+        self.page.get_by_role("combobox", name="Success dependency", exact=True).select_option("step_1")
+        self.page.get_by_role("button", name="Add required operation", exact=True).click()
+        expect(self.page.locator(".required-operations-summary .required-operation")).to_have_count(2)
+        self.page.get_by_role("button", name="Remove fixture_identity_create", exact=True).click()
+        expect(self.page.get_by_role("alert")).to_have_text("Remove the dependent operation first.")
+        composer = self.page.locator("#messageInput")
+        composer.fill("Create the specified identity and then the issue.")
+        composer.press("Enter")
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        expected = {"version": 1, "steps": [
+            {"id": "step_1", "capability": "fixture_identity_create",
+             "grounded_arguments": {"login": [" Exact account "]}, "after_success_of": None},
+            {"id": "step_2", "capability": "fixture_issue_create",
+             "grounded_arguments": {"project": ["ALPHA"], "issue_type": ["Task"]}, "after_success_of": "step_1"},
+        ]}
+        self.assertEqual(len(self.submissions), 1)
+        self.assertEqual(self.submissions[0]["workflow_contract"], expected)
+        self.page.get_by_role("button", name="Completed", exact=True).click()
+        expect(self.page.locator(".required-operations-review .required-operation")).to_have_count(2)
+        expect(self.page.get_by_text("login:  Exact account ", exact=True)).to_be_visible()
+        self.assertEqual(self.errors, [])
+
+    def test_operation_drafts_do_not_leak_into_another_chat(self):
+        self.open_first_chat()
+        self.add_required_identity()
+        self.begin_second_chat()
+        self.release_second_chat()
+        expect(self.page.get_by_role("button", name="Required operations", exact=True)).to_be_visible()
+        self.page.locator("#messageInput").fill("A separate request")
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertNotIn("workflow_contract", self.submissions[0])
+        self.assertEqual(self.errors, [])
+
+    def test_missing_contract_ack_retains_original_submission_for_explicit_recovery(self):
+        self.open_first_chat()
+        self.add_required_identity()
+        self.omit_workflow_ack_once = True
+        self.page.locator("#messageInput").fill("Create the reviewed identity")
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        recover = self.page.get_by_role("button", name="Check saved submission", exact=True)
+        expect(recover).to_be_visible()
+        self.assertEqual(len(self.submissions), 1)
+        self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k => k.startsWith('janus.pending-submission.v1:')).length"), 1)
+        recover.click()
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual(len(self.submissions), 2)
+        self.assertEqual(self.submissions[0], self.submissions[1])
+        self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k => k.startsWith('janus.pending-submission.v1:')).length"), 0)
+        self.assertEqual(self.errors, [])
+
+    def test_recovery_keeps_the_exact_saved_operations_instead_of_building_another_request(self):
+        identity = "1ab9024f-9bd4-421b-912c-38d73b71f084"
+        workflow = {"version": 1, "steps": [{"id": "first", "capability": "fixture_issue_create",
+                    "grounded_arguments": {"project": [" Exact project "]}, "after_success_of": None}]}
+        record = {"version": 1, "backend": self.base, "owner": "fixture-owner", "chat_id": "fixture-second",
+                  "submission_id": identity, "message": "Previously reviewed request", "workflow_contract": workflow}
+        key = "janus.pending-submission.v1:" + json.dumps(
+            [self.base, "fixture-owner", "fixture-second"], separators=(",", ":"))
+        self.context.add_init_script(
+            f"sessionStorage.setItem({json.dumps(key)}, {json.dumps(json.dumps(record))});")
+        self.open_first_chat()
+        self.begin_second_chat()
+        self.release_second_chat()
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual(self.submissions, [{"chat_id": "fixture-second", "message": record["message"],
+                                           "submission_id": identity, "workflow_contract": workflow}])
         self.assertIsNone(self.page.evaluate("key => sessionStorage.getItem(key)", key))
         self.assertEqual(self.errors, [])
 

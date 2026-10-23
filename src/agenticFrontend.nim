@@ -17,6 +17,7 @@ import components/composer
 import components/brand
 import components/inspector
 import components/result_card
+import components/required_operations
 
 
 var appState =
@@ -213,6 +214,11 @@ proc renderActivityView(): VNode =
                 else:
                   "This job was recovered from durable chat history."
               )
+
+        if appState.run.workflowContract != nil:
+          tdiv(class = "activity-section"):
+            h3: text "Required operations"
+            renderWorkflowReview(appState.run.workflowContract)
 
         if appState.runEvents.len > 0:
           tdiv(class = "activity-section"):

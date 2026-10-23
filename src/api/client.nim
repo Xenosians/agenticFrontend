@@ -24,11 +24,15 @@ type
     jobId*: string
     status*: string
     submissionId*: string
+    workflowContract*: JsonNode
+    workflowContractHash*: string
 
 
   JobResponse* = object
     jobId*: string
     status*: string
+    workflowContract*: JsonNode
+    workflowContractHash*: string
 
     selectedAgent*: string
     proposedTool*: string
@@ -631,6 +635,10 @@ proc parseJobResponse(
           "status"
         ),
 
+      workflowContract: (if data.hasKey("workflow_contract") and
+        data["workflow_contract"].kind == JObject: data["workflow_contract"] else: nil),
+      workflowContractHash: jsonValueText(data, "workflow_contract_hash"),
+
       selectedAgent:
         jsonValueText(
           data,
@@ -825,7 +833,8 @@ proc createJob*(
   chatId: string,
   message: string,
   csrfToken: string,
-  submissionId: string
+  submissionId: string,
+  workflowContract: JsonNode = nil
 ): Future[
   JobCreateResponse
 ] {.async.} =
@@ -852,6 +861,9 @@ proc createJob*(
 
     "submission_id": submissionId
   }
+
+  if workflowContract != nil and workflowContract.kind != JNull:
+    payload["workflow_contract"] = workflowContract
 
 
   headers[
@@ -905,6 +917,18 @@ proc createJob*(
       jsonValueText(data, "job_id").len == 0 or jsonValueText(data, "status") notin publicJobStates:
     raise newException(ValueError, "The response did not confirm this saved submission.")
 
+  var confirmedHash = ""
+  if workflowContract != nil and workflowContract.kind != JNull:
+    if not data.hasKey("workflow_contract") or data["workflow_contract"] != workflowContract or
+        not data.hasKey("workflow_contract_hash") or data["workflow_contract_hash"].kind != JString:
+      raise newException(ValueError, "The response did not confirm the reviewed required operations.")
+    confirmedHash = data["workflow_contract_hash"].getStr
+    if confirmedHash.len != 64:
+      raise newException(ValueError, "The response did not confirm the reviewed required operations.")
+    for ch in confirmedHash:
+      if ch notin {'0'..'9', 'a'..'f'}:
+        raise newException(ValueError, "The response did not confirm the reviewed required operations.")
+
   result =
     JobCreateResponse(
       jobId:
@@ -917,7 +941,9 @@ proc createJob*(
           "status"
         ].getStr(),
 
-      submissionId: submissionId
+      submissionId: submissionId,
+      workflowContract: workflowContract,
+      workflowContractHash: confirmedHash
     )
 
 

@@ -96,3 +96,78 @@ test("corrupt or cross-owner saved records fail closed instead of generating a n
   saved.setItem(saved.key(0), JSON.stringify(other));
   assert.throws(() => client.prepare("Request"), /invalid/);
 });
+
+const contract = () => ({version: 1, steps: [
+  {id: "step_1", capability: "identity_create", grounded_arguments: {login: [" Exact Value "]}, after_success_of: null},
+  {id: "step_2", capability: "issue_create", grounded_arguments: {}, after_success_of: "step_1"}
+]});
+
+test("the reviewed workflow is copied and pinned with its message across reload and uncertain acknowledgement", () => {
+  const saved = storage(), before = bind(saved), reviewed = contract();
+  const request = before.prepare("Create identity, then issue", reviewed);
+  reviewed.steps[0].grounded_arguments.login[0] = "Different target";
+  assert.equal(request.workflow_contract.steps[0].grounded_arguments.login[0], " Exact Value ");
+  const after = bind(saved), pinned = after.pending();
+  assert.deepEqual(pinned, request);
+  assert.equal(after.prepare(pinned.message, pinned.workflow_contract).submission_id, request.submission_id);
+  assert.throws(() => after.prepare(pinned.message), /unresolved submission/);
+  assert.throws(() => after.prepare(pinned.message, reviewed), /unresolved submission/);
+  const changedDependency = contract(); changedDependency.steps[1].after_success_of = null;
+  assert.throws(() => after.prepare(pinned.message, changedDependency), /unresolved submission/);
+  const reorderedKeys = {steps: contract().steps, version: 1};
+  assert.equal(after.prepare(pinned.message, reorderedKeys).submission_id, request.submission_id);
+});
+
+test("malformed obligations and oversized UTF-8 input never persist a submission", () => {
+  const cases = [[], {}, {version: 1, steps: []}, {...contract(), extra: true}, contract(), contract(), contract(), contract(), contract(), contract(), contract()];
+  cases[4].steps[1].id = "step_1";
+  cases[5].steps[1].capability = "identity_create";
+  cases[6].steps[0].after_success_of = "step_2";
+  cases[7].steps[0].grounded_arguments = {login: "exact"};
+  cases[8].steps[0].grounded_arguments = {login: [" "]};
+  cases[9].steps[0].grounded_arguments = {login: ["x".repeat(1025)]};
+  cases[10].steps[0].grounded_arguments = {login: Array(16).fill("界".repeat(1024))};
+  for (const invalid of cases) {
+    const saved = storage();
+    assert.throws(() => bind(saved).prepare("Request", invalid), /required operations are invalid/);
+    assert.equal(saved.length, 0);
+  }
+});
+
+test("corrupt saved obligations block recovery instead of dropping the workflow", () => {
+  const saved = storage(), client = bind(saved);
+  client.prepare("Request", contract());
+  const damaged = JSON.parse(saved.getItem(saved.key(0)));
+  delete damaged.workflow_contract.steps[1].after_success_of;
+  saved.setItem(saved.key(0), JSON.stringify(damaged));
+  assert.throws(() => client.pending(), /required operations are invalid/);
+  assert.equal(saved.length, 1);
+});
+
+test("invalid grounded argument names and excessive field counts cannot be prepared or recovered", () => {
+  for (const fields of [{"bad-target": ["value"]}, {["a".repeat(151)]: ["value"]},
+    {"target_界": ["value"]}, Object.fromEntries(Array.from({length: 33}, (_, index) => ["field_" + index, ["value"]]))]) {
+    const reviewed = contract(); reviewed.steps[0].grounded_arguments = fields;
+    const saved = storage(), client = bind(saved);
+    assert.throws(() => client.prepare("Request", reviewed), /required operations are invalid/);
+    assert.equal(saved.length, 0);
+    client.prepare("Request", contract());
+    const damaged = JSON.parse(saved.getItem(saved.key(0)));
+    damaged.workflow_contract = reviewed;
+    saved.setItem(saved.key(0), JSON.stringify(damaged));
+    assert.throws(() => client.pending(), /required operations are invalid/);
+    assert.equal(saved.length, 1);
+  }
+});
+
+test("a matching UUID cannot clear reviewed obligations without their exact persisted acknowledgement", () => {
+  const client = bind(storage()), request = client.prepare("Request", contract());
+  for (const response of [ack(request), {...ack(request), workflow_contract: contract()},
+    {...ack(request), workflow_contract: contract(), workflow_contract_hash: "A".repeat(64)},
+    {...ack(request), workflow_contract: {version: 1, steps: []}, workflow_contract_hash: "a".repeat(64)}]) {
+    assert.throws(() => client.acknowledge(response), /reviewed required operations/);
+    assert.deepEqual(client.pending(), request);
+  }
+  client.acknowledge({...ack(request), workflow_contract: contract(), workflow_contract_hash: "a".repeat(64)});
+  assert.equal(client.pending(), null);
+});

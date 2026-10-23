@@ -62,6 +62,7 @@ proc clearAuthenticatedState(
   inc state.chatNavigationEpoch
   inc state.jobObservationEpoch
   state.auth.authenticated = false
+  clearWorkflowDraft(state)
   state.extensionCatalog = nil
   state.extensionBusy = false
   state.extensionError = ""
@@ -96,6 +97,8 @@ proc applyHistory(
   chatId: string,
   history: seq[ChatHistoryMessage]
 ) =
+  if state.currentChatId != chatId:
+    clearWorkflowDraft(state)
   state.currentChatId = chatId
   state.messages.setLen(0)
   state.run = emptyRun()

@@ -1,5 +1,13 @@
 import types
 
+proc clearWorkflowDraft*(state: AppState) =
+  state.workflowSteps.setLen(0)
+  state.workflowCapabilityDraft = ""
+  state.workflowAfterDraft = ""
+  state.workflowArgumentDrafts = nil
+  state.workflowError = ""
+  state.workflowPanelOpen = false
+
 proc emptyRunState():
   RunState =
 
@@ -456,6 +464,8 @@ proc clearRun*(
 proc resetConversation*(
   state: AppState
 ) =
+
+  clearWorkflowDraft(state)
 
   state.messages.setLen(
     0

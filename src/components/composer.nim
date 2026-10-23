@@ -8,6 +8,7 @@ import ../app/types
 import ../app/state
 import ../app/backend_bridge
 import brand
+import required_operations
 
 
 proc resizeComposerInput() {.
@@ -163,6 +164,8 @@ proc renderComposer*(
     section(class = "composer-container")
   ):
 
+    renderRequiredOperations(state, state.auth.loading or jobBusy)
+
     tdiv(class = "composer"):
       textarea(
         id = "messageInput",
@@ -216,7 +219,8 @@ proc renderComposer*(
           elif jobBusy:
             text "Task in progress · you can draft your next message"
           else:
-            text "Tools selected automatically"
+            text (if state.workflowSteps.len > 0: "Required operations included · review before sending"
+                  else: "Tools selected automatically")
 
         button(
           class = sendClass,

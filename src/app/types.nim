@@ -1,4 +1,5 @@
 import std/json
+import workflow_request
 
 type
   AppView* = enum
@@ -83,6 +84,8 @@ type
     observationMode*: string
     progressStage*: string
     presentations*: seq[ResultCard]
+    workflowContract*: JsonNode
+    workflowContractHash*: string
 
   SystemState* = object
     checked*: bool
@@ -174,6 +177,10 @@ type
     inspectorOpen*: bool
     headerMenuOpen*: bool
     composerDraft*: string
+    workflowPanelOpen*: bool
+    workflowCapabilityDraft*, workflowAfterDraft*, workflowError*: string
+    workflowArgumentDrafts*: JsonNode
+    workflowSteps*: seq[WorkflowStep]
     searchDraft*: string
     composerSelectedToolId*: string
     selectedToolId*: string
