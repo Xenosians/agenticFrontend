@@ -363,6 +363,46 @@ class ChatNavigationTests(unittest.TestCase):
         expect(composer).to_have_value("")
         self.assertEqual(self.errors, [])
 
+    def test_the_composer_never_covers_the_approval_controls(self):
+        proposal = {"tool": "fixture_identity_create", "approval_id": "fixture-approval",
+                    "arguments": {"login": "fixture.user", "department": "IT"}}
+        decisions = []
+
+        def submit(route):
+            payload = route.request.post_data_json
+            self.submissions.append(payload)
+            route.fulfill(json={"job_id": "fixture-job", "status": "waiting_approval",
+                                "submission_id": payload["submission_id"]})
+
+        def job(route):
+            if route.request.method == "POST" and route.request.url.endswith("/approve"):
+                decisions.append(route.request.post_data_json)
+                route.fulfill(json={"contract_version": 2, "job_id": "fixture-job", "status": "completed",
+                                    "result": {"answer": "Fixture approval executed"}})
+            else:
+                route.fulfill(json={"contract_version": 2, "job_id": "fixture-job", "status": "waiting_approval",
+                                    "proposed_tool": proposal, "result": {"answer": "Approval required"}})
+
+        self.page.set_viewport_size({"width": 1440, "height": 720})
+        self.open_first_chat()
+        self.page.route("**/api/v1/jobs", submit)
+        self.page.route("**/api/v2/jobs/fixture-job**", job)
+        composer = self.page.locator("#messageInput")
+        composer.fill("Create the fixture identity")
+        composer.press("Enter")
+        approve = self.page.get_by_role("button", name="Approve action", exact=True)
+        approve.scroll_into_view_if_needed()
+        topmost = approve.evaluate("""button => {
+            const box = button.getBoundingClientRect();
+            const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+            return hit === button ? "button" : (hit && hit.className) || "nothing";
+        }""")
+        self.assertEqual(topmost, "button", "another element covers the Approve action button")
+        approve.click(timeout=5000)
+        expect(self.page.get_by_text("Fixture approval executed", exact=True)).to_be_visible()
+        self.assertEqual(decisions, [{"approval_id": "fixture-approval"}])
+        self.assertEqual(self.errors, [])
+
     def test_recovery_keeps_the_exact_saved_operations_instead_of_building_another_request(self):
         identity = "1ab9024f-9bd4-421b-912c-38d73b71f084"
         workflow = {"version": 1, "steps": [{"id": "first", "capability": "fixture_issue_create",
