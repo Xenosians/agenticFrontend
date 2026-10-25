@@ -123,6 +123,10 @@ class WorkspaceContextTests(navigation.ChatNavigationTests):
         expect(self.page.locator(".sidebar")).to_be_hidden()
         header = self.page.locator(".workspace-header")
         expect(header).to_contain_text("First fixture chat")
+        # Search covers only the open chat, so it names that chat too.
+        self.page.keyboard.press("Control+Shift+F")
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Search")
+        expect(header).to_contain_text("First fixture chat")
         self.page.get_by_role("button", name="More", exact=True).click()
         expect(self.page.locator(".header-menu")).to_contain_text("Fixture Owner")
         self.assertEqual(self.errors, [])

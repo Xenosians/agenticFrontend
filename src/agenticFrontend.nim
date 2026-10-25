@@ -1056,10 +1056,11 @@ proc renderWorkspace(): VNode =
           text activeViewTitle()
         span:
           text activeViewSubtitle()
-        # Shown where the sidebar (and its chat list) is hidden.
+        # Shown where the sidebar (and its chat list) is hidden. Search covers
+        # only the open chat, so it names that chat as well.
         let chatTitle = currentChatTitle()
-        if appState.activeView == viewChat and not appState.commandPaletteOpen and
-           chatTitle.len > 0:
+        if appState.activeView in {viewChat, viewSearch} and
+           not appState.commandPaletteOpen and chatTitle.len > 0:
           span(class = "workspace-chat-title"):
             text chatTitle
 
