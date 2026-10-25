@@ -108,16 +108,18 @@ proc resourceName(
   return resourceId
 
 
-proc activeContextLabel*(
+proc activeContextNames*(
   state: AppState
-): string =
+): tuple[model, dataset: string] =
   ## The active model and reference dataset as the Personal section names
   ## them, so the workspace header and the selection cards always agree.
+  ## An empty model means the catalog has not loaded; an empty dataset means
+  ## none is selected.
   if state.extensionCatalog == nil or
      state.extensionCatalog.kind != JObject:
-    return ""
+    return ("", "")
 
-  result = resourceName(
+  result.model = resourceName(
     state,
     selection(state, "model_id"),
     "Default local models"
@@ -127,7 +129,7 @@ proc activeContextLabel*(
     selection(state, "dataset_id")
 
   if datasetId.len > 0:
-    result &= " · " & resourceName(state, datasetId, "Reference dataset")
+    result.dataset = resourceName(state, datasetId, "Reference dataset")
 
 
 proc openActiveContext*(

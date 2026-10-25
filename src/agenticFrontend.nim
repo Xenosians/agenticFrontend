@@ -1043,14 +1043,23 @@ proc renderWorkspace(): VNode =
           text activeViewSubtitle()
 
       tdiv(class = "header-controls"):
-        let context = activeContextLabel(appState)
-        if context.len > 0:
+        let context = activeContextNames(appState)
+        if context.model.len > 0:
+          let label =
+            if context.dataset.len > 0: context.model & " · " & context.dataset
+            else: context.model
           button(
             class = "workspace-context",
-            title = cstring("Active model and dataset: " & context),
-            `aria-label` = cstring("Active model and dataset: " & context)
+            title = cstring("Active model and dataset: " & label),
+            `aria-label` = cstring("Active model and dataset: " & label)
           ):
-            text context
+            span(class = "workspace-context-model"):
+              text context.model
+            if context.dataset.len > 0:
+              span(class = "workspace-context-separator"):
+                text "·"
+              span(class = "workspace-context-dataset"):
+                text context.dataset
             proc onclick(event: Event, node: VNode) =
               openActiveContext(appState)
               runWorkspaceCommand("connections")

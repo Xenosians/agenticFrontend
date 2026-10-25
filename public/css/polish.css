@@ -929,12 +929,16 @@ body {
   font-size: var(--header-control-size);
 }
 
-/* Active model · dataset. Opens the Personal connections section. */
+/* Active model · dataset. Opens the Personal connections section. Each name
+   keeps its own share of the width and truncates on its own. */
 .workspace-context {
   min-width: 0;
   max-width: min(36vw, 320px);
   height: 30px;
   padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   overflow: hidden;
   border: 1px solid var(--border-strong);
   border-radius: 999px;
@@ -942,9 +946,29 @@ body {
   color: var(--text-soft);
   font: inherit;
   font-size: var(--header-control-size);
-  text-overflow: ellipsis;
   white-space: nowrap;
   cursor: pointer;
+}
+
+.workspace-context-model,
+.workspace-context-dataset {
+  min-width: 3ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workspace-context-model {
+  flex: 0 1 auto;
+}
+
+.workspace-context-dataset {
+  flex: 0 2 auto;
+  color: var(--muted);
+}
+
+.workspace-context-separator {
+  flex: 0 0 auto;
+  color: var(--muted);
 }
 
 .workspace-context:hover {

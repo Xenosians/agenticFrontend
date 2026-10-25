@@ -85,6 +85,14 @@ class WorkspaceContextTests(navigation.ChatNavigationTests):
                     '.workspace-context', '.chats-header-action', '.command-header-action',
                 ].map((selector) => getComputedStyle(document.querySelector(selector)).fontSize)""")
                 self.assertEqual(len(set(sizes)), 1, sizes)
+                # Both names stay visible at every width; the full text is in the name.
+                widths = self.page.evaluate("""() => ['model', 'dataset'].map((part) => {
+                    const node = document.querySelector('.workspace-context-' + part);
+                    return node ? node.getBoundingClientRect().width : 0;
+                })""")
+                self.assertTrue(all(width >= 24 for width in widths), widths)
+                expect(context).to_have_attribute(
+                    "aria-label", "Active model and dataset: Fixture provider model · Fixture runbooks")
                 self.assertGreater(self.catalog_requests, 0)
                 self.assertEqual(self.mutations, [])
                 self.assertEqual(self.errors, [])
