@@ -59,6 +59,45 @@ proc renderViewButton(
         discard refreshExtensions(state)
 
 
+proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
+  # Each call owns the target captured by its open/delete handlers. A local
+  # declared inside a rendering loop shares one closure in Nim's JS backend.
+  result = buildHtml(tdiv(class = "chat-nav-row")):
+    button(
+      class =
+        if chat.chatId == state.currentChatId:
+          cstring"chat-nav-main active"
+        else:
+          cstring"chat-nav-main"
+    ):
+      span(class = "nav-icon"):
+        text "◇"
+      span(class = "chat-nav-title"):
+        text chat.title
+      proc onclick(event: Event, node: VNode) =
+        state.commandPaletteOpen = false
+        discard selectChat(state, chat.chatId)
+
+    if state.pendingDeleteChatId == chat.chatId:
+      tdiv(class = "chat-delete-confirm"):
+        button(class = "chat-delete-confirm-yes", title = "Delete chat"):
+          text "Delete"
+          proc onclick(event: Event, node: VNode) =
+            state.pendingDeleteChatId = ""
+            discard deleteChatApplication(state, chat.chatId)
+        button(class = "chat-delete-confirm-no", title = "Cancel"):
+          text "Cancel"
+          proc onclick(event: Event, node: VNode) =
+            state.pendingDeleteChatId = ""
+            redraw(kxi)
+    else:
+      button(class = "chat-delete", title = "Delete chat"):
+        text "×"
+        proc onclick(event: Event, node: VNode) =
+          state.pendingDeleteChatId = chat.chatId
+          redraw(kxi)
+
+
 proc renderSidebar*(
   state: AppState
 ): VNode =
@@ -90,6 +129,7 @@ proc renderSidebar*(
         event: Event,
         node: VNode
       ) =
+        state.commandPaletteOpen = false
         discard createNewChat(
           state
         )
@@ -104,74 +144,7 @@ proc renderSidebar*(
           text "No chats"
       else:
         for chat in state.chats:
-          let currentChat = chat
-
-          tdiv(class = "chat-nav-row"):
-            button(
-              class =
-                if currentChat.chatId == state.currentChatId:
-                  cstring"chat-nav-main active"
-                else:
-                  cstring"chat-nav-main"
-            ):
-              span(class = "nav-icon"):
-                text "◇"
-
-              span(class = "chat-nav-title"):
-                text currentChat.title
-
-              proc onclick(
-                event: Event,
-                node: VNode
-              ) =
-                discard selectChat(
-                  state,
-                  currentChat.chatId
-                )
-
-            if state.pendingDeleteChatId == currentChat.chatId:
-              tdiv(class = "chat-delete-confirm"):
-                button(
-                  class = "chat-delete-confirm-yes",
-                  title = "Delete chat"
-                ):
-                  text "Delete"
-
-                  proc onclick(
-                    event: Event,
-                    node: VNode
-                  ) =
-                    state.pendingDeleteChatId = ""
-                    discard deleteChatApplication(
-                      state,
-                      currentChat.chatId
-                    )
-
-                button(
-                  class = "chat-delete-confirm-no",
-                  title = "Cancel"
-                ):
-                  text "Cancel"
-
-                  proc onclick(
-                    event: Event,
-                    node: VNode
-                  ) =
-                    state.pendingDeleteChatId = ""
-                    redraw(kxi)
-            else:
-              button(
-                class = "chat-delete",
-                title = "Delete chat"
-              ):
-                text "×"
-
-                proc onclick(
-                  event: Event,
-                  node: VNode
-                ) =
-                  state.pendingDeleteChatId = currentChat.chatId
-                  redraw(kxi)
+          renderSavedChat(state, chat)
 
 
     nav(class = "nav-section"):

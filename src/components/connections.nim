@@ -313,6 +313,21 @@ proc resourceGlyph(
     "P"
 
 
+proc renderInstalledResource(state: AppState, item: JsonNode): VNode =
+  # Procedure arguments give each rendered row its own callback binding.
+  result = buildHtml(button(class = "installed-item")):
+    span(class = "installed-icon"):
+      text resourceGlyph(item)
+    tdiv:
+      strong:
+        text nodeText(item, "name")
+      span:
+        text nodeText(item, "kind") & " · " & nodeText(item, "state") &
+          (if nodeBool(item, "insecure_transport"): " · unencrypted" else: "")
+    proc onclick(event: Event, node: VNode) =
+      setPluginSection(state, if nodeText(item, "kind") == "dataset": "data" else: "personal")
+
+
 proc renderInstalledRail(
   state: AppState
 ): VNode =
@@ -419,76 +434,8 @@ proc renderInstalledRail(
        state.extensionCatalog.hasKey("resources"):
 
       for row in state.extensionCatalog["resources"]:
-
-        let
-          item = row
-          itemName =
-            nodeText(
-              item,
-              "name"
-            )
-
-        if matchesSearch(
-             state,
-             itemName,
-             nodeText(item, "kind"),
-             nodeText(item, "backend")
-           ):
-
-          button(
-            class = "installed-item"
-          ):
-
-            span(class = "installed-icon"):
-              text resourceGlyph(
-                item
-              )
-
-            tdiv:
-
-              strong:
-                text itemName
-
-              span:
-                text (
-                  nodeText(
-                    item,
-                    "kind"
-                  ) &
-                  " · " &
-                  nodeText(
-                    item,
-                    "state"
-                  ) &
-                  (
-                    if nodeBool(item, "insecure_transport"):
-                      " · unencrypted"
-                    else:
-                      ""
-                  )
-                )
-
-            proc onclick(
-              event: Event,
-              node: VNode
-            ) =
-
-              if nodeText(
-                   item,
-                   "kind"
-                 ) == "dataset":
-
-                setPluginSection(
-                  state,
-                  "data"
-                )
-
-              else:
-
-                setPluginSection(
-                  state,
-                  "personal"
-                )
+        if matchesSearch(state, nodeText(row, "name"), nodeText(row, "kind"), nodeText(row, "backend")):
+          renderInstalledResource(state, row)
 
 
 proc renderCurrentSelection(
@@ -790,152 +737,115 @@ proc renderSpecialistModels(
         )
 
 
-proc renderPublicProviders(
-  state: AppState
-): VNode =
+proc renderProviderPreset(state: AppState, preset: JsonNode): VNode =
+  let
+    name = nodeText(preset, "name")
+    description = nodeText(preset, "description")
+    model = nodeText(preset, "recommended_model")
+  result = buildHtml(tdiv(class = "marketplace-card")):
 
-  result = buildHtml(
-    tdiv(class = "plugin-content-section")
-  ):
+    tdiv(class = "marketplace-card-main"):
 
-    tdiv(class = "plugin-section-heading"):
+      span(class = "marketplace-icon"):
+        text providerGlyph(
+          nodeText(
+            preset,
+            "id"
+          )
+        )
 
       tdiv:
 
+        strong:
+          text name
+
+        if model.len > 0:
+
+          span(class = "marketplace-model"):
+            text model
+
+        else:
+
+          span(class = "marketplace-model"):
+            text "Local endpoint"
+
+    p:
+      text description
+
+    tdiv(class = "marketplace-card-footer"):
+
+      if nodeBool(
+           preset,
+           "requires_api_key"
+         ):
+
+        span(class = "plugin-chip"):
+          text "API key"
+
+      else:
+
+        span(class = "plugin-chip quiet"):
+          text "Local"
+
+      button(
+        class = "plugin-add-small",
+        disabled = state.extensionBusy,
+        title = "Configure provider"
+      ):
+
+        text "+"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+
+          state.connectionName =
+            name
+
+          state.connectionBackend =
+            nodeText(
+              preset,
+              "backend"
+            )
+
+          state.connectionModel =
+            model
+
+          state.connectionUrl =
+            nodeText(
+              preset,
+              "url"
+            )
+
+          state.connectionKey =
+            ""
+
+          resetConnectionOptions(state)
+
+          state.pluginSection =
+            "add"
+
+          redraw(kxi)
+
+
+proc renderPublicProviders(state: AppState): VNode =
+  result = buildHtml(tdiv(class = "plugin-content-section")):
+    tdiv(class = "plugin-section-heading"):
+      tdiv:
         h3:
           text "Available providers"
-
         p:
           text "Inference providers that can be connected to this workspace."
-
-    if not state.extensionCatalog.hasKey(
-      "provider_presets"
-    ):
-
+    if not state.extensionCatalog.hasKey("provider_presets"):
       tdiv(class = "plugin-empty"):
         text "No provider presets are available."
-
     else:
-
       tdiv(class = "marketplace-grid"):
-
-        for row in
-            state.extensionCatalog[
-              "provider_presets"
-            ]:
-
-          let
-            preset = row
-            name =
-              nodeText(
-                preset,
-                "name"
-              )
-
-            description =
-              nodeText(
-                preset,
-                "description"
-              )
-
-            model =
-              nodeText(
-                preset,
-                "recommended_model"
-              )
-
-          if matchesSearch(
-               state,
-               name,
-               description,
-               model
-             ):
-
-            tdiv(class = "marketplace-card"):
-
-              tdiv(class = "marketplace-card-main"):
-
-                span(class = "marketplace-icon"):
-                  text providerGlyph(
-                    nodeText(
-                      preset,
-                      "id"
-                    )
-                  )
-
-                tdiv:
-
-                  strong:
-                    text name
-
-                  if model.len > 0:
-
-                    span(class = "marketplace-model"):
-                      text model
-
-                  else:
-
-                    span(class = "marketplace-model"):
-                      text "Local endpoint"
-
-              p:
-                text description
-
-              tdiv(class = "marketplace-card-footer"):
-
-                if nodeBool(
-                     preset,
-                     "requires_api_key"
-                   ):
-
-                  span(class = "plugin-chip"):
-                    text "API key"
-
-                else:
-
-                  span(class = "plugin-chip quiet"):
-                    text "Local"
-
-                button(
-                  class = "plugin-add-small",
-                  disabled = state.extensionBusy,
-                  title = "Configure provider"
-                ):
-
-                  text "+"
-
-                  proc onclick(
-                    event: Event,
-                    node: VNode
-                  ) =
-
-                    state.connectionName =
-                      name
-
-                    state.connectionBackend =
-                      nodeText(
-                        preset,
-                        "backend"
-                      )
-
-                    state.connectionModel =
-                      model
-
-                    state.connectionUrl =
-                      nodeText(
-                        preset,
-                        "url"
-                      )
-
-                    state.connectionKey =
-                      ""
-
-                    resetConnectionOptions(state)
-
-                    state.pluginSection =
-                      "add"
-
-                    redraw(kxi)
+        for preset in state.extensionCatalog["provider_presets"]:
+          if matchesSearch(state, nodeText(preset, "name"), nodeText(preset, "description"),
+              nodeText(preset, "recommended_model")):
+            renderProviderPreset(state, preset)
 
 
 proc renderResourceActions(

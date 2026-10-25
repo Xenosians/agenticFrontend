@@ -163,6 +163,9 @@ proc setActiveView*(
   state.headerMenuOpen =
     false
 
+  state.commandPaletteOpen =
+    false
+
 
 proc setInspectorTab*(
   state: AppState,

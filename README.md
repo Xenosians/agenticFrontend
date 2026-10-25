@@ -52,7 +52,7 @@ window.AGENTIC_CONFIG = Object.freeze({
   backendBaseUrl: "http://127.0.0.1:4000",
   pollIntervalMs: 1000
 });
-```limit
+```
 
 Serve the `public` directory, for example:
 
@@ -109,6 +109,8 @@ Playwright and its Chromium browser installed:
 
 ```bash
 python tests/test_chat_navigation.py
+python tests/test_workspace_navigation.py
+python tests/test_connection_actions.py
 ```
 
 It delays chat-history responses to verify that clicking Send or pressing Enter
@@ -117,6 +119,11 @@ the original submission identity and reviewed required operations. It also check
 the metadata picker, exact targets, dependencies and chat draft isolation. It serves the built frontend on a temporary
 loopback port and uses test-only API fixtures; it needs no app credentials or live
 providers and does not certify provider execution.
+
+Workspace and connection browser tests also check each displayed row's exact
+chat, session, provider or resource target, and keyboard command focus. They
+intercept all API requests with isolated fixtures and never revoke real sessions,
+delete real chats or admit a live provider connection.
 
 ## Current boundaries
 

@@ -1,5 +1,7 @@
 include karax/prelude
 
+import karax/kdom
+
 import std/strutils
 
 import app/commands
@@ -25,6 +27,58 @@ var appState =
 
 
 proc runWorkspaceCommand(action: string)
+
+
+type WorkspaceFocus = object
+  target, userId, sessionId: string
+  view: AppView
+  paletteOpen: bool
+
+var pendingWorkspaceFocus, paletteOrigin: WorkspaceFocus
+
+proc activeElementId(): cstring {.importjs: "(() => document.activeElement?.id || '')()".}
+proc focusElement(id: cstring) {.importjs: "document.getElementById(#)?.focus()".}
+proc activateSearchCommand(event: Event): bool {.
+  importjs: "((e) => e.key === 'Enter' && !e.isComposing && !e.repeat)(#)".}
+
+proc focusTargetForView(): string =
+  case appState.activeView
+  of viewChat: "messageInput"
+  of viewSearch: "chatSearch"
+  else: "commandPaletteButton"
+
+proc workspaceFocus(target: string): WorkspaceFocus =
+  WorkspaceFocus(target: target, userId: appState.auth.userId,
+    sessionId: appState.auth.sessionId, view: appState.activeView,
+    paletteOpen: appState.commandPaletteOpen)
+
+proc focusContextMatches(request: WorkspaceFocus): bool =
+  appState.auth.authenticated and request.userId.len > 0 and request.sessionId.len > 0 and
+    request.userId == appState.auth.userId and request.sessionId == appState.auth.sessionId and
+    request.view == appState.activeView and request.paletteOpen == appState.commandPaletteOpen
+
+proc queueWorkspaceFocus(target: string) =
+  pendingWorkspaceFocus = workspaceFocus(target)
+
+proc focusWorkspaceAfterRender() =
+  # Consume once, after Karax commits DOM; another navigation/owner cancels it.
+  let request = pendingWorkspaceFocus
+  pendingWorkspaceFocus = WorkspaceFocus()
+  if request.target.len > 0 and focusContextMatches(request):
+    focusElement(cstring(request.target))
+
+proc activateFirstSearchResult() =
+  let query = appState.commandQuery.toLowerAscii()
+  for command in workspaceCommands:
+    if query in command.label.toLowerAscii():
+      runWorkspaceCommand(command.id)
+      return
+  let chatQuery = appState.commandQuery.strip().toLowerAscii()
+  for chat in appState.chats:
+    if chatQuery in chat.title.toLowerAscii():
+      appState.commandPaletteOpen = false
+      discard selectChat(appState, chat.chatId)
+      return
 
 
 proc activeViewTitle(): string =
@@ -107,6 +161,7 @@ proc renderSearchView(): VNode =
           text "⌕"
 
         input(
+          id = "chatSearch",
           class = "search-input",
           `type` = "search",
           placeholder = "Search this chat...",
@@ -548,6 +603,44 @@ proc renderSimulatorView(): VNode =
             text "No flashing, printing, or machine actuation is available from this draft page."
 
 
+proc renderAccountSession(currentSession: AuthSessionItem): VNode =
+  result = buildHtml(tdiv(class = "system-row account-session-row")):
+    tdiv:
+      strong:
+        text (
+          if currentSession.current:
+            "Current session"
+          else:
+            "Session"
+        )
+
+      span:
+        text (
+          currentSession.userAgent &
+          " · expires " &
+          currentSession.expiresAt
+        )
+
+    if currentSession.revokedAt.len > 0:
+      span(class = "capability-badge disabled"):
+        text "Revoked"
+    elif currentSession.current:
+      span(class = "capability-badge enabled"):
+        text "Current"
+    else:
+      button(class = "secondary-action"):
+        text "Revoke"
+
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
+          discard revokeAuthSession(
+            appState,
+            currentSession.sessionId
+          )
+
+
 proc renderAccountView(): VNode =
   result = buildHtml(
     section(class = "conversation")
@@ -626,43 +719,28 @@ proc renderAccountView(): VNode =
             text "No sessions found."
         else:
           for authSession in appState.sessions:
-            let currentSession = authSession
+            renderAccountSession(authSession)
 
-            tdiv(class = "system-row account-session-row"):
-              tdiv:
-                strong:
-                  text (
-                    if currentSession.current:
-                      "Current session"
-                    else:
-                      "Session"
-                  )
 
-                span:
-                  text (
-                    currentSession.userAgent &
-                    " · expires " &
-                    currentSession.expiresAt
-                  )
-
-              if currentSession.revokedAt.len > 0:
-                span(class = "capability-badge disabled"):
-                  text "Revoked"
-              elif currentSession.current:
-                span(class = "capability-badge enabled"):
-                  text "Current"
-              else:
-                button(class = "secondary-action"):
-                  text "Revoke"
-
-                  proc onclick(
-                    event: Event,
-                    node: VNode
-                  ) =
-                    discard revokeAuthSession(
-                      appState,
-                      currentSession.sessionId
-                    )
+proc renderSavedChat(savedChat: ChatItem): VNode =
+  result = buildHtml(button(class =
+      if savedChat.chatId == appState.currentChatId:
+        cstring"command-center-row saved-chat-row active"
+      else:
+        cstring"command-center-row saved-chat-row")):
+    span(class = "command-center-icon"):
+      text "◇"
+    tdiv(class = "command-center-copy"):
+      strong:
+        text savedChat.title
+      span:
+        if savedChat.chatId == appState.currentChatId:
+          text "Current chat"
+        else:
+          text "Open conversation"
+    proc onclick(event: Event, node: VNode) =
+      appState.commandPaletteOpen = false
+      discard selectChat(appState, savedChat.chatId)
 
 
 proc renderChatList(query: string = ""): VNode =
@@ -674,27 +752,7 @@ proc renderChatList(query: string = ""): VNode =
     else:
       for chat in appState.chats:
         if search in chat.title.toLowerAscii():
-          let savedChat = chat
-          button(
-            class =
-              if savedChat.chatId == appState.currentChatId:
-                cstring"command-center-row saved-chat-row active"
-              else:
-                cstring"command-center-row saved-chat-row"
-          ):
-            span(class = "command-center-icon"):
-              text "◇"
-            tdiv(class = "command-center-copy"):
-              strong:
-                text savedChat.title
-              span:
-                if savedChat.chatId == appState.currentChatId:
-                  text "Current chat"
-                else:
-                  text "Open conversation"
-            proc onclick(event: Event, node: VNode) =
-              appState.commandPaletteOpen = false
-              discard selectChat(appState, savedChat.chatId)
+          renderSavedChat(chat)
 
 
 proc renderChatsView(): VNode =
@@ -711,6 +769,66 @@ proc renderChatsView(): VNode =
           proc onclick(event: Event, node: VNode) =
             discard createNewChat(appState)
       renderChatList()
+
+
+proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
+  result = buildHtml(button(class = "command-center-row")):
+    span(class = "command-center-icon"):
+      case command.id
+      of "new_chat":
+        text "+"
+      of "chats":
+        text "◇"
+      of "search":
+        text "⌕"
+      of "connections":
+        text "◇"
+      of "inspector":
+        text "I"
+      of "refresh":
+        text "↻"
+      of "compose":
+        text "✎"
+      else:
+        text "·"
+
+    tdiv(class = "command-center-copy"):
+      strong:
+        text command.label
+
+      span:
+        case command.id
+        of "new_chat":
+          text "Create a new durable conversation"
+        of "chats":
+          text "Browse your saved conversations"
+        of "search":
+          text "Search the current chat"
+        of "connections":
+          text "Open models, harnesses, datasets and integrations"
+        of "inspector":
+          text "Toggle developer diagnostics"
+        of "refresh":
+          text "Refresh service and connection state"
+        of "compose":
+          text "Return to the chat composer"
+        else:
+          text "Workspace action"
+
+    if command.shortcut.len > 0:
+      kbd:
+        text command.shortcut
+    else:
+      span(class = "command-enter"):
+        text "↵"
+
+    proc onclick(
+      event: Event,
+      node: VNode
+    ) =
+      runWorkspaceCommand(
+        command.id
+      )
 
 
 proc renderCommandCenter(): VNode =
@@ -760,6 +878,10 @@ proc renderCommandCenter(): VNode =
               $node.value
 
             redraw(kxi)
+          proc onkeydown(event: Event, node: VNode) =
+            if activateSearchCommand(event):
+              event.preventDefault()
+              activateFirstSearchResult()
 
       tdiv(class = "command-center-section"):
         tdiv(class = "command-section-heading"):
@@ -770,72 +892,9 @@ proc renderCommandCenter(): VNode =
             text "Ctrl/⌘ K"
 
         tdiv(class = "command-center-list"):
-          for item in workspaceCommands:
-            if appState.commandQuery
-                 .toLowerAscii() in
-               item.label
-                 .toLowerAscii():
-
-              let command =
-                item
-
-              button(class = "command-center-row"):
-                span(class = "command-center-icon"):
-                  case command.id
-                  of "new_chat":
-                    text "+"
-                  of "chats":
-                    text "◇"
-                  of "search":
-                    text "⌕"
-                  of "connections":
-                    text "◇"
-                  of "inspector":
-                    text "I"
-                  of "refresh":
-                    text "↻"
-                  of "compose":
-                    text "✎"
-                  else:
-                    text "·"
-
-                tdiv(class = "command-center-copy"):
-                  strong:
-                    text command.label
-
-                  span:
-                    case command.id
-                    of "new_chat":
-                      text "Create a new durable conversation"
-                    of "chats":
-                      text "Browse your saved conversations"
-                    of "search":
-                      text "Search the current chat"
-                    of "connections":
-                      text "Open models, harnesses, datasets and integrations"
-                    of "inspector":
-                      text "Toggle developer diagnostics"
-                    of "refresh":
-                      text "Refresh service and connection state"
-                    of "compose":
-                      text "Return to the chat composer"
-                    else:
-                      text "Workspace action"
-
-                if command.shortcut.len > 0:
-                  kbd:
-                    text command.shortcut
-                else:
-                  span(class = "command-enter"):
-                    text "↵"
-
-                proc onclick(
-                  event: Event,
-                  node: VNode
-                ) =
-                  runWorkspaceCommand(
-                    command.id
-                  )
+          for command in workspaceCommands:
+            if appState.commandQuery.toLowerAscii() in command.label.toLowerAscii():
+              renderWorkspaceCommand(command)
 
       tdiv(class = "command-center-section"):
         tdiv(class = "command-section-heading"):
@@ -1006,6 +1065,7 @@ proc renderWorkspace(): VNode =
             runWorkspaceCommand("chats")
 
         button(
+          id = "commandPaletteButton",
           class = "header-action command-header-action",
           title = "Commands (Ctrl/Cmd+K)"
         ):
@@ -1037,6 +1097,7 @@ proc renderWorkspace(): VNode =
 
         button(
           class = "header-action",
+          id = "workspaceMoreButton",
           title = "More"
         ):
           text "⋯"
@@ -1063,21 +1124,34 @@ proc renderWorkspace(): VNode =
 
 
 
-proc focusComposer() {.importjs: "document.getElementById('messageInput')?.focus()".}
-
 proc runWorkspaceCommand(action: string) =
   if not appState.auth.authenticated: return
+  let wasPalette = appState.commandPaletteOpen
+  let wasMenu = appState.headerMenuOpen
+  if action == "palette" and not wasPalette:
+    let current = $activeElementId()
+    paletteOrigin = workspaceFocus(if current.len > 0: current else: focusTargetForView())
   appState.commandPaletteOpen = false
   case action
   of "palette":
+    appState.headerMenuOpen = false
     appState.commandQuery = ""
     appState.commandPaletteOpen = true
+    queueWorkspaceFocus("commandSearch")
   of "dismiss":
     appState.headerMenuOpen = false
     appState.composerPanel = cpNone
+    if wasPalette and focusContextMatches(paletteOrigin):
+      queueWorkspaceFocus(paletteOrigin.target)
+    elif wasMenu:
+      queueWorkspaceFocus("workspaceMoreButton")
+    else:
+      queueWorkspaceFocus(focusTargetForView())
   of "new_chat": discard createNewChat(appState)
   of "chats": setActiveView(appState, viewChats)
-  of "search": setActiveView(appState, viewSearch)
+  of "search":
+    setActiveView(appState, viewSearch)
+    queueWorkspaceFocus("chatSearch")
   of "connections":
     setActiveView(appState, viewPlugin)
     discard refreshExtensions(appState)
@@ -1085,7 +1159,7 @@ proc runWorkspaceCommand(action: string) =
   of "refresh": discard refreshSystemStatus(appState)
   of "compose":
     setActiveView(appState, viewChat)
-    focusComposer()
+    queueWorkspaceFocus("messageInput")
   else: discard
   redraw(kxi)
 
@@ -1123,7 +1197,8 @@ proc renderApp(): VNode =
 
 setRenderer(
   renderApp,
-  "app"
+  "app",
+  clientPostRenderCallback = focusWorkspaceAfterRender
 )
 
 
