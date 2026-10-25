@@ -96,7 +96,8 @@ nim js -r tests/test_connection_options.nim
 nim js -r tests/test_logout_outcome.nim
 nim js -r tests/test_workflow_request.nim
 nim js -o:.runtime/job_submission_client_driver.js tests/job_submission_client_driver.nim
-node --test tests/test_job_submission.js tests/test_job_submission_client.js tests/test_job_socket.js
+nim js -o:.runtime/job_submission_flow_driver.js tests/job_submission_flow_driver.nim
+node --test tests/test_job_submission.js tests/test_job_submission_client.js tests/test_job_submission_flow.js tests/test_job_socket.js
 ```
 
 Sign-out clears the workspace only after Phoenix confirms that the session ended (401 means it already had). If the answer is lost or the server cannot confirm revocation, the user stays signed in and is asked to sign out again.

@@ -256,6 +256,113 @@ class ChatNavigationTests(unittest.TestCase):
         self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k => k.startsWith('janus.pending-submission.v1:')).length"), 0)
         self.assertEqual(self.errors, [])
 
+    def test_storage_rejection_keeps_the_unsent_composer_text(self):
+        self.context.add_init_script("""
+          const original = Storage.prototype.setItem;
+          Storage.prototype.setItem = function(key, value) {
+            if (key.startsWith('janus.pending-submission.v1:')) {
+              throw new Error('Fixture storage unavailable');
+            }
+            return original.call(this, key, value);
+          };
+        """)
+        self.open_first_chat()
+        composer = self.page.locator("#messageInput")
+        composer.fill("  Keep this unsent request  ")
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        expect(composer).to_have_value("  Keep this unsent request  ")
+        expect(self.page.get_by_text("No new request was sent. Fixture storage unavailable", exact=True)).to_be_visible()
+        self.assertEqual(self.submissions, [])
+        self.assertEqual(self.errors, [])
+
+    def test_oversized_required_operations_keep_the_message_without_posting(self):
+        self.open_first_chat()
+        self.page.get_by_role("button", name="Required operations", exact=True).click()
+        self.page.get_by_role("combobox", name="Required operation", exact=True).select_option("fixture_identity_create")
+        self.page.get_by_role("textbox", name="Exact login", exact=True).fill("\n".join(["界" * 1024] * 16))
+        self.page.get_by_role("button", name="Add required operation", exact=True).click()
+        composer = self.page.locator("#messageInput")
+        composer.fill("Keep this message while I revise the exact targets")
+        composer.press("Enter")
+        expect(composer).to_have_value("Keep this message while I revise the exact targets")
+        expect(self.page.get_by_text(
+            "No new request was sent. The required operations are invalid. Review them before sending.",
+            exact=True)).to_be_visible()
+        self.assertEqual(self.submissions, [])
+        self.assertEqual(self.page.evaluate(
+            "Object.keys(sessionStorage).filter(k => k.startsWith('janus.pending-submission.v1:')).length"), 0)
+        self.assertEqual(self.errors, [])
+
+    def test_recovery_and_delayed_ack_preserve_an_independent_composer_draft(self):
+        held = []
+
+        def interrupt_then_hold(route):
+            self.submissions.append(route.request.post_data_json)
+            if len(self.submissions) == 1:
+                route.abort()  # Simulate an acknowledgement lost after POST.
+            else:
+                held.append(route)
+
+        self.open_first_chat()
+        self.page.route("**/api/v1/jobs", interrupt_then_hold)
+        composer = self.page.locator("#messageInput")
+        composer.fill("The originally prepared request")
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        recover = self.page.get_by_role("button", name="Check saved submission", exact=True)
+        expect(recover).to_be_visible()
+        composer.fill("My independently typed next request")
+        recover.click()
+        self.page.wait_for_function("document.querySelector('.composer-hint').textContent.includes('Submitting request')")
+        expect(composer).to_have_value("My independently typed next request")
+        self.assertEqual(len(held), 1)
+        composer.fill("A newer draft while recovery is pending")
+        request = self.submissions[-1]
+        held.pop().fulfill(json={"job_id": "fixture-job", "status": "completed",
+                                "submission_id": request["submission_id"]})
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        expect(composer).to_have_value("A newer draft while recovery is pending")
+        self.assertEqual(len(self.submissions), 2)
+        self.assertEqual(self.submissions[0], self.submissions[1])
+        self.assertEqual(self.errors, [])
+
+    def test_delayed_submission_ack_does_not_clear_a_newer_draft(self):
+        held = []
+
+        def hold(route):
+            self.submissions.append(route.request.post_data_json)
+            held.append(route)
+
+        self.open_first_chat()
+        self.page.route("**/api/v1/jobs", hold)
+        composer = self.page.locator("#messageInput")
+        composer.fill("The request being prepared")
+        composer.press("Enter")
+        expect(composer).to_have_value("")
+        self.assertEqual(len(held), 1)
+        composer.fill("A newer draft while the first response is pending")
+        held.pop().fulfill(json={"job_id": "fixture-job", "status": "completed",
+                                "submission_id": self.submissions[0]["submission_id"]})
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        expect(composer).to_have_value("A newer draft while the first response is pending")
+        self.assertEqual(len(self.submissions), 1)
+        self.assertEqual(self.errors, [])
+
+    def test_enter_before_the_next_frame_still_clears_the_sent_draft(self):
+        self.open_first_chat()
+        composer = self.page.locator("#messageInput")
+        # Input and Enter in one task: no frame renders the typed text before
+        # the request consumes it (a paste-and-send on a busy page).
+        composer.evaluate("""element => {
+            element.value = "Sent before the next frame";
+            element.dispatchEvent(new Event("input", {bubbles: true}));
+            element.dispatchEvent(new KeyboardEvent("keydown", {key: "Enter", bubbles: true, cancelable: true}));
+        }""")
+        expect(composer).to_have_value("")
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual([s["message"] for s in self.submissions], ["Sent before the next frame"])
+        expect(composer).to_have_value("")
+        self.assertEqual(self.errors, [])
+
     def test_recovery_keeps_the_exact_saved_operations_instead_of_building_another_request(self):
         identity = "1ab9024f-9bd4-421b-912c-38d73b71f084"
         workflow = {"version": 1, "steps": [{"id": "first", "capability": "fixture_issue_create",

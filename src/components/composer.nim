@@ -17,6 +17,14 @@ proc resizeComposerInput() {.
 
 proc isComposing(event: Event): bool {.importjs: "Boolean(#.isComposing)".}
 
+proc showComposerDraft(state: AppState) =
+  ## Karax refreshes a textarea's live value only when its rendered value
+  ## attribute changes. A draft typed and sent before the next frame leaves
+  ## that attribute unchanged, so apply the submission's outcome directly.
+  let input = getVNodeById("messageInput")
+  if input != nil and input.getInputText != cstring(state.composerDraft):
+    input.setInputText(cstring(state.composerDraft))
+
 proc backendJobBusy(
   state: AppState
 ): bool =
@@ -88,8 +96,7 @@ proc composerStatusText(
 
 
 proc submitDraft(
-  state: AppState,
-  textareaNode: VNode = nil
+  state: AppState
 ) =
 
   if state.auth.loading:
@@ -127,14 +134,7 @@ proc submitDraft(
     message
   )
 
-  setComposerDraft(
-    state,
-    ""
-  )
-
-  if textareaNode != nil:
-    textareaNode.value = cstring""
-
+  showComposerDraft(state)
   resizeComposerInput()
 
 
@@ -207,10 +207,7 @@ proc renderComposer*(
           if keyboardEvent.key == "Enter" and
              not keyboardEvent.shiftKey and not isComposing(event):
             event.preventDefault()
-            submitDraft(
-              state,
-              node
-            )
+            submitDraft(state)
 
       tdiv(class = "composer-footer"):
         span(class = "composer-context"):

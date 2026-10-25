@@ -1,6 +1,6 @@
 include karax/prelude
 
-import std/[asyncjs, json]
+import std/[asyncjs, json, strutils]
 
 import ../api/client
 import ../api/chat_history
@@ -417,6 +417,7 @@ proc submitBackendJob*(
 
   let submissionOwner = state.auth.userId
   let submissionChat = state.currentChatId
+  let submittedDraft = state.composerDraft
   var submission: PendingSubmission
   try:
     if recovering:
@@ -430,6 +431,13 @@ proc submitBackendJob*(
     showToast(state, "No new request was sent. " & exc.msg)
     redraw(kxi)
     return
+
+  # Consume only the composer text this request actually prepared. A local
+  # storage/validation failure leaves it editable; recovery and later replies
+  # must not erase an independently typed next message.
+  if not recovering and submittedDraft.strip() == message and
+      state.composerDraft == submittedDraft:
+    setComposerDraft(state, "")
 
   if not recovering or state.messages.len == 0 or
       state.messages[^1].role != mrUser or state.messages[^1].content != message:
