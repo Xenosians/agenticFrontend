@@ -1248,7 +1248,7 @@
   width: auto !important;
   min-width: 42px;
   padding: 0 8px !important;
-  font-size: 8px !important;
+  font-size: var(--header-control-size) !important;
 }
 
 .command-palette,

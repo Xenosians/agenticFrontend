@@ -316,7 +316,8 @@ proc renderInspector*(
 
       button(
         class = "inspector-close",
-        title = "Hide inspector"
+        title = "Hide inspector",
+        `aria-label` = "Hide inspector"
       ):
 
         text "×"

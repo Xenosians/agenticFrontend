@@ -108,6 +108,35 @@ proc resourceName(
   return resourceId
 
 
+proc activeContextLabel*(
+  state: AppState
+): string =
+  ## The active model and reference dataset as the Personal section names
+  ## them, so the workspace header and the selection cards always agree.
+  if state.extensionCatalog == nil or
+     state.extensionCatalog.kind != JObject:
+    return ""
+
+  result = resourceName(
+    state,
+    selection(state, "model_id"),
+    "Default local models"
+  )
+
+  let datasetId =
+    selection(state, "dataset_id")
+
+  if datasetId.len > 0:
+    result &= " · " & resourceName(state, datasetId, "Reference dataset")
+
+
+proc openActiveContext*(
+  state: AppState
+) =
+  ## The header context opens the Personal section, where the selection changes.
+  state.pluginSection = "personal"
+
+
 proc matchesSearch(
   state: AppState,
   values: varargs[string]
@@ -176,7 +205,8 @@ proc textField(
           cstring"text",
 
       value = cstring(value),
-      placeholder = cstring(placeholder)
+      placeholder = cstring(placeholder),
+      `aria-label` = cstring(labelText)
     ):
 
       proc oninput(
@@ -229,7 +259,7 @@ proc renderUsageControls(state: AppState): VNode =
       tdiv(class = "plugin-field"):
         label:
           text "Reasoning effort"
-        select(class = "plugin-select", value = cstring(state.connectionReasoning)):
+        select(class = "plugin-select", `aria-label` = "Reasoning effort", value = cstring(state.connectionReasoning)):
           option(value = ""): text "Provider default"
           for effort in efforts:
             option(value = cstring(effort)): text effort.capitalizeAscii()
@@ -243,7 +273,7 @@ proc renderUsageControls(state: AppState): VNode =
       tdiv(class = "plugin-field"):
         label:
           text "Thinking"
-        select(class = "plugin-select", value = cstring(state.connectionThinking)):
+        select(class = "plugin-select", `aria-label` = "Thinking", value = cstring(state.connectionThinking)):
           option(value = ""): text "Automatic"
           for mode in thinkingModes:
             option(value = cstring(mode)): text mode.capitalizeAscii()
@@ -480,6 +510,7 @@ proc renderCurrentSelection(
 
       select(
         class = "plugin-select",
+        `aria-label` = "Active model",
         disabled = state.extensionBusy
       ):
 
@@ -555,6 +586,7 @@ proc renderCurrentSelection(
 
       select(
         class = "plugin-select",
+        `aria-label` = "Reference dataset",
         disabled = state.extensionBusy
       ):
 
@@ -668,6 +700,7 @@ proc renderRoleRow(
 
     select(
       class = "plugin-select",
+      `aria-label` = cstring(roleLabel(roleId) & " model"),
       disabled = state.extensionBusy
     ):
 
@@ -790,7 +823,8 @@ proc renderProviderPreset(state: AppState, preset: JsonNode): VNode =
       button(
         class = "plugin-add-small",
         disabled = state.extensionBusy,
-        title = "Configure provider"
+        title = "Configure provider",
+        `aria-label` = "Configure provider"
       ):
 
         text "+"
@@ -1396,7 +1430,9 @@ proc renderConnectionForm(
     tdiv(class = "plugin-setup-header"):
 
       button(
-        class = "plugin-back-button"
+        class = "plugin-back-button",
+        title = "Back to providers",
+        `aria-label` = "Back to providers"
       ):
 
         text "←"
@@ -1438,6 +1474,7 @@ proc renderConnectionForm(
 
           select(
             class = "plugin-select",
+            `aria-label` = "Connection preset",
             value = cstring(
               presetId
             )
@@ -1514,6 +1551,7 @@ proc renderConnectionForm(
 
           select(
             class = "plugin-select",
+            `aria-label` = "Connection type",
             value = cstring(
               state.connectionBackend
             )
@@ -1579,6 +1617,7 @@ proc renderConnectionForm(
 
             select(
               class = "plugin-select",
+              `aria-label` = "Installed model",
               value = cstring(
                 state.connectionModel
               )
@@ -1740,6 +1779,7 @@ proc renderConnectionForm(
 
             select(
               class = "plugin-select",
+              `aria-label` = "API protocol",
               value = cstring(
                 state.connectionApiFormat
               )
@@ -1841,6 +1881,7 @@ proc renderConnectionForm(
 
                 select(
                   class = "plugin-select",
+                  `aria-label` = "Model",
                   value = cstring(
                     state.connectionModel
                   )
@@ -2040,6 +2081,7 @@ proc renderDatasetManager(
 
       select(
         class = "plugin-select",
+        `aria-label` = "Purpose",
         value = cstring(
           state.datasetPurpose
         )
@@ -2106,7 +2148,7 @@ proc renderDatasetManager(
 
     details(class = "dataset-api"):
 
-      summary:
+      summary(role = "button", `aria-label` = "Import from API"):
         text "Import from API"
 
       tdiv(class = "dataset-api-body"):
@@ -2245,7 +2287,7 @@ proc renderDataAutomation(
 
     details(class = "developer-capabilities"):
 
-      summary:
+      summary(role = "button", `aria-label` = "Developer capabilities"):
 
         tdiv:
 
@@ -2284,7 +2326,7 @@ proc renderDataAutomation(
 
             details(class = "capability-item"):
 
-              summary:
+              summary(role = "button", `aria-label` = cstring(nodeText(row, "id"))):
                 text nodeText(
                   row,
                   "id"
@@ -2368,6 +2410,7 @@ proc renderConnections*(
             input(
               `type` = "search",
               placeholder = "Search plugins",
+              `aria-label` = "Search plugins",
               value = cstring(
                 state.pluginSearchDraft
               )
@@ -2386,7 +2429,8 @@ proc renderConnections*(
           button(
             class = "plugin-icon-button",
             disabled = state.extensionBusy,
-            title = "Refresh"
+            title = "Refresh connections",
+            `aria-label` = "Refresh connections"
           ):
 
             text "↻"

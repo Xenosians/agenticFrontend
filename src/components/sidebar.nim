@@ -91,7 +91,8 @@ proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
             state.pendingDeleteChatId = ""
             redraw(kxi)
     else:
-      button(class = "chat-delete", title = "Delete chat"):
+      button(class = "chat-delete", title = "Delete chat",
+             `aria-label` = cstring("Delete chat " & chat.title)):
         text "×"
         proc onclick(event: Event, node: VNode) =
           state.pendingDeleteChatId = chat.chatId

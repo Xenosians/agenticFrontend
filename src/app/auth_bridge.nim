@@ -11,6 +11,7 @@ import ../api/job_submission
 import types
 import state
 import backend_bridge
+import extension_bridge
 import connection_draft
 import request_context
 
@@ -250,6 +251,8 @@ proc bootstrapApplication*(
     let auth = await me()
     if not matchesAuthRequest(state, requestEpoch): return
     applyAuth(state, auth)
+    # The header shows the active model and dataset from the owner's catalog.
+    discard refreshExtensions(state)
     await loadChats(state)
   except CatchableError as exc:
     if matchesAuthRequest(state, requestEpoch):
@@ -286,6 +289,7 @@ proc loginApplication*(
     applyAuth(state, auth)
     state.auth.passwordDraft = ""
     state.auth.notice = ""
+    discard refreshExtensions(state)
     await loadChats(state)
   except CatchableError as exc:
     if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg

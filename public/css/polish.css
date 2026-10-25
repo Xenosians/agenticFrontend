@@ -35,18 +35,26 @@
 
 
 /* =========================================================
-   BUTTON FOCUS
+   KEYBOARD FOCUS
    ========================================================= */
 
-button:focus-visible {
-  outline: 1px solid #444;
-
-  outline-offset: 1px;
+/* One light ring for every keyboard-focusable control: on the near-black
+   workspace it meets the 3:1 non-text contrast minimum. Pointer clicks
+   do not trigger :focus-visible, so mouse use stays unchanged. */
+:root {
+  --focus-ring: var(--text-soft);
+  /* One type size for every text control in the workspace header. */
+  --header-control-size: 11px;
 }
 
-
-.composer button:focus-visible {
-  outline-color: #3a3a3a;
+button:focus-visible,
+select:focus-visible,
+summary:focus-visible,
+a:focus-visible,
+.plugin-field input:focus-visible,
+.plugin-search input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 
@@ -918,6 +926,34 @@ body {
 .chats-header-action {
   width: auto;
   padding-inline: 10px;
+  font-size: var(--header-control-size);
+}
+
+/* Active model · dataset. Opens the Personal connections section. */
+.workspace-context {
+  min-width: 0;
+  max-width: min(36vw, 320px);
+  height: 30px;
+  padding: 0 10px;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: var(--header-control-size);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.workspace-context:hover {
+  border-color: var(--muted-dark);
+  color: var(--text);
+}
+
+.header-controls {
+  min-width: 0;
 }
 
 .approval-action-button {
@@ -1594,10 +1630,11 @@ body {
 @media (max-width: 760px) {
   .run-status-chip { max-width: 100px; padding-inline: 8px; gap: 5px; }
   .run-status-label { display: block; }
-  .header-controls { flex-shrink: 0; gap: 4px; }
+  .header-controls { flex-shrink: 1; gap: 4px; }
   .workspace-header { padding-inline: 14px; gap: 8px; }
-  .workspace-title { flex: 1; }
-  .command-header-action { width: 35px; font-size: 10px; }
+  .workspace-title { flex: 0 0 auto; }
+  .command-header-action { width: 35px; }
+  .workspace-context { max-width: 100%; flex-shrink: 1; }
   .message-column.user { max-width: 90%; }
   .message-column.assistant { max-width: calc(100% - 40px); }
   .composer-container { padding-bottom: max(12px, env(safe-area-inset-bottom)); }

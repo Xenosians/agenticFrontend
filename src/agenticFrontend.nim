@@ -178,7 +178,7 @@ proc renderSearchView(): VNode =
             redraw(kxi)
 
         if appState.searchDraft.len > 0:
-          button(title = "Clear search"):
+          button(title = "Clear search", `aria-label` = "Clear search"):
             text "×"
 
             proc onclick(
@@ -1043,6 +1043,18 @@ proc renderWorkspace(): VNode =
           text activeViewSubtitle()
 
       tdiv(class = "header-controls"):
+        let context = activeContextLabel(appState)
+        if context.len > 0:
+          button(
+            class = "workspace-context",
+            title = cstring("Active model and dataset: " & context),
+            `aria-label` = cstring("Active model and dataset: " & context)
+          ):
+            text context
+            proc onclick(event: Event, node: VNode) =
+              openActiveContext(appState)
+              runWorkspaceCommand("connections")
+
         if appState.run.active and appState.run.status.len > 0:
           button(
             class = runStatusClass(appState.run.status),
@@ -1083,7 +1095,8 @@ proc renderWorkspace(): VNode =
            not appState.commandPaletteOpen:
           button(
             class = "header-action",
-            title = "Refresh system status"
+            title = "Refresh system status",
+            `aria-label` = "Refresh system status"
           ):
             text "↻"
 
@@ -1098,7 +1111,9 @@ proc renderWorkspace(): VNode =
         button(
           class = "header-action",
           id = "workspaceMoreButton",
-          title = "More"
+          title = "More",
+          `aria-label` = "More",
+          `aria-expanded` = cstring($appState.headerMenuOpen)
         ):
           text "⋯"
 

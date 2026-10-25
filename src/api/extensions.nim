@@ -91,10 +91,21 @@ proc extensionCatalog*(): Future[JsonNode] {.async.} =
     raise newException(ValueError, "Connections could not be loaded.")
   return decodeJson(response.body)
 
-proc datasetFileText*(): Future[cstring] {.importjs: "(async () => { const f=document.getElementById('datasetFile').files[0]; if(!f || f.size>2000000) throw new Error('Choose a text or JSONL file under 2 MB.'); return await f.text(); })()".}
+proc datasetFileOutcome(): Future[cstring] {.importjs: """
+(async () => {
+  try {
+    const f=document.getElementById('datasetFile').files[0];
+    if(!f || f.size>2000000) throw new Error('Choose a text or JSONL file under 2 MB.');
+    return JSON.stringify({value: await f.text()});
+  } catch(error) {
+    return JSON.stringify({error: error && typeof error.message==='string' ? error.message : 'The dataset file could not be read.'});
+  }
+})()
+""".}
 
-proc uploadModelFiles*(baseUrl, csrf, name: cstring): Future[cstring] {.importjs: """
+proc modelUploadOutcome(baseUrl, csrf, name: cstring): Future[cstring] {.importjs: """
 (async (base,csrf,name) => {
+ try {
   const files=Array.from(document.getElementById('modelFiles').files).filter(f=>/\.(json|safetensors|txt|model)$$/.test(f.name) && !f.name.startsWith('.'));
   if(!files.length) throw new Error('Choose a model folder first.');
   if(new Set(files.map(f=>f.name)).size!==files.length || files.some(f=>f.webkitRelativePath.split('/').length>2)) throw new Error('Choose one model folder without nested model data.');
@@ -112,9 +123,26 @@ proc uploadModelFiles*(baseUrl, csrf, name: cstring): Future[cstring] {.importjs
       await call('upload_chunk',{upload_id,filename:file.name,offset,base64:btoa(raw)});
     }
   }
-  return JSON.stringify(await call('upload_finish',{upload_id,name}));
+  return JSON.stringify({value: JSON.stringify(await call('upload_finish',{upload_id,name}))});
+ } catch(error) {
+  return JSON.stringify({error: error && typeof error.message==='string' ? error.message : 'The model upload failed.'});
+ }
 })(#,#,#)
 """.}
+
+proc browserOutcome(raw: cstring): string =
+  # Browser failures cross as data and become a normal Nim exception; a
+  # native JavaScript Error would escape every CatchableError handler.
+  let outcome = decodeJson($raw)
+  if outcome.hasKey("error"):
+    raise newException(ValueError, outcome["error"].getStr)
+  outcome["value"].getStr
+
+proc datasetFileText*(): Future[string] {.async.} =
+  return browserOutcome(await datasetFileOutcome())
+
+proc uploadModelFiles*(baseUrl, csrf, name: cstring): Future[string] {.async.} =
+  return browserOutcome(await modelUploadOutcome(baseUrl, csrf, name))
 
 proc downloadTrainingDataset*(data: cstring) {.importjs: """
 ((data)=>{const parsed=JSON.parse(data);const blob=new Blob([parsed.records.map(r=>JSON.stringify(r)).join('\n')+'\n'],{type:'application/x-ndjson'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='reviewed-training-dataset.jsonl';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);})(#)
