@@ -930,11 +930,14 @@ body {
 }
 
 /* Active model · dataset. Opens the Personal connections section. Each name
-   keeps its own share of the width and truncates on its own. */
+   keeps its own share of the width and truncates on its own. On wide screens
+   it sits just before the header controls; narrow screens give it a row. */
 .workspace-context {
   min-width: 0;
   max-width: min(36vw, 320px);
   height: 30px;
+  margin-left: auto;
+  margin-right: 7px;
   padding: 0 10px;
   display: inline-flex;
   align-items: center;
@@ -968,6 +971,38 @@ body {
 
 .workspace-context-separator {
   flex: 0 0 auto;
+  color: var(--muted);
+}
+
+/* The open chat's title. The sidebar names it on wide screens; narrow
+   screens hide the sidebar and show it under the view title instead. */
+.workspace-title .workspace-chat-title {
+  display: none;
+}
+
+.header-menu-owner {
+  padding: 8px 9px 9px;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--header-control-size);
+}
+
+.header-menu-owner strong,
+.header-menu-owner span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-menu-owner strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.header-menu-owner span {
   color: var(--muted);
 }
 
@@ -1654,11 +1689,30 @@ body {
 @media (max-width: 760px) {
   .run-status-chip { max-width: 100px; padding-inline: 8px; gap: 5px; }
   .run-status-label { display: block; }
-  .header-controls { flex-shrink: 1; gap: 4px; }
+  .header-controls { flex-shrink: 0; gap: 4px; }
   .workspace-header { padding-inline: 14px; gap: 8px; }
-  .workspace-title { flex: 0 0 auto; }
+  .workspace-title { flex: 1; }
   .command-header-action { width: 35px; }
-  .workspace-context { max-width: 100%; flex-shrink: 1; }
+  /* The context takes its own full-width row under the title and controls. */
+  .workspace-header:has(.workspace-context) {
+    height: auto;
+    min-height: 58px;
+    padding-block: 8px;
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .workspace-context {
+    order: 3;
+    flex: 1 0 100%;
+    max-width: 100%;
+    margin: 0;
+    justify-content: flex-start;
+  }
+  .workspace-title .workspace-chat-title {
+    display: block;
+    color: var(--muted);
+    font-size: var(--header-control-size);
+  }
   .message-column.user { max-width: 90%; }
   .message-column.assistant { max-width: calc(100% - 40px); }
   .composer-container { padding-bottom: max(12px, env(safe-area-inset-bottom)); }

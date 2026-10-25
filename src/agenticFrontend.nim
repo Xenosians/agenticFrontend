@@ -106,6 +106,12 @@ proc activeViewTitle(): string =
     "Account"
 
 
+proc currentChatTitle(): string =
+  for chat in appState.chats:
+    if chat.chatId == appState.currentChatId:
+      return chat.title
+
+
 proc activeViewSubtitle(): string =
   if appState.commandPaletteOpen:
     return "Quick workspace actions and navigation"
@@ -964,6 +970,15 @@ proc renderHeaderMenu(): VNode =
   result = buildHtml(
     tdiv(class = "header-menu")
   ):
+    # Who is signed in: the sidebar footer shows this on wide screens only.
+    tdiv(class = "header-menu-owner"):
+      strong:
+        text (if appState.auth.displayName.len > 0: appState.auth.displayName
+              else: appState.auth.email)
+      if appState.auth.displayName.len > 0 and appState.auth.email.len > 0:
+        span:
+          text appState.auth.email
+
     button:
       text "New chat"
       proc onclick(
@@ -1041,29 +1056,37 @@ proc renderWorkspace(): VNode =
           text activeViewTitle()
         span:
           text activeViewSubtitle()
+        # Shown where the sidebar (and its chat list) is hidden.
+        let chatTitle = currentChatTitle()
+        if appState.activeView == viewChat and not appState.commandPaletteOpen and
+           chatTitle.len > 0:
+          span(class = "workspace-chat-title"):
+            text chatTitle
+
+      # Active model · dataset. A sibling of the controls so narrow layouts
+      # can give it a full-width row instead of squeezing it between buttons.
+      let context = activeContextNames(appState)
+      if context.model.len > 0:
+        let label =
+          if context.dataset.len > 0: context.model & " · " & context.dataset
+          else: context.model
+        button(
+          class = "workspace-context",
+          title = cstring("Active model and dataset: " & label),
+          `aria-label` = cstring("Active model and dataset: " & label)
+        ):
+          span(class = "workspace-context-model"):
+            text context.model
+          if context.dataset.len > 0:
+            span(class = "workspace-context-separator"):
+              text "·"
+            span(class = "workspace-context-dataset"):
+              text context.dataset
+          proc onclick(event: Event, node: VNode) =
+            openActiveContext(appState)
+            runWorkspaceCommand("connections")
 
       tdiv(class = "header-controls"):
-        let context = activeContextNames(appState)
-        if context.model.len > 0:
-          let label =
-            if context.dataset.len > 0: context.model & " · " & context.dataset
-            else: context.model
-          button(
-            class = "workspace-context",
-            title = cstring("Active model and dataset: " & label),
-            `aria-label` = cstring("Active model and dataset: " & label)
-          ):
-            span(class = "workspace-context-model"):
-              text context.model
-            if context.dataset.len > 0:
-              span(class = "workspace-context-separator"):
-                text "·"
-              span(class = "workspace-context-dataset"):
-                text context.dataset
-            proc onclick(event: Event, node: VNode) =
-              openActiveContext(appState)
-              runWorkspaceCommand("connections")
-
         if appState.run.active and appState.run.status.len > 0:
           button(
             class = runStatusClass(appState.run.status),

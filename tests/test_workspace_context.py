@@ -97,6 +97,36 @@ class WorkspaceContextTests(navigation.ChatNavigationTests):
                 self.assertEqual(self.mutations, [])
                 self.assertEqual(self.errors, [])
 
+    def test_header_context_stays_readable_beside_a_job_status(self):
+        # Narrow width plus an active job is the most crowded header.
+        self.page.set_viewport_size({"width": 390, "height": 760})
+        self.open_first_chat()
+        self.page.locator("#messageInput").fill("Fixture request")
+        self.page.locator("#messageInput").press("Enter")
+        expect(self.page.locator(".run-status-chip")).to_be_visible()
+        context = self.page.locator(".workspace-context")
+        expect(context).to_be_visible()
+        widths = self.page.evaluate("""() => ['model', 'dataset'].map((part) => {
+            const node = document.querySelector('.workspace-context-' + part);
+            return node ? node.getBoundingClientRect().width : 0;
+        })""")
+        # At least a few characters of each name, not a two-letter stub.
+        self.assertTrue(all(width >= 40 for width in widths), widths)
+        expect(context).to_have_attribute(
+            "aria-label", "Active model and dataset: Fixture provider model · Fixture runbooks")
+        self.assertEqual(self.errors, [])
+
+    def test_narrow_screens_still_show_who_is_signed_in_and_which_chat_is_open(self):
+        # Phones hide the sidebar, which is where the owner and chat list live.
+        self.page.set_viewport_size({"width": 390, "height": 760})
+        self.open_first_chat()
+        expect(self.page.locator(".sidebar")).to_be_hidden()
+        header = self.page.locator(".workspace-header")
+        expect(header).to_contain_text("First fixture chat")
+        self.page.get_by_role("button", name="More", exact=True).click()
+        expect(self.page.locator(".header-menu")).to_contain_text("Fixture Owner")
+        self.assertEqual(self.errors, [])
+
     def test_header_context_follows_a_changed_selection_without_a_dataset(self):
         self.catalog["selected"] = {"model_id": None, "dataset_id": None}
         self.open_first_chat()
@@ -148,6 +178,8 @@ def load_tests(loader, _tests, _pattern):
     # Reuse the fixture lifecycle without rerunning its separate regression suite.
     return unittest.TestSuite(WorkspaceContextTests(name) for name in (
         "test_header_shows_the_selected_model_and_dataset",
+        "test_header_context_stays_readable_beside_a_job_status",
+        "test_narrow_screens_still_show_who_is_signed_in_and_which_chat_is_open",
         "test_header_context_follows_a_changed_selection_without_a_dataset",
         "test_header_context_opens_the_connection_settings",
         "test_icon_and_unlabeled_controls_have_accessible_names",
