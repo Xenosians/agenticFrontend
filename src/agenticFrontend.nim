@@ -11,6 +11,7 @@ import app/auth_bridge
 import app/backend_bridge
 
 import components/connections
+import components/capabilities
 import app/extension_bridge
 import components/auth
 import components/sidebar
@@ -104,6 +105,8 @@ proc activeViewTitle(): string =
     "PCB / Infrastructure Simulator"
   of viewAccount:
     "Account"
+  of viewCapabilities:
+    "Capabilities"
 
 
 proc currentChatTitle(): string =
@@ -135,6 +138,8 @@ proc activeViewSubtitle(): string =
     "Design preview — simulation is not connected"
   of viewAccount:
     "Profile and authenticated sessions"
+  of viewCapabilities:
+    "Governed operations by specialist"
 
 
 proc renderSearchView(): VNode =
@@ -734,7 +739,7 @@ proc renderSavedChat(savedChat: ChatItem): VNode =
         cstring"command-center-row saved-chat-row active"
       else:
         cstring"command-center-row saved-chat-row")):
-    span(class = "command-center-icon"):
+    span(class = "command-center-icon", `aria-hidden` = "true"):
       text "◇"
     tdiv(class = "command-center-copy"):
       strong:
@@ -779,7 +784,7 @@ proc renderChatsView(): VNode =
 
 proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
   result = buildHtml(button(class = "command-center-row")):
-    span(class = "command-center-icon"):
+    span(class = "command-center-icon", `aria-hidden` = "true"):
       case command.id
       of "new_chat":
         text "+"
@@ -789,6 +794,8 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         text "⌕"
       of "connections":
         text "◇"
+      of "capabilities":
+        text "▤"
       of "inspector":
         text "I"
       of "refresh":
@@ -812,6 +819,8 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
           text "Search the current chat"
         of "connections":
           text "Open models, harnesses, datasets and integrations"
+        of "capabilities":
+          text "Browse governed operations by specialist"
         of "inspector":
           text "Toggle developer diagnostics"
         of "refresh":
@@ -825,7 +834,7 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
       kbd:
         text command.shortcut
     else:
-      span(class = "command-enter"):
+      span(class = "command-enter", `aria-hidden` = "true"):
         text "↵"
 
     proc onclick(
@@ -934,6 +943,8 @@ proc renderWorkspaceBody(): VNode =
     renderSimulatorView()
   of viewAccount:
     renderAccountView()
+  of viewCapabilities:
+    renderCapabilitiesView(appState)
 
 
 proc runStatusLabel(status: string): string =
@@ -1202,6 +1213,9 @@ proc runWorkspaceCommand(action: string) =
     queueWorkspaceFocus("chatSearch")
   of "connections":
     setActiveView(appState, viewPlugin)
+    discard refreshExtensions(appState)
+  of "capabilities":
+    setActiveView(appState, viewCapabilities)
     discard refreshExtensions(appState)
   of "inspector": appState.inspectorOpen = not appState.inspectorOpen
   of "refresh": discard refreshSystemStatus(appState)

@@ -443,6 +443,12 @@ a:focus-visible,
   background: var(--surface-active, rgba(255, 255, 255, 0.06));
 }
 
+/* The open chat while another page is in view: marked, not highlighted. */
+.chat-nav-main.active.background {
+  background: transparent;
+  box-shadow: inset 2px 0 0 var(--border-strong);
+}
+
 .chat-nav-title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -632,8 +638,8 @@ body {
 }
 
 .workspace-title span {
-  font-size: 11px;
-  opacity: 0.52;
+  font-size: var(--header-control-size);
+  color: var(--text-soft);
 }
 
 .header-controls {
@@ -793,7 +799,9 @@ body {
 
 .developer-view-header p {
   margin: 0;
-  opacity: 0.58;
+  /* Secondary, but readable: one token instead of a dimmed literal. */
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
 }
 
 .developer-card,
@@ -972,6 +980,94 @@ body {
 .workspace-context-separator {
   flex: 0 0 auto;
   color: var(--muted);
+}
+
+/* Capabilities page: governed operations grouped by specialist. One type
+   scale (the header control size) and token colours only. */
+.capability-toolbar {
+  margin-bottom: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 16px;
+}
+
+.capability-search {
+  flex: 1 1 240px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--header-control-size);
+}
+
+.capability-summary,
+.capability-empty,
+.capability-copy span {
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+}
+
+.capability-empty {
+  padding: 24px 0;
+}
+
+.capability-group {
+  margin-bottom: 20px;
+}
+
+.capability-group h3 {
+  margin: 0 0 6px;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+  font-weight: 600;
+}
+
+.capability-row {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.capability-copy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.capability-copy strong {
+  color: var(--text);
+  font-size: var(--header-control-size);
+  font-weight: 600;
+  word-break: keep-all;
+}
+
+.capability-tags {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 6px;
+}
+
+.capability-tag {
+  padding: 3px 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+  white-space: nowrap;
+}
+
+.capability-tag.strong {
+  border-color: var(--text-soft);
+  color: var(--text);
 }
 
 /* The open chat's title. The sidebar names it on wide screens; narrow
@@ -1712,6 +1808,12 @@ body {
     display: block;
     color: var(--muted);
     font-size: var(--header-control-size);
+  }
+  /* Narrow rows keep the full width for the name; tags sit underneath. */
+  .capability-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
   .message-column.user { max-width: 90%; }
   .message-column.assistant { max-width: calc(100% - 40px); }

@@ -33,11 +33,12 @@ proc renderViewButton(
       class = viewNavClass(
         state,
         target
-      )
+      ),
+      `aria-current` = (if state.activeView == target: cstring"page" else: cstring"false")
     )
   ):
 
-    span(class = "nav-icon"):
+    span(class = "nav-icon", `aria-hidden` = "true"):
       text icon
 
     span:
@@ -55,7 +56,7 @@ proc renderViewButton(
         state,
         target
       )
-      if target in [viewPlugin, viewTool]:
+      if target in [viewPlugin, viewTool, viewCapabilities]:
         discard refreshExtensions(state)
 
 
@@ -63,14 +64,23 @@ proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
   # Each call owns the target captured by its open/delete handlers. A local
   # declared inside a rendering loop shares one closure in Nim's JS backend.
   result = buildHtml(tdiv(class = "chat-nav-row")):
+    # The open chat is the page in view only in the chat view; elsewhere it
+    # stays marked as the current chat without competing with the page.
+    let isOpen = chat.chatId == state.currentChatId
     button(
       class =
-        if chat.chatId == state.currentChatId:
+        if isOpen and state.activeView == viewChat:
           cstring"chat-nav-main active"
+        elif isOpen:
+          cstring"chat-nav-main active background"
         else:
-          cstring"chat-nav-main"
+          cstring"chat-nav-main",
+      `aria-current` =
+        if isOpen and state.activeView == viewChat: cstring"page"
+        elif isOpen: cstring"true"
+        else: cstring"false"
     ):
-      span(class = "nav-icon"):
+      span(class = "nav-icon", `aria-hidden` = "true"):
         text "◇"
       span(class = "chat-nav-title"):
         text chat.title
@@ -175,6 +185,13 @@ proc renderSidebar*(
 
       renderViewButton(
         state,
+        "▤",
+        "Capabilities",
+        viewCapabilities
+      )
+
+      renderViewButton(
+        state,
         "◌",
         "Activity",
         viewJobs
@@ -237,7 +254,7 @@ proc renderSidebar*(
               "authenticated"
           )
 
-      span(class = "nav-tail"):
+      span(class = "nav-tail", `aria-hidden` = "true"):
         text "›"
 
       proc onclick(

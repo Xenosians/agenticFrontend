@@ -14,7 +14,8 @@ type
     viewPlugin,
     viewNodeBuilder,
     viewSimulator,
-    viewAccount
+    viewAccount,
+    viewCapabilities
 
   InspectorTab* = enum
     tabRun,
@@ -182,6 +183,7 @@ type
     workflowArgumentDrafts*: JsonNode
     workflowSteps*: seq[WorkflowStep]
     searchDraft*: string
+    capabilityQuery*: string
     composerSelectedToolId*: string
     selectedToolId*: string
     selectedPluginId*: string
