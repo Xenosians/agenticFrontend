@@ -22,6 +22,7 @@ import components/inspector
 import components/result_card
 import components/required_operations
 import components/statusbar
+import components/chat_search
 import config/runtime_config
 
 
@@ -127,7 +128,7 @@ proc activeViewSubtitle(): string =
   of viewChats:
     "Your saved conversations"
   of viewSearch:
-    "Search the loaded chat"
+    "Saved chats and the open conversation"
   of viewJobs, viewRuns, viewLogs:
     "Current durable job and execution timeline"
   of viewSystem:
@@ -167,7 +168,7 @@ proc renderSearchView(): VNode =
           h2:
             text "Search"
           p:
-            text "Search messages in the current durable chat."
+            text "Search every saved chat, and the messages in the open one."
 
       tdiv(class = "search-box"):
         span:
@@ -177,7 +178,7 @@ proc renderSearchView(): VNode =
           id = "chatSearch",
           class = "search-input",
           `type` = "search",
-          placeholder = "Search this chat...",
+          placeholder = "Search chats...",
           value = cstring(appState.searchDraft)
         ):
           proc oninput(
@@ -188,6 +189,7 @@ proc renderSearchView(): VNode =
               appState,
               $node.value
             )
+            scheduleChatSearch($node.value)
             redraw(kxi)
 
         if appState.searchDraft.len > 0:
@@ -202,28 +204,41 @@ proc renderSearchView(): VNode =
                 appState,
                 ""
               )
+              scheduleChatSearch("")
               redraw(kxi)
+
+      # Every saved chat, searched by the backend (FR-078). Opening a match
+      # shows the chat at once; its history and saved job load into it.
+      renderChatSearchResults(
+        appState,
+        proc(chatId: string) =
+          setActiveView(appState, viewChat)
+          discard selectChat(appState, chatId)
+      )
 
       if query.len == 0:
         tdiv(class = "empty-card"):
-          text "Start typing to search the messages already loaded for this chat."
-      elif resultCount == 0:
-        tdiv(class = "empty-card"):
-          text "No messages matched your search."
+          text "Start typing to search saved chats and this chat's messages."
       else:
-        tdiv(class = "search-results"):
-          for message in appState.messages:
-            if query in message.content.toLowerAscii():
-              tdiv(class = "search-result"):
-                span:
-                  case message.role
-                  of mrUser:
-                    text "You"
-                  of mrAssistant:
-                    text productName
+        h3(class = "chat-search-heading"):
+          text "In this chat"
+        if resultCount == 0:
+          tdiv(class = "empty-card"):
+            text "No messages in this chat match your search."
+        else:
+          tdiv(class = "search-results"):
+            for message in appState.messages:
+              if query in message.content.toLowerAscii():
+                tdiv(class = "search-result"):
+                  span:
+                    case message.role
+                    of mrUser:
+                      text "You"
+                    of mrAssistant:
+                      text productName
 
-                p:
-                  text message.content
+                  p:
+                    text message.content
 
 
 proc renderActivityView(): VNode =

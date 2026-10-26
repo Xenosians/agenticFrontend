@@ -2,7 +2,8 @@ import std/[
   asyncjs,
   jsfetch,
   jsheaders,
-  json
+  json,
+  uri
 ]
 
 from std/httpcore import
@@ -35,6 +36,14 @@ type
     title*: string
     createdAt*: string
     updatedAt*: string
+
+  ## One saved chat matching a search: by its title, or by a saved turn
+  ## (`excerpt` is that turn's text).
+  ChatSearchResult* = object
+    chatId*: string
+    title*: string
+    matched*: string
+    excerpt*: string
 
   SessionSummary* = object
     sessionId*: string
@@ -374,6 +383,40 @@ proc listChats*(): Future[seq[ChatSummary]] {.async.} =
           updatedAt: jsonText(node, "updated_at")
         )
       )
+
+  return items
+
+
+proc searchChats*(query: string): Future[seq[ChatSearchResult]] {.async.} =
+  ## The backend searches every saved chat this account owns.
+  let options = newFetchOptions(
+    metod = HttpGet,
+    mode = fmCors,
+    credentials = fcInclude
+  )
+
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/chats/search?q=" & encodeUrl(query, usePlus = false),
+    options
+  )
+
+  if not response.ok:
+    raise apiError($response.status, response.body)
+
+  let data = decodeJson(response.body)
+  if data.kind != JObject or not data.hasKey("results") or data["results"].kind != JArray:
+    raise newException(ValueError, "Backend chat search response is invalid.")
+
+  var items = newSeq[ChatSearchResult]()
+  for node in data["results"].items:
+    items.add(
+      ChatSearchResult(
+        chatId: jsonText(node, "chat_id"),
+        title: jsonText(node, "title"),
+        matched: jsonText(node, "matched"),
+        excerpt: jsonText(node, "excerpt")
+      )
+    )
 
   return items
 

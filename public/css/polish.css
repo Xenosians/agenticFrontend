@@ -814,6 +814,65 @@ body {
   border-radius: 12px;
 }
 
+/* Saved-chat search results: the same card as an in-chat result, as buttons. */
+.chat-search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.chat-search-heading {
+  margin: 0 0 2px;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+  font-weight: 600;
+}
+
+.chat-search-status {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+}
+
+.chat-search-result {
+  width: 100%;
+  min-width: 0;
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chat-search-result:hover,
+.chat-search-result.current {
+  border-color: var(--border-strong);
+  background: var(--panel-hover);
+}
+
+.chat-search-result strong {
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-search-result span {
+  overflow: hidden;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .developer-grid {
   gap: 12px;
 }
