@@ -10,6 +10,7 @@ import ../app/job_decision
 import result_card
 import message_body
 import brand
+import statusbar
 
 
 proc progressLabel(state: AppState): string =
@@ -27,16 +28,6 @@ proc progressLabel(state: AppState): string =
     else: "Working on your request"
 
 
-proc observationLabel(state: AppState): string =
-  case state.run.observationMode
-  of "live": "Live updates"
-  of "connecting": "Connecting to live updates"
-  of "reconnecting": "Reconnecting · checking for updates"
-  of "polling": "Checking for updates"
-  of "interrupted": "Connection interrupted"
-  else: "Checking saved progress"
-
-
 proc renderJobProgress(state: AppState): VNode =
   result = buildHtml(tdiv(class = "job-progress", role = "status", `aria-live` = "polite")):
     span(class = "job-progress-dot"):
@@ -45,7 +36,7 @@ proc renderJobProgress(state: AppState): VNode =
       strong:
         text progressLabel(state)
       span:
-        text observationLabel(state)
+        text observationLabel(state.run.observationMode)
     if state.run.observationMode == "interrupted":
       button(class = "approval-recovery-button"):
         text "Check saved task"

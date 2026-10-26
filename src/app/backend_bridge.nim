@@ -690,6 +690,12 @@ proc refreshSystemStatusBase(
   redraw(kxi)
 
 
+## Public service health only, for the status bar's periodic re-read: the
+## integrations and capability catalog are refreshed on explicit request.
+proc refreshServiceHealth*(state: AppState) {.async.} =
+  await refreshSystemStatusBase(state)
+
+
 proc refreshSystemStatus*(
   state: AppState
 ) {.async.} =

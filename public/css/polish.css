@@ -763,11 +763,13 @@ body {
   min-height: 17px;
   padding: 6px 4px 0;
   overflow: hidden;
+  /* Quiet but readable on the page: the shared secondary-text token
+     (--muted reaches only about 4.2:1 here). */
+  color: var(--text-soft);
   font-size: 11px;
   line-height: 17px;
   text-overflow: ellipsis;
   white-space: nowrap;
-  opacity: 0.55;
 }
 
 /* Legacy floating feedback should never obscure the composer. */
@@ -1824,6 +1826,114 @@ body {
   .job-progress .approval-recovery-button { max-width: 118px; }
 }
 @supports (height: 100dvh) { #app, .app-shell { height: 100dvh; } }
+
+/* ----------------------------------------------------------
+   Status bar: one quiet full-width row under the panes, as in
+   Hermes. Every pane sits in the first row at every width.
+   ---------------------------------------------------------- */
+:root {
+  --statusbar-height: 26px;
+}
+
+.app-shell,
+.app-shell.inspector-hidden {
+  grid-template-rows: minmax(0, 1fr) calc(var(--statusbar-height) + env(safe-area-inset-bottom));
+}
+
+.app-shell > :not(.statusbar) {
+  grid-row: 1;
+}
+
+.statusbar {
+  grid-row: 2;
+  grid-column: 1 / -1;
+  min-width: 0;
+  /* Items carry their own 7px inset, so the bar's edges match on both sides. */
+  padding: 0 0 env(safe-area-inset-bottom);
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 7px;
+  overflow: hidden;
+  border-top: 1px solid var(--border);
+  background: var(--panel);
+}
+
+.statusbar-group {
+  min-width: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.statusbar-item {
+  min-width: 0;
+  padding: 0 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: var(--header-control-size);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.statusbar-item:hover,
+.statusbar-inspector[aria-pressed="true"] {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+.statusbar-item:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Monochrome states: filled when ready, hollow when starting, struck when unavailable. */
+.statusbar-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--text-soft);
+  border-radius: 50%;
+}
+
+.statusbar-health.ready .statusbar-dot,
+.statusbar-job .statusbar-dot {
+  background: var(--text-soft);
+}
+
+.statusbar-health.unavailable .statusbar-dot {
+  border-radius: 1px;
+  transform: rotate(45deg);
+}
+
+.statusbar-health.unknown .statusbar-dot {
+  border-style: dashed;
+}
+
+.statusbar-job .statusbar-dot {
+  animation: status-pulse 1.4s ease-in-out infinite;
+}
+
+/* Matches the layouts that drop the inspector rail. */
+@media (max-width: 1100px) {
+  .statusbar-inspector {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .statusbar-job .statusbar-dot {
+    animation: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .conversation { scroll-behavior: auto; }
   .run-status-chip.working .run-status-dot { animation: none; }

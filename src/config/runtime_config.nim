@@ -5,6 +5,9 @@ type
   FrontendRuntimeConfig* = object
     backendBaseUrl*: string
     pollIntervalMs*: int
+    # Optional. How often the status bar re-reads public service health;
+    # 0 (absent) reads it once at sign-in and on explicit refresh only.
+    healthIntervalMs*: int
 
 
 proc hasConfigKey(
@@ -77,9 +80,19 @@ proc loadFrontendRuntimeConfig*(): FrontendRuntimeConfig =
       "AGENTIC_CONFIG.pollIntervalMs must be greater than zero."
     )
 
+  var healthIntervalMs = 0
+  if hasConfigKey(cstring"healthIntervalMs"):
+    healthIntervalMs = configInteger(cstring"healthIntervalMs")
+    if healthIntervalMs <= 0:
+      raise newException(
+        ValueError,
+        "AGENTIC_CONFIG.healthIntervalMs must be greater than zero when set."
+      )
+
   result = FrontendRuntimeConfig(
     backendBaseUrl: backendBaseUrl,
-    pollIntervalMs: pollIntervalMs
+    pollIntervalMs: pollIntervalMs,
+    healthIntervalMs: healthIntervalMs
   )
 
 

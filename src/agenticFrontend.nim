@@ -21,6 +21,8 @@ import components/brand
 import components/inspector
 import components/result_card
 import components/required_operations
+import components/statusbar
+import config/runtime_config
 
 
 var appState =
@@ -1256,6 +1258,15 @@ proc renderApp(): VNode =
         appState
       )
 
+    renderStatusbar(
+      appState,
+      proc(view: AppView) =
+        setActiveView(appState, view)
+        redraw(kxi),
+      proc() =
+        runWorkspaceCommand("inspector")
+    )
+
 
 setRenderer(
   renderApp,
@@ -1272,6 +1283,16 @@ discard bootstrapApplication(
 discard refreshSystemStatus(
   appState
 )
+
+# Re-read public service health on the configured cadence, so the status bar
+# follows an outage or recovery without a reload. One read at a time.
+if frontendConfig.healthIntervalMs > 0:
+  discard setInterval(
+    proc() =
+      if appState.auth.authenticated and not appState.system.checking:
+        discard refreshServiceHealth(appState),
+    frontendConfig.healthIntervalMs
+  )
 
 installWorkspaceKeys(proc(key: cstring, modifier, shift, composing, repeated, alt: bool): bool =
   if not appState.auth.authenticated: return false
