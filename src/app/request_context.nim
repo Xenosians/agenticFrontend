@@ -60,6 +60,14 @@ proc clearOperations*(state: AppState) =
   state.reviewDeciding = ""
   state.reviewItemErrors = @[]
   state.reviewReasons = @[]
+  # Knowledge searches and hits belong to the signed-in owner.
+  inc state.knowledgeEpoch
+  state.knowledgeHits = @[]
+  state.knowledgeSearched = false
+  state.knowledgeBusy = false
+  state.knowledgeError = ""
+  state.knowledgeQuery = ""
+  state.knowledgeSource = ""
 
 proc beginReviewRequest*(state: AppState): OperationsRequestContext =
   inc state.reviewEpoch
@@ -67,6 +75,13 @@ proc beginReviewRequest*(state: AppState): OperationsRequestContext =
 
 proc matchesReviewRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.reviewEpoch == request.epoch
+
+proc beginKnowledgeRequest*(state: AppState): OperationsRequestContext =
+  inc state.knowledgeEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.knowledgeEpoch)
+
+proc matchesKnowledgeRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.knowledgeEpoch == request.epoch
 
 proc isReviewer*(state: AppState): bool =
   ## The backend enforces this; the UI only hides what would be refused.

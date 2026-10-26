@@ -2,6 +2,7 @@ import std/json
 import workflow_request
 import operations_snapshot
 import feedback_review
+import knowledge
 
 type
   AppView* = enum
@@ -18,7 +19,8 @@ type
     viewSimulator,
     viewAccount,
     viewCapabilities,
-    viewReview
+    viewReview,
+    viewKnowledge
 
   InspectorTab* = enum
     tabRun,
@@ -156,6 +158,10 @@ type
     reviewItemErrors*: seq[(string, string)]
     reviewReasons*: seq[(string, string)]
     reviewEpoch*: int
+    knowledgeHits*: seq[KnowledgeHit]
+    knowledgeBusy*, knowledgeSearched*: bool
+    knowledgeError*, knowledgeQuery*, knowledgeSource*: string
+    knowledgeEpoch*: int
     extensionCatalog*: JsonNode
     commandPaletteOpen*: bool
     commandQuery*: string

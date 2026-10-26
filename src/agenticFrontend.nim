@@ -11,6 +11,7 @@ import app/auth_bridge
 import app/backend_bridge
 import app/operations_bridge
 import app/review_bridge
+import app/knowledge_bridge
 import app/request_context
 
 import components/connections
@@ -28,6 +29,7 @@ import components/statusbar
 import components/chat_search
 import components/operations
 import components/review
+import components/knowledge
 import config/runtime_config
 
 
@@ -118,6 +120,8 @@ proc activeViewTitle(): string =
     "Capabilities"
   of viewReview:
     "Review"
+  of viewKnowledge:
+    "Knowledge"
 
 
 proc currentChatTitle(): string =
@@ -153,6 +157,8 @@ proc activeViewSubtitle(): string =
     "Governed operations by specialist"
   of viewReview:
     "Critiques and corrections awaiting a decision"
+  of viewKnowledge:
+    "Reference sources and cited search"
 
 
 proc renderSearchView(): VNode =
@@ -814,6 +820,8 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         text "◇"
       of "capabilities":
         text "▤"
+      of "knowledge":
+        text "❏"
       of "inspector":
         text "I"
       of "refresh":
@@ -841,6 +849,8 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
           text "Browse governed operations by specialist"
         of "review":
           text "Decide on critiques and corrections"
+        of "knowledge":
+          text "Search your reference datasets with citations"
         of "inspector":
           text "Toggle developer diagnostics"
         of "refresh":
@@ -968,6 +978,8 @@ proc renderWorkspaceBody(): VNode =
     renderCapabilitiesView(appState)
   of viewReview:
     renderReviewPanel(appState)
+  of viewKnowledge:
+    renderKnowledgePanel(appState)
 
 
 proc runStatusLabel(status: string): string =
@@ -1242,6 +1254,7 @@ proc runWorkspaceCommand(action: string) =
     discard refreshExtensions(appState)
   of "operations": openOperations(appState)
   of "review": openReview(appState)
+  of "knowledge": openKnowledge(appState)
   of "inspector": appState.inspectorOpen = not appState.inspectorOpen
   of "refresh": discard refreshSystemStatus(appState)
   of "compose":

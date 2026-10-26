@@ -59,7 +59,7 @@ proc renderViewButton(
         state,
         target
       )
-      if target in [viewPlugin, viewTool, viewCapabilities]:
+      if target in [viewPlugin, viewTool, viewCapabilities, viewKnowledge]:
         discard refreshExtensions(state)
       elif target == viewJobs:
         discard refreshOperations(state)
@@ -195,6 +195,13 @@ proc renderSidebar*(
         "▤",
         "Capabilities",
         viewCapabilities
+      )
+
+      renderViewButton(
+        state,
+        "❏",
+        "Knowledge",
+        viewKnowledge
       )
 
       renderViewButton(

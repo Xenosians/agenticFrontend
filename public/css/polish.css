@@ -2160,3 +2160,27 @@ body {
 .review-item[data-review-status="pending_review"] .review-status { border-color: var(--text-soft); color: var(--text); font-weight: 600; }
 .review-item[data-review-status="accepted"] .review-status,
 .review-item[data-review-status="dismissed"] .review-status { border-style: dashed; }
+
+/* Knowledge: reference sources and cited, untrusted search hits. */
+.knowledge-source, .knowledge-hit { padding: 14px 0; border-top: 1px solid var(--border); min-width: 0; }
+.knowledge-meta { margin: 6px 0 0; color: var(--text-soft); font-size: var(--header-control-size); line-height: 1.6; overflow-wrap: anywhere; }
+.knowledge-content { margin: 10px 0 0; padding-left: 12px; border-left: 2px solid var(--border-strong); color: var(--text); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; white-space: pre-wrap; }
+.knowledge-trust { border: 1px dashed var(--text-soft); border-radius: var(--radius-sm); padding: 2px 8px; color: var(--text); font-size: var(--header-control-size); white-space: nowrap; }
+.knowledge-citation { color: var(--text-soft); font-size: var(--header-control-size); overflow-wrap: anywhere; }
+.knowledge-citation-line { margin-top: 8px; }
+.knowledge-panel .section-heading-row { margin-top: 24px; }
+.knowledge-search { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 16px; }
+.knowledge-query { display: flex; gap: 10px; min-width: 0; }
+.knowledge-select, .knowledge-input {
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+.knowledge-input { flex: 1; }
+@media (max-width: 650px) {
+  .knowledge-query { flex-direction: column; }
+}
