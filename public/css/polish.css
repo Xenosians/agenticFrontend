@@ -2105,3 +2105,32 @@ body {
 .integration-recheck { background: transparent; cursor: pointer; }
 .integration-recheck:hover { color: var(--text); }
 .integration-recheck:disabled { cursor: default; }
+
+/* Owner-scoped Operations snapshots and observed calls. */
+.operation-counts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 24px; }
+/* A long status label may wrap; the number stays on one line across the row. */
+.operation-count { display: flex; flex-direction: column; justify-content: space-between; gap: 8px; }
+.operation-count .run-label { color: var(--text-soft); line-height: 1.4; }
+.operation-count strong { font-size: 20px; }
+.operations-panel .section-heading-row span { color: var(--text-soft); }
+.operation-job-heading .capability-badge { border: 1px solid var(--border); color: var(--text-soft); font-size: var(--header-control-size); }
+.operation-note { color: var(--text-soft); font-size: var(--header-control-size); line-height: 1.6; margin: 6px 0; overflow-wrap: anywhere; }
+.operation-error { color: var(--text); font-size: 13px; line-height: 1.6; }
+.operation-job { padding: 16px 0; border-top: 1px solid var(--border); min-width: 0; }
+.operation-job-heading, .operation-call-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.operation-job-heading > div { min-width: 0; }
+.operation-job-id { display: block; overflow-wrap: anywhere; font-size: 12px; }
+.operation-measurements { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 12px 0; }
+.operation-measurement { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.operation-measurement span, .operation-call-outcome { color: var(--text-soft); font-size: var(--header-control-size); }
+.operation-measurement strong { font-size: 13px; overflow-wrap: anywhere; }
+.operation-job-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.operation-calls { margin-top: 16px; padding-left: 14px; border-left: 1px solid var(--border-strong); }
+.operation-calls h4 { margin: 0 0 8px; font-size: 13px; }
+.operation-call { padding: 12px 0; border-top: 1px solid var(--border); }
+.operation-call-heading strong { font-size: 13px; }
+.operation-call-limits summary { color: var(--text-soft); font-size: var(--header-control-size); cursor: pointer; }
+@media (max-width: 650px) {
+  .operation-counts, .operation-measurements { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .operation-job-heading { flex-wrap: wrap; }
+}

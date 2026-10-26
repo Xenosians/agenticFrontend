@@ -9,6 +9,7 @@ import app/types
 import app/state
 import app/auth_bridge
 import app/backend_bridge
+import app/operations_bridge
 
 import components/connections
 import components/capabilities
@@ -23,6 +24,7 @@ import components/result_card
 import components/required_operations
 import components/statusbar
 import components/chat_search
+import components/operations
 import config/runtime_config
 
 
@@ -97,7 +99,7 @@ proc activeViewTitle(): string =
   of viewSearch:
     "Search"
   of viewJobs, viewRuns, viewLogs:
-    "Activity"
+    "Operations"
   of viewSystem:
     "System"
   of viewPlugin, viewTool:
@@ -130,7 +132,7 @@ proc activeViewSubtitle(): string =
   of viewSearch:
     "Saved chats and the open conversation"
   of viewJobs, viewRuns, viewLogs:
-    "Current durable job and execution timeline"
+    "Your task queue and recorded inference timings"
   of viewSystem:
     "Safe service health and application state"
   of viewPlugin, viewTool:
@@ -246,11 +248,12 @@ proc renderActivityView(): VNode =
   result = buildHtml(
     section(class = "conversation")
   ):
+    renderOperationsPanel(appState)
     tdiv(class = "developer-view"):
       tdiv(class = "developer-view-header"):
         tdiv:
           h2:
-            text "Activity"
+            text "Current task"
           p:
             text "Current durable job state and frontend-visible lifecycle events."
 
@@ -286,17 +289,6 @@ proc renderActivityView(): VNode =
                   appState.run.jobId
                 else:
                   "Waiting for backend"
-              )
-
-          tdiv(class = "developer-card wide"):
-            span(class = "run-label"):
-              text "Request"
-            p:
-              text (
-                if appState.run.request.len > 0:
-                  appState.run.request
-                else:
-                  "This job was recovered from durable chat history."
               )
 
         if appState.run.workflowContract != nil:
@@ -1128,7 +1120,7 @@ proc renderWorkspace(): VNode =
             span(class = "run-status-label"):
               text runStatusLabel(appState.run.status)
             proc onclick(event: Event, node: VNode) =
-              setActiveView(appState, viewJobs)
+              openOperations(appState)
 
         button(
           class = "header-action chats-header-action",
@@ -1235,6 +1227,7 @@ proc runWorkspaceCommand(action: string) =
   of "capabilities":
     setActiveView(appState, viewCapabilities)
     discard refreshExtensions(appState)
+  of "operations": openOperations(appState)
   of "inspector": appState.inspectorOpen = not appState.inspectorOpen
   of "refresh": discard refreshSystemStatus(appState)
   of "compose":
@@ -1277,7 +1270,8 @@ proc renderApp(): VNode =
     renderStatusbar(
       appState,
       proc(view: AppView) =
-        setActiveView(appState, view)
+        if view == viewJobs: openOperations(appState)
+        else: setActiveView(appState, view)
         redraw(kxi),
       proc() =
         runWorkspaceCommand("inspector")

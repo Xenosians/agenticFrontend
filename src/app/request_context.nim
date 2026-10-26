@@ -1,9 +1,13 @@
 import types
+import operations_snapshot
 
 type
   AccountRequestContext* = object
     userId*, sessionId*: string
   ChatNavigationContext* = object
+    account*: AccountRequestContext
+    epoch*: int
+  OperationsRequestContext* = object
     account*: AccountRequestContext
     epoch*: int
 
@@ -30,3 +34,18 @@ proc beginAuthRequest*(state: AppState): int =
 
 proc matchesAuthRequest*(state: AppState, epoch: int): bool =
   state.authRequestEpoch == epoch
+
+proc beginOperationsRequest*(state: AppState): OperationsRequestContext =
+  inc state.operationsEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.operationsEpoch)
+
+proc matchesOperationsRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.operationsEpoch == request.epoch
+
+proc clearOperations*(state: AppState) =
+  inc state.operationsEpoch
+  state.operations = OperationsSnapshot()
+  state.operationsLoaded = false
+  state.operationsBusy = false
+  state.operationsError = ""
+  state.operationsExpandedJob = ""

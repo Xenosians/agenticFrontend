@@ -1,5 +1,6 @@
 import std/json
 import workflow_request
+import operations_snapshot
 
 type
   AppView* = enum
@@ -143,6 +144,10 @@ type
     resetToken*: string
 
   AppState* = ref object
+    operations*: OperationsSnapshot
+    operationsBusy*, operationsLoaded*: bool
+    operationsError*, operationsExpandedJob*: string
+    operationsEpoch*: int
     extensionCatalog*: JsonNode
     commandPaletteOpen*: bool
     commandQuery*: string

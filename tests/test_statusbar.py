@@ -143,7 +143,7 @@ class StatusbarTests(navigation.ChatNavigationTests):
         self.page.locator(".sidebar").get_by_role("button", name="Capabilities", exact=True).click()
         expect(job).to_be_visible()
         job.click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Activity")
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Operations")
         self.job_status = "completed"
         expect(job).to_have_count(0)
         self.assertEqual(self.errors, [])

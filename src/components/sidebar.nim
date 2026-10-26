@@ -6,6 +6,7 @@ import ../app/types
 import ../app/state
 import ../app/extension_bridge
 import ../app/auth_bridge
+import ../app/operations_bridge
 import brand
 
 
@@ -58,6 +59,8 @@ proc renderViewButton(
       )
       if target in [viewPlugin, viewTool, viewCapabilities]:
         discard refreshExtensions(state)
+      elif target == viewJobs:
+        discard refreshOperations(state)
 
 
 proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
@@ -193,7 +196,7 @@ proc renderSidebar*(
       renderViewButton(
         state,
         "◌",
-        "Activity",
+        "Operations",
         viewJobs
       )
 

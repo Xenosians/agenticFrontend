@@ -62,6 +62,7 @@ proc clearAuthenticatedState(
 ) =
   inc state.chatNavigationEpoch
   inc state.jobObservationEpoch
+  clearOperations(state)
   state.auth.authenticated = false
   clearWorkflowDraft(state)
   state.extensionCatalog = nil
