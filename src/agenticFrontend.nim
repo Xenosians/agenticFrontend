@@ -834,7 +834,7 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         of "chats":
           text "Browse your saved conversations"
         of "search":
-          text "Search the current chat"
+          text "Search every saved chat"
         of "connections":
           text "Open models, harnesses, datasets and integrations"
         of "capabilities":

@@ -118,7 +118,11 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
     def test_commands_invoke_selected_action(self):
         self.open_first_chat()
         self.page.keyboard.press("Control+k")
-        self.page.locator(".command-center-row").filter(has=self.page.get_by_text("Search chats", exact=True)).click()
+        search_command = self.page.locator(".command-center-row").filter(
+            has=self.page.get_by_text("Search chats", exact=True))
+        # The command describes what the page does: every saved chat.
+        expect(search_command).to_contain_text("Search every saved chat")
+        search_command.click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Search")
         self.page.keyboard.press("Control+k")
         self.page.locator(".command-center-row").filter(has=self.page.get_by_text("New chat", exact=True)).click()
