@@ -1745,6 +1745,16 @@ body {
   padding-right: 0;
 }
 
+.account-notifications { margin-bottom: 14px; }
+.account-mail-choice, .account-session-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.account-mail-choice { margin: 14px 0; color: var(--text); }
+.account-mail-choice input { accent-color: var(--text); }
+.account-view .run-label, .account-setting-help, .account-notice { color: var(--text-soft); }
+.account-setting-help, .account-notice { font-size: 13px; line-height: 1.6; }
+.account-notice { margin: 12px 0; }
+.account-view .developer-view-header { flex-wrap: wrap; }
+.account-session-row > div { min-width: 0; overflow-wrap: anywhere; }
+
 @media (max-width: 980px) {
   .node-builder-shell {
     grid-template-columns: 150px minmax(0, 1fr);

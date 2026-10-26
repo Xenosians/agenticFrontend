@@ -223,5 +223,12 @@ type
     authRequestEpoch*: int
     sessions*: seq[AuthSessionItem]
     sessionsLoaded*: bool
+    sessionsBusy*, sessionActionBusy*, sessionsNeedRefresh*: bool
+    sessionsError*, sessionsNotice*: string
+    sessionsEpoch*: int
+    preferencesLoaded*, preferencesBusy*, preferencesSaving*: bool
+    completionMail*, completionMailDraft*: bool
+    preferencesError*, preferencesNotice*: string
+    preferencesEpoch*: int
     nextMessageId*: int
     nextEventId*: int

@@ -44,6 +44,7 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
             if path == "/api/v1/auth/sessions":
                 route.fulfill(json={"sessions": [
                     {"session_id": "fixture-" + key, "user_agent": key.title() + " fixture browser",
+                     "created_at": "2026-10-25", "last_seen_at": "2026-10-26",
                      "expires_at": "2030-01-01", "current": key == "session",
                      "revoked_at": "2026-10-25" if key in self.revoked else ""}
                     for key in ("one", "two", "three", "session")]})
@@ -51,7 +52,7 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
             if path.startswith("/api/v1/auth/sessions/") and path.endswith("/revoke"):
                 key = path.split("/")[-2].removeprefix("fixture-")
                 self.revoked.append(key)
-                route.fulfill(json={"status": "revoked"})
+                route.fulfill(json={"status": "revoked", "session_id": "fixture-" + key})
                 return
         super().route(route)
 

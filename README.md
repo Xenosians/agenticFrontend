@@ -5,6 +5,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 ## Features
 
 - Registration, email verification, login, password reset, and session management.
+- Account settings: read and save task completion email preferences, inspect sessions, and revoke other sessions while retaining the current one. Unconfirmed changes require refreshing saved state; the browser does not resend them automatically. Authentication, approval and failure notices stay independent.
 - Saved chats and history, search across every saved chat, and a command palette with saved-chat navigation at every screen size.
 - Live job status and AI progress over authenticated WebSockets, with reconnect recovery and polling fallback.
 - Durable submission identities prevent duplicate jobs when an acknowledgement is lost; the same request can be recovered after reopening its chat.

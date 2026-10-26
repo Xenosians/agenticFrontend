@@ -14,6 +14,7 @@ from std/httpcore import
 import ../config/runtime_config
 import chat_history
 import http_call
+import ../app/account_settings
 export chat_history, http_call
 
 
@@ -114,7 +115,7 @@ proc parseAuthResponse(
   )
 
 
-proc jsonHeaders(
+proc jsonHeaders*(
   csrfToken: string = ""
 ): auto =
   result = newHeaders()
@@ -549,19 +550,20 @@ proc listSessions*(): Future[seq[SessionSummary]] {.async.} =
   let data = decodeJson(response.body)
   var items = newSeq[SessionSummary]()
 
-  if data.kind == JObject and data.hasKey("sessions") and data["sessions"].kind == JArray:
-    for node in data["sessions"].items:
-      items.add(
-        SessionSummary(
-          sessionId: jsonText(node, "session_id"),
-          createdAt: jsonText(node, "created_at"),
-          lastSeenAt: jsonText(node, "last_seen_at"),
-          expiresAt: jsonText(node, "expires_at"),
-          revokedAt: jsonText(node, "revoked_at"),
-          userAgent: jsonText(node, "user_agent"),
-          current: jsonBool(node, "current")
-        )
-      )
+  if data.kind != JObject or not data.hasKey("sessions") or data["sessions"].kind != JArray:
+    raise newException(ValueError, "The session history response was invalid.")
+  for node in data["sessions"].items:
+    if node.kind != JObject or not node.hasKey("session_id") or
+        node["session_id"].kind != JString or node["session_id"].getStr().len == 0 or
+        not node.hasKey("current") or node["current"].kind != JBool:
+      raise newException(ValueError, "The session history response was invalid.")
+    for key in ["created_at", "last_seen_at", "expires_at", "revoked_at", "user_agent"]:
+      if not node.hasKey(key) or node[key].kind notin {JString, JNull}:
+        raise newException(ValueError, "The session history response was invalid.")
+    items.add(SessionSummary(sessionId: jsonText(node, "session_id"),
+      createdAt: jsonText(node, "created_at"), lastSeenAt: jsonText(node, "last_seen_at"),
+      expiresAt: jsonText(node, "expires_at"), revokedAt: jsonText(node, "revoked_at"),
+      userAgent: jsonText(node, "user_agent"), current: jsonBool(node, "current")))
 
   return items
 
@@ -586,3 +588,5 @@ proc revokeSession*(
 
   if not response.ok:
     raise apiError($response.status, response.body)
+
+  validateSessionRevocation(decodeJson(response.body), sessionId)

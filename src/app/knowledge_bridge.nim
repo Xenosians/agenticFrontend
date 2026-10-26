@@ -14,6 +14,16 @@ proc knowledgeSourceList*(state: AppState): seq[KnowledgeSource] =
 proc chosenKnowledgeSource*(state: AppState): string =
   defaultKnowledgeSource(knowledgeSourceList(state), state.knowledgeSource)
 
+proc changeKnowledgeSource*(state: AppState, source: string) =
+  ## A reply for a previous source must not populate the newly selected one.
+  ## This releases only the old read's UI state; it does not replay a request.
+  inc state.knowledgeEpoch
+  state.knowledgeSource = source
+  state.knowledgeBusy = false
+  state.knowledgeHits = @[]
+  state.knowledgeSearched = false
+  state.knowledgeError = ""
+
 proc searchKnowledge*(state: AppState) {.async.} =
   ## One search at a time; a stale reply (sign-out, new search) is dropped.
   if not state.auth.authenticated or state.knowledgeBusy: return

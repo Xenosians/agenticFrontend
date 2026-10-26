@@ -68,6 +68,23 @@ proc clearOperations*(state: AppState) =
   state.knowledgeError = ""
   state.knowledgeQuery = ""
   state.knowledgeSource = ""
+  # Account settings and session inventories are owned by this exact session.
+  inc state.sessionsEpoch
+  state.sessions = @[]
+  state.sessionsLoaded = false
+  state.sessionsBusy = false
+  state.sessionActionBusy = false
+  state.sessionsNeedRefresh = false
+  state.sessionsError = ""
+  state.sessionsNotice = ""
+  inc state.preferencesEpoch
+  state.preferencesLoaded = false
+  state.preferencesBusy = false
+  state.preferencesSaving = false
+  state.completionMail = false
+  state.completionMailDraft = false
+  state.preferencesError = ""
+  state.preferencesNotice = ""
 
 proc beginReviewRequest*(state: AppState): OperationsRequestContext =
   inc state.reviewEpoch
@@ -88,3 +105,17 @@ proc isReviewer*(state: AppState): bool =
   state.auth.authenticated and state.auth.role == "admin"
 
 proc reviewQueueItems*(state: AppState): seq[ReviewItem] = state.reviewItems
+
+proc beginSessionsRequest*(state: AppState): OperationsRequestContext =
+  inc state.sessionsEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.sessionsEpoch)
+
+proc matchesSessionsRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.sessionsEpoch == request.epoch
+
+proc beginPreferencesRequest*(state: AppState): OperationsRequestContext =
+  inc state.preferencesEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.preferencesEpoch)
+
+proc matchesPreferencesRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.preferencesEpoch == request.epoch

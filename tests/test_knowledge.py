@@ -43,6 +43,9 @@ class KnowledgeTests(navigation.ChatNavigationTests):
         self.catalog["selected"] = {"model_id": "fixture-model", "dataset_id": "a" * 32}
         self.searches = []
         self.search_status = 200
+        self.defer_search = False
+        self.pending_search = []
+        self.search_response = None
         super().setUp()
         self.page.set_default_timeout(5000)
 
@@ -68,7 +71,11 @@ class KnowledgeTests(navigation.ChatNavigationTests):
                     "error": "extension_request_rejected",
                     "detail": {"code": "rejected", "message": "Extension request rejected."}})
             else:
-                route.fulfill(json={"hits": self.hits_for(body["payload"]["id"])})
+                if self.defer_search:
+                    self.pending_search.append((route, body["payload"]["id"]))
+                    return
+                route.fulfill(json=self.search_response if self.search_response is not None else
+                              {"hits": self.hits_for(body["payload"]["id"])})
             return
         super().route(route)
 
@@ -131,6 +138,49 @@ class KnowledgeTests(navigation.ChatNavigationTests):
         self.page.locator(".knowledge-panel").get_by_role("button", name="Search", exact=True).click()
         expect(self.page.locator(".knowledge-panel").get_by_role("alert")).to_contain_text("rejected")
         expect(self.page.locator(".knowledge-hit")).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_changing_source_discards_the_previous_sources_delayed_reply(self):
+        self.open_knowledge()
+        self.defer_search = True
+        search = self.page.get_by_role("searchbox", name="Search knowledge", exact=True)
+        search.fill("router")
+        with self.page.expect_request(lambda req: req.method == "POST" and req.url.endswith("/extensions")):
+            search.press("Enter")
+        self.assertEqual(len(self.pending_search), 1)
+        old_route, old_source = self.pending_search.pop()
+        self.page.get_by_role("combobox", name="Source", exact=True).select_option(SOURCE)
+        expect(self.page.locator(".knowledge-panel").get_by_role("button", name="Search", exact=True)).to_be_enabled()
+        # Start the new source's read before the old reply arrives. That old
+        # reply must not overwrite hits or release the new search's busy state.
+        with self.page.expect_request(lambda req: req.method == "POST" and req.url.endswith("/extensions")):
+            search.press("Enter")
+        self.assertEqual(len(self.pending_search), 1)
+        new_route, new_source = self.pending_search.pop()
+        old_route.fulfill(json={"hits": self.hits_for(old_source)})
+        expect(self.page.locator(".knowledge-hit")).to_have_count(0)
+        expect(self.page.locator(".knowledge-panel").get_by_role("button", name="Searching…", exact=True)).to_be_disabled()
+        self.assertEqual(new_source, SOURCE)
+        new_route.fulfill(json={"hits": self.hits_for(new_source)})
+        expect(self.page.locator(".knowledge-hit")).to_have_count(2)
+        expect(self.page.locator(".knowledge-hit").first).to_contain_text("Router manual (v2)")
+        expect(self.page.locator(".knowledge-hit").first.locator(".knowledge-citation")).to_have_text(
+            f"dataset:{SOURCE}#chunk:1@{DIGEST}")
+        expect(self.page.locator(".knowledge-panel").get_by_role("button", name="Search", exact=True)).to_be_enabled()
+        self.assertEqual(len(self.searches), 2)
+        self.assertEqual(self.errors, [])
+
+    def test_malformed_search_success_is_an_error_not_no_matches(self):
+        for malformed in ({"detail": "unreadable"}, {"hits": [{"schema": "owner-retrieval.v0"}]}):
+            with self.subTest(body=malformed):
+                self.search_response = malformed
+                self.open_knowledge()
+                search = self.page.get_by_role("searchbox", name="Search knowledge", exact=True)
+                search.fill("router")
+                search.press("Enter")
+                expect(self.page.locator(".knowledge-panel").get_by_role("alert")).to_be_visible()
+                expect(self.page.locator(".knowledge-panel")).not_to_contain_text("No passages matched")
+                expect(self.page.locator(".knowledge-hit")).to_have_count(0)
         self.assertEqual(self.errors, [])
 
     def test_without_reference_datasets_the_page_says_how_to_add_one(self):

@@ -39,9 +39,8 @@ proc renderSearch(state: AppState, sources: seq[KnowledgeSource]): VNode =
         option(value = cstring(source.id), selected = source.id == chosen):
           text source.title
       proc onchange(event: Event, node: VNode) =
-        state.knowledgeSource = $node.value
-        state.knowledgeHits = @[]
-        state.knowledgeSearched = false
+        changeKnowledgeSource(state, $node.value)
+        redraw(kxi)
     tdiv(class = "knowledge-query"):
       input(`type` = "search", class = "knowledge-input", `aria-label` = "Search knowledge",
           maxlength = $knowledgeQueryLimit, placeholder = "Search this source",

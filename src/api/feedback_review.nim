@@ -32,7 +32,8 @@ proc fetchReviewQueue*(showAll: bool): Future[seq[ReviewItem]] {.async.} =
 proc sendReview*(feedbackId, decision, reason, csrfToken: string): Future[ReviewItem] {.async.} =
   ## Records one decision. The server keeps the first decision; a different
   ## one is refused and stated, never retried automatically.
-  let body = $reviewPayload(decision, reason)
+  let payload = reviewPayload(decision, reason)
+  let body = $payload
   let headers = newHeaders()
   headers["Content-Type"] = "application/json"
   headers["X-CSRF-Token"] = csrfToken
@@ -47,8 +48,9 @@ proc sendReview*(feedbackId, decision, reason, csrfToken: string): Future[Review
   if not response.ok:
     raise newException(ValueError, publicDetail(response.body,
       "The decision was not saved (HTTP " & $response.status & ")."))
-  let items = parseReviewQueue(%*{"feedback": [decodeJson(response.body)["feedback"]]})
-  if items.len != 1:
+  try:
+    result = parseReviewReceipt(decodeJson(response.body), feedbackId,
+      payload["decision"].getStr, payload["reason"].getStr)
+  except CatchableError:
     raise newException(ValueError,
       "The decision response was invalid. Refresh the queue before deciding again.")
-  result = items[0]

@@ -26,7 +26,7 @@ proc reviewItemError*(state: AppState, feedbackId: string): string =
   entry(state.reviewItemErrors, feedbackId)
 
 proc refreshReview*(state: AppState) {.async.} =
-  if not isReviewer(state) or state.reviewBusy: return
+  if not isReviewer(state) or state.reviewBusy or state.reviewDeciding.len > 0: return
   let request = beginReviewRequest(state)
   state.reviewBusy = true
   state.reviewError = ""
@@ -48,7 +48,7 @@ proc refreshReview*(state: AppState) {.async.} =
 proc decideReview*(state: AppState, feedbackId, decision: string) {.async.} =
   ## One decision in flight at a time; the result replaces the record, or the
   ## refusal is stated on it. Nothing is retried automatically.
-  if not isReviewer(state) or state.reviewDeciding.len > 0: return
+  if not isReviewer(state) or state.reviewBusy or state.reviewDeciding.len > 0: return
   let reason = reviewReason(state, feedbackId)
   let request = beginReviewRequest(state)
   state.reviewDeciding = feedbackId

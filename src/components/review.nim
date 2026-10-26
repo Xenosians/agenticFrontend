@@ -17,7 +17,7 @@ proc renderDecision(state: AppState, item: ReviewItem): VNode =
   # One invocation owns each record; handlers capture its identity only.
   let reason = reviewReason(state, item.feedbackId)
   let deciding = state.reviewDeciding == item.feedbackId
-  let blocked = state.reviewDeciding.len > 0 or reason.len == 0
+  let blocked = state.reviewBusy or state.reviewDeciding.len > 0 or reason.len == 0
   result = buildHtml(tdiv(class = "review-decision")):
     label(class = "review-label", `for` = cstring("reason-" & item.feedbackId)):
       text "Reason"
@@ -67,13 +67,13 @@ proc renderReviewPanel*(state: AppState): VNode =
           h2: text "Review"
           p: text "Critiques and corrections people saved on task results."
         tdiv(class = "review-actions"):
-          button(class = "secondary-action", `aria-pressed` =
+          button(class = "secondary-action", disabled = state.reviewBusy or state.reviewDeciding.len > 0, `aria-pressed` =
               (if state.reviewShowDecided: cstring"true" else: cstring"false")):
             text (if state.reviewShowDecided: "Show only pending" else: "Show decided")
             proc onclick(event: Event, node: VNode) =
               state.reviewShowDecided = not state.reviewShowDecided
               discard refreshReview(state)
-          button(class = "secondary-action", disabled = state.reviewBusy, `aria-label` = "Refresh review"):
+          button(class = "secondary-action", disabled = state.reviewBusy or state.reviewDeciding.len > 0, `aria-label` = "Refresh review"):
             text (if state.reviewBusy: "Refreshing…" else: "Refresh")
             proc onclick(event: Event, node: VNode) =
               discard refreshReview(state)

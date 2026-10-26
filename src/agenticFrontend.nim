@@ -18,6 +18,7 @@ import components/connections
 import components/capabilities
 import app/extension_bridge
 import components/auth
+import components/account
 import components/sidebar
 import components/chat
 import components/composer
@@ -152,7 +153,7 @@ proc activeViewSubtitle(): string =
   of viewSimulator:
     "Design preview — simulation is not connected"
   of viewAccount:
-    "Profile and authenticated sessions"
+    "Profile, notifications and authenticated sessions"
   of viewCapabilities:
     "Governed operations by specialist"
   of viewReview:
@@ -638,125 +639,6 @@ proc renderSimulatorView(): VNode =
             text "No flashing, printing, or machine actuation is available from this draft page."
 
 
-proc renderAccountSession(currentSession: AuthSessionItem): VNode =
-  result = buildHtml(tdiv(class = "system-row account-session-row")):
-    tdiv:
-      strong:
-        text (
-          if currentSession.current:
-            "Current session"
-          else:
-            "Session"
-        )
-
-      span:
-        text (
-          currentSession.userAgent &
-          " · expires " &
-          currentSession.expiresAt
-        )
-
-    if currentSession.revokedAt.len > 0:
-      span(class = "capability-badge disabled"):
-        text "Revoked"
-    elif currentSession.current:
-      span(class = "capability-badge enabled"):
-        text "Current"
-    else:
-      button(class = "secondary-action"):
-        text "Revoke"
-
-        proc onclick(
-          event: Event,
-          node: VNode
-        ) =
-          discard revokeAuthSession(
-            appState,
-            currentSession.sessionId
-          )
-
-
-proc renderAccountView(): VNode =
-  result = buildHtml(
-    section(class = "conversation")
-  ):
-    tdiv(class = "developer-view"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2:
-            text "Account"
-          p:
-            text "Application identity and server-side sessions."
-
-        button(class = "secondary-action", disabled = appState.auth.loading):
-          text (if appState.auth.loading: "Signing out…" else: "Sign out")
-
-          proc onclick(
-            event: Event,
-            node: VNode
-          ) =
-            discard logoutApplication(
-              appState
-            )
-
-      if appState.auth.error.len > 0:
-        p(class = "account-error", role = "alert"):
-          text appState.auth.error
-
-      tdiv(class = "account-profile-grid"):
-        tdiv(class = "developer-card"):
-          span(class = "run-label"):
-            text "Display name"
-          strong:
-            text (
-              if appState.auth.displayName.len > 0:
-                appState.auth.displayName
-              else:
-                "Not set"
-            )
-
-        tdiv(class = "developer-card"):
-          span(class = "run-label"):
-            text "Email"
-          strong:
-            text appState.auth.email
-
-        tdiv(class = "developer-card"):
-          span(class = "run-label"):
-            text "Role"
-          strong:
-            text appState.auth.role
-
-      tdiv(class = "developer-card wide account-session-panel"):
-        tdiv(class = "developer-view-header compact"):
-          tdiv:
-            h3:
-              text "Authenticated sessions"
-            p:
-              text "Sessions are owned and enforced by the backend."
-
-          button(class = "secondary-action"):
-            text "Refresh"
-
-            proc onclick(
-              event: Event,
-              node: VNode
-            ) =
-              discard loadAuthSessions(
-                appState
-              )
-
-        if not appState.sessionsLoaded:
-          p:
-            text "Refresh to load your active sessions."
-        elif appState.sessions.len == 0:
-          p:
-            text "No sessions found."
-        else:
-          for authSession in appState.sessions:
-            renderAccountSession(authSession)
-
-
 proc renderSavedChat(savedChat: ChatItem): VNode =
   result = buildHtml(button(class =
       if savedChat.chatId == appState.currentChatId:
@@ -973,7 +855,7 @@ proc renderWorkspaceBody(): VNode =
   of viewSimulator:
     renderSimulatorView()
   of viewAccount:
-    renderAccountView()
+    renderAccountView(appState)
   of viewCapabilities:
     renderCapabilitiesView(appState)
   of viewReview:
@@ -1249,6 +1131,9 @@ proc runWorkspaceCommand(action: string) =
   of "connections":
     setActiveView(appState, viewPlugin)
     discard refreshExtensions(appState)
+  of "account":
+    setActiveView(appState, viewAccount)
+    discard loadAuthSessions(appState)
   of "capabilities":
     setActiveView(appState, viewCapabilities)
     discard refreshExtensions(appState)

@@ -66,13 +66,24 @@ proc knowledgeSearchPayload*(sourceId, query: string): JsonNode =
 proc parseKnowledgeHits*(data: JsonNode, sourceId: string, title = ""): seq[KnowledgeHit] =
   ## Keeps only owner-private, untrusted hits from the searched source, named by its title.
   if data == nil or data.kind != JObject or not data.hasKey("hits") or data["hits"].kind != JArray:
-    return
+    raise newException(ValueError, "The search response was invalid. Search again to check this source.")
   for row in data["hits"]:
-    if text(row, "schema") != "owner-retrieval.v1" or text(row, "dataset_id") != sourceId or
+    if row.kind != JObject or text(row, "schema") != "owner-retrieval.v1":
+      raise newException(ValueError, "The search returned an unsupported passage. Search again to check this source.")
+    if text(row, "dataset_id") != sourceId or
         text(row, "trust") != "untrusted_retrieval" or text(row, "scope") != "owner_private":
       continue
-    if not row.hasKey("chunk") or row["chunk"].kind != JInt: continue
+    if not row.hasKey("chunk") or row["chunk"].kind != JInt or row["chunk"].getInt < 1:
+      raise newException(ValueError, "The search returned an invalid citation. Search again to check this source.")
     let digest = text(row, "sha256")
+    let contentDigest = text(row, "content_sha256")
+    let locator = text(row, "locator")
+    if digest.len != 64 or not digest.allCharsInSet({'0'..'9', 'a'..'f'}) or
+        contentDigest.len != 64 or not contentDigest.allCharsInSet({'0'..'9', 'a'..'f'}) or
+        text(row, "source_type") != "dataset" or text(row, "content").len == 0 or
+        text(row, "source").len == 0 or text(row, "license").len == 0 or
+        locator != "dataset:" & sourceId & "#chunk:" & $row["chunk"].getInt & "@" & digest:
+      raise newException(ValueError, "The search returned an invalid citation. Search again to check this source.")
     result.add KnowledgeHit(content: text(row, "content"), source: text(row, "source"),
-      license: text(row, "license"), locator: text(row, "locator"), title: title,
+      license: text(row, "license"), locator: locator, title: title,
       digest: digest[0 ..< min(8, digest.len)], chunk: row["chunk"].getInt)

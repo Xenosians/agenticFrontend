@@ -29,14 +29,35 @@ suite "feedback review queue":
     # A task without an answer is shown as such, never as an empty answer.
     check items[1].answer == ""
 
-  test "records without an identity or a known review status are left out":
-    let items = parseReviewQueue(%*{"feedback": [
-      {"feedback_id": "", "note": "No identity", "review_status": "pending_review"},
-      {"feedback_id": "e".repeat(32), "note": "Unknown", "review_status": "applied"},
-      {"feedback_id": "f".repeat(32), "note": "Kept", "review_status": "dismissed"}]})
-    check items.len == 1
-    check items[0].feedbackId == "f".repeat(32)
-    check parseReviewQueue(%*{"detail": "outage"}).len == 0
+  test "malformed observations are not reported as an empty queue":
+    check parseReviewQueue(%*{"feedback": []}).len == 0
+    expect ValueError: discard parseReviewQueue(%*{"detail": "outage"})
+    expect ValueError: discard parseReviewQueue(%*{"feedback": nil})
+    expect ValueError: discard parseReviewQueue(%*{"feedback": [nil]})
+    for field in ["feedback_id", "kind", "note", "subject", "created_at"]:
+      let malformed = parseJson($queue)
+      malformed["feedback"][0].delete(field)
+      expect ValueError: discard parseReviewQueue(malformed)
+    let unknown = parseJson($queue)
+    unknown["feedback"][0]["review_status"] = %"applied"
+    expect ValueError: discard parseReviewQueue(unknown)
+    let inconsistent = parseJson($queue)
+    inconsistent["feedback"][1]["review"]["decision"] = %"dismissed"
+    expect ValueError: discard parseReviewQueue(inconsistent)
+    let repeated = parseJson($queue)
+    repeated["feedback"].add repeated["feedback"][0]
+    expect ValueError: discard parseReviewQueue(repeated)
+
+  test "a decision receipt confirms only the exact submitted decision":
+    let identity = "c".repeat(32)
+    let receipt = %*{"feedback": queue["feedback"][1]}
+    check parseReviewReceipt(receipt, identity, "accepted", "  Valid  ").status == "accepted"
+    expect ValueError: discard parseReviewReceipt(receipt, "a".repeat(32), "accepted", "Valid")
+    expect ValueError: discard parseReviewReceipt(receipt, identity, "dismissed", "Valid")
+    expect ValueError: discard parseReviewReceipt(receipt, identity, "accepted", "A different reason")
+    expect ValueError: discard parseReviewReceipt(%*{"feedback": queue["feedback"][0]},
+                                                 "a".repeat(32), "accepted", "Valid")
+    expect ValueError: discard parseReviewReceipt(%*{"detail": "outage"}, identity, "accepted", "Valid")
 
   test "a decision needs one of the two outcomes and a reason":
     check reviewPayload("accepted", "  Valid: dropped a filter  ") ==

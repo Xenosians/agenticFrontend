@@ -14,6 +14,7 @@ import backend_bridge
 import extension_bridge
 import connection_draft
 import request_context
+import account_bridge
 
 
 proc browserQueryParam(
@@ -700,47 +701,27 @@ proc selectChat*(
 proc loadAuthSessions*(
   state: AppState
 ) {.async.} =
-  if not state.auth.authenticated:
-    return
-
-  let context = accountContext(state)
-  try:
-    let remoteSessions = await listSessions()
-    if not matchesAccount(state, context): return
-    state.sessions.setLen(0)
-
-    for remote in remoteSessions:
-      state.sessions.add(
-        AuthSessionItem(
-          sessionId: remote.sessionId,
-          createdAt: remote.createdAt,
-          lastSeenAt: remote.lastSeenAt,
-          expiresAt: remote.expiresAt,
-          revokedAt: remote.revokedAt,
-          userAgent: remote.userAgent,
-          current: remote.current
-        )
-      )
-
-    state.sessionsLoaded = true
-  except CatchableError as exc:
-    if matchesAccount(state, context):
-      showToast(state, "Session history failed: " & exc.msg)
-
-  redraw(kxi)
+  discard loadAccountPreferences(state)
+  await refreshAccountSessions(state)
 
 
 proc revokeAuthSession*(
   state: AppState,
   sessionId: string
 ) {.async.} =
-  if not state.auth.authenticated or sessionId.len == 0:
+  if not state.auth.authenticated or sessionId.len == 0 or
+      state.sessionsBusy or state.sessionActionBusy or state.sessionsNeedRefresh:
     return
 
-  let context = accountContext(state)
+  let context = beginSessionsRequest(state)
+  state.sessionActionBusy = true
+  state.sessionsError = ""
+  state.sessionsNotice = ""
+  redraw(kxi)
+  var confirmed = false
   try:
     await revokeSession(state.auth.csrfToken, sessionId)
-    if not matchesAccount(state, context): return
+    if not matchesSessionsRequest(state, context): return
 
     if sessionId == state.auth.sessionId:
       clearAuthenticatedState(state)
@@ -748,9 +729,14 @@ proc revokeAuthSession*(
       state.auth.mode = amLogin
       state.auth.notice = "Current session revoked."
     else:
-      await loadAuthSessions(state)
-  except CatchableError as exc:
-    if matchesAccount(state, context):
-      showToast(state, "Could not revoke session: " & exc.msg)
+      state.sessionsNotice = "Session revoked."
+      confirmed = true
+  except CatchableError:
+    if matchesSessionsRequest(state, context):
+      state.sessionsError = "Session revocation was not confirmed. Refresh sessions to check their saved state."
+      state.sessionsNeedRefresh = true
+  finally:
+    if matchesSessionsRequest(state, context): state.sessionActionBusy = false
+  if confirmed and matchesSessionsRequest(state, context): await refreshAccountSessions(state)
 
   redraw(kxi)
