@@ -11,6 +11,7 @@ from std/httpcore import
 
 import ../app/types
 import ../app/job_decision
+import ../app/job_feedback
 import tool_proposal
 import approval_result
 import http_call
@@ -1052,3 +1053,22 @@ proc decideJob*(
     parseJobResponse(
       data
     )
+
+
+proc sendJobFeedback*(
+  jobId, identity, note, correction, csrfToken: string
+) {.async.} =
+  ## Saves the user's feedback on a task for review (FR-089).
+  let headers = newHeaders()
+  headers["Content-Type"] = "application/json"
+  headers["X-CSRF-Token"] = csrfToken
+  let options = newFetchOptions(
+    metod = HttpPost,
+    body = cstring($feedbackPayload(identity, note, correction)),
+    mode = fmCors,
+    credentials = fcInclude,
+    headers = headers
+  )
+  let response = await sendRequest(frontendConfig.backendBaseUrl & feedbackPath(jobId), options)
+  if not response.ok:
+    raise publicApiError($response.status, response.body)

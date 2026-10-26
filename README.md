@@ -5,13 +5,14 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 ## Features
 
 - Registration, email verification, login, password reset, and session management.
-- Saved chats and history, current-chat search, and a command palette with saved-chat navigation at every screen size.
+- Saved chats and history, search across every saved chat, and a command palette with saved-chat navigation at every screen size.
 - Live job status and AI progress over authenticated WebSockets, with reconnect recovery and polling fallback.
 - Durable submission identities prevent duplicate jobs when an acknowledgement is lost; the same request can be recovered after reopening its chat.
 - Optional, reviewed required operations pin the intended capabilities, exact targets and supported success dependencies to the saved request.
 - Explicit approve/reject decisions bound to the displayed saved action, separate approval for each workflow step, and structured result cards.
 - Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
 - Display of completed, failed, denied, and unknown-outcome jobs.
+- Feedback on any answer from a saved task: what was wrong and, optionally, the correct result, saved for review. A note that was not confirmed is kept and resent under the same identity.
 - Run inspector, activity view, and backend/AI integration status.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
 - Per-account model selection, connection probes, local model folder uploads, reference datasets, and reviewed training-data exports.
@@ -94,6 +95,7 @@ nim js -r tests/test_chat_projection.nim
 nim js -r tests/test_job_status.nim
 nim js -r tests/test_tool_proposal.nim
 nim js -r tests/test_job_decision.nim
+nim js -r tests/test_job_feedback.nim
 nim js -r tests/test_approval_result.nim
 nim js -r tests/test_connection_options.nim
 nim js -r tests/test_logout_outcome.nim
@@ -112,6 +114,7 @@ Playwright and its Chromium browser installed:
 
 ```bash
 python tests/test_chat_navigation.py
+python tests/test_job_feedback.py
 python tests/test_workspace_navigation.py
 python tests/test_connection_actions.py
 ```

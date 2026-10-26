@@ -9,6 +9,7 @@ import ../app/job_decision
 
 import result_card
 import message_body
+import message_feedback
 import brand
 import statusbar
 
@@ -45,6 +46,7 @@ proc renderJobProgress(state: AppState): VNode =
 
 
 proc renderMessage(
+  state: AppState,
   message: ChatMessage
 ): VNode =
 
@@ -94,6 +96,10 @@ proc renderMessage(
               renderResultCard(
                 card
               )
+
+        # Only answers from a saved task can be linked for review.
+        if message.jobId.len > 0 and message.content.len > 0:
+          renderMessageFeedback(state, message.jobId)
 
 
 proc renderApprovalAction(
@@ -215,6 +221,7 @@ connected tools and plugins.
       for message in state.messages:
 
         renderMessage(
+          state,
           message
         )
 

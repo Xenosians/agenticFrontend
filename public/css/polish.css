@@ -2035,3 +2035,46 @@ body {
   .command-center-row, .approval-action-button, .approval-recovery-button,
   .result-card, .composer { transition: none; }
 }
+
+/* Feedback on an answer (FR-089): one quiet row under the answer, aligned
+   with the answer's text (the bubble's 14px inset) and set at its 13px size. */
+.message-feedback { margin: 4px 0 0 14px; }
+/* An open form takes the answer column's full width so a correction has room. */
+.message-column.assistant:has(.message-feedback-form) { width: 100%; }
+.message-feedback-toggle {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+  cursor: pointer;
+}
+.message-feedback-toggle:hover { color: var(--text); }
+.message-feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.message-feedback-field { display: flex; flex-direction: column; gap: 5px; }
+.message-feedback-field span { color: var(--text-soft); font-size: var(--header-control-size); }
+.message-feedback-field textarea {
+  width: 100%;
+  min-height: 52px;
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  resize: none;
+}
+.message-feedback-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.message-feedback-actions .approval-recovery-button { margin-top: 0; font-size: 13px; }
+.message-feedback-actions .approval-recovery-button:disabled { opacity: .55; cursor: default; }
+.message-feedback-cancel { background: transparent; }
+.message-feedback-status,
+.message-feedback-error { margin: 0; color: var(--text-soft); font-size: var(--header-control-size); }
