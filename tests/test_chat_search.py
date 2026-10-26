@@ -5,6 +5,7 @@ The open chat's loaded messages are still searched locally. Isolated HTTP
 fixtures only; no deployment service, credential, provider or model.
 Run after rebuilding: python tests/test_chat_search.py
 """
+import base64
 import unittest
 from urllib.parse import parse_qs, urlparse
 
@@ -84,6 +85,40 @@ class ChatSearchTests(navigation.ChatNavigationTests):
         self.page.get_by_role("button", name="Clear search", exact=True).click()
         expect(self.page.locator(".chat-search-result")).to_have_count(0)
         expect(self.page.locator(".chat-search-status")).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_the_search_field_is_one_box_with_one_clear_button(self):
+        search = self.open_search()
+        search.fill("VPN")
+        self.assertTrue(search.evaluate("node => node.matches(':focus-visible')"))
+        field = self.page.evaluate("""() => {
+            const input = getComputedStyle(document.querySelector('#chatSearch'));
+            const box = getComputedStyle(document.querySelector('.search-box'));
+            return {inputOutline: input.outlineStyle, boxRing: box.outlineStyle !== 'none'};
+        }""")
+        # Focus is shown once, on the rounded field, not as a square inside it.
+        self.assertEqual(field, {"inputOutline": "none", "boxRing": True})
+        # The browser's own clear glyph is not drawn beside the app's Clear
+        # button. Computed styles cannot read that pseudo-element, so measure
+        # the pixels at the input's right edge: a drawn glyph is near white.
+        box = search.bounding_box()
+        edge = self.page.screenshot(clip={"x": box["x"] + box["width"] - 30, "y": box["y"],
+                                          "width": 28, "height": box["height"]})
+        brightest = self.page.evaluate("""async (data) => {
+            const image = new Image();
+            image.src = 'data:image/png;base64,' + data;
+            await image.decode();
+            const canvas = new OffscreenCanvas(image.width, image.height);
+            const context = canvas.getContext('2d');
+            context.drawImage(image, 0, 0);
+            const pixels = context.getImageData(0, 0, image.width, image.height).data;
+            let max = 0;
+            for (let index = 0; index < pixels.length; index += 4) {
+                max = Math.max(max, (pixels[index] + pixels[index + 1] + pixels[index + 2]) / 3);
+            }
+            return max;
+        }""", base64.b64encode(edge).decode())
+        self.assertLess(brightest, 128, "a native clear glyph is drawn inside the search field")
         self.assertEqual(self.errors, [])
 
 

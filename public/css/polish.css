@@ -912,6 +912,24 @@ body {
   min-width: 0;
 }
 
+/* One field, one focus ring: the rounded box shows keyboard focus, so the
+   input inside it draws no square outline of its own. */
+.search-input:focus-visible {
+  outline: none;
+}
+
+.search-box:has(.search-input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* The page's own Clear button is the only clear control. */
+.search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
 
 /* ----------------------------------------------------------
    Auth
