@@ -95,8 +95,9 @@ class StatusbarTests(navigation.ChatNavigationTests):
                 self.assertLessEqual(composer["y"] + composer["height"], box["y"] + 1)
                 self.assertFalse(self.page.evaluate(
                     "() => document.documentElement.scrollWidth > window.innerWidth"))
-                # Small text on and just above the bar stays readable (WCAG AA, 4.5:1).
-                for selector in (".statusbar-health", ".composer-hint"):
+                # Small text on and just above the bar, and the sidebar's
+                # product tagline and section labels, stay readable (WCAG AA, 4.5:1).
+                for selector in (".statusbar-health", ".composer-hint", ".brand-copy span", ".section-label"):
                     self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5, selector)
                 self.assertEqual(self.errors, [])
 
