@@ -1,6 +1,7 @@
 include karax/prelude
 import std/[asyncjs, json, strutils]
 import types
+import dataset_versions
 import ../api/extensions
 import ../api/connection_options
 import ../config/runtime_config
@@ -105,9 +106,10 @@ proc saveDatasetFile*(state: AppState) {.async.} =
   try:
     let content = $(await datasetFileText())
     if not sameSession(state, session): return
-    await changeExtension(state, "dataset", %*{"name": state.datasetName, "text": content,
-      "source": state.datasetSource, "license": state.datasetLicense, "purpose": state.datasetPurpose,
-      "reviewed": state.datasetReviewed})
+    # A replacement that no longer applies (a newer version arrived) uploads nothing as a version.
+    let replaces = validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces)
+    await changeExtension(state, "dataset", datasetPayload(state.datasetName, content,
+      state.datasetSource, state.datasetLicense, state.datasetPurpose, state.datasetReviewed, replaces))
   except CatchableError as exc:
     if sameSession(state, session): state.extensionError = exc.msg
     redraw(kxi)

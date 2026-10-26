@@ -566,9 +566,15 @@
 }
 
 .personal-resource-copy span {
-  color: #606060;
+  /* Resource details, including a dataset's version and digest, stay readable (WCAG AA). */
+  color: var(--text-soft);
   font-size: 7px;
   text-transform: capitalize;
+}
+
+/* A digest is shown exactly as recorded. */
+.personal-resource-copy .resource-version {
+  text-transform: none;
 }
 
 .personal-resource-actions {

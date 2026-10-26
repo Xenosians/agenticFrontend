@@ -172,6 +172,7 @@ type
     datasetText*: string
     datasetApiKey*: string
     datasetReviewed*: bool
+    datasetReplaces*: string
     activeView*: AppView
     inspectorTab*: InspectorTab
     composerPanel*: ComposerPanel

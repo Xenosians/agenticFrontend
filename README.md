@@ -17,6 +17,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - A Capabilities page listing every governed operation by specialist, with its effect, approval need and its provider's setup state (Configured, Simulated, Needs setup with the missing setting names). Setup comes from the AI service's configuration and is labelled as such; it is not a provider check.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
 - Per-account model selection, connection probes, local model folder uploads, reference datasets, and reviewed training-data exports.
+- Dataset versions: a changed dataset is uploaded as a new version of the latest one (**Upload as**). Each dataset shows its version and digest prefix, a replaced version says which version replaced it, and versions of one dataset are named with their version number.
 - Provider usage settings for shared request/token queues and supported reasoning controls, editable without re-entering the saved API key.
 
 ## How the repositories fit together
@@ -98,6 +99,7 @@ nim js -r tests/test_tool_proposal.nim
 nim js -r tests/test_job_decision.nim
 nim js -r tests/test_job_feedback.nim
 nim js -r tests/test_integration_setup.nim
+nim js -r tests/test_dataset_versions.nim
 nim js -r tests/test_approval_result.nim
 nim js -r tests/test_connection_options.nim
 nim js -r tests/test_logout_outcome.nim

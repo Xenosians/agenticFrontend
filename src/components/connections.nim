@@ -4,6 +4,7 @@ import std/[json, strutils]
 
 import ../app/[types, extension_bridge]
 import ../app/connection_draft
+import ../app/dataset_versions
 import ../api/connection_options
 import brand
 
@@ -103,7 +104,8 @@ proc resourceName(
         )
 
       if name.len > 0:
-        return name
+        # Versions of one dataset share a name, so a dataset is named with its version.
+        return if nodeText(row, "kind") == "dataset": datasetTitle(row) else: name
 
   return resourceId
 
@@ -352,7 +354,7 @@ proc renderInstalledResource(state: AppState, item: JsonNode): VNode =
       text resourceGlyph(item)
     tdiv:
       strong:
-        text nodeText(item, "name")
+        text (if nodeText(item, "kind") == "dataset": datasetTitle(item) else: nodeText(item, "name"))
       span:
         text nodeText(item, "kind") & " · " & nodeText(item, "state") &
           (if nodeBool(item, "insecure_transport"): " · unencrypted" else: "")
@@ -625,10 +627,7 @@ proc renderCurrentSelection(
                 ) == datasetId
             ):
 
-              text nodeText(
-                row,
-                "name"
-              )
+              text datasetTitle(row)
 
         proc onchange(
           event: Event,
@@ -1086,11 +1085,10 @@ proc renderPersonal(
 
         let
           item = row
+          # Versions of one dataset share a name, so a versioned dataset is named with its version.
           name =
-            nodeText(
-              item,
-              "name"
-            )
+            if nodeText(item, "kind") == "dataset": datasetTitle(item)
+            else: nodeText(item, "name")
 
         if matchesSearch(
              state,
@@ -1135,6 +1133,10 @@ proc renderPersonal(
                     "state"
                   )
                 )
+
+              if nodeText(item, "kind") == "dataset":
+                span(class = "resource-version"):
+                  text versionLabel(state.extensionCatalog, item)
 
             renderResourceActions(
               state,
@@ -2105,6 +2107,36 @@ proc renderDatasetManager(
 
           state.datasetPurpose =
             $node.value
+          state.datasetReplaces = ""
+
+    tdiv(class = "plugin-field"):
+
+      label:
+        text "Upload as"
+
+      select(
+        class = "plugin-select",
+        `aria-label` = "Upload as",
+        value = cstring(validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces))
+      ):
+
+        option(value = ""):
+          text "New dataset"
+
+        for choice in replaceableDatasets(state.extensionCatalog, state.datasetPurpose):
+          option(
+            value = cstring(choice.id),
+            selected = choice.id == state.datasetReplaces
+          ):
+            text "New version of " & choice.label
+
+        proc onchange(
+          event: Event,
+          node: VNode
+        ) =
+
+          state.datasetReplaces =
+            $node.value
 
     input(
       id = "datasetFile",
@@ -2208,7 +2240,10 @@ proc renderDatasetManager(
                   state.datasetReviewed,
 
                 "api_key":
-                  state.datasetApiKey
+                  state.datasetApiKey,
+
+                "replaces":
+                  validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces)
               }
             )
 

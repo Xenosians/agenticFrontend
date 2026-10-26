@@ -52,3 +52,4 @@ proc clearExtensionDrafts*(state: AppState) =
   state.datasetText = ""
   state.datasetApiKey = ""
   state.datasetReviewed = false
+  state.datasetReplaces = ""
