@@ -1,5 +1,6 @@
 import types
 import operations_snapshot
+import feedback_review
 
 type
   AccountRequestContext* = object
@@ -49,3 +50,26 @@ proc clearOperations*(state: AppState) =
   state.operationsBusy = false
   state.operationsError = ""
   state.operationsExpandedJob = ""
+  # The review queue belongs to the signed-in reviewer as well.
+  inc state.reviewEpoch
+  state.reviewItems = @[]
+  state.reviewLoaded = false
+  state.reviewBusy = false
+  state.reviewShowDecided = false
+  state.reviewError = ""
+  state.reviewDeciding = ""
+  state.reviewItemErrors = @[]
+  state.reviewReasons = @[]
+
+proc beginReviewRequest*(state: AppState): OperationsRequestContext =
+  inc state.reviewEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.reviewEpoch)
+
+proc matchesReviewRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.reviewEpoch == request.epoch
+
+proc isReviewer*(state: AppState): bool =
+  ## The backend enforces this; the UI only hides what would be refused.
+  state.auth.authenticated and state.auth.role == "admin"
+
+proc reviewQueueItems*(state: AppState): seq[ReviewItem] = state.reviewItems

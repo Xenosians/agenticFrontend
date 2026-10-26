@@ -10,6 +10,8 @@ import app/state
 import app/auth_bridge
 import app/backend_bridge
 import app/operations_bridge
+import app/review_bridge
+import app/request_context
 
 import components/connections
 import components/capabilities
@@ -25,6 +27,7 @@ import components/required_operations
 import components/statusbar
 import components/chat_search
 import components/operations
+import components/review
 import config/runtime_config
 
 
@@ -76,6 +79,7 @@ proc focusWorkspaceAfterRender() =
 proc activateFirstSearchResult() =
   let query = appState.commandQuery.toLowerAscii()
   for command in workspaceCommands:
+    if command.reviewerOnly and not isReviewer(appState): continue
     if query in command.label.toLowerAscii():
       runWorkspaceCommand(command.id)
       return
@@ -112,6 +116,8 @@ proc activeViewTitle(): string =
     "Account"
   of viewCapabilities:
     "Capabilities"
+  of viewReview:
+    "Review"
 
 
 proc currentChatTitle(): string =
@@ -145,6 +151,8 @@ proc activeViewSubtitle(): string =
     "Profile and authenticated sessions"
   of viewCapabilities:
     "Governed operations by specialist"
+  of viewReview:
+    "Critiques and corrections awaiting a decision"
 
 
 proc renderSearchView(): VNode =
@@ -831,6 +839,8 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
           text "Open models, harnesses, datasets and integrations"
         of "capabilities":
           text "Browse governed operations by specialist"
+        of "review":
+          text "Decide on critiques and corrections"
         of "inspector":
           text "Toggle developer diagnostics"
         of "refresh":
@@ -918,6 +928,7 @@ proc renderCommandCenter(): VNode =
 
         tdiv(class = "command-center-list"):
           for command in workspaceCommands:
+            if command.reviewerOnly and not isReviewer(appState): continue
             if appState.commandQuery.toLowerAscii() in command.label.toLowerAscii():
               renderWorkspaceCommand(command)
 
@@ -955,6 +966,8 @@ proc renderWorkspaceBody(): VNode =
     renderAccountView()
   of viewCapabilities:
     renderCapabilitiesView(appState)
+  of viewReview:
+    renderReviewPanel(appState)
 
 
 proc runStatusLabel(status: string): string =
@@ -1228,6 +1241,7 @@ proc runWorkspaceCommand(action: string) =
     setActiveView(appState, viewCapabilities)
     discard refreshExtensions(appState)
   of "operations": openOperations(appState)
+  of "review": openReview(appState)
   of "inspector": appState.inspectorOpen = not appState.inspectorOpen
   of "refresh": discard refreshSystemStatus(appState)
   of "compose":

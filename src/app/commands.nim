@@ -1,5 +1,6 @@
 type WorkspaceCommand* = object
   id*, label*, shortcut*: string
+  reviewerOnly*: bool  ## Shown only to reviewers; the backend still enforces it.
 
 const workspaceCommands* = [
   WorkspaceCommand(id: "new_chat", label: "New chat", shortcut: "Ctrl/Meta+Alt+N"),
@@ -8,6 +9,7 @@ const workspaceCommands* = [
   WorkspaceCommand(id: "connections", label: "Models, harnesses and datasets", shortcut: "Ctrl/Meta+,"),
   WorkspaceCommand(id: "capabilities", label: "Capabilities", shortcut: ""),
   WorkspaceCommand(id: "operations", label: "Operations and recorded timings", shortcut: ""),
+  WorkspaceCommand(id: "review", label: "Review feedback", shortcut: "", reviewerOnly: true),
   WorkspaceCommand(id: "inspector", label: "Toggle run inspector", shortcut: "Ctrl/Meta+Alt+I"),
   WorkspaceCommand(id: "refresh", label: "Refresh system and connections", shortcut: ""),
   WorkspaceCommand(id: "compose", label: "Focus message composer", shortcut: "")]

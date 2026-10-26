@@ -2134,3 +2134,29 @@ body {
   .operation-counts, .operation-measurements { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .operation-job-heading { flex-wrap: wrap; }
 }
+
+/* Reviewer queue for critiques and corrections; same scale as Operations. */
+.review-item { padding: 16px 0; border-top: 1px solid var(--border); min-width: 0; }
+.review-status { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 2px 8px; color: var(--text-soft); font-size: var(--header-control-size); white-space: nowrap; }
+.review-field { display: flex; flex-direction: column; gap: 4px; margin: 12px 0; min-width: 0; }
+.review-label { color: var(--text-soft); font-size: var(--header-control-size); }
+.review-subject { margin: 0; color: var(--text); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; white-space: pre-wrap; }
+.review-decision { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+/* Same field style as the feedback form that created the record. */
+.review-reason {
+  width: 100%;
+  min-height: 64px;
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+  resize: vertical;
+}
+.review-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+/* A pending record is the one that needs action; a decided one is quieter. */
+.review-item[data-review-status="pending_review"] .review-status { border-color: var(--text-soft); color: var(--text); font-weight: 600; }
+.review-item[data-review-status="accepted"] .review-status,
+.review-item[data-review-status="dismissed"] .review-status { border-style: dashed; }

@@ -1,6 +1,7 @@
 import std/json
 import workflow_request
 import operations_snapshot
+import feedback_review
 
 type
   AppView* = enum
@@ -16,7 +17,8 @@ type
     viewNodeBuilder,
     viewSimulator,
     viewAccount,
-    viewCapabilities
+    viewCapabilities,
+    viewReview
 
   InspectorTab* = enum
     tabRun,
@@ -148,6 +150,12 @@ type
     operationsBusy*, operationsLoaded*: bool
     operationsError*, operationsExpandedJob*: string
     operationsEpoch*: int
+    reviewItems*: seq[ReviewItem]
+    reviewBusy*, reviewLoaded*, reviewShowDecided*: bool
+    reviewError*, reviewDeciding*: string
+    reviewItemErrors*: seq[(string, string)]
+    reviewReasons*: seq[(string, string)]
+    reviewEpoch*: int
     extensionCatalog*: JsonNode
     commandPaletteOpen*: bool
     commandQuery*: string

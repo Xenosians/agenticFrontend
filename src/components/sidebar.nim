@@ -7,6 +7,8 @@ import ../app/state
 import ../app/extension_bridge
 import ../app/auth_bridge
 import ../app/operations_bridge
+import ../app/review_bridge
+import ../app/request_context
 import brand
 
 
@@ -61,6 +63,8 @@ proc renderViewButton(
         discard refreshExtensions(state)
       elif target == viewJobs:
         discard refreshOperations(state)
+      elif target == viewReview:
+        discard refreshReview(state)
 
 
 proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
@@ -199,6 +203,14 @@ proc renderSidebar*(
         "Operations",
         viewJobs
       )
+
+      if isReviewer(state):
+        renderViewButton(
+          state,
+          "✓",
+          "Review",
+          viewReview
+        )
 
       renderViewButton(
         state,
