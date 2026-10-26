@@ -12,6 +12,7 @@ import karax/kdom
 
 import ../api/auth_client
 import ../app/types
+import search_marks
 
 type
   ChatSearchState = object
@@ -59,6 +60,18 @@ proc scheduleChatSearch*(rawQuery: string) =
     discard runSearch(query, epoch), searchDebounceMs)
 
 
+proc renderMarkedText*(content, query: string): VNode =
+  ## The text with every match of the query wrapped in <mark>.
+  result = buildHtml(span(class = "search-text")):
+    for part in matchSpans(content, query):
+      let slice = content[part.first ..< part.first + part.len]
+      if part.matched:
+        mark:
+          text slice
+      else:
+        text slice
+
+
 proc renderChatSearchResults*(state: AppState, openChat: proc(chatId: string)): VNode =
   result = buildHtml(tdiv(class = "chat-search")):
     if chatSearch.query.len > 0 or chatSearch.pending:
@@ -77,8 +90,10 @@ proc renderChatSearchResults*(state: AppState, openChat: proc(chatId: string)): 
                           else: cstring"chat-search-result")):
             strong:
               text (if item.title.len > 0: item.title else: "Untitled chat")
-            span:
-              text (if item.matched == "message" and item.excerpt.len > 0: item.excerpt
-                    else: "Title matches")
+            if item.matched == "message" and item.excerpt.len > 0:
+              renderMarkedText(excerptAround(item.excerpt, chatSearch.query), chatSearch.query)
+            else:
+              span:
+                text "Title matches"
             proc onclick(event: Event, node: VNode) =
               openChat(chatId)

@@ -221,7 +221,8 @@ proc renderSearchView(): VNode =
           text "Start typing to search saved chats and this chat's messages."
       else:
         h3(class = "chat-search-heading"):
-          text "In this chat"
+          let openTitle = currentChatTitle()
+          text (if openTitle.len > 0: "In this chat · " & openTitle else: "In this chat")
         if resultCount == 0:
           tdiv(class = "empty-card"):
             text "No messages in this chat match your search."
@@ -238,7 +239,7 @@ proc renderSearchView(): VNode =
                       text productName
 
                   p:
-                    text message.content
+                    renderMarkedText(message.content, query)
 
 
 proc renderActivityView(): VNode =

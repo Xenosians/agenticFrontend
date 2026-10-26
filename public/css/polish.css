@@ -814,6 +814,12 @@ body {
   border-radius: 12px;
 }
 
+/* An empty state among search results shares the result cards' inset. */
+.chat-search-heading + .empty-card,
+.search-box + .chat-search + .empty-card {
+  padding: 13px;
+}
+
 /* Saved-chat search results: the same card as an in-chat result, as buttons. */
 .chat-search {
   display: flex;
@@ -871,6 +877,16 @@ body {
   line-height: 1.5;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* Matched words: monochrome, so brightness and an underline, not a colour. */
+.search-text mark {
+  background: transparent;
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 2px;
 }
 
 .developer-grid {

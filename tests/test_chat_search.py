@@ -36,6 +36,17 @@ class ChatSearchTests(navigation.ChatNavigationTests):
                     {"chat_id": "fixture-second", "title": "Second fixture chat", "matched": "message",
                      "excerpt": "Reset the VPN token for the night shift", "updated_at": None},
                 ]
+            elif "rollback" in query.lower():
+                # The backend returns the whole saved request; here the match
+                # sits far past the end of one line of the result card.
+                results = [
+                    {"chat_id": "fixture-second", "title": "Second fixture chat", "matched": "message",
+                     "excerpt": "The overnight deployment of the billing service ran for most of the "
+                                "maintenance window, the health checks stayed red on two of the three "
+                                "regions, the on-call engineer paged the database team twice, and after "
+                                "the error budget for the week was spent the change board approved a "
+                                "rollback", "updated_at": None},
+                ]
             route.fulfill(json={"results": results})
             return
         super().route(route)
@@ -52,6 +63,13 @@ class ChatSearchTests(navigation.ChatNavigationTests):
         result = self.page.locator(".chat-search-result").filter(has_text="Second fixture chat")
         expect(result).to_be_visible()
         expect(result).to_contain_text("Reset the VPN token for the night shift")
+        # The words that matched are marked in the excerpt, as in Hermes.
+        expect(result.locator("mark")).to_have_text(["VPN"])
+        # A result card and the empty state beside it share one inset.
+        insets = self.page.evaluate("""() => [
+            getComputedStyle(document.querySelector('.chat-search-result')).paddingLeft,
+            getComputedStyle(document.querySelector('.chat-search-heading + .empty-card')).paddingLeft]""")
+        self.assertEqual(insets[0], insets[1])
         # Typing is debounced: one request for the settled query, not one per key.
         self.assertEqual(self.queries, ["VPN"])
         result.click()
@@ -76,6 +94,25 @@ class ChatSearchTests(navigation.ChatNavigationTests):
         search = self.open_search()
         search.fill("First chat")
         expect(self.page.locator(".search-result")).to_contain_text("First chat history")
+        expect(self.page.locator(".search-result mark")).to_have_text(["First chat"])
+        # The local section names the chat it searched, at every width.
+        expect(self.page.locator(".chat-search-heading").last).to_have_text("In this chat · First fixture chat")
+        self.assertEqual(self.errors, [])
+
+    def test_a_match_late_in_a_long_saved_message_stays_in_view(self):
+        search = self.open_search()
+        search.fill("rollback")
+        excerpt = self.page.locator(".chat-search-result .search-text")
+        expect(excerpt.locator("mark")).to_have_text(["rollback"])
+        # The line starts shortly before the match, marked as cut, so the
+        # matched word is inside the card instead of past its ellipsis.
+        expect(excerpt).to_contain_text("…")
+        visible = self.page.evaluate("""() => {
+            const line = document.querySelector('.chat-search-result .search-text').getBoundingClientRect();
+            const mark = document.querySelector('.chat-search-result .search-text mark').getBoundingClientRect();
+            return mark.right <= line.right + 0.5 && mark.left >= line.left - 0.5;
+        }""")
+        self.assertTrue(visible, "the matched word is cut off by the result card")
         self.assertEqual(self.errors, [])
 
     def test_clearing_the_query_clears_saved_chat_results(self):
