@@ -2078,3 +2078,30 @@ body {
 .message-feedback-cancel { background: transparent; }
 .message-feedback-status,
 .message-feedback-error { margin: 0; color: var(--text-soft); font-size: var(--header-control-size); }
+
+/* Provider setup on the Capabilities page (FR-081): configuration only. */
+.integration-setup { margin-bottom: 20px; }
+.integration-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.integration-setup h3 {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+  font-weight: 600;
+}
+.integration-note {
+  margin: 6px 0 8px;
+  color: var(--text-soft);
+  font-size: var(--header-control-size);
+  line-height: 1.5;
+}
+.integration-row {
+  padding: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+}
+.integration-recheck { background: transparent; cursor: pointer; }
+.integration-recheck:hover { color: var(--text); }
+.integration-recheck:disabled { cursor: default; }

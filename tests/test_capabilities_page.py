@@ -12,26 +12,39 @@ from urllib.parse import urlparse
 from playwright.sync_api import expect
 
 import test_chat_navigation as navigation
+from test_statusbar import CONTRAST
 from test_workspace_context import CATALOG
 
 
-def capability(name, owners, effect, approval, description):
+def capability(name, owners, effect, approval, description, provider="fixture-directory"):
     return {"id": name, "description": description, "effect": effect, "permission": effect,
             "risk": "read" if effect == "read" else "write", "requires_approval": approval,
             "resource_type": "fixture", "agent_names": owners, "grounded_arguments": [],
-            "required_arguments": [], "parameters": {}, "success_continuations": []}
+            "required_arguments": [], "parameters": {}, "success_continuations": [],
+            "provider": provider}
 
 
 CAPABILITIES = [
     capability("fixture_identity_create", ["fixture-identity"], "mutation", True, "Create a directory identity."),
     capability("fixture_identity_read", ["fixture-identity"], "read", False, "Read a directory identity."),
     capability("fixture_issue_create", ["fixture-issues", "fixture-provider-issues"], "mutation", True,
-               "Create an issue in a project."),
+               "Create an issue in a project.", provider="fixture-issues"),
     capability("fixture_unowned", [], "read", False, "A capability no specialist serves."),
     # Long enough to wrap at phone width, so the break rule is exercised.
     capability("fixture_directory_group_membership_bulk_reconcile", ["fixture-identity"], "read", False,
                "Compare directory group membership in bulk."),
 ]
+# Setup readiness from the AI service's configuration (FR-081): never a provider check.
+INTEGRATIONS = {"integrations": [
+    {"id": "fixture-directory", "name": "Fixture directory", "kind": "provider", "state": "not_configured",
+     "configured": False, "missing": ["FIXTURE_HOST", "FIXTURE_BIND_PASSWORD"], "mode": "read_write",
+     "capabilities": ["fixture_identity_create", "fixture_identity_read",
+                      "fixture_directory_group_membership_bulk_reconcile", "fixture_unowned"]},
+    {"id": "fixture-issues", "name": "Fixture issues", "kind": "provider", "state": "simulated",
+     "configured": False, "missing": [], "mode": "read_write", "capabilities": ["fixture_issue_create"]},
+    {"id": "fixture-local", "name": "Fixture workspace", "kind": "local", "state": "configured",
+     "configured": True, "missing": [], "mode": "read_write", "capabilities": []},
+]}
 ROLES = [
     {"id": "fixture-identity", "description": "Directory accounts.", "local_model": "fixture-local"},
     {"id": "fixture-issues", "description": "Issue tracking.", "local_model": "fixture-local"},
@@ -43,18 +56,27 @@ class CapabilitiesPageTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.catalog = copy.deepcopy(CATALOG)
         self.catalog.update(capabilities=copy.deepcopy(CAPABILITIES), specialist_roles=copy.deepcopy(ROLES))
+        self.integrations = copy.deepcopy(INTEGRATIONS)
+        self.integration_status = 200
         self.mutations = []
         super().setUp()
         self.page.set_default_timeout(5000)
 
     def route(self, route):
         request = route.request
-        if urlparse(request.url).path == "/api/v1/extensions" and request.url.startswith(self.base + "/api/"):
+        path = urlparse(request.url).path
+        if path == "/api/v1/extensions" and request.url.startswith(self.base + "/api/"):
             if request.method == "GET":
                 route.fulfill(json=self.catalog)
             else:
                 self.mutations.append(request.post_data_json)
                 route.fulfill(status=500, json={"detail": "unexpected fixture mutation"})
+            return
+        if path == "/api/v1/integrations" and request.url.startswith(self.base + "/api/"):
+            if self.integration_status != 200:
+                route.fulfill(status=self.integration_status, json={"error": "integration_status_unavailable"})
+            else:
+                route.fulfill(json=self.integrations)
             return
         super().route(route)
 
@@ -174,6 +196,51 @@ class CapabilitiesPageTests(navigation.ChatNavigationTests):
         self.page.locator(".sidebar").get_by_role("button", name="Capabilities", exact=True).click()
         expect(self.page.locator(".capability-empty")).to_be_visible()
         expect(self.page.locator(".capability-row")).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_each_provider_shows_its_setup_state_and_missing_settings(self):
+        self.open_capabilities()
+        setup = self.page.locator(".integration-setup")
+        expect(setup.get_by_role("heading", name="Setup", exact=True)).to_be_visible()
+        directory = setup.locator(".integration-row").filter(has_text="Fixture directory")
+        expect(directory).to_contain_text("Needs setup")
+        expect(directory).to_contain_text("Missing FIXTURE_HOST, FIXTURE_BIND_PASSWORD")
+        expect(setup.locator(".integration-row").filter(has_text="Fixture issues")).to_contain_text("Simulated")
+        expect(setup.locator(".integration-row").filter(has_text="Fixture workspace")).to_contain_text("Configured")
+        # Configuration is not a provider check, and the page says so.
+        expect(setup).to_contain_text("Configured means the settings are present")
+        expect(setup).not_to_contain_text("Healthy")
+        # The state that asks for action is the emphasised one.
+        expect(directory.locator(".capability-tag.strong")).to_have_text("Needs setup")
+        expect(setup.locator(".integration-row .capability-tag.strong")).to_have_count(1)
+        # Each operation carries its provider's setup state.
+        expect(self.row("fixture_identity_create")).to_contain_text("Needs setup")
+        expect(self.row("fixture_issue_create").first).to_contain_text("Simulated")
+        contrast = self.page.evaluate(CONTRAST, ".integration-row span")
+        self.assertGreaterEqual(contrast, 4.5)
+        self.assertEqual(self.mutations, [])
+        self.assertEqual(self.errors, [])
+
+    def test_setup_that_cannot_be_read_is_stated_and_never_shown_as_set_up(self):
+        self.integration_status = 503
+        self.open_capabilities()
+        setup = self.page.locator(".integration-setup")
+        expect(setup).to_contain_text("Setup status could not be read.")
+        expect(setup.locator(".integration-row")).to_have_count(0)
+        # The operations are still listed, but none claims a setup state.
+        expect(self.row("fixture_identity_create")).to_be_visible()
+        expect(self.row("fixture_identity_create")).not_to_contain_text("Configured")
+        expect(self.row("fixture_identity_create")).not_to_contain_text("Needs setup")
+        self.assertEqual(self.errors, [])
+
+    def test_refresh_reads_setup_again(self):
+        self.integration_status = 503
+        self.open_capabilities()
+        setup = self.page.locator(".integration-setup")
+        expect(setup).to_contain_text("Setup status could not be read.")
+        self.integration_status = 200
+        setup.get_by_role("button", name="Check setup again", exact=True).click()
+        expect(setup.locator(".integration-row").filter(has_text="Fixture directory")).to_contain_text("Needs setup")
         self.assertEqual(self.errors, [])
 
 

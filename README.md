@@ -14,6 +14,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Display of completed, failed, denied, and unknown-outcome jobs.
 - Feedback on any answer from a saved task: what was wrong and, optionally, the correct result, saved for review. A note that was not confirmed is kept and resent under the same identity.
 - Run inspector, activity view, and backend/AI integration status.
+- A Capabilities page listing every governed operation by specialist, with its effect, approval need and its provider's setup state (Configured, Simulated, Needs setup with the missing setting names). Setup comes from the AI service's configuration and is labelled as such; it is not a provider check.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
 - Per-account model selection, connection probes, local model folder uploads, reference datasets, and reviewed training-data exports.
 - Provider usage settings for shared request/token queues and supported reasoning controls, editable without re-entering the saved API key.
@@ -96,6 +97,7 @@ nim js -r tests/test_job_status.nim
 nim js -r tests/test_tool_proposal.nim
 nim js -r tests/test_job_decision.nim
 nim js -r tests/test_job_feedback.nim
+nim js -r tests/test_integration_setup.nim
 nim js -r tests/test_approval_result.nim
 nim js -r tests/test_connection_options.nim
 nim js -r tests/test_logout_outcome.nim
