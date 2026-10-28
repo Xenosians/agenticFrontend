@@ -71,6 +71,12 @@ proc clearOperations*(state: AppState) =
   state.knowledgeError = ""
   state.knowledgeQuery = ""
   state.knowledgeSource = ""
+  # Reopened answer passages are the signed-in owner's reference text.
+  inc state.referenceEpoch
+  state.referencePassages = @[]
+  state.referenceOpening = ""
+  state.referenceError = ""
+  state.referenceErrorLocator = ""
   inc state.learningEpoch
   state.learningCatalog = LearningCatalog()
   state.learningPreflight = LearningPreflight()
@@ -153,6 +159,13 @@ proc beginKnowledgeRequest*(state: AppState): OperationsRequestContext =
 
 proc matchesKnowledgeRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.knowledgeEpoch == request.epoch
+
+proc beginReferenceRequest*(state: AppState): OperationsRequestContext =
+  inc state.referenceEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.referenceEpoch)
+
+proc matchesReferenceRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.referenceEpoch == request.epoch
 
 proc beginLearningRequest*(state: AppState): OperationsRequestContext =
   inc state.learningEpoch

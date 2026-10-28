@@ -16,6 +16,7 @@ import connection_draft
 import request_context
 import account_bridge
 import chat_bridge
+import answer_references
 
 
 proc browserQueryParam(
@@ -126,7 +127,8 @@ proc applyHistory(
         jobId: item.jobId,
         role: role,
         content: item.content,
-        cards: @[]
+        cards: @[],
+        references: parseAnswerReferences(item.references)
       )
     )
 

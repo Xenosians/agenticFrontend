@@ -6,6 +6,7 @@ import knowledge
 import learning
 import workflows
 import engineering
+import answer_references
 import chat_list
 export chat_list
 
@@ -74,6 +75,7 @@ type
     role*: MessageRole
     content*: string
     cards*: seq[ResultCard]
+    references*: seq[AnswerReference]
 
   RunEvent* = object
     id*: int
@@ -164,6 +166,10 @@ type
     knowledgeBusy*, knowledgeSearched*: bool
     knowledgeError*, knowledgeQuery*, knowledgeSource*: string
     knowledgeEpoch*: int
+    ## Reopened answer passages by citation locator, and the one being reopened.
+    referencePassages*: seq[(string, string)]
+    referenceOpening*, referenceError*, referenceErrorLocator*: string
+    referenceEpoch*: int
     learningCatalog*: LearningCatalog
     learningPreflight*: LearningPreflight
     learningLoaded*, learningBusy*, learningChecking*: bool

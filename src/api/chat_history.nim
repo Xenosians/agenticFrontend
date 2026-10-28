@@ -1,10 +1,12 @@
-import std/sets
+import std/[json, sets]
 
 type ChatHistoryMessage* = object
   role*: string
   content*: string
   jobId*: string
   status*: string
+  ## Citations of the reference passages this answer's model was given.
+  references*: JsonNode
 
 const observableJobStates* = [
   "pending", "processing", "waiting_approval", "approving",

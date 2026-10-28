@@ -2305,3 +2305,16 @@ body {
 @media (max-width: 900px) {
   .topology-panels { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Citations under an answer: the reference passages its model was given. */
+.answer-references { margin: 8px 0 0; padding: 12px 20px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--panel); }
+.answer-references-title { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin: 0; color: var(--text); font-size: 13px; }
+.answer-reference-list { margin: 8px 0 0; padding: 0; list-style: none; }
+.answer-reference { padding: 8px 0; border-top: 1px solid var(--border); }
+.answer-reference-line { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.answer-reference-line .knowledge-meta { margin: 0; overflow-wrap: anywhere; }
+.answer-reference-open { min-height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: var(--radius-sm, 6px); background: transparent; color: var(--text); font-size: 13px; cursor: pointer; }
+.answer-reference-open:hover:not(:disabled) { background: var(--panel-active); }
+.answer-reference-open:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.answer-reference-open:disabled { cursor: default; color: var(--text-soft); }
+.answer-reference .knowledge-content { margin: 8px 0 0; }

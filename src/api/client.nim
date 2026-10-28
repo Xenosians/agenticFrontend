@@ -41,6 +41,8 @@ type
 
     answer*: string
     error*: string
+    ## Citations of the reference passages the answer's model was given.
+    references*: JsonNode
 
     presentations*: seq[
       ResultCard
@@ -661,6 +663,10 @@ proc parseJobResponse(
           data,
           "error"
         ),
+
+      references:
+        (if data.kind == JObject and data.hasKey("result") and data["result"].kind == JObject and
+            data["result"].hasKey("references"): data["result"]["references"] else: nil),
 
       presentations:
         extractPresentations(

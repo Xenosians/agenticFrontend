@@ -3,6 +3,7 @@ include karax/prelude
 import std/[asyncjs, json]
 import ../api/extensions
 import knowledge
+import answer_references
 import types
 import state
 import request_context
@@ -58,3 +59,29 @@ proc searchKnowledge*(state: AppState) {.async.} =
 proc openKnowledge*(state: AppState) =
   setActiveView(state, viewKnowledge)
   discard refreshExtensions(state)
+
+proc reopenedPassage*(state: AppState, locator: string): string =
+  for (key, content) in state.referencePassages:
+    if key == locator: return content
+
+proc reopenAnswerReference*(state: AppState, row: AnswerReference) {.async.} =
+  ## Shows the exact cited passage; a reply after sign-out or another reopen is dropped.
+  if not state.auth.authenticated or state.referenceOpening.len > 0 or
+      reopenedPassage(state, row.locator).len > 0:
+    return
+  let request = beginReferenceRequest(state)
+  state.referenceOpening = row.locator
+  state.referenceError = ""
+  state.referenceErrorLocator = ""
+  redraw(kxi)
+  try:
+    let response = await extensionRequest("resolve", referenceResolvePayload(row), state.auth.csrfToken)
+    if not matchesReferenceRequest(state, request): return
+    state.referencePassages.add (row.locator, parseReopenedPassage(response, row))
+  except CatchableError as exc:
+    if matchesReferenceRequest(state, request):
+      state.referenceError = exc.msg
+      state.referenceErrorLocator = row.locator
+  finally:
+    if matchesReferenceRequest(state, request): state.referenceOpening = ""
+    redraw(kxi)
