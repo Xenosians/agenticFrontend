@@ -13,6 +13,7 @@ import app/operations_bridge
 import app/review_bridge
 import app/knowledge_bridge
 import app/learning_bridge
+import app/workflow_bridge
 import app/request_context
 
 import components/connections
@@ -33,6 +34,7 @@ import components/operations
 import components/review
 import components/knowledge
 import components/learning
+import components/workflows
 import components/workspace_menu
 import config/runtime_config
 
@@ -162,7 +164,7 @@ proc activeViewSubtitle(): string =
   of viewPlugin, viewTool:
     "Models, harnesses, datasets and governed integrations"
   of viewNodeBuilder:
-    "Design preview — execution is not enabled"
+    "Saved workflows that run as governed jobs"
   of viewSimulator:
     "Design preview — simulation is not connected"
   of viewAccount:
@@ -486,98 +488,6 @@ proc pluginDescription(
     "Server-managed integration surface."
 
 
-proc renderNodeBuilderView(): VNode =
-  result = buildHtml(
-    section(class = "conversation")
-  ):
-    tdiv(class = "developer-view build-preview-page"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2:
-            text "AI Node Builder"
-          p:
-            text "Visual workflow design surface for a future no-code capability graph."
-
-        span(class = "capability-badge preview"):
-          text "Design preview"
-
-      tdiv(class = "preview-banner"):
-        strong:
-          text "Execution is disabled."
-        p:
-          text "This draft only establishes the frontend information architecture. Future workflows must compile to the same typed capability, risk, policy, and approval model used by chat."
-
-      tdiv(class = "node-builder-shell"):
-        tdiv(class = "node-palette"):
-          span(class = "section-label"):
-            text "Planned nodes"
-
-          tdiv(class = "palette-item"):
-            strong:
-              text "Input"
-            span:
-              text "User or event data"
-
-          tdiv(class = "palette-item"):
-            strong:
-              text "AI step"
-            span:
-              text "Semantic proposal"
-
-          tdiv(class = "palette-item"):
-            strong:
-              text "Capability"
-            span:
-              text "Governed operation"
-
-          tdiv(class = "palette-item"):
-            strong:
-              text "Approval"
-            span:
-              text "Human checkpoint"
-
-        tdiv(class = "node-canvas-preview"):
-          tdiv(class = "workflow-node preview-node"):
-            span:
-              text "1"
-            strong:
-              text "Request"
-            small:
-              text "typed input"
-
-          tdiv(class = "workflow-arrow"):
-            text "→"
-
-          tdiv(class = "workflow-node preview-node"):
-            span:
-              text "2"
-            strong:
-              text "AI proposal"
-            small:
-              text "no authority"
-
-          tdiv(class = "workflow-arrow"):
-            text "→"
-
-          tdiv(class = "workflow-node preview-node"):
-            span:
-              text "3"
-            strong:
-              text "Approval / policy"
-            small:
-              text "trusted boundary"
-
-          tdiv(class = "canvas-watermark"):
-            text "Preview only — no graph execution engine is connected"
-
-      tdiv(class = "preview-actions"):
-        button(
-          class = "secondary-action",
-          disabled = true
-        ):
-          text "Run workflow — not enabled"
-
-
 proc renderSimulatorView(): VNode =
   result = buildHtml(
     section(class = "conversation")
@@ -892,7 +802,7 @@ proc renderWorkspaceBody(): VNode =
   of viewPlugin, viewTool:
     renderConnections(appState)
   of viewNodeBuilder:
-    renderNodeBuilderView()
+    renderWorkflowPanel(appState)
   of viewSimulator:
     renderSimulatorView()
   of viewAccount:
@@ -1194,6 +1104,7 @@ proc runWorkspaceCommand(action: string) =
   of "review": openReview(appState)
   of "knowledge": openKnowledge(appState)
   of "learning": openLearning(appState)
+  of "automation": openWorkflows(appState)
   of "help":
     if not wasHelp: workspaceHelpPreviousView = appState.activeView
     setActiveView(appState, viewHelp)

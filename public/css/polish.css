@@ -2209,3 +2209,65 @@ body {
 .learning-result { padding: 14px 0; border-top: 1px solid var(--border); min-width: 0; }
 .learning-gates { margin: 10px 0 0; padding-left: 18px; }
 .learning-gate { margin: 6px 0 0; color: var(--text); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+
+/* Automation (FR-084): one grid unit (20px) for canvas positions; node size matches workflows.nim. */
+.workflow-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; margin: 12px 0; }
+.workflow-toolbar .review-label { width: 100%; }
+.workflow-toolbar .learning-select, .workflow-name { flex: 1 1 200px; min-width: 0; }
+.workflow-name, .workflow-target {
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+.workflow-target { width: 100%; resize: vertical; }
+.workflow-editor { display: grid; grid-template-columns: 220px minmax(0, 1fr) 260px; gap: 12px; align-items: start; }
+.workflow-palette, .workflow-inspector { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.workflow-canvas {
+  position: relative;
+  min-height: 360px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.workflow-edges { position: absolute; left: 0; top: 0; pointer-events: none; }
+.workflow-edge { stroke: var(--text-soft); stroke-width: 2; }
+.workflow-step {
+  position: absolute;
+  width: 200px;
+  height: 96px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--panel-soft);
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.workflow-step.selected { border-color: var(--text); background: var(--panel-active); }
+.workflow-step:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.workflow-step-id, .workflow-step small { color: var(--text-soft); font-size: var(--header-control-size); }
+.workflow-step strong { overflow-wrap: anywhere; }
+.workflow-empty { position: absolute; left: 20px; top: 20px; margin: 0; color: var(--text-soft); font-size: 13px; }
+.workflow-actions { display: flex; gap: 8px; }
+.workflow-run-form { display: flex; flex-direction: column; gap: 8px; margin: 16px 0 0; max-width: 640px; }
+.workflow-run-form .secondary-action { align-self: flex-start; }
+.workflow-runs { margin: 16px 0 0; padding: 14px 0 0; border-top: 1px solid var(--border); }
+.workflow-run-list { margin: 8px 0 0; padding: 0; list-style: none; }
+.workflow-run { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 0; color: var(--text); font-size: 13px; border-top: 1px solid var(--border); }
+@media (max-width: 900px) {
+  .workflow-editor { grid-template-columns: minmax(0, 1fr); }
+}

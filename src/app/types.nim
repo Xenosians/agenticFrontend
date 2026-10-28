@@ -4,6 +4,7 @@ import operations_snapshot
 import feedback_review
 import knowledge
 import learning
+import workflows
 import chat_list
 export chat_list
 
@@ -167,6 +168,16 @@ type
     learningLoaded*, learningBusy*, learningChecking*: bool
     learningError*, learningMethod*, learningRole*, learningTuning*, learningModel*, learningDataset*: string
     learningEpoch*: int
+    automationWorkflows*: seq[WorkflowSummary]
+    automationDraft*: WorkflowDraft
+    automationPendingRun*: WorkflowPendingRun
+    automationRuns*: seq[WorkflowRunRow]
+    automationLoaded*, automationBusy*, automationSaving*, automationRunning*, automationDirty*: bool
+    automationError*, automationNotice*, automationSelectedNode*, automationRunMessage*, automationRecoveryError*: string
+    automationRecoveryChecked*: bool
+    automationRunConfirmed*: bool
+    automationAddCapability*, automationAddAfter*: string
+    automationEpoch*: int
     extensionCatalog*: JsonNode
     commandPaletteOpen*: bool
     commandQuery*: string

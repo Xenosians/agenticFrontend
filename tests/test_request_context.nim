@@ -1,5 +1,7 @@
 import std/unittest
 import ../src/app/[types, state, request_context]
+import ../src/app/workflows
+import std/json
 
 proc signedIn(): AppState =
   result = initAppState()
@@ -50,3 +52,17 @@ suite "asynchronous account and chat boundaries":
     let newLogin = beginAuthRequest(app)
     check not matchesAuthRequest(app, signOut)
     check matchesAuthRequest(app, newLogin)
+
+  test "owner reset clears workflow canvas and pending recovery state and invalidates requests":
+    let app = signedIn()
+    let request = beginWorkflowRequest(app)
+    app.automationPendingRun = WorkflowPendingRun(payload: %*{"submission_id": "old-owner-request"})
+    app.automationRecoveryChecked = true
+    app.automationRecoveryError = "old recovery"
+    app.automationSaving = true
+    clearOperations(app)
+    check app.automationPendingRun.payload == nil
+    check not app.automationRecoveryChecked
+    check app.automationRecoveryError.len == 0
+    check not app.automationSaving
+    check not matchesWorkflowRequest(app, request)

@@ -2,6 +2,7 @@ import types
 import operations_snapshot
 import feedback_review
 import learning
+import workflows
 
 type
   AccountRequestContext* = object
@@ -81,6 +82,26 @@ proc clearOperations*(state: AppState) =
   state.learningTuning = ""
   state.learningModel = ""
   state.learningDataset = ""
+  # Saved workflows, the open canvas and its run identity belong to the owner.
+  inc state.automationEpoch
+  state.automationWorkflows = @[]
+  state.automationDraft = WorkflowDraft(name: "New workflow")
+  state.automationPendingRun = WorkflowPendingRun()
+  state.automationRuns = @[]
+  state.automationLoaded = false
+  state.automationBusy = false
+  state.automationSaving = false
+  state.automationRunning = false
+  state.automationDirty = false
+  state.automationError = ""
+  state.automationNotice = ""
+  state.automationSelectedNode = ""
+  state.automationRunMessage = ""
+  state.automationRecoveryError = ""
+  state.automationRecoveryChecked = false
+  state.automationRunConfirmed = false
+  state.automationAddCapability = ""
+  state.automationAddAfter = ""
   # Account settings and session inventories are owned by this exact session.
   inc state.sessionsEpoch
   state.sessions = @[]
@@ -119,6 +140,13 @@ proc beginLearningRequest*(state: AppState): OperationsRequestContext =
 
 proc matchesLearningRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.learningEpoch == request.epoch
+
+proc beginWorkflowRequest*(state: AppState): OperationsRequestContext =
+  inc state.automationEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.automationEpoch)
+
+proc matchesWorkflowRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.automationEpoch == request.epoch
 
 proc isReviewer*(state: AppState): bool =
   ## The backend enforces this; the UI only hides what would be refused.
