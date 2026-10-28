@@ -1,6 +1,7 @@
 import types
 import operations_snapshot
 import feedback_review
+import learning
 
 type
   AccountRequestContext* = object
@@ -68,6 +69,18 @@ proc clearOperations*(state: AppState) =
   state.knowledgeError = ""
   state.knowledgeQuery = ""
   state.knowledgeSource = ""
+  inc state.learningEpoch
+  state.learningCatalog = LearningCatalog()
+  state.learningPreflight = LearningPreflight()
+  state.learningLoaded = false
+  state.learningBusy = false
+  state.learningChecking = false
+  state.learningError = ""
+  state.learningMethod = ""
+  state.learningRole = ""
+  state.learningTuning = ""
+  state.learningModel = ""
+  state.learningDataset = ""
   # Account settings and session inventories are owned by this exact session.
   inc state.sessionsEpoch
   state.sessions = @[]
@@ -99,6 +112,13 @@ proc beginKnowledgeRequest*(state: AppState): OperationsRequestContext =
 
 proc matchesKnowledgeRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.knowledgeEpoch == request.epoch
+
+proc beginLearningRequest*(state: AppState): OperationsRequestContext =
+  inc state.learningEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.learningEpoch)
+
+proc matchesLearningRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.learningEpoch == request.epoch
 
 proc isReviewer*(state: AppState): bool =
   ## The backend enforces this; the UI only hides what would be refused.

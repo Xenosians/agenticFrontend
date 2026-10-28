@@ -3,6 +3,7 @@ import workflow_request
 import operations_snapshot
 import feedback_review
 import knowledge
+import learning
 import chat_list
 export chat_list
 
@@ -23,6 +24,7 @@ type
     viewCapabilities,
     viewReview,
     viewKnowledge,
+    viewLearning,
     viewHelp
 
   InspectorTab* = enum
@@ -160,6 +162,11 @@ type
     knowledgeBusy*, knowledgeSearched*: bool
     knowledgeError*, knowledgeQuery*, knowledgeSource*: string
     knowledgeEpoch*: int
+    learningCatalog*: LearningCatalog
+    learningPreflight*: LearningPreflight
+    learningLoaded*, learningBusy*, learningChecking*: bool
+    learningError*, learningMethod*, learningRole*, learningTuning*, learningModel*, learningDataset*: string
+    learningEpoch*: int
     extensionCatalog*: JsonNode
     commandPaletteOpen*: bool
     commandQuery*: string

@@ -2194,3 +2194,18 @@ body {
 @media (max-width: 650px) {
   .knowledge-query { flex-direction: column; }
 }
+.learning-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 12px 0 16px; }
+.learning-field { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.learning-select {
+  min-width: 0;
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+.learning-actions { display: flex; align-items: flex-end; }
+.learning-result { padding: 14px 0; border-top: 1px solid var(--border); min-width: 0; }
+.learning-gates { margin: 10px 0 0; padding-left: 18px; }
+.learning-gate { margin: 6px 0 0; color: var(--text); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }

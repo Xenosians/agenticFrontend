@@ -12,6 +12,7 @@ import app/backend_bridge
 import app/operations_bridge
 import app/review_bridge
 import app/knowledge_bridge
+import app/learning_bridge
 import app/request_context
 
 import components/connections
@@ -31,6 +32,7 @@ import components/chat_search
 import components/operations
 import components/review
 import components/knowledge
+import components/learning
 import components/workspace_menu
 import config/runtime_config
 
@@ -130,6 +132,8 @@ proc activeViewTitle(): string =
     "Review"
   of viewKnowledge:
     "Knowledge"
+  of viewLearning:
+    "Learning"
   of viewHelp:
     "Help"
 
@@ -169,6 +173,8 @@ proc activeViewSubtitle(): string =
     "Critiques and corrections awaiting a decision"
   of viewKnowledge:
     "Reference sources and cited search"
+  of viewLearning:
+    "Training readiness for your models and datasets"
   of viewHelp:
     "Workspace actions and keyboard shortcuts"
 
@@ -897,6 +903,8 @@ proc renderWorkspaceBody(): VNode =
     renderReviewPanel(appState)
   of viewKnowledge:
     renderKnowledgePanel(appState)
+  of viewLearning:
+    renderLearningPanel(appState)
   of viewHelp:
     renderWorkspaceHelp()
 
@@ -1185,6 +1193,7 @@ proc runWorkspaceCommand(action: string) =
   of "operations": openOperations(appState)
   of "review": openReview(appState)
   of "knowledge": openKnowledge(appState)
+  of "learning": openLearning(appState)
   of "help":
     if not wasHelp: workspaceHelpPreviousView = appState.activeView
     setActiveView(appState, viewHelp)

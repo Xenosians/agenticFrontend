@@ -17,6 +17,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Feedback on any answer from a saved task: what was wrong and, optionally, the correct result, saved for review. A note that was not confirmed is kept and resent under the same identity.
 - Review (administrators only): pending critiques and corrections with the request and answer they describe; each record gets one decision — accept or dismiss — with a reason. A refused decision is stated on the record, and a decision never changes the task.
 - Knowledge: your ready reference datasets with version, digest, source and license, which one is used for your requests, and a search of one chosen source. Each passage is shown as untrusted reference text with its dataset, chunk and citation; searching never changes the selected dataset, and passages never grant permission or change routing.
+- Learning (command palette → Learning readiness): choose SFT, DPO or PPO, a role, LoRA/QLoRA/full adaptation, one of your models and a current training dataset version, then check readiness. The answer lists every gate that still blocks a candidate run. Checking never starts training, loads a model or changes what serves your requests.
 - Run inspector, owner-scoped Operations queue and recorded inference timings, and backend/AI integration status.
 - A Capabilities page listing every governed operation by specialist, with its effect, approval need and its provider's setup state (Configured, Simulated, Needs setup with the missing setting names). Setup comes from the AI service's configuration and is labelled as such; it is not a provider check.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
@@ -106,6 +107,7 @@ nim js -r tests/test_job_decision.nim
 nim js -r tests/test_job_feedback.nim
 nim js -r tests/test_feedback_review.nim
 nim js -r tests/test_knowledge.nim
+nim js -r tests/test_learning.nim
 nim js -r tests/test_integration_setup.nim
 nim js -r tests/test_dataset_versions.nim
 nim js -r tests/test_approval_result.nim
@@ -129,6 +131,7 @@ python tests/test_chat_navigation.py
 python tests/test_job_feedback.py
 python tests/test_feedback_review.py
 python tests/test_knowledge.py
+python tests/test_learning.py
 python tests/test_workspace_navigation.py
 python tests/test_connection_actions.py
 ```
