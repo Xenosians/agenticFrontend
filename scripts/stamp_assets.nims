@@ -5,7 +5,7 @@ import std/[md5, os, strutils]
 let publicDir = currentSourcePath().parentDir.parentDir / "public"
 let indexPath = publicDir / "index.html"
 var html = readFile(indexPath)
-for asset in ["config.js", "js/job_submission.js", "js/job_socket.js", "js/app.js", "css/app.css", "css/polish.css", "css/desktop-ui.css"]:
+for asset in ["config.js", "js/job_submission.js", "js/job_socket.js", "js/app.js", "css/app.css", "css/polish.css", "css/desktop-ui.css", "css/workspace.css", "css/workspace-menu.css"]:
   let prefix = "./" & asset
   let start = html.find(prefix)
   if start < 0:

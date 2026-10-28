@@ -117,10 +117,11 @@ class WorkspaceContextTests(navigation.ChatNavigationTests):
         self.assertEqual(self.errors, [])
 
     def test_narrow_screens_still_show_who_is_signed_in_and_which_chat_is_open(self):
-        # Phones hide the sidebar, which is where the owner and chat list live.
+        # Phones retain navigation while the wide conversation list is hidden.
         self.page.set_viewport_size({"width": 390, "height": 760})
         self.open_first_chat()
-        expect(self.page.locator(".sidebar")).to_be_hidden()
+        expect(self.page.locator(".chats-sidebar")).to_be_hidden()
+        expect(self.page.locator(".workspace-rail")).to_be_visible()
         header = self.page.locator(".workspace-header")
         expect(header).to_contain_text("First fixture chat")
         # Search covers only the open chat, so it names that chat too.

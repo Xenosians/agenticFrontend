@@ -96,8 +96,9 @@ class StatusbarTests(navigation.ChatNavigationTests):
                 self.assertFalse(self.page.evaluate(
                     "() => document.documentElement.scrollWidth > window.innerWidth"))
                 # Small text on and just above the bar, and the sidebar's
-                # product tagline and section labels, stay readable (WCAG AA, 4.5:1).
-                for selector in (".statusbar-health", ".composer-hint", ".brand-copy span", ".section-label"):
+                # product label, menus and section captions stay readable (WCAG AA, 4.5:1).
+                for selector in (".statusbar-health", ".composer-hint", ".chats-sidebar-heading strong",
+                                 ".workspace-menu-trigger", ".section-label", ".chat-nav-title"):
                     self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5, selector)
                 self.assertEqual(self.errors, [])
 

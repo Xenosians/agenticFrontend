@@ -66,7 +66,7 @@ class ChatNavigationTests(unittest.TestCase):
             if path == "/config.js":
                 route.fulfill(content_type="application/javascript", body=(
                     "window.AGENTIC_CONFIG = Object.freeze({backendBaseUrl:"
-                    + json.dumps(self.base) + ",pollIntervalMs:10});"
+                    + json.dumps(self.base) + ",pollIntervalMs:10,requiredOperations:true});"
                 ))
             else:
                 route.continue_()

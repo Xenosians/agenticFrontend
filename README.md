@@ -6,10 +6,11 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 
 - Registration, email verification, login, password reset, and session management.
 - Account settings: read and save task completion email preferences, inspect sessions, and revoke other sessions while retaining the current one. Unconfirmed changes require refreshing saved state; the browser does not resend them automatically. Authentication, approval and failure notices stay independent.
-- Saved chats and history, search across every saved chat, and a command palette with saved-chat navigation at every screen size.
+- Separate workspace navigation rail and scrollable chat sidebar, with pinned conversations, date groups, filtering and rename controls. Untitled chats take their first saved request as a title; manual names are preserved.
+- File/Edit/View/Help menus, saved-chat history, search across every saved chat, and keyboard commands at every screen size. Menu actions share the same navigation and permissions as the rest of the app.
 - Live job status and AI progress over authenticated WebSockets, with reconnect recovery and polling fallback.
 - Durable submission identities prevent duplicate jobs when an acknowledgement is lost; the same request can be recovered after reopening its chat.
-- Optional, reviewed required operations pin the intended capabilities, exact targets and supported success dependencies to the saved request.
+- The optional acceptance-only Required operations editor pins capabilities, exact targets and supported success dependencies to a saved request. It is hidden in the normal composer; tool selection and approvals still work normally.
 - Explicit approve/reject decisions bound to the displayed saved action, separate approval for each workflow step, and structured result cards.
 - Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
 - Display of completed, failed, denied, and unknown-outcome jobs.
@@ -36,7 +37,9 @@ The approval card displays that saved action before offering **Approve action** 
 
 Before creating a job, the browser pins its submission UUID and request text in this tab's session storage, scoped to the backend, account and chat. It removes that temporary record after the exact submission is acknowledged, or on explicit sign-out. If the acknowledgement is interrupted, **Check saved submission** and reopening the chat use the same identity. Phoenix atomically creates one job for that owner and identity and rejects a changed chat or message. Recovering a submission does not replay its tools or reset its existing job state. Browser storage and secure UUID generation must be available before a new request can be sent.
 
-For a request that must include specific operations, open **Required operations** above the composer. Choose registered capabilities, optionally enter exact target values and select a supported success dependency. Review the list before sending. Only capabilities with a registered specialist are offered, and two steps cannot share a possible specialist. A capability that several specialists own (such as a provider-specific and a provider-neutral one) stays available; the server chooses which of them carries the step. Success dependencies currently support one pair; unsupported workflow graphs are rejected by the servers. A supplied target field pins its entire exact value list; omitted fields still need normal grounding from the message. Empty selection leaves normal chat unchanged. The original selection is pinned with the submission and recovered unchanged after a lost acknowledgement. A contract-bearing acknowledgement must echo the exact saved selection and its server-issued hash before the browser clears recovery state. Selection does not grant permission or approve an action. The Operations view restores the saved operation list from the current durable job.
+For acceptance testing that needs exact reviewed operations, explicitly set `AGENTIC_CONFIG.requiredOperations: true`; the editor then appears above the composer. Other values leave it hidden. Choose registered capabilities, optionally enter exact target values and a supported success dependency. Success dependencies currently support one pair; unsupported graphs are rejected by the servers. The original selection remains bound to the submission and is recovered unchanged after a lost acknowledgement. It never grants permission or approves an action. The Operations view restores any saved operation list from the current job.
+
+Rename and pin changes are shown as saved only after the server confirms the exact chat and submitted values. If a response is interrupted, **Refresh chats** reads the saved state before another metadata change is allowed. Pinning, renaming and filtering do not dispatch AI jobs.
 
 ## Stack
 

@@ -9,11 +9,13 @@ import std/[
 from std/httpcore import
   HttpDelete,
   HttpGet,
+  HttpPatch,
   HttpPost
 
 import ../config/runtime_config
 import chat_history
 import http_call
+import ../app/chat_list
 import ../app/account_settings
 export chat_history, http_call
 
@@ -32,11 +34,7 @@ type
     expiresAt*: string
     csrfToken*: string
 
-  ChatSummary* = object
-    chatId*: string
-    title*: string
-    createdAt*: string
-    updatedAt*: string
+  ChatSummary* = ChatItem
 
   ## One saved chat matching a search: by its title, or by a saved turn
   ## (`excerpt` is that turn's text).
@@ -372,20 +370,7 @@ proc listChats*(): Future[seq[ChatSummary]] {.async.} =
     raise apiError($response.status, response.body)
 
   let data = decodeJson(response.body)
-  var items = newSeq[ChatSummary]()
-
-  if data.kind == JObject and data.hasKey("chats") and data["chats"].kind == JArray:
-    for node in data["chats"].items:
-      items.add(
-        ChatSummary(
-          chatId: jsonText(node, "chat_id"),
-          title: jsonText(node, "title"),
-          createdAt: jsonText(node, "created_at"),
-          updatedAt: jsonText(node, "updated_at")
-        )
-      )
-
-  return items
+  return parseChatList(data)
 
 
 proc searchChats*(query: string): Future[seq[ChatSearchResult]] {.async.} =
@@ -451,14 +436,18 @@ proc createChat*(
   if data.kind != JObject or not data.hasKey("chat"):
     raise newException(ValueError, "Backend chat response is invalid.")
 
-  let node = data["chat"]
+  result = parseChat(data["chat"])
 
-  result = ChatSummary(
-    chatId: jsonText(node, "chat_id"),
-    title: jsonText(node, "title"),
-    createdAt: jsonText(node, "created_at"),
-    updatedAt: jsonText(node, "updated_at")
-  )
+
+proc updateChat*(chatId: string, patch: JsonNode, csrfToken: string): Future[ChatSummary] {.async.} =
+  if chatId.len == 0 or patch.kind != JObject or patch.len == 0:
+    raise newException(ValueError, "A chat and metadata change are required.")
+  let options = newFetchOptions(metod = HttpPatch, body = ($patch).cstring,
+    mode = fmCors, credentials = fcInclude, headers = jsonHeaders(csrfToken))
+  let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/chats/" &
+    encodeUrl(chatId, usePlus = false), options)
+  if not response.ok: raise apiError($response.status, response.body)
+  return validateChatUpdate(decodeJson(response.body), chatId, patch)
 
 
 

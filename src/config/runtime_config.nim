@@ -8,6 +8,7 @@ type
     # Optional. How often the status bar re-reads public service health;
     # 0 (absent) reads it once at sign-in and on explicit refresh only.
     healthIntervalMs*: int
+    requiredOperations*: bool
 
 
 proc hasConfigKey(
@@ -31,6 +32,10 @@ proc configInteger(
 ): int {.
   importjs:
     "Number(globalThis.AGENTIC_CONFIG[#])"
+.}
+
+proc configEnabled(key: cstring): bool {.
+  importjs: "(globalThis.AGENTIC_CONFIG[#] === true)"
 .}
 
 
@@ -92,7 +97,8 @@ proc loadFrontendRuntimeConfig*(): FrontendRuntimeConfig =
   result = FrontendRuntimeConfig(
     backendBaseUrl: backendBaseUrl,
     pollIntervalMs: pollIntervalMs,
-    healthIntervalMs: healthIntervalMs
+    healthIntervalMs: healthIntervalMs,
+    requiredOperations: hasConfigKey(cstring"requiredOperations") and configEnabled(cstring"requiredOperations")
   )
 
 

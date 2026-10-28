@@ -31,6 +31,7 @@ import components/chat_search
 import components/operations
 import components/review
 import components/knowledge
+import components/workspace_menu
 import config/runtime_config
 
 
@@ -47,6 +48,9 @@ type WorkspaceFocus = object
   paletteOpen: bool
 
 var pendingWorkspaceFocus, paletteOrigin: WorkspaceFocus
+var openWorkspaceMenu, workspaceMenuOwner, workspaceMenuSession: string
+var workspaceHelpPreviousView = viewChat
+var pendingMenuFocus: string
 
 proc activeElementId(): cstring {.importjs: "(() => document.activeElement?.id || '')()".}
 proc focusElement(id: cstring) {.importjs: "document.getElementById(#)?.focus()".}
@@ -78,6 +82,9 @@ proc focusWorkspaceAfterRender() =
   pendingWorkspaceFocus = WorkspaceFocus()
   if request.target.len > 0 and focusContextMatches(request):
     focusElement(cstring(request.target))
+  if pendingMenuFocus.len > 0 and appState.auth.authenticated:
+    focusElement(cstring(pendingMenuFocus))
+  pendingMenuFocus = ""
 
 proc activateFirstSearchResult() =
   let query = appState.commandQuery.toLowerAscii()
@@ -123,6 +130,8 @@ proc activeViewTitle(): string =
     "Review"
   of viewKnowledge:
     "Knowledge"
+  of viewHelp:
+    "Help"
 
 
 proc currentChatTitle(): string =
@@ -160,6 +169,8 @@ proc activeViewSubtitle(): string =
     "Critiques and corrections awaiting a decision"
   of viewKnowledge:
     "Reference sources and cited search"
+  of viewHelp:
+    "Workspace actions and keyboard shortcuts"
 
 
 proc renderSearchView(): VNode =
@@ -831,6 +842,30 @@ proc renderCommandCenter(): VNode =
         renderChatList(appState.commandQuery)
 
 
+proc renderWorkspaceHelp(): VNode =
+  result = buildHtml(section(class = "conversation")):
+    tdiv(class = "workspace-help"):
+      h2: text "Working with " & productName
+      p: text "Choose a local model or an outbound connection in Connections. Add reference datasets there, then use Knowledge to inspect cited passages. Chat uses the available tools and asks for approval when an action needs it."
+      h3: text "Keyboard shortcuts"
+      dl:
+        for command in workspaceCommands:
+          if command.shortcut.len > 0 and (not command.reviewerOnly or isReviewer(appState)):
+            dt: text command.label
+            dd:
+              kbd: text command.shortcut
+        dt: text "Commands"
+        dd:
+          kbd: text "Ctrl/⌘ K"
+        dt: text "Close menu or commands"
+        dd:
+          kbd: text "Escape"
+      p: text "Menus support arrow keys, Enter and Escape. Sending a request or receiving a progress update does not confirm that an external task finished; check its saved result and any delivery status."
+      button(class = "secondary-action"):
+        text "Back to workspace"
+        proc onclick(event: Event, node: VNode) =
+          runWorkspaceCommand("dismiss")
+
 proc renderWorkspaceBody(): VNode =
   if appState.commandPaletteOpen:
     return renderCommandCenter()
@@ -862,6 +897,8 @@ proc renderWorkspaceBody(): VNode =
     renderReviewPanel(appState)
   of viewKnowledge:
     renderKnowledgePanel(appState)
+  of viewHelp:
+    renderWorkspaceHelp()
 
 
 proc runStatusLabel(status: string): string =
@@ -976,7 +1013,7 @@ proc renderHeaderMenu(): VNode =
 
 proc renderWorkspace(): VNode =
   result = buildHtml(
-    main(class = "workspace")
+    main(class = "workspace", `data-chat-id` = cstring(appState.currentChatId))
   ):
     header(class = "workspace-header"):
       tdiv(class = "workspace-title"):
@@ -1104,6 +1141,9 @@ proc runWorkspaceCommand(action: string) =
   if not appState.auth.authenticated: return
   let wasPalette = appState.commandPaletteOpen
   let wasMenu = appState.headerMenuOpen
+  let wasWorkspaceMenu = openWorkspaceMenu
+  let wasHelp = appState.activeView == viewHelp
+  openWorkspaceMenu = ""
   if action == "palette" and not wasPalette:
     let current = $activeElementId()
     paletteOrigin = workspaceFocus(if current.len > 0: current else: focusTargetForView())
@@ -1119,6 +1159,11 @@ proc runWorkspaceCommand(action: string) =
     appState.composerPanel = cpNone
     if wasPalette and focusContextMatches(paletteOrigin):
       queueWorkspaceFocus(paletteOrigin.target)
+    elif wasWorkspaceMenu.len > 0:
+      pendingMenuFocus = "menu" & wasWorkspaceMenu
+    elif wasHelp:
+      setActiveView(appState, workspaceHelpPreviousView)
+      pendingMenuFocus = "menuHelp"
     elif wasMenu:
       queueWorkspaceFocus("workspaceMoreButton")
     else:
@@ -1140,6 +1185,12 @@ proc runWorkspaceCommand(action: string) =
   of "operations": openOperations(appState)
   of "review": openReview(appState)
   of "knowledge": openKnowledge(appState)
+  of "help":
+    if not wasHelp: workspaceHelpPreviousView = appState.activeView
+    setActiveView(appState, viewHelp)
+  of "system":
+    setActiveView(appState, viewSystem)
+    discard refreshSystemStatus(appState)
   of "inspector": appState.inspectorOpen = not appState.inspectorOpen
   of "refresh": discard refreshSystemStatus(appState)
   of "compose":
@@ -1150,9 +1201,15 @@ proc runWorkspaceCommand(action: string) =
 
 
 
-proc installWorkspaceKeys(handler: proc(key: cstring, modifier, shift, composing, repeated, alt: bool): bool) {.importjs: "document.addEventListener('keydown', e => { if (#(e.key, e.ctrlKey || e.metaKey, e.shiftKey, e.isComposing, e.repeat, e.altKey)) e.preventDefault(); })".}
+proc installWorkspaceKeys(handler: proc(key: cstring, modifier, shift, composing, repeated, alt: bool): bool) {.importjs: "document.addEventListener('keydown', e => { if (!e.defaultPrevented && #(e.key, e.ctrlKey || e.metaKey, e.shiftKey, e.isComposing, e.repeat, e.altKey)) e.preventDefault(); })".}
 
 proc renderApp(): VNode =
+  if workspaceMenuOwner != appState.auth.userId or workspaceMenuSession != appState.auth.sessionId:
+    openWorkspaceMenu = ""
+    workspaceHelpPreviousView = viewChat
+    pendingMenuFocus = ""
+    workspaceMenuOwner = appState.auth.userId
+    workspaceMenuSession = appState.auth.sessionId
   if not appState.auth.checked or
      not appState.auth.authenticated:
     return renderAuthScreen(
@@ -1168,6 +1225,13 @@ proc renderApp(): VNode =
   result = buildHtml(
     tdiv(class = shellClass)
   ):
+    renderWorkspaceMenubar(openWorkspaceMenu,
+      proc(menu: string) =
+        openWorkspaceMenu = (if openWorkspaceMenu == menu: "" else: menu)
+        appState.headerMenuOpen = false
+        redraw(kxi),
+      proc(action: string) = runWorkspaceCommand(action))
+
     renderSidebar(
       appState
     )
@@ -1215,6 +1279,13 @@ if frontendConfig.healthIntervalMs > 0:
         discard refreshServiceHealth(appState),
     frontendConfig.healthIntervalMs
   )
+
+installMenuInteractions(proc(focusId: cstring) =
+  if openWorkspaceMenu.len > 0:
+    openWorkspaceMenu = ""
+    pendingMenuFocus = $focusId
+    redraw(kxi)
+)
 
 installWorkspaceKeys(proc(key: cstring, modifier, shift, composing, repeated, alt: bool): bool =
   if not appState.auth.authenticated: return false

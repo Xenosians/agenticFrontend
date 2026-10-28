@@ -13,6 +13,7 @@ import types
 import state
 import job_decision
 import extension_bridge
+import chat_bridge
 
 
 proc applyJobState(
@@ -494,6 +495,8 @@ proc submitBackendJob*(
     acknowledgeSubmission(submissionOwner, submissionChat, response.jobId,
       response.status, response.submissionId, response.workflowContract, response.workflowContractHash)
     clearWorkflowDraft(state)
+    # The saved request may have named this chat on the backend.
+    discard refreshChatMetadata(state)
     state.run.workflowContractHash = response.workflowContractHash
 
     state.run.jobId = response.jobId

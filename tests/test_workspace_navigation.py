@@ -76,6 +76,7 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
     def test_sidebar_delete_confirmation_and_cancel_keep_exact_target(self):
         self.open_first_chat()
         first = self.sidebar_row("first")
+        first.hover()
         first.locator(".chat-delete").click()
         expect(first.locator(".chat-delete-confirm-yes")).to_be_visible()
         expect(self.sidebar_row("third").locator(".chat-delete-confirm-yes")).to_have_count(0)
@@ -84,10 +85,25 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
         for key in ("first", "second", "third"):
             with self.subTest(key=key):
                 row = self.sidebar_row(key)
+                row.hover()
                 row.locator(".chat-delete").click()
                 row.locator(".chat-delete-confirm-yes").click()
                 expect(self.sidebar_row(key)).to_have_count(0)
                 self.assertEqual(self.deleted[-1], key)
+        self.assert_no_side_effects()
+
+    def test_sidebar_actions_are_reachable_by_keyboard_without_hover(self):
+        self.open_first_chat()
+        row = self.sidebar_row("first")
+        row.locator(".chat-nav-main").focus()
+        for action in (".chat-pin", ".chat-rename-open", ".chat-delete"):
+            self.page.keyboard.press("Tab")
+            expect(row.locator(action)).to_be_focused()
+            expect(row.locator(action)).to_be_visible()
+        self.page.keyboard.press("Enter")
+        expect(row.locator(".chat-delete-confirm-yes")).to_be_visible()
+        row.get_by_role("button", name="Cancel", exact=True).click()
+        self.assertEqual(self.deleted, [])
         self.assert_no_side_effects()
 
     def test_saved_chat_list_keeps_each_displayed_target(self):

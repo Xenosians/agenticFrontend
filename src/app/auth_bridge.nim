@@ -15,6 +15,7 @@ import extension_bridge
 import connection_draft
 import request_context
 import account_bridge
+import chat_bridge
 
 
 proc browserQueryParam(
@@ -61,6 +62,7 @@ proc applyAuth(
 proc clearAuthenticatedState(
   state: AppState
 ) =
+  clearChatMetadata(state)
   inc state.chatNavigationEpoch
   inc state.jobObservationEpoch
   clearOperations(state)
@@ -202,7 +204,8 @@ proc loadChats*(
       ChatItem(
         chatId: remote.chatId,
         title: remote.title,
-        updatedAt: remote.updatedAt
+        updatedAt: remote.updatedAt,
+        createdAt: remote.createdAt, pinned: remote.pinned
       )
     )
 
@@ -218,7 +221,8 @@ proc loadChats*(
         ChatItem(
           chatId: created.chatId,
           title: created.title,
-          updatedAt: created.updatedAt
+          updatedAt: created.updatedAt,
+          createdAt: created.createdAt, pinned: created.pinned
         )
       )
 
@@ -510,6 +514,11 @@ proc createNewChat*(
     redraw(kxi)
     return
 
+  if state.chatActionId.len > 0:
+    showToast(state, "Wait for the current chat change to finish.")
+    redraw(kxi)
+    return
+  cancelChatMetadataRead(state)
   let context = beginNavigation(state)
   state.auth.loading = true
   try:
@@ -518,6 +527,7 @@ proc createNewChat*(
         state.auth.csrfToken
       )
     if not matchesNavigation(state, context): return
+    cancelChatMetadataRead(state)
 
     state.chats.insert(
       ChatItem(
@@ -528,7 +538,9 @@ proc createNewChat*(
           created.title,
 
         updatedAt:
-          created.updatedAt
+          created.updatedAt,
+        createdAt: created.createdAt,
+        pinned: created.pinned
       ),
       0
     )
@@ -588,6 +600,11 @@ proc deleteChatApplication*(
     redraw(kxi)
     return
 
+  if state.chatActionId.len > 0:
+    showToast(state, "Wait for the current chat change to finish.")
+    redraw(kxi)
+    return
+  cancelChatMetadataRead(state)
   let context = accountContext(state)
   try:
     await deleteChat(
@@ -595,6 +612,7 @@ proc deleteChatApplication*(
       state.auth.csrfToken
     )
     if not matchesAccount(state, context): return
+    cancelChatMetadataRead(state)
 
     let wasCurrent =
       chatId ==
@@ -637,7 +655,9 @@ proc deleteChatApplication*(
               created.title,
 
             updatedAt:
-              created.updatedAt
+              created.updatedAt,
+            createdAt: created.createdAt,
+            pinned: created.pinned
           )
         )
 

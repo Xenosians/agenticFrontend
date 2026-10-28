@@ -9,6 +9,7 @@ import ../app/state
 import ../app/backend_bridge
 import brand
 import required_operations
+import ../config/runtime_config
 
 
 proc resizeComposerInput() {.
@@ -164,7 +165,8 @@ proc renderComposer*(
     section(class = "composer-container")
   ):
 
-    renderRequiredOperations(state, state.auth.loading or jobBusy)
+    if frontendConfig.requiredOperations:
+      renderRequiredOperations(state, state.auth.loading or jobBusy)
 
     tdiv(class = "composer"):
       textarea(

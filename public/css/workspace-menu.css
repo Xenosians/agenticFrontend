@@ -1,0 +1,71 @@
+/* Application menus share the workspace's existing surface and text tokens. */
+.app-shell, .app-shell.inspector-hidden {
+  grid-template-rows: 32px minmax(0, 1fr) calc(var(--statusbar-height) + env(safe-area-inset-bottom));
+}
+.workspace-menubar {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 8px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  z-index: 60;
+}
+.workspace-menu { position: relative; }
+.workspace-menu-trigger {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  cursor: pointer;
+}
+.workspace-menu-trigger:hover, .workspace-menu-trigger[aria-expanded="true"] {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+.workspace-menu-popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: min(290px, calc(100vw - 24px));
+  padding: 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+}
+.workspace-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  white-space: nowrap;
+  text-align: left;
+  cursor: pointer;
+}
+.workspace-menu-item:hover, .workspace-menu-item:focus-visible { background: var(--panel-active); }
+.workspace-menu-item kbd { color: var(--text-soft); font: inherit; font-size: 10px; }
+.app-shell > .sidebar, .app-shell > .workspace, .app-shell > .inspector { grid-row: 2; }
+.app-shell > .statusbar { grid-row: 3; }
+.workspace-help { max-width: 760px; width: 100%; margin: 0 auto; padding: 32px; }
+.workspace-help p { color: var(--text-soft); line-height: 1.65; }
+.workspace-help dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; }
+.workspace-help dt, .workspace-help dd { margin: 0; color: var(--text); font-size: 13px; }
+.workspace-help kbd { color: var(--text-soft); }
+@media (max-width: 760px) {
+  .workspace-menu-popup { position: fixed; top: 32px; left: 8px; right: 8px; min-width: 0; }
+  .workspace-help { padding: 20px; }
+  .workspace-help dl { grid-template-columns: 1fr; gap: 8px; }
+  .workspace-help dd { margin-bottom: 12px; }
+}

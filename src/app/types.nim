@@ -3,6 +3,8 @@ import workflow_request
 import operations_snapshot
 import feedback_review
 import knowledge
+import chat_list
+export chat_list
 
 type
   AppView* = enum
@@ -20,7 +22,8 @@ type
     viewAccount,
     viewCapabilities,
     viewReview,
-    viewKnowledge
+    viewKnowledge,
+    viewHelp
 
   InspectorTab* = enum
     tabRun,
@@ -113,11 +116,6 @@ type
     name*: string
     connected*: bool
 
-  ChatItem* = object
-    chatId*: string
-    title*: string
-    updatedAt*: string
-
   AuthSessionItem* = object
     sessionId*: string
     createdAt*: string
@@ -208,6 +206,10 @@ type
     selectedToolId*: string
     selectedPluginId*: string
     pendingDeleteChatId*: string
+    chatFilter*, chatRenameId*, chatRenameDraft*: string
+    chatActionId*, chatActionError*: string
+    chatsRefreshing*, chatsNeedRefresh*: bool
+    chatMetadataEpoch*: int
     toastMessage*: string
     messages*: seq[ChatMessage]
     run*: RunState
