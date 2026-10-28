@@ -14,6 +14,7 @@ import app/review_bridge
 import app/knowledge_bridge
 import app/learning_bridge
 import app/workflow_bridge
+import app/engineering_bridge
 import app/request_context
 
 import components/connections
@@ -35,6 +36,7 @@ import components/review
 import components/knowledge
 import components/learning
 import components/workflows
+import components/engineering
 import components/workspace_menu
 import config/runtime_config
 
@@ -166,7 +168,7 @@ proc activeViewSubtitle(): string =
   of viewNodeBuilder:
     "Saved workflows that run as governed jobs"
   of viewSimulator:
-    "Design preview — simulation is not connected"
+    "Desired topologies, drift checks and PCB netlist inspection"
   of viewAccount:
     "Profile, notifications and authenticated sessions"
   of viewCapabilities:
@@ -488,84 +490,6 @@ proc pluginDescription(
     "Server-managed integration surface."
 
 
-proc renderSimulatorView(): VNode =
-  result = buildHtml(
-    section(class = "conversation")
-  ):
-    tdiv(class = "developer-view build-preview-page"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2:
-            text "PCB / Infrastructure Simulator"
-          p:
-            text "Future simulation-first engineering and infrastructure workspace."
-
-        span(class = "capability-badge preview"):
-          text "Design preview"
-
-      tdiv(class = "preview-banner"):
-        strong:
-          text "No simulator or physical device bridge is connected."
-        p:
-          text "Observed, desired, and simulated state will remain separate. Physical actions will require dedicated governed capabilities and explicit approval."
-
-      tdiv(class = "simulation-layout"):
-        tdiv(class = "simulation-toolbar"):
-          button(class = "simulation-tab active", disabled = true):
-            text "Infrastructure"
-          button(class = "simulation-tab", disabled = true):
-            text "PCB"
-          button(class = "simulation-tab", disabled = true):
-            text "Devices"
-
-        tdiv(class = "simulation-canvas"):
-          tdiv(class = "infra-node infra-node-a"):
-            strong:
-              text "Service"
-            span:
-              text "planned graph node"
-
-          tdiv(class = "infra-node infra-node-b"):
-            strong:
-              text "Host"
-            span:
-              text "planned graph node"
-
-          tdiv(class = "infra-node infra-node-c"):
-            strong:
-              text "Provider"
-            span:
-              text "planned graph node"
-
-          tdiv(class = "canvas-watermark"):
-            text "Simulation workspace placeholder"
-
-      tdiv(class = "simulation-cards"):
-        tdiv(class = "developer-card"):
-          span(class = "run-label"):
-            text "Infrastructure graph"
-          strong:
-            text "Planned"
-          p:
-            text "Model services, hosts, repositories, deployments, tickets, and dependencies."
-
-        tdiv(class = "developer-card"):
-          span(class = "run-label"):
-            text "PCB / EDA"
-          strong:
-            text "Planned"
-          p:
-            text "Simulation and design review before any hardware or manufacturing integration."
-
-        tdiv(class = "developer-card"):
-          span(class = "run-label"):
-            text "Physical bridge"
-          strong:
-            text "Not enabled"
-          p:
-            text "No flashing, printing, or machine actuation is available from this draft page."
-
-
 proc renderSavedChat(savedChat: ChatItem): VNode =
   result = buildHtml(button(class =
       if savedChat.chatId == appState.currentChatId:
@@ -804,7 +728,7 @@ proc renderWorkspaceBody(): VNode =
   of viewNodeBuilder:
     renderWorkflowPanel(appState)
   of viewSimulator:
-    renderSimulatorView()
+    renderEngineeringPanel(appState)
   of viewAccount:
     renderAccountView(appState)
   of viewCapabilities:
@@ -1105,6 +1029,8 @@ proc runWorkspaceCommand(action: string) =
   of "knowledge": openKnowledge(appState)
   of "learning": openLearning(appState)
   of "automation": openWorkflows(appState)
+  of "engineering": openEngineering(appState)
+  of "pcb": openEngineering(appState, "pcb")
   of "help":
     if not wasHelp: workspaceHelpPreviousView = appState.activeView
     setActiveView(appState, viewHelp)

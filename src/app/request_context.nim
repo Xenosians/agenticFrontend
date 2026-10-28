@@ -3,6 +3,7 @@ import operations_snapshot
 import feedback_review
 import learning
 import workflows
+import engineering
 
 type
   AccountRequestContext* = object
@@ -102,6 +103,25 @@ proc clearOperations*(state: AppState) =
   state.automationRunConfirmed = false
   state.automationAddCapability = ""
   state.automationAddAfter = ""
+  # Topologies, drift reports and netlist reports belong to the signed-in owner.
+  inc state.engineeringEpoch
+  state.engineeringTopologies = @[]
+  state.engineeringDraft = TopologyDraft(name: "New topology")
+  state.engineeringDrift = DriftReport()
+  state.engineeringNetlist = NetlistReport()
+  state.engineeringHasDrift = false
+  state.engineeringHasNetlist = false
+  state.engineeringLoaded = false
+  state.engineeringBusy = false
+  state.engineeringSaving = false
+  state.engineeringChecking = false
+  state.engineeringDirty = false
+  state.engineeringError = ""
+  state.engineeringNotice = ""
+  state.engineeringSelectedNode = ""
+  state.engineeringEdgeTarget = ""
+  state.engineeringNetlistText = ""
+  state.engineeringNetlistName = ""
   # Account settings and session inventories are owned by this exact session.
   inc state.sessionsEpoch
   state.sessions = @[]
@@ -147,6 +167,13 @@ proc beginWorkflowRequest*(state: AppState): OperationsRequestContext =
 
 proc matchesWorkflowRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.automationEpoch == request.epoch
+
+proc beginEngineeringRequest*(state: AppState): OperationsRequestContext =
+  inc state.engineeringEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.engineeringEpoch)
+
+proc matchesEngineeringRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.engineeringEpoch == request.epoch
 
 proc isReviewer*(state: AppState): bool =
   ## The backend enforces this; the UI only hides what would be refused.

@@ -19,6 +19,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Knowledge: your ready reference datasets with version, digest, source and license, which one is used for your requests, and a search of one chosen source. Each passage is shown as untrusted reference text with its dataset, chunk and citation; searching never changes the selected dataset, and passages never grant permission or change routing.
 - Learning (command palette → Learning readiness): choose SFT, DPO or PPO, a role, LoRA/QLoRA/full adaptation, one of your models and a current training dataset version, then check readiness. The answer lists every gate that still blocks a candidate run. Checking never starts training, loads a model or changes what serves your requests.
 - Automation (command palette → Automation workflows): draw a workflow from registered capabilities on a canvas, give each step its exact targets and an optional "after the previous step succeeds" dependency, then save it as a version. A run uses the saved version, becomes one ordinary job in its own chat, and asks for approval before any change. An unconfirmed run stays locked in the browser; only an explicit retry sends that same run again, so it is never duplicated.
+- PCB / Infrastructure Simulator (rail, or command palette → Infrastructure topology and drift / PCB netlist inspection): draw the desired topology of containers, endpoints and router interfaces with the properties you expect, save it as a version, then check that exact version for drift. The report is a labelled simulated comparison against what the read tools observe; each source reports its own failure, and nothing is ever changed. The PCB tab inspects a KiCad netlist export for connectivity findings; nothing is fabricated or flashed.
 - Run inspector, owner-scoped Operations queue and recorded inference timings, and backend/AI integration status.
 - A Capabilities page listing every governed operation by specialist, with its effect, approval need and its provider's setup state (Configured, Simulated, Needs setup with the missing setting names). Setup comes from the AI service's configuration and is labelled as such; it is not a provider check.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
@@ -110,6 +111,7 @@ nim js -r tests/test_feedback_review.nim
 nim js -r tests/test_knowledge.nim
 nim js -r tests/test_learning.nim
 nim js -r tests/test_workflows.nim
+nim js -r tests/test_engineering.nim
 nim js -r tests/test_integration_setup.nim
 nim js -r tests/test_dataset_versions.nim
 nim js -r tests/test_approval_result.nim
@@ -135,6 +137,7 @@ python tests/test_feedback_review.py
 python tests/test_knowledge.py
 python tests/test_learning.py
 python tests/test_workflows.py
+python tests/test_engineering.py
 python tests/test_workspace_navigation.py
 python tests/test_connection_actions.py
 ```

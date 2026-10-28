@@ -5,6 +5,7 @@ import feedback_review
 import knowledge
 import learning
 import workflows
+import engineering
 import chat_list
 export chat_list
 
@@ -178,6 +179,16 @@ type
     automationRunConfirmed*: bool
     automationAddCapability*, automationAddAfter*: string
     automationEpoch*: int
+    engineeringTopologies*: seq[TopologySummary]
+    engineeringDraft*: TopologyDraft
+    engineeringDrift*: DriftReport
+    engineeringNetlist*: NetlistReport
+    engineeringTab*, engineeringSelectedNode*, engineeringError*, engineeringNotice*: string
+    engineeringNewKind*, engineeringNewName*, engineeringEdgeTarget*, engineeringEdgeRelation*: string
+    engineeringNetlistText*, engineeringNetlistName*: string
+    engineeringLoaded*, engineeringBusy*, engineeringSaving*, engineeringChecking*, engineeringDirty*: bool
+    engineeringHasDrift*, engineeringHasNetlist*: bool
+    engineeringEpoch*: int
     extensionCatalog*: JsonNode
     commandPaletteOpen*: bool
     commandQuery*: string

@@ -2,7 +2,7 @@ import std/[strutils, unicode]
 include karax/prelude
 import karax/kdom
 import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge,
-  operations_bridge, review_bridge, request_context]
+  operations_bridge, review_bridge, request_context, engineering_bridge]
 import brand
 
 proc currentCalendarDay(): cstring {.importjs: "(() => {const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');})()".}
@@ -25,6 +25,7 @@ proc renderViewButton(state: AppState, icon, label: string, target: AppView,
         discard refreshExtensions(state)
       elif target == viewJobs: discard refreshOperations(state)
       elif target == viewReview: discard refreshReview(state)
+      elif target == viewSimulator and not state.engineeringLoaded: discard refreshTopologies(state)
 
 proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
   # Each invocation captures one immutable identity, including all row actions.

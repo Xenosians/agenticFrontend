@@ -12,6 +12,8 @@ const workspaceCommands* = [
   WorkspaceCommand(id: "knowledge", label: "Knowledge and cited search", shortcut: ""),
   WorkspaceCommand(id: "learning", label: "Learning readiness", shortcut: ""),
   WorkspaceCommand(id: "automation", label: "Automation workflows", shortcut: ""),
+  WorkspaceCommand(id: "engineering", label: "Infrastructure topology and drift", shortcut: ""),
+  WorkspaceCommand(id: "pcb", label: "PCB netlist inspection", shortcut: ""),
   WorkspaceCommand(id: "operations", label: "Operations and recorded timings", shortcut: ""),
   WorkspaceCommand(id: "review", label: "Review feedback", shortcut: "", reviewerOnly: true),
   WorkspaceCommand(id: "inspector", label: "Toggle run inspector", shortcut: "Ctrl/Meta+Alt+I"),

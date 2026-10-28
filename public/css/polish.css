@@ -2271,3 +2271,37 @@ body {
 @media (max-width: 900px) {
   .workflow-editor { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Engineering (FR-093): the canvas spans the column; the add and selected-node
+   panels sit below it on the same 20px grid. Drift is shown with border weight
+   and pattern, never colour, to stay monochrome. */
+.topology-workspace { margin: 20px 0 0; }
+.topology-editor { display: flex; flex-direction: column; gap: 20px; }
+.topology-canvas { min-height: 320px; }
+.topology-panels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.topology-add, .topology-inspector { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.topology-section-title { color: var(--text); font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.topology-add .workflow-name, .topology-inspector .workflow-name { flex: 0 0 auto; height: 40px; }
+.topology-add .secondary-action, .topology-inspector .secondary-action { align-self: flex-start; }
+.topology-node { height: 80px; }
+.topology-node .workflow-step-id { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.topology-node[data-status="drifted"] { border-width: 2px; border-color: var(--text); }
+.topology-node[data-status="missing"] { border-style: dashed; border-color: var(--text); }
+.topology-node[data-status="drifted"] small, .topology-node[data-status="missing"] small { color: var(--text); font-weight: 600; }
+.topology-node[data-status="unknown"] { border-style: dotted; }
+.topology-edge-weak { stroke-dasharray: 4 4; }
+.topology-difference { margin: 0; font-family: var(--font-mono, monospace); }
+.topology-drift .workflow-run span:last-child { color: var(--text-soft); }
+.workflow-panel .simulation-toolbar { margin: 20px 0 0; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--panel); }
+.workflow-panel .simulation-tab { color: var(--text-soft); font-size: 13px; }
+.workflow-panel .simulation-tab.active { color: var(--text); background: var(--panel-active); }
+.netlist-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0 0; }
+.netlist-file { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.netlist-choose { display: inline-flex; align-items: center; cursor: pointer; }
+.netlist-file:focus-visible + .netlist-selected { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.netlist-selected { margin: 0; }
+.netlist-finding { display: flex; flex-wrap: wrap; gap: 4px 12px; padding: 8px 0; color: var(--text); font-size: 13px; border-top: 1px solid var(--border); }
+.netlist-finding-subject { font-weight: 600; }
+@media (max-width: 900px) {
+  .topology-panels { grid-template-columns: minmax(0, 1fr); }
+}
