@@ -36,6 +36,20 @@ type
 
   ChatSummary* = ChatItem
 
+  ## A registration waiting for its email to be verified. The server keeps the
+  ## step (an HttpOnly cookie names the account) and the wait between emails.
+  VerificationStep* = object
+    pending*: bool
+    verified*: bool
+    resendAfterSeconds*: int
+    emailHint*: string
+    tooSoon*: bool
+    mailFailed*: bool
+
+  ## Sign-in reached an account whose email is not verified yet.
+  EmailNotVerified* = object of ValueError
+    step*: VerificationStep
+
   ## One saved chat matching a search: by its title, or by a saved turn
   ## (`excerpt` is that turn's text).
   ChatSearchResult* = object
@@ -85,6 +99,23 @@ proc jsonBool(
     return value.getBool()
 
   return false
+
+
+proc jsonInt(
+  node: JsonNode,
+  key: string
+): int =
+  if node.kind == JObject and node.hasKey(key) and node[key].kind == JInt:
+    return max(node[key].getInt(), 0)
+
+
+proc parseVerificationStep(
+  data: JsonNode
+): VerificationStep =
+  VerificationStep(
+    resendAfterSeconds: jsonInt(data, "resend_after_seconds"),
+    emailHint: jsonText(data, "email_hint")
+  )
 
 
 proc parseUser(
@@ -185,6 +216,16 @@ proc login*(
     options
   )
 
+  if response.status == 403:
+    let data = decodeJson(response.body)
+    if jsonText(data, "error") == "email_not_verified":
+      var step = parseVerificationStep(data)
+      step.pending = true
+      let error = newException(EmailNotVerified,
+        "This email is not verified yet. Use the link we sent, or send a new one when the wait ends.")
+      error.step = step
+      raise error
+
   if not response.ok:
     raise apiError($response.status, response.body)
 
@@ -213,7 +254,7 @@ proc register*(
   displayName: string,
   email: string,
   password: string
-): Future[void] {.async.} =
+): Future[VerificationStep] {.async.} =
   let payload = %*{
     "display_name": displayName,
     "email": email,
@@ -235,6 +276,12 @@ proc register*(
 
   if not response.ok:
     raise apiError($response.status, response.body)
+
+  let data = decodeJson(response.body)
+  var step = parseVerificationStep(data)
+  step.pending = true
+  step.mailFailed = jsonText(data, "mail_delivery") == "failed"
+  return step
 
 
 proc verifyEmail*(
@@ -261,16 +308,12 @@ proc verifyEmail*(
     raise apiError($response.status, response.body)
 
 
-proc resendVerification*(
-  email: string
-): Future[void] {.async.} =
-  let payload = %*{
-    "email": email
-  }
-
+proc resendVerification*(): Future[VerificationStep] {.async.} =
+  ## The server identifies the pending account by its HttpOnly verification
+  ## cookie and decides whether another email may be sent yet.
   let options = newFetchOptions(
     metod = HttpPost,
-    body = ($payload).cstring,
+    body = "{}".cstring,
     mode = fmCors,
     credentials = fcInclude,
     headers = jsonHeaders()
@@ -281,8 +324,46 @@ proc resendVerification*(
     options
   )
 
+  if response.status == 429:
+    let data = decodeJson(response.body)
+    return VerificationStep(pending: true,
+      resendAfterSeconds: max(jsonInt(data, "retry_after_seconds"), 1), tooSoon: true)
+
   if not response.ok:
     raise apiError($response.status, response.body)
+
+  let data = decodeJson(response.body)
+  var step = parseVerificationStep(data)
+  step.pending = true
+  step.mailFailed = jsonText(data, "mail_delivery") == "failed"
+  return step
+
+
+proc verificationStatus*(): Future[VerificationStep] {.async.} =
+  ## The verification step this browser's cookie belongs to, if any.
+  let options = newFetchOptions(
+    metod = HttpGet,
+    mode = fmCors,
+    credentials = fcInclude
+  )
+
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/auth/verification",
+    options
+  )
+
+  if response.status == 404:
+    return VerificationStep(pending: false)
+
+  if not response.ok:
+    raise apiError($response.status, response.body)
+
+  let data = decodeJson(response.body)
+  if jsonText(data, "status") == "verified":
+    return VerificationStep(pending: false, verified: true)
+  var step = parseVerificationStep(data)
+  step.pending = true
+  return step
 
 
 proc forgotPassword*(

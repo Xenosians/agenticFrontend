@@ -999,6 +999,24 @@ body {
   margin-top: 15px;
 }
 
+/* Readable sign-in text: no auth copy below 12px, and secondary text at
+   least 4.5:1 against the card. Sizes only; the card layout is unchanged. */
+.auth-brand span { font-size: 12px; color: #9a9a9a; }
+.auth-subtitle { font-size: 13px; color: #a3a3a3; }
+.auth-subtitle strong { color: var(--text); font-weight: 600; }
+.auth-field span { font-size: 12px; color: #a0a0a0; }
+.auth-field input { font-size: 14px; }
+.auth-primary { font-size: 14px; }
+.auth-actions button { font-size: 12px; color: #a6a6a6; padding: 6px 0; }
+.auth-notice, .auth-error, .auth-status { font-size: 13px; }
+
+.auth-countdown {
+  margin: 10px 0 0;
+  color: #a3a3a3;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
 
 /* ----------------------------------------------------------
    Inline delete confirmation

@@ -33,6 +33,59 @@ proc clearBrowserQuery() {.
 .}
 
 
+proc monotonicMs(): float {.importjs: "performance.now()".}
+
+
+proc everySecond(callback: proc()) : int {.importjs: "setInterval(#, 1000)".}
+
+
+proc stopTimer(id: int) {.importjs: "clearInterval(#)".}
+
+
+var verificationTimer = 0
+
+
+proc updateVerificationCountdown(state: AppState) =
+  let left = int((state.auth.verificationResendAt - monotonicMs() + 999.0) / 1000.0)
+  state.auth.verificationSecondsLeft = max(left, 0)
+  if state.auth.verificationSecondsLeft == 0 and verificationTimer != 0:
+    stopTimer(verificationTimer)
+    verificationTimer = 0
+
+
+proc leaveVerification(state: AppState) =
+  ## Ends the verification step in this page. The server's cookie is the step;
+  ## nothing about it was kept in the browser.
+  inc state.auth.verificationEpoch
+  if verificationTimer != 0:
+    stopTimer(verificationTimer)
+    verificationTimer = 0
+  state.auth.verificationEmailHint = ""
+  state.auth.verificationResendAt = 0
+  state.auth.verificationSecondsLeft = 0
+  state.auth.mode = amLogin
+
+
+proc enterVerification(state: AppState, step: VerificationStep) =
+  ## Shows the timed step with the server's wait. The countdown only mirrors
+  ## that wait; the server refuses an early resend whatever the page shows.
+  inc state.auth.verificationEpoch
+  state.auth.mode = amVerifyEmail
+  if step.emailHint.len > 0: state.auth.verificationEmailHint = step.emailHint
+  state.auth.verificationResendAt = monotonicMs() + float(step.resendAfterSeconds) * 1000.0
+  updateVerificationCountdown(state)
+  if state.auth.verificationSecondsLeft > 0 and verificationTimer == 0:
+    verificationTimer = everySecond(proc() =
+      updateVerificationCountdown(state)
+      redraw(kxi))
+
+
+proc backToSignIn*(state: AppState) =
+  state.auth.error = ""
+  state.auth.notice = ""
+  leaveVerification(state)
+
+
 proc emptyRun(): RunState =
   RunState(
     active: false,
@@ -231,6 +284,20 @@ proc loadChats*(
       applyHistory(state, created.chatId, @[])
 
 
+proc resumeVerification(state: AppState, requestEpoch: int) {.async.} =
+  ## After a reload, the server says whether this browser has a pending
+  ## verification step and how long its wait still is.
+  try:
+    let step = await verificationStatus()
+    if not matchesAuthRequest(state, requestEpoch): return
+    if step.pending:
+      enterVerification(state, step)
+    elif step.verified:
+      state.auth.notice = "Email verified. You can sign in now."
+  except CatchableError:
+    discard # The sign-in form stays usable; a later sign-in resumes the step.
+
+
 proc bootstrapApplication*(
   state: AppState
 ) {.async.} =
@@ -265,7 +332,10 @@ proc bootstrapApplication*(
   except CatchableError as exc:
     if matchesAuthRequest(state, requestEpoch):
       clearAuthenticatedState(state)
-      if not exc.msg.startsWith("HTTP 401"):
+      if exc.msg.startsWith("HTTP 401"):
+        if verifyToken.len == 0 and resetToken.len == 0:
+          await resumeVerification(state, requestEpoch)
+      else:
         state.auth.error = "Your session could not be checked right now. Check the connection and reload."
 
   if not matchesAuthRequest(state, requestEpoch): return
@@ -299,6 +369,11 @@ proc loginApplication*(
     state.auth.notice = ""
     discard refreshExtensions(state)
     await loadChats(state)
+  except EmailNotVerified as exc:
+    if matchesAuthRequest(state, requestEpoch):
+      state.auth.passwordDraft = ""
+      state.auth.notice = exc.msg
+      enterVerification(state, exc.step)
   except CatchableError as exc:
     if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
   finally:
@@ -326,11 +401,13 @@ proc registerApplication*(
   redraw(kxi)
 
   try:
-    await register(displayName, email, password)
+    let step = await register(displayName, email, password)
     if not matchesAuthRequest(state, requestEpoch): return
-    state.auth.notice = "Registration created. Check your email for the verification link."
     state.auth.passwordDraft = ""
-    state.auth.mode = amLogin
+    state.auth.notice =
+      if step.mailFailed: "Account created, but the verification email could not be sent. Send a new one when the wait ends."
+      else: "Account created. Check your email for the verification link."
+    enterVerification(state, step)
   except CatchableError as exc:
     if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
   finally:
@@ -342,25 +419,33 @@ proc registerApplication*(
 proc resendVerificationApplication*(
   state: AppState
 ) {.async.} =
-  if state.auth.loading: return
-  let email = state.auth.emailDraft.strip()
-
-  if email.len == 0:
-    state.auth.error = "Enter your email first."
-    redraw(kxi)
-    return
+  ## Asks the server for another email. The server decides whether the wait
+  ## has passed; its answer (sent, or the time left) restarts the countdown.
+  if state.auth.loading or state.auth.mode != amVerifyEmail: return
 
   state.auth.loading = true
   state.auth.error = ""
+  state.auth.notice = ""
   let requestEpoch = beginAuthRequest(state)
   redraw(kxi)
 
   try:
-    await resendVerification(email)
+    let step = await resendVerification()
     if not matchesAuthRequest(state, requestEpoch): return
-    state.auth.notice = "If the account still needs verification, a new email was sent."
+    if step.tooSoon:
+      state.auth.notice = "Please wait before sending another email."
+    elif step.mailFailed:
+      state.auth.error = "The verification email could not be sent. Try again when the wait ends."
+    else:
+      state.auth.notice = "A new verification email was sent. Earlier links still work until they expire."
+    enterVerification(state, step)
   except CatchableError as exc:
-    if matchesAuthRequest(state, requestEpoch): state.auth.error = exc.msg
+    if matchesAuthRequest(state, requestEpoch):
+      if exc.msg.startsWith("HTTP 404"):
+        leaveVerification(state)
+        state.auth.notice = "No account is waiting for verification in this browser. Sign in to continue."
+      else:
+        state.auth.error = exc.msg
   finally:
     if matchesAuthRequest(state, requestEpoch): state.auth.loading = false
 

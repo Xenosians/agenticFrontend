@@ -50,7 +50,8 @@ type
     amLogin,
     amRegister,
     amForgotPassword,
-    amResetPassword
+    amResetPassword,
+    amVerifyEmail
 
   ResultCardField* = object
     label*: string
@@ -151,6 +152,12 @@ type
     displayNameDraft*: string
     newPasswordDraft*: string
     resetToken*: string
+    ## The server's verification step for this browser: when another
+    ## email may be sent and a masked address. Never stored in the browser.
+    verificationEmailHint*: string
+    verificationResendAt*: float  ## performance.now() milliseconds
+    verificationSecondsLeft*: int
+    verificationEpoch*: int
 
   AppState* = ref object
     operations*: OperationsSnapshot

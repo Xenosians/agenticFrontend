@@ -96,18 +96,15 @@ proc renderAuthScreen*(
               text "Create account"
               proc onclick(event: Event, node: VNode) =
                 state.auth.error = ""
+                state.auth.notice = ""
                 state.auth.mode = amRegister
 
             button(disabled = state.auth.loading):
               text "Forgot password"
               proc onclick(event: Event, node: VNode) =
                 state.auth.error = ""
+                state.auth.notice = ""
                 state.auth.mode = amForgotPassword
-
-            button(disabled = state.auth.loading):
-              text "Resend verification"
-              proc onclick(event: Event, node: VNode) =
-                discard resendVerificationApplication(state)
 
         of amRegister:
           h1:
@@ -198,6 +195,36 @@ proc renderAuthScreen*(
             text "Reset password"
             proc onclick(event: Event, node: VNode) =
               discard resetPasswordApplication(state)
+
+        of amVerifyEmail:
+          h1:
+            text "Verify your email"
+
+          p(class = "auth-subtitle"):
+            text "Open the link we sent"
+            if state.auth.verificationEmailHint.len > 0:
+              text " to "
+              strong:
+                text state.auth.verificationEmailHint
+            text ". If it has not arrived, you can ask for another email when the wait ends."
+
+          let waiting = state.auth.verificationSecondsLeft > 0
+          button(class = "auth-primary", disabled = state.auth.loading or waiting):
+            text "Resend verification email"
+            proc onclick(event: Event, node: VNode) =
+              discard resendVerificationApplication(state)
+
+          p(class = "auth-countdown", role = "status"):
+            if waiting:
+              text "You can send another email in " & $state.auth.verificationSecondsLeft & " s."
+            else:
+              text "You can send another email now."
+
+          tdiv(class = "auth-actions"):
+            button(disabled = state.auth.loading):
+              text "Back to sign in"
+              proc onclick(event: Event, node: VNode) =
+                backToSignIn(state)
 
         if state.auth.notice.len > 0:
           tdiv(class = "auth-notice"):
