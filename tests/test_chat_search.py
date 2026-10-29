@@ -139,8 +139,11 @@ class ChatSearchTests(navigation.ChatNavigationTests):
         # button. Computed styles cannot read that pseudo-element, so measure
         # the pixels at the input's right edge: a drawn glyph is near white.
         box = search.bounding_box()
+        # Capturing a clip waits for web fonts; on a loaded host that can outlast
+        # the 5 s UI default, so wait for fonts first and give the capture itself more time.
+        self.page.evaluate("document.fonts.ready.then(() => true)")
         edge = self.page.screenshot(clip={"x": box["x"] + box["width"] - 30, "y": box["y"],
-                                          "width": 28, "height": box["height"]})
+                                          "width": 28, "height": box["height"]}, timeout=20_000)
         brightest = self.page.evaluate("""async (data) => {
             const image = new Image();
             image.src = 'data:image/png;base64,' + data;
