@@ -101,27 +101,10 @@ The AI repository's `docs/user-extensions.md` documents formats, limits, storage
 With Node.js available for Nim's JavaScript test runner:
 
 ```bash
-nim js -r tests/test_commands.nim
-nim js -r tests/test_job_lifecycle.nim
-nim js -r tests/test_chat_history.nim
-nim js -r tests/test_chat_projection.nim
-nim js -r tests/test_job_status.nim
-nim js -r tests/test_tool_proposal.nim
-nim js -r tests/test_job_decision.nim
-nim js -r tests/test_job_feedback.nim
-nim js -r tests/test_feedback_review.nim
-nim js -r tests/test_knowledge.nim
-nim js -r tests/test_learning.nim
-nim js -r tests/test_workflows.nim
-nim js -r tests/test_engineering.nim
-nim js -r tests/test_answer_references.nim
-nim js -r tests/test_lua_transforms.nim
-nim js -r tests/test_integration_setup.nim
-nim js -r tests/test_dataset_versions.nim
-nim js -r tests/test_approval_result.nim
-nim js -r tests/test_connection_options.nim
-nim js -r tests/test_logout_outcome.nim
-nim js -r tests/test_workflow_request.nim
+mkdir -p .runtime
+for suite in tests/test_*.nim; do
+  nim js -o:".runtime/$(basename "$suite" .nim).js" -r "$suite"
+done
 nim js -o:.runtime/job_submission_client_driver.js tests/job_submission_client_driver.nim
 nim js -o:.runtime/job_submission_flow_driver.js tests/job_submission_flow_driver.nim
 node --test tests/test_job_submission.js tests/test_job_submission_client.js tests/test_job_submission_flow.js tests/test_job_socket.js

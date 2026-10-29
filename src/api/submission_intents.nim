@@ -1,42 +1,22 @@
 ## Server-held request identity; this cache is only a view of that record.
 ## Reload reads the original intent. It never dispatches or acknowledges work.
-import std/[asyncjs, jsfetch, jsheaders, json, tables, strutils, uri]
+import std/[asyncjs, jsfetch, jsheaders, json, tables, uri]
 from std/httpcore import HttpGet, HttpPost
 import ../config/runtime_config
 import http_call
-
-type SubmissionIntent* = object
-  id*, state*: string
-  request*, context*, receipt*: JsonNode
+import submission_intent_contract
+export submission_intent_contract
 
 var slots = initTable[string, SubmissionIntent]()
 
 proc slotKey(owner, kind, target: string): string = $(%*[frontendConfig.backendBaseUrl, owner, kind, target])
-proc hex(value: string, size: int): bool = value.len == size and value.allCharsInSet({'0'..'9', 'a'..'f'})
-
-proc parseSlot(data: JsonNode, kind, target: string): SubmissionIntent =
-  if data == nil or data.kind != JObject or data.len != 4 or
-      data{"schema"}.getStr("") != "submission-intent-slot.v1" or
-      data{"kind"}.getStr("") != kind or data{"target_id"}.getStr("") != target or not data.hasKey("intent"):
-    raise newException(ValueError, "The server did not confirm this request slot. Reload before sending.")
-  let item = data["intent"]
-  if item.kind == JNull: return
-  if item.kind != JObject or not hex(item{"intent_id"}.getStr(""), 32) or
-      item{"kind"}.getStr("") != kind or item{"target_id"}.getStr("") != target or
-      item{"state"}.getStr("") notin ["pending", "acknowledged", "rejected"] or
-      not item.hasKey("request") or item["request"].kind != JObject or
-      not item.hasKey("context") or not item.hasKey("receipt") or
-      not hex(item{"request_sha256"}.getStr(""), 64):
-    raise newException(ValueError, "The saved request is invalid. Check it before sending another request.")
-  result = SubmissionIntent(id: item["intent_id"].getStr, state: item["state"].getStr,
-    request: item["request"].copy, context: item["context"].copy, receipt: item["receipt"].copy)
 
 proc readIntent*(owner, kind, target: string): Future[SubmissionIntent] {.async.} =
   let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/submission-intents?kind=" &
     encodeUrl(kind) & "&target_id=" & encodeUrl(target),
     newFetchOptions(metod = HttpGet, credentials = fcInclude, mode = fmCors))
   if not response.ok: raise newException(ValueError, "The saved request could not be checked. Reload before sending another request.")
-  let parsed = parseSlot(decodeJson(response.body), kind, target)
+  let parsed = parseSubmissionIntent(decodeJson(response.body), kind, target)
   slots[slotKey(owner, kind, target)] = parsed
   return parsed
 
@@ -80,7 +60,7 @@ proc reserveIntent*(owner, kind, target: string, request: JsonNode, csrf: string
   let expected = if previous.id.len == 0: newJNull() else: %previous.id
   let response = await postSlot("/api/v1/submission-intents",
     %*{"kind": kind, "target_id": target, "expected_id": expected, "request": request}, csrf)
-  let parsed = parseSlot(response, kind, target)
+  let parsed = parseSubmissionIntent(response, kind, target)
   var original = parsed.request.copy
   original.delete("submission_id")
   if parsed.state != "pending" or original != request:
@@ -91,7 +71,7 @@ proc reserveIntent*(owner, kind, target: string, request: JsonNode, csrf: string
 proc acknowledgeIntent*(owner, kind, target, intentId: string, csrf: string): Future[SubmissionIntent] {.async.} =
   let original = cachedIntent(owner, kind, target)
   if original.id != intentId: raise newException(ValueError, "A newer request owns this slot. Reload its current state.")
-  let parsed = parseSlot(await postSlot("/api/v1/submission-intents/acknowledge",
+  let parsed = parseSubmissionIntent(await postSlot("/api/v1/submission-intents/acknowledge",
     %*{"kind": kind, "target_id": target, "intent_id": intentId}, csrf), kind, target)
   if parsed.id != intentId or parsed.state != "acknowledged" or parsed.request != original.request:
     raise newException(ValueError, "The server did not confirm the original accepted request.")

@@ -21,3 +21,9 @@ Thumbs.db
 *.log
 
 .runtime/
+
+# Legacy Nim test output; compile source tests into .runtime instead.
+/tests/test_commands
+/tests/test_commands.js
+/tests/test_job_lifecycle
+/tests/test_job_lifecycle.js

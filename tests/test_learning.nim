@@ -1,6 +1,5 @@
 import std/[json, strutils, unittest]
 import ../src/app/learning
-import ../src/app/learning_recovery
 
 let model = "a".repeat(32)
 let remote = "b".repeat(32)
@@ -242,14 +241,3 @@ suite "candidate runs":
     let selection = %*{"method":"sft", "role":"hub", "tuning":"qlora", "model_id":model,
                        "dataset_id":current,"dataset_sha256":digest,"preflight_sha256":check,"submission_id":runId}
     expect ValueError: discard parseStartedLearningRun(legacy, selection)
-
-  test "stored starts are exact owner and backend bound requests":
-    let request = %*{"method":"sft", "role":"hub", "tuning":"qlora", "model_id":model,
-                       "dataset_id":current,"dataset_sha256":digest,"preflight_sha256":check,"submission_id":runId}
-    let stored = %*{"schema":"pending-learning-run.v1", "owner":"owner-a", "backend":"https://itsm.example.test", "request":request}
-    check parsePendingLearningRun(stored, "owner-a", "https://itsm.example.test") == request
-    expect ValueError: discard parsePendingLearningRun(stored, "owner-b", "https://itsm.example.test")
-    expect ValueError: discard parsePendingLearningRun(stored, "owner-a", "https://other.example.test")
-    var malformed = stored.copy
-    malformed["request"]["submission_id"] = %"../run"
-    expect ValueError: discard parsePendingLearningRun(malformed, "owner-a", "https://itsm.example.test")

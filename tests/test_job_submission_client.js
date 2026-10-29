@@ -9,7 +9,6 @@ const {webcrypto} = require("node:crypto");
 // Compile tests/job_submission_client_driver.nim to this ignored build file
 // first. A missing artifact is a test failure, never an automatic skip.
 const driver = fs.readFileSync(path.join(__dirname, "../.runtime/job_submission_client_driver.js"), "utf8");
-const submissionHelper = fs.readFileSync(path.join(__dirname, "../public/js/job_submission.js"), "utf8");
 function fixture(fetch) {
   const requests = [];
   const context = vm.createContext({console, Headers,
@@ -57,17 +56,6 @@ test("a missing or changed workflow acknowledgement remains unknown even with th
     });
     assert.equal((await f.submit(workflow)).kind, "unknown");
   }
-});
-
-test("an identity the browser cannot create stops preparation before any POST", () => {
-  let posts = 0;
-  const context = vm.createContext({console, Headers, crypto: {},
-    fetch() { posts++; throw new Error("must not post"); },
-    AGENTIC_CONFIG: {backendBaseUrl: "https://backend.example", pollIntervalMs: 1000}});
-  vm.runInContext(submissionHelper, context);
-  vm.runInContext(driver, context);
-  assert.equal(JSON.parse(context.prepareJobForTest("owner-a", "chat-a", "Request")).kind, "storage_error");
-  assert.equal(posts, 0);
 });
 
 test("native read failures reach the durable job observer as handled interruptions", async () => {

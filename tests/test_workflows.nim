@@ -1,7 +1,6 @@
 import std/[json, strutils, unittest]
 import ../src/app/workflow_request
 import ../src/app/workflows
-import ../src/app/workflow_recovery
 
 let workflowId = "e".repeat(32)
 let digest = "1".repeat(64)
@@ -215,24 +214,3 @@ suite "exact workflow mutation receipts":
     var wrongTargets = savedJson()
     wrongTargets["workflow"]["definition"]["steps"][0]["grounded_arguments"]["given_name"] = %"Dana"
     expect ValueError: discard parseWorkflow(wrongTargets)
-
-suite "unconfirmed workflow recovery":
-  test "recovery binds account, server, exact saved version and exact request":
-    let draft = parseWorkflow(savedJson(2))
-    let payload = runPayload(draft, "sub", "Onboard Dana")
-    let journal = %*{"schema": "pending-workflow-run.v1", "backend": "https://fixture.test", "owner": "alice",
-      "workflow": workflowSnapshot(draft), "request": payload}
-    let recovered = parsePendingWorkflow(journal, "https://fixture.test", "alice")
-    check recovered.draft.digest == draft.digest
-    check recovered.payload == payload
-    expect ValueError: discard parsePendingWorkflow(journal, "https://fixture.test", "bob")
-    expect ValueError: discard parsePendingWorkflow(journal, "https://other.test", "alice")
-    var changed = journal.copy
-    changed["request"]["version"] = %3
-    expect ValueError: discard parsePendingWorkflow(changed, "https://fixture.test", "alice")
-    var extra = journal.copy
-    extra["request"]["new_submission"] = %true
-    expect ValueError: discard parsePendingWorkflow(extra, "https://fixture.test", "alice")
-    var malformed = journal.copy
-    malformed["request"].delete("message")
-    expect ValueError: discard parsePendingWorkflow(malformed, "https://fixture.test", "alice")

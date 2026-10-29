@@ -2,7 +2,7 @@
 import std/[asyncjs, json]
 import ../src/api/client
 import ../src/api/auth_client
-import ../src/api/job_submission
+import ../src/api/submission_intents
 
 proc submitJobForTest(chat, message, csrf, identity: cstring, workflow: cstring = "null"): Future[cstring] {.async, exportc.} =
   try:
@@ -14,12 +14,40 @@ proc submitJobForTest(chat, message, csrf, identity: cstring, workflow: cstring 
   except CatchableError:
     return cstring("{\"kind\":\"unknown\"}")
 
-proc prepareJobForTest(owner, chat, message: cstring): cstring {.exportc.} =
+proc intentJson(slot: SubmissionIntent): JsonNode =
+  %*{"id": slot.id, "state": slot.state,
+    "request": (if slot.request == nil: newJNull() else: slot.request),
+    "context": (if slot.context == nil: newJNull() else: slot.context),
+    "receipt": (if slot.receipt == nil: newJNull() else: slot.receipt)}
+
+proc readIntentForTest(owner, kind, target: cstring): Future[cstring] {.async, exportc.} =
   try:
-    let saved = prepareSubmission($owner, $chat, $message)
-    return cstring($(%*{"kind": "prepared", "submission_id": saved.identity}))
-  except CatchableError:
-    return cstring("{\"kind\":\"storage_error\"}")
+    let saved = await readIntent($owner, $kind, $target)
+    return cstring($(%*{"ok": true, "intent": intentJson(saved)}))
+  except CatchableError as exc:
+    return cstring($(%*{"ok": false, "error": exc.msg}))
+
+proc reserveIntentForTest(owner, kind, target, payload: cstring): Future[cstring] {.async, exportc.} =
+  try:
+    let saved = await reserveIntent($owner, $kind, $target, parseJson($payload), "fixture-csrf")
+    return cstring($(%*{"ok": true, "intent": intentJson(saved)}))
+  except CatchableError as exc:
+    return cstring($(%*{"ok": false, "error": exc.msg}))
+
+proc acknowledgeIntentForTest(owner, kind, target, identity: cstring): Future[cstring] {.async, exportc.} =
+  try:
+    let saved = await acknowledgeIntent($owner, $kind, $target, $identity, "fixture-csrf")
+    return cstring($(%*{"ok": true, "intent": intentJson(saved)}))
+  except CatchableError as exc:
+    return cstring($(%*{"ok": false, "error": exc.msg}))
+
+proc cachedIntentForTest(owner, kind, target: cstring): cstring {.exportc.} =
+  try:
+    return cstring($(%*{"ok": true, "intent": intentJson(cachedIntent($owner, $kind, $target))}))
+  except CatchableError as exc:
+    return cstring($(%*{"ok": false, "error": exc.msg}))
+
+proc clearIntentForTest(owner: cstring) {.exportc.} = clearIntentCache($owner)
 
 proc logoutForTest(csrf: cstring): Future[cstring] {.async, exportc.} =
   try:

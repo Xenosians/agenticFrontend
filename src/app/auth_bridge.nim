@@ -17,7 +17,6 @@ import request_context
 import account_bridge
 import chat_bridge
 import answer_references
-import request_recovery
 
 
 proc browserQueryParam(
@@ -556,7 +555,6 @@ proc logoutApplication*(
 
   try:
     clearOwnerSubmissions(ownerId)
-    clearOwnerRecovery(ownerId)
   except CatchableError:
     discard # Clearing the in-memory workspace must still proceed.
   clearAuthenticatedState(state)

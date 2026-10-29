@@ -4,189 +4,175 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
-const {webcrypto} = require("node:crypto");
-const {create, clearOwner} = require("../public/js/job_submission.js");
+const {intentServer} = require("./fixtures/submission_intent_server.js");
 
-function storage() {
-  const values = new Map();
-  return {getItem: key => values.get(key) ?? null, setItem: (key, value) => values.set(key, value),
-    removeItem: key => values.delete(key), key: index => [...values.keys()][index] ?? null,
-    get length() { return values.size; }};
+// Exercise the production Nim API, compiled into ignored test output. Phoenix
+// separately tests durable storage and the authority of operation receipts.
+const driver = fs.readFileSync(path.join(__dirname, "../.runtime/job_submission_client_driver.js"), "utf8");
+const base = "https://backend.example";
+const proposal = () => ({chat_id: "chat-a", message: "Read the exact inventory"});
+function fixture({server = intentServer(), intercept = null} = {}) {
+  const requests = [], touched = [];
+  const forbidden = new Proxy({}, {get(_target, name) {
+    touched.push(String(name)); throw new Error("browser storage must not be used");
+  }});
+  const context = vm.createContext({console, Headers, crypto: {},
+    localStorage: forbidden, sessionStorage: forbidden, indexedDB: forbidden,
+    AGENTIC_CONFIG: {backendBaseUrl: base, pollIntervalMs: 1000},
+    fetch: async (url, options) => {
+      requests.push({url, options});
+      return intercept ? intercept(url, options, server) : server.handle(url, options);
+    }});
+  vm.runInContext(driver, context);
+  const decode = async promise => JSON.parse(await promise);
+  return {server, requests, touched,
+    read: (owner = "owner-a", kind = "chat", target = "chat-a") => decode(context.readIntentForTest(owner, kind, target)),
+    reserve: (payload = proposal(), owner = "owner-a", kind = "chat", target = "chat-a") =>
+      decode(context.reserveIntentForTest(owner, kind, target, JSON.stringify(payload))),
+    acknowledge: (id, owner = "owner-a", kind = "chat", target = "chat-a") =>
+      decode(context.acknowledgeIntentForTest(owner, kind, target, id)),
+    cached: (owner = "owner-a", kind = "chat", target = "chat-a") => JSON.parse(context.cachedIntentForTest(owner, kind, target)),
+    clear: owner => context.clearIntentForTest(owner),
+    posts: () => requests.filter(row => row.options.method === "POST")};
 }
-const bind = (saved, owner = "owner-a", chat = "chat-a", base = "https://backend.example") =>
-  create(saved, webcrypto, base, owner, chat);
-const ack = (request, status = "pending") => ({submission_id: request.submission_id, job_id: "durable-job", status});
 
-test("identity and exact request are pinned before sending, and duplicate attempts reuse them", () => {
-  const saved = storage(), client = bind(saved);
-  const first = client.prepare("Check the service");
-  assert.deepEqual(client.pending(), first);
-  assert.deepEqual(client.prepare("Check the service"), first);
-  assert.throws(() => client.prepare("A different request"), /unresolved submission/);
-  assert.equal(saved.length, 1);
+test("server identity is reserved before dispatch without browser UUID or storage", async () => {
+  const f = fixture(), first = await f.reserve();
+  assert.equal(first.ok, true);
+  assert.equal(first.intent.state, "pending");
+  assert.match(first.intent.request.submission_id, /^[0-9a-f-]{36}$/);
+  assert.equal(f.requests[0].options.method, "GET");
+  assert.equal(f.posts().length, 1);
+  assert.equal(f.posts()[0].options.headers.get("X-CSRF-Token"), "fixture-csrf");
+  assert.equal(f.posts()[0].options.credentials, "include");
+  assert.deepEqual(await f.reserve(), first);
+  assert.equal(f.posts().length, 1);
+  assert.deepEqual(f.touched, []);
 });
 
-test("lost create acknowledgement survives a browser reload with the same durable identity", async () => {
-  const saved = storage(), beforeReload = bind(saved);
-  const first = beforeReload.prepare("Read the account status");
-  // Sending succeeded but its acknowledgement was lost. The production
-  // helper must keep the pinned request; it cannot infer a failed job.
-  await assert.rejects(async () => { throw new Error("connection interrupted after POST"); });
-  const afterReload = bind(saved), recovered = afterReload.pending();
-  assert.deepEqual(recovered, first);
-  assert.equal(afterReload.prepare(recovered.message).submission_id, first.submission_id);
-  afterReload.acknowledge(ack(recovered, "processing"));
-  assert.equal(afterReload.pending(), null);
+test("a pending identity freezes exact text, obligations and target", async () => {
+  const f = fixture();
+  const reviewed = {...proposal(), workflow_contract: {version: 1, steps: [
+    {id: "read", capability: "read_files", grounded_arguments: {paths: [" Exact target "]}, after_success_of: null}]}};
+  const first = await f.reserve(reviewed);
+  reviewed.workflow_contract.steps[0].grounded_arguments.paths[0] = "Different target";
+  assert.equal((await f.reserve(reviewed)).ok, false);
+  assert.equal((await f.reserve({...proposal(), message: "Changed text"})).ok, false);
+  assert.equal(f.cached().intent.request.workflow_contract.steps[0].grounded_arguments.paths[0], " Exact target ");
+  assert.equal(f.cached().intent.id, first.intent.id);
+  assert.equal(f.posts().length, 1);
 });
 
-test("an acknowledgement records existing failure or unknown execution without inventing success", () => {
-  for (const status of ["failed", "denied", "outcome_unknown", "completed", "waiting_approval"]) {
-    const client = bind(storage()), request = client.prepare("Check saved request");
-    assert.equal(client.acknowledge(ack(request, status)).status, status);
-    assert.equal(client.pending(), null);
+test("a lost reservation acknowledgement survives reload as a read-only exact identity", async () => {
+  const server = intentServer();
+  let lose = true;
+  const firstPage = fixture({server, intercept(url, options, current) {
+    const response = current.handle(url, options);
+    if (options.method === "POST" && lose) { lose = false; throw new TypeError("reply lost"); }
+    return response;
+  }});
+  assert.equal((await firstPage.reserve()).ok, false);
+  const original = structuredClone(server.slots.get("chat:chat-a"));
+  const reload = fixture({server});
+  const recovered = await reload.read();
+  assert.equal(recovered.intent.id, original.intent_id);
+  assert.deepEqual(recovered.intent.request, original.request);
+  assert.equal(reload.posts().length, 0);
+  assert.deepEqual(await reload.reserve(), recovered);
+  assert.equal(reload.posts().length, 0);
+});
+
+test("unknown acceptance cannot release a pending request or create another identity", async () => {
+  let failAck = true;
+  const f = fixture({intercept(url, options, server) {
+    if (new URL(url).pathname.endsWith("/acknowledge") && failAck) {
+      return {ok: false, status: 503, text: async () => '{"error":"submission_intent_unavailable"}'};
+    }
+    return server.handle(url, options);
+  }});
+  const first = await f.reserve();
+  assert.equal((await f.acknowledge(first.intent.id)).ok, false);
+  assert.equal(f.cached().intent.id, first.intent.id);
+  assert.equal(f.cached().intent.state, "pending");
+  assert.equal((await f.reserve({...proposal(), message: "Another request"})).ok, false);
+  failAck = false;
+  assert.equal((await f.acknowledge(first.intent.id)).intent.state, "acknowledged");
+  const next = await f.reserve();
+  assert.notEqual(next.intent.id, first.intent.id);
+});
+
+test("late tab reservations and acknowledgements cannot overwrite a newer request", async () => {
+  const server = intentServer(), a = fixture({server}), b = fixture({server});
+  await a.read(); await b.read();
+  const first = await a.reserve();
+  await a.acknowledge(first.intent.id);
+  assert.equal((await b.reserve()).ok, false, "stale empty predecessor must not reserve again");
+  await b.read();
+  const next = await b.reserve();
+  assert.notEqual(next.intent.id, first.intent.id);
+  assert.equal((await a.acknowledge(first.intent.id)).ok, false);
+  assert.equal(server.slots.get("chat:chat-a").intent_id, next.intent.id);
+  assert.equal(server.slots.get("chat:chat-a").state, "pending");
+});
+
+test("owners and targets have separate caches and sign-out drops no server identity", async () => {
+  const f = fixture(), first = await f.reserve();
+  assert.equal(f.cached("owner-b").ok, false);
+  assert.equal(f.cached("owner-a", "chat", "another-chat").ok, false);
+  await f.read("owner-b");
+  f.clear("owner-a");
+  assert.equal(f.cached("owner-a").ok, false);
+  assert.equal(f.cached("owner-b").intent.id, first.intent.id);
+  assert.equal((await f.read()).intent.id, first.intent.id);
+  assert.equal(f.posts().length, 1);
+});
+
+test("unavailable, missing and malformed slot observations never become verified absence", async () => {
+  const replies = [null, {}, {schema: "submission-intent-slot.v1", kind: "chat", target_id: "wrong", intent: null}];
+  for (const body of replies) {
+    const f = fixture({intercept: () => ({ok: true, status: 200, text: async () => JSON.stringify(body)})});
+    assert.equal((await f.reserve()).ok, false);
+    assert.equal(f.cached().ok, false);
+    assert.equal(f.posts().length, 0);
+  }
+  const failed = fixture({intercept: () => { throw new TypeError("network unavailable"); }});
+  assert.equal((await failed.reserve()).ok, false);
+  assert.equal(failed.posts().length, 0);
+});
+
+test("a mismatched reservation receipt stops before a usable dispatch identity exists", async () => {
+  for (const field of ["target_id", "kind", "schema"]) {
+    const f = fixture({intercept: async (url, options, server) => {
+      const response = server.handle(url, options);
+      if (options.method !== "POST") return response;
+      const body = JSON.parse(await response.text()); body[field] = "wrong";
+      return {ok: true, status: 200, text: async () => JSON.stringify(body)};
+    }});
+    assert.equal((await f.reserve()).ok, false);
+    assert.equal(f.cached().intent.id, "");
   }
 });
 
-test("invalid or unrelated acknowledgements cannot clear a pending submission", () => {
-  const client = bind(storage()), request = client.prepare("One request");
-  for (const response of [null, {}, {...ack(request), submission_id: webcrypto.randomUUID()},
-    {...ack(request), job_id: ""}, {...ack(request), status: "success"}]) {
-    assert.throws(() => client.acknowledge(response), /did not confirm/);
-    assert.deepEqual(client.pending(), request);
+test("only an exact acknowledged receipt clears the original frozen request", async () => {
+  for (const change of [row => { row.intent.intent_id = "f".repeat(32); },
+    row => { row.intent.state = "pending"; }, row => { row.intent.request.message = "Changed"; }]) {
+    const f = fixture({intercept: async (url, options, server) => {
+      const response = server.handle(url, options);
+      if (!new URL(url).pathname.endsWith("/acknowledge")) return response;
+      const body = JSON.parse(await response.text()); change(body);
+      return {ok: true, status: 200, text: async () => JSON.stringify(body)};
+    }});
+    const first = await f.reserve();
+    assert.equal((await f.acknowledge(first.intent.id)).ok, false);
+    assert.deepEqual(f.cached(), first);
   }
 });
 
-test("concurrent preparations for the same tab and chat reuse a single pinned identity", async () => {
-  const saved = storage();
-  const requests = await Promise.all(Array.from({length: 16}, async () => bind(saved).prepare("Same request")));
-  assert.equal(new Set(requests.map(request => request.submission_id)).size, 1);
-  assert.equal(saved.length, 1);
-});
-
-test("owners, backends and chats have separate recovery records and explicit sign out removes only its owner", () => {
-  const saved = storage(), first = bind(saved).prepare("Owner A request");
-  const second = bind(saved, "owner-b").prepare("Owner B request");
-  bind(saved, "owner-a", "chat-b").prepare("Other chat");
-  const otherBackend = bind(saved, "owner-a", "chat-a", "https://other.example").prepare("Other backend");
-  assert.notEqual(first.submission_id, second.submission_id);
-  clearOwner(saved, "https://backend.example", "owner-a");
-  assert.equal(bind(saved).pending(), null);
-  assert.deepEqual(bind(saved, "owner-b").pending(), second);
-  assert.deepEqual(bind(saved, "owner-a", "chat-a", "https://other.example").pending(), otherBackend);
-});
-
-test("storage or identity-generation failure prevents preparing a request for POST", () => {
-  assert.throws(() => bind({getItem() { return null; }, setItem() { throw new Error("storage full"); }}).prepare("Request"), /storage full/);
-  assert.throws(() => create(storage(), {}, "base", "owner", "chat").prepare("Request"), /safe submission identity/);
-});
-
-test("confirmed rejection clears only the rejected request, never a newer identity", () => {
-  const client = bind(storage()), first = client.prepare("Rejected request");
-  client.reject(webcrypto.randomUUID());
-  assert.deepEqual(client.pending(), first);
-  client.reject(first.submission_id);
-  const next = client.prepare("Corrected request");
-  client.reject(first.submission_id);
-  assert.deepEqual(client.pending(), next);
-});
-
-test("corrupt or cross-owner saved records fail closed instead of generating a new identity", () => {
-  const saved = storage(), client = bind(saved);
-  client.prepare("Request");
-  saved.setItem(saved.key(0), "not JSON");
-  assert.throws(() => client.prepare("Request"), /unreadable/);
-  const other = bind(storage(), "owner-b").prepare("Private request");
-  saved.setItem(saved.key(0), JSON.stringify(other));
-  assert.throws(() => client.prepare("Request"), /invalid/);
-});
-
-const contract = () => ({version: 1, steps: [
-  {id: "step_1", capability: "identity_create", grounded_arguments: {login: [" Exact Value "]}, after_success_of: null},
-  {id: "step_2", capability: "issue_create", grounded_arguments: {}, after_success_of: "step_1"}
-]});
-
-test("the reviewed workflow is copied and pinned with its message across reload and uncertain acknowledgement", () => {
-  const saved = storage(), before = bind(saved), reviewed = contract();
-  const request = before.prepare("Create identity, then issue", reviewed);
-  reviewed.steps[0].grounded_arguments.login[0] = "Different target";
-  assert.equal(request.workflow_contract.steps[0].grounded_arguments.login[0], " Exact Value ");
-  const after = bind(saved), pinned = after.pending();
-  assert.deepEqual(pinned, request);
-  assert.equal(after.prepare(pinned.message, pinned.workflow_contract).submission_id, request.submission_id);
-  assert.throws(() => after.prepare(pinned.message), /unresolved submission/);
-  assert.throws(() => after.prepare(pinned.message, reviewed), /unresolved submission/);
-  const changedDependency = contract(); changedDependency.steps[1].after_success_of = null;
-  assert.throws(() => after.prepare(pinned.message, changedDependency), /unresolved submission/);
-  const reorderedKeys = {steps: contract().steps, version: 1};
-  assert.equal(after.prepare(pinned.message, reorderedKeys).submission_id, request.submission_id);
-});
-
-test("malformed obligations and oversized UTF-8 input never persist a submission", () => {
-  const cases = [[], {}, {version: 1, steps: []}, {...contract(), extra: true}, contract(), contract(), contract(), contract(), contract(), contract(), contract()];
-  cases[4].steps[1].id = "step_1";
-  cases[5].steps[1].capability = "identity_create";
-  cases[6].steps[0].after_success_of = "step_2";
-  cases[7].steps[0].grounded_arguments = {login: "exact"};
-  cases[8].steps[0].grounded_arguments = {login: [" "]};
-  cases[9].steps[0].grounded_arguments = {login: ["x".repeat(1025)]};
-  cases[10].steps[0].grounded_arguments = {login: Array(16).fill("界".repeat(1024))};
-  for (const invalid of cases) {
-    const saved = storage();
-    assert.throws(() => bind(saved).prepare("Request", invalid), /required operations are invalid/);
-    assert.equal(saved.length, 0);
-  }
-});
-
-test("corrupt saved obligations block recovery instead of dropping the workflow", () => {
-  const saved = storage(), client = bind(saved);
-  client.prepare("Request", contract());
-  const damaged = JSON.parse(saved.getItem(saved.key(0)));
-  delete damaged.workflow_contract.steps[1].after_success_of;
-  saved.setItem(saved.key(0), JSON.stringify(damaged));
-  assert.throws(() => client.pending(), /required operations are invalid/);
-  assert.equal(saved.length, 1);
-});
-
-test("invalid grounded argument names and excessive field counts cannot be prepared or recovered", () => {
-  for (const fields of [{"bad-target": ["value"]}, {["a".repeat(151)]: ["value"]},
-    {"target_界": ["value"]}, Object.fromEntries(Array.from({length: 33}, (_, index) => ["field_" + index, ["value"]]))]) {
-    const reviewed = contract(); reviewed.steps[0].grounded_arguments = fields;
-    const saved = storage(), client = bind(saved);
-    assert.throws(() => client.prepare("Request", reviewed), /required operations are invalid/);
-    assert.equal(saved.length, 0);
-    client.prepare("Request", contract());
-    const damaged = JSON.parse(saved.getItem(saved.key(0)));
-    damaged.workflow_contract = reviewed;
-    saved.setItem(saved.key(0), JSON.stringify(damaged));
-    assert.throws(() => client.pending(), /required operations are invalid/);
-    assert.equal(saved.length, 1);
-  }
-});
-
-test("a matching UUID cannot clear reviewed obligations without their exact persisted acknowledgement", () => {
-  const client = bind(storage()), request = client.prepare("Request", contract());
-  for (const response of [ack(request), {...ack(request), workflow_contract: contract()},
-    {...ack(request), workflow_contract: contract(), workflow_contract_hash: "A".repeat(64)},
-    {...ack(request), workflow_contract: {version: 1, steps: []}, workflow_contract_hash: "a".repeat(64)}]) {
-    assert.throws(() => client.acknowledge(response), /reviewed required operations/);
-    assert.deepEqual(client.pending(), request);
-  }
-  client.acknowledge({...ack(request), workflow_contract: contract(), workflow_contract_hash: "a".repeat(64)});
-  assert.equal(client.pending(), null);
-});
-
-test("the page keeps pending submissions in memory and never touches browser storage", () => {
-  const touched = [];
-  const spy = name => (...args) => { touched.push(name); throw new Error("browser storage must not be used"); };
-  const context = vm.createContext({console, sessionStorage: {getItem: spy("get"), setItem: spy("set"), removeItem: spy("remove")},
-    localStorage: {getItem: spy("get"), setItem: spy("set"), removeItem: spy("remove")}});
-  vm.runInContext(fs.readFileSync(path.join(__dirname, "../public/js/job_submission.js"), "utf8"), context);
-  const pageApi = context.AgenticJobSubmission;
-  const first = pageApi.forPage(webcrypto, "https://backend.example", "owner-a", "chat-a").prepare("Check the service");
-  // The same page sees the same pinned identity after a lost acknowledgement.
-  assert.deepEqual(pageApi.forPage(webcrypto, "https://backend.example", "owner-a", "chat-a").pending(), first);
-  assert.equal(pageApi.forPage(webcrypto, "https://backend.example", "owner-b", "chat-a").pending(), null);
-  pageApi.clearPageOwner("https://backend.example", "owner-a");
-  assert.equal(pageApi.forPage(webcrypto, "https://backend.example", "owner-a", "chat-a").pending(), null);
-  assert.deepEqual(touched, []);
+test("server admission refusals retain their reason and never allocate a fallback identity", async () => {
+  const f = fixture();
+  const oversized = {...proposal(), workflow_contract: {payload: "界".repeat(12000)}};
+  const result = await f.reserve(oversized);
+  assert.equal(result.ok, false);
+  assert.match(result.error, /invalid/);
+  assert.equal(f.server.slots.size, 0);
 });
