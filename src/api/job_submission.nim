@@ -8,24 +8,25 @@ type PendingSubmission* = object
 proc browserCall(base, owner, chat, action, payload: cstring): cstring {.importjs: """
 ((base,owner,chat,action,payload)=>{
   try {
+    const submissions=globalThis.AgenticJobSubmission;
     if(action==='clear') {
-      globalThis.AgenticJobSubmission.clearOwner(globalThis.sessionStorage,base,owner);
+      submissions.clearPageOwner(base,owner);
       return '{"value":null}';
     }
-    const store=globalThis.AgenticJobSubmission.create(globalThis.sessionStorage,globalThis.crypto,base,owner,chat);
+    const store=submissions.forPage(globalThis.crypto,base,owner,chat);
     const request=action==='prepare'?JSON.parse(payload):null;
     const value=action==='pending'?store.pending():action==='prepare'?store.prepare(request.message,request.workflow_contract):
       action==='acknowledge'?store.acknowledge(JSON.parse(payload)):store.reject(payload);
     return JSON.stringify({value:value===undefined?null:value});
   } catch(error) {
-    return JSON.stringify({error:error&&typeof error.message==='string'?error.message:'Browser storage is unavailable.'});
+    return JSON.stringify({error:error&&typeof error.message==='string'?error.message:'The submission could not be prepared.'});
   }
 })(#,#,#,#,#)
 """.}
 
 proc call(owner, chat, action: string, payload = ""): JsonNode =
   # Browser exceptions cross as data and become a normal Nim exception.
-  # Otherwise native storage Errors would escape CatchableError handlers.
+  # Otherwise native JavaScript Errors would escape CatchableError handlers.
   let response = parseJson($browserCall(cstring(frontendConfig.backendBaseUrl),
     cstring(owner), cstring(chat), cstring(action), cstring(payload)))
   if response.hasKey("error"):

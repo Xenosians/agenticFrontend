@@ -223,28 +223,25 @@ class WorkflowTests(navigation.ChatNavigationTests):
         retry.click()
         expect(self.page.get_by_text("Run confirmed: Queued. Open its chat for approvals and results.", exact=True)).to_be_visible()
         self.assertEqual(self.runs[1], first)
-        self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k=>k.startsWith('janus.pending-workflow-run.v1:')).length"), 0)
         self.assert_clean()
 
-    def test_reload_restores_frozen_request_without_dispatching_it(self):
+    def test_reload_after_a_lost_run_reply_shows_the_servers_runs_and_never_resends(self):
         self.run_http_status = 503
         self.open_workflow()
         self.start_run()
         expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_be_enabled()
-        first = copy.deepcopy(self.runs[0])
-        original_receipt = self.run_receipt(WORKFLOW, first["body"])
-        # The server's latest version changes while this original run is uncertain.
-        self.records[WORKFLOW] = saved(version=3, name="Later saved version")
+        # The server saved the run; only its answer was lost.
+        self.history = [{"job_id": JOB, "chat_id": CHAT, "workflow_id": WORKFLOW, "workflow_version": 2,
+                         "definition_sha256": DIGEST, "status": "pending", "created_at": "2026-10-29T12:00:00Z"}]
         self.page.reload(wait_until="networkidle")
         self.open_automation_page()
-        expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_be_enabled()
-        expect(self.page.locator("#workflowName")).to_have_value("Provision identity")
-        expect(self.page.locator("#automationRunMessage")).to_have_value(first["body"]["message"])
+        self.page.locator("#workflowOpen").select_option(WORKFLOW)
+        expect(self.page.locator(".workflow-run")).to_have_count(1)
+        expect(self.page.locator(".workflow-run")).to_contain_text("Queued")
+        # Nothing was kept in the browser: nothing is resent and nothing stays locked.
+        expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_have_count(0)
+        expect(self.page.get_by_role("button", name="Run saved version", exact=True)).to_be_enabled()
         self.assertEqual(len(self.runs), 1)
-        self.run_http_status, self.run_override = 200, original_receipt
-        self.page.get_by_role("button", name="Retry same run", exact=True).click()
-        expect(self.page.get_by_text("Run confirmed: Queued. Open its chat for approvals and results.", exact=True)).to_be_visible()
-        self.assertEqual(self.runs[1], first)
         self.assert_clean()
 
     def test_malformed_run_receipt_keeps_recovery_and_never_claims_started(self):
@@ -260,27 +257,6 @@ class WorkflowTests(navigation.ChatNavigationTests):
         expect(self.page.locator(".workflow-panel [role=alert]")).to_contain_text("does not match this workflow version")
         expect(self.page.get_by_text("Run confirmed:", exact=False)).to_have_count(0)
         self.assertEqual(len(self.runs), 1)
-        self.assert_clean()
-
-    def test_storage_failure_prevents_dispatch_and_keeps_the_request_locked(self):
-        self.context.add_init_script("Storage.prototype.setItem = function(){throw new Error('fixture storage refusal')}")
-        self.open_workflow()
-        self.start_run()
-        expect(self.page.locator(".workflow-panel [role=alert]")).to_contain_text("recovery storage could not be confirmed")
-        expect(self.page.locator("#automationRunMessage")).to_be_disabled()
-        self.assertEqual(self.runs, [])
-        self.assert_clean()
-
-    def test_recovery_cleanup_failure_preserves_confirmed_job_and_blocks_a_new_identity(self):
-        self.context.add_init_script("Storage.prototype.removeItem = function(){throw new Error('fixture cleanup refusal')}")
-        self.open_workflow()
-        self.start_run()
-        expect(self.page.get_by_text("Run confirmed: Queued. Open its chat for approvals and results.", exact=True)).to_be_visible()
-        expect(self.page.locator(".workflow-panel [role=alert]")).to_contain_text("run is confirmed")
-        expect(self.page.locator("#automationRunMessage")).to_be_disabled()
-        expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_be_enabled()
-        self.assertEqual(len(self.runs), 1)
-        self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k=>k.startsWith('janus.pending-workflow-run.v1:')).length"), 1)
         self.assert_clean()
 
     def test_late_save_list_cannot_replace_another_owners_workflows(self):
@@ -323,8 +299,8 @@ class WorkflowTests(navigation.ChatNavigationTests):
         route.fulfill(json=receipt)
         expect(self.page.locator("#workflowName")).to_have_value("New workflow")
         expect(self.page.get_by_text("Run confirmed:", exact=False)).to_have_count(0)
-        # The old owner's exact unknown request survives for their own reconciliation.
-        self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k=>k.startsWith('janus.pending-workflow-run.v1:')).length"), 1)
+        # Signing out drops the old owner's pending request from the page.
+        expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_have_count(0)
         self.assertEqual(len(self.runs), 1)
         self.assert_clean()
 

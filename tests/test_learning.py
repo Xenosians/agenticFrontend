@@ -460,27 +460,23 @@ class LearningTests(navigation.ChatNavigationTests):
         expect(pending).to_have_count(0)
         self.assertEqual([entry["body"] for entry in self.starts], [expected, expected])
 
-    def test_reload_restores_an_unknown_start_without_dispatch_and_resolves_its_original_run(self):
+    def test_reload_after_an_unknown_start_shows_the_servers_runs_and_never_resends(self):
         self.start_reply = (503, {"error": "learning_run_outcome_unknown"})
         self.open_learning()
         self.check()
         self.start_button().click()
         expect(self.page.locator(".learning-pending")).to_be_visible()
         expected = copy.deepcopy(self.starts[0]["body"])
+        # The server started the run; only its answer was lost.
+        self.runs = [run(state="completed", step=9, submission_id=expected["submission_id"])]
         self.page.reload()
         self.page.keyboard.press("Control+k")
         self.page.locator("#commandSearch").fill("Learning")
         self.page.locator("#commandSearch").press("Enter")
-        pending = self.page.locator(".learning-pending")
-        expect(pending).to_be_visible()
-        self.assertEqual(len(self.starts), 1, "reload must never submit")
-        # The known original run may have finished while its acknowledgement was lost.
-        self.resolve_reply = run(state="completed", step=9, submission_id=expected["submission_id"])
-        pending.get_by_role("button", name="Check previous start", exact=True).click()
         expect(self.page.locator(f'.learning-run[data-run="{RUN}"]')).to_contain_text("Candidate ready")
-        expect(pending).to_have_count(0)
-        self.assertEqual(self.resolves, [expected["submission_id"]])
-        self.assertEqual(len(self.starts), 1)
+        # Nothing was kept in the browser: nothing is resent or left pending.
+        expect(self.page.locator(".learning-pending")).to_have_count(0)
+        self.assertEqual(len(self.starts), 1, "reload must never submit")
 
     def test_a_resolution_for_another_submission_cannot_clear_the_unknown_start(self):
         self.start_reply = (503, {"error": "learning_service_unavailable"})
@@ -508,18 +504,6 @@ class LearningTests(navigation.ChatNavigationTests):
         expect(pending).to_have_count(0)
         expect(self.page.locator(".learning-run")).to_contain_text("Candidate ready")
         self.assertEqual(len(self.starts), 1)
-
-    def test_storage_failure_prevents_dispatch_before_a_start(self):
-        self.page.add_init_script("""const original=Storage.prototype.setItem;
-        Storage.prototype.setItem=function(key,value){
-          if(key.startsWith('janus.pending-learning-run.v1:')) throw new Error('fixture storage denial');
-          return original.call(this,key,value);
-        };""")
-        self.open_learning()
-        self.check()
-        self.start_button().click()
-        expect(self.page.locator(".learning-runs").get_by_role("alert")).to_contain_text("storage could not be confirmed")
-        self.assertEqual(self.starts, [])
 
     def test_a_start_receipt_for_another_selection_remains_unknown(self):
         self.start_reply = run(model={"id": REMOTE, "backend": "local", "source_kind": "local"})

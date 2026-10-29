@@ -1,11 +1,11 @@
-## One frozen unconfirmed candidate start per owner/server/browser tab.
+## One frozen unconfirmed candidate start per owner/server, kept in page memory.
 ## Loading or clearing it never submits a training job.
 import std/json
 import learning
 import request_recovery
 
 const namespace = "janus.pending-learning-run.v1"
-const storageError = "Learning recovery storage could not be confirmed. Restore browser storage and reconcile the previous start before another run."
+const storageError = "A different candidate start is still unconfirmed. Check the previous start before another run."
 
 proc record(owner, backend: string, request: JsonNode): JsonNode =
   validateLearningRunRequest(request)

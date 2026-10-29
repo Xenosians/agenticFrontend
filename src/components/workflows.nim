@@ -186,7 +186,7 @@ proc renderWorkflowPanel*(state: AppState): VNode =
         text "Saving never runs anything. A run uses the saved version and asks for approval before any change. Retries keep the same run identity."
       if workflowUnconfirmed(state):
         p(class = "operation-note", role = "status"):
-          text (if state.automationRunConfirmed: "Confirmed run needs browser recovery cleanup. " else: "Unconfirmed run. ") &
+          text (if state.automationRunConfirmed: "Confirmed run is still being cleared. " else: "Unconfirmed run. ") &
             "Saved version " & $draft.version & " and its exact request stay locked. Refresh does not send it again."
       if state.automationRecoveryError.len > 0:
         p(class = "operation-error", role = "alert"): text state.automationRecoveryError

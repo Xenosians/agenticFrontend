@@ -59,10 +59,9 @@ test("a missing or changed workflow acknowledgement remains unknown even with th
   }
 });
 
-test("native browser storage exceptions become handled Nim errors before any POST", () => {
+test("an identity the browser cannot create stops preparation before any POST", () => {
   let posts = 0;
-  const context = vm.createContext({console, Headers, crypto: webcrypto,
-    sessionStorage: {getItem() { return null; }, setItem() { throw new Error("storage unavailable"); }},
+  const context = vm.createContext({console, Headers, crypto: {},
     fetch() { posts++; throw new Error("must not post"); },
     AGENTIC_CONFIG: {backendBaseUrl: "https://backend.example", pollIntervalMs: 1000}});
   vm.runInContext(submissionHelper, context);

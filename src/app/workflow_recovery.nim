@@ -1,5 +1,5 @@
-## One owner-scoped unconfirmed run per browser tab. Recovery never dispatches;
-## only an explicit retry sends the original immutable request again.
+## One owner-scoped unconfirmed run, kept in page memory. Recovery never
+## dispatches; only an explicit retry sends the original immutable request again.
 import std/json
 import workflows
 import request_recovery
@@ -11,7 +11,7 @@ proc record(owner, backend: string, pending: WorkflowPendingRun): JsonNode =
 proc call(owner, backend, action: string, payload = ""): JsonNode =
   if owner.len == 0: raise newException(ValueError, "A signed-in owner is required for workflow recovery.")
   recoveryStorage("janus.pending-workflow-run.v1", owner, backend, action, payload,
-    "Workflow recovery storage could not be confirmed. Keep this run unchanged and restore browser storage before retrying.")
+    "A different workflow run is still unconfirmed. Keep this run unchanged and retry it before another run.")
 
 proc parsePendingWorkflow*(data: JsonNode, backend, owner: string): WorkflowPendingRun =
   if data == nil or data.kind != JObject or data.len != 5 or

@@ -15,6 +15,28 @@ from urllib.parse import urlparse
 
 from playwright.sync_api import expect, sync_playwright
 
+# Records localStorage/sessionStorage writes, script cookie writes and IndexedDB
+# opens. Server cookies arrive as HttpOnly Set-Cookie headers and are not seen here.
+BROWSER_WRITE_RECORDER = """(() => {
+  const writes = [];
+  Object.defineProperty(globalThis, "__browserWrites", {value: writes});
+  for (const name of ["setItem", "removeItem", "clear"]) {
+    const original = Storage.prototype[name];
+    Storage.prototype[name] = function (...args) {
+      writes.push(name + ":" + (this === globalThis.localStorage ? "localStorage" : "sessionStorage"));
+      return original.apply(this, args);
+    };
+  }
+  const cookie = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+  Object.defineProperty(Document.prototype, "cookie", {configurable: true,
+    get() { return cookie.get.call(this); },
+    set(value) { writes.push("cookie"); cookie.set.call(this, value); }});
+  if (globalThis.indexedDB) {
+    const open = indexedDB.open.bind(indexedDB);
+    indexedDB.open = (...args) => { writes.push("indexedDB"); return open(...args); };
+  }
+})();"""
+
 
 class QuietStaticHandler(SimpleHTTPRequestHandler):
     def log_message(self, *_args):
@@ -45,6 +67,9 @@ class ChatNavigationTests(unittest.TestCase):
     def setUp(self):
         self.context = self.browser.new_context()
         self.context.add_init_script("window.WebSocket = undefined;")
+        # The frontend keeps nothing in the browser: record every storage or
+        # cookie write so each test can prove there were none.
+        self.context.add_init_script(BROWSER_WRITE_RECORDER)
         self.page = self.context.new_page()
         self.pending_history = []
         self.submissions = []
@@ -56,7 +81,12 @@ class ChatNavigationTests(unittest.TestCase):
     def tearDown(self):
         for route in self.pending_history:
             route.abort()
-        self.context.close()
+        try:
+            if not self.page.is_closed() and self.page.url.startswith(self.base):
+                self.assertEqual(self.page.evaluate("globalThis.__browserWrites || []"), [],
+                                 "the frontend wrote to browser storage or cookies")
+        finally:
+            self.context.close()
 
     def route(self, route):
         request = route.request
@@ -169,23 +199,33 @@ class ChatNavigationTests(unittest.TestCase):
         self.assertEqual(self.submissions[0]["message"], "Draft for the selected chat")
         self.assertEqual(self.errors, [])
 
-    def test_navigation_preserves_recovery_of_pinned_submission(self):
-        identity = "62bb7d94-4b65-44cc-8bd1-b01b61241c17"
-        record = {"version": 1, "backend": self.base, "owner": "fixture-owner",
-                  "chat_id": "fixture-second", "submission_id": identity,
-                  "message": "Previously submitted fixture request"}
-        key = "janus.pending-submission.v1:" + json.dumps(
-            [self.base, "fixture-owner", "fixture-second"], separators=(",", ":"))
-        self.context.add_init_script(
-            f"sessionStorage.setItem({json.dumps(key)}, {json.dumps(json.dumps(record))});")
+    def lose_acknowledgement_in_second_chat(self, message, operations=None):
+        """Sends from the second chat, loses its acknowledgement and returns to the first."""
+        def lose_once(route):
+            self.submissions.append(route.request.post_data_json)
+            self.page.unroute("**/api/v1/jobs", lose_once)
+            route.abort()  # The POST may have been saved; its answer never arrives.
+
         self.open_first_chat()
         self.begin_second_chat()
-        self.assertEqual(self.submissions, [])
         self.release_second_chat()
+        if operations:
+            operations()
+        self.page.route("**/api/v1/jobs", lose_once)
+        self.page.locator("#messageInput").fill(message)
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        expect(self.page.get_by_role("button", name="Check saved submission", exact=True)).to_be_visible()
+        self.page.locator(".chat-nav-title", has_text="First fixture chat").click()
+        expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
+        return self.submissions[0]
+
+    def test_navigation_preserves_recovery_of_pinned_submission(self):
+        first = self.lose_acknowledgement_in_second_chat("Previously submitted fixture request")
+        self.begin_second_chat()
+        self.release_second_chat()
+        # Reopening the chat re-sends only the request pinned in this page.
         expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
-        self.assertEqual(self.submissions, [{"chat_id": "fixture-second", "message": record["message"],
-                                             "submission_id": identity}])
-        self.assertIsNone(self.page.evaluate("key => sessionStorage.getItem(key)", key))
+        self.assertEqual(self.submissions, [first, first])
         self.assertEqual(self.errors, [])
 
     def add_required_identity(self):
@@ -248,31 +288,32 @@ class ChatNavigationTests(unittest.TestCase):
         recover = self.page.get_by_role("button", name="Check saved submission", exact=True)
         expect(recover).to_be_visible()
         self.assertEqual(len(self.submissions), 1)
-        self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k => k.startsWith('janus.pending-submission.v1:')).length"), 1)
         recover.click()
         expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
         self.assertEqual(len(self.submissions), 2)
         self.assertEqual(self.submissions[0], self.submissions[1])
-        self.assertEqual(self.page.evaluate("Object.keys(sessionStorage).filter(k => k.startsWith('janus.pending-submission.v1:')).length"), 0)
         self.assertEqual(self.errors, [])
 
-    def test_storage_rejection_keeps_the_unsent_composer_text(self):
-        self.context.add_init_script("""
-          const original = Storage.prototype.setItem;
-          Storage.prototype.setItem = function(key, value) {
-            if (key.startsWith('janus.pending-submission.v1:')) {
-              throw new Error('Fixture storage unavailable');
-            }
-            return original.call(this, key, value);
-          };
-        """)
+    def test_a_missing_submission_identity_keeps_the_unsent_composer_text(self):
+        self.context.add_init_script("Object.defineProperty(globalThis.crypto, 'randomUUID', {value: undefined});")
         self.open_first_chat()
         composer = self.page.locator("#messageInput")
         composer.fill("  Keep this unsent request  ")
         self.page.get_by_role("button", name="Send message", exact=True).click()
         expect(composer).to_have_value("  Keep this unsent request  ")
-        expect(self.page.get_by_text("No new request was sent. Fixture storage unavailable", exact=True)).to_be_visible()
+        expect(self.page.get_by_text(
+            "No new request was sent. This browser cannot create a safe submission identity.", exact=True)).to_be_visible()
         self.assertEqual(self.submissions, [])
+        self.assertEqual(self.errors, [])
+
+    def test_a_reload_after_a_lost_acknowledgement_never_sends_the_request_again(self):
+        first = self.lose_acknowledgement_in_second_chat("Request whose answer was lost")
+        self.page.reload(wait_until="networkidle")
+        self.begin_second_chat()
+        self.release_second_chat()
+        # Nothing was kept in the browser: the server's saved jobs are the record.
+        expect(self.page.get_by_role("button", name="Check saved submission", exact=True)).to_have_count(0)
+        self.assertEqual(self.submissions, [first])
         self.assertEqual(self.errors, [])
 
     def test_oversized_required_operations_keep_the_message_without_posting(self):
@@ -289,8 +330,6 @@ class ChatNavigationTests(unittest.TestCase):
             "No new request was sent. The required operations are invalid. Review them before sending.",
             exact=True)).to_be_visible()
         self.assertEqual(self.submissions, [])
-        self.assertEqual(self.page.evaluate(
-            "Object.keys(sessionStorage).filter(k => k.startsWith('janus.pending-submission.v1:')).length"), 0)
         self.assertEqual(self.errors, [])
 
     def test_recovery_and_delayed_ack_preserve_an_independent_composer_draft(self):
@@ -404,22 +443,12 @@ class ChatNavigationTests(unittest.TestCase):
         self.assertEqual(self.errors, [])
 
     def test_recovery_keeps_the_exact_saved_operations_instead_of_building_another_request(self):
-        identity = "1ab9024f-9bd4-421b-912c-38d73b71f084"
-        workflow = {"version": 1, "steps": [{"id": "first", "capability": "fixture_issue_create",
-                    "grounded_arguments": {"project": [" Exact project "]}, "after_success_of": None}]}
-        record = {"version": 1, "backend": self.base, "owner": "fixture-owner", "chat_id": "fixture-second",
-                  "submission_id": identity, "message": "Previously reviewed request", "workflow_contract": workflow}
-        key = "janus.pending-submission.v1:" + json.dumps(
-            [self.base, "fixture-owner", "fixture-second"], separators=(",", ":"))
-        self.context.add_init_script(
-            f"sessionStorage.setItem({json.dumps(key)}, {json.dumps(json.dumps(record))});")
-        self.open_first_chat()
+        first = self.lose_acknowledgement_in_second_chat("Previously reviewed request", self.add_required_identity)
+        self.assertIn("workflow_contract", first)
         self.begin_second_chat()
         self.release_second_chat()
         expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
-        self.assertEqual(self.submissions, [{"chat_id": "fixture-second", "message": record["message"],
-                                           "submission_id": identity, "workflow_contract": workflow}])
-        self.assertIsNone(self.page.evaluate("key => sessionStorage.getItem(key)", key))
+        self.assertEqual(self.submissions, [first, first])
         self.assertEqual(self.errors, [])
 
 

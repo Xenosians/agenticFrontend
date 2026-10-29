@@ -39,7 +39,7 @@ proc restoreWorkflowRecovery(state: AppState): bool =
       state.automationNotice = "An earlier run is unconfirmed. Its request is locked; retry only that same run to reconcile it."
     result = true
   except CatchableError:
-    state.automationRecoveryError = "Stored workflow recovery could not be read. Restore browser storage and reconcile the earlier run before another change."
+    state.automationRecoveryError = "The pending workflow run could not be read. Reload this page; the run list shows what the server saved."
     state.automationError = state.automationRecoveryError
 
 proc clearWorkflowEditor(state: AppState) =
@@ -216,7 +216,7 @@ proc runWorkflowDraft*(state: AppState) {.async.} =
       state.automationRunConfirmed = false
     except CatchableError:
       # A local cleanup failure cannot erase the valid durable-job receipt.
-      state.automationError = "The run is confirmed, but its browser recovery record could not be cleared. Restore browser storage, then confirm the same run again."
+      state.automationError = "The run is confirmed, but its pending record could not be cleared. Confirm the same run again."
     redraw(kxi)
     await refreshWorkflowRuns(state, request)
   except CatchableError as exc:

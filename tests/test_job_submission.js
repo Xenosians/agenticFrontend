@@ -1,6 +1,9 @@
 "use strict";
 const {test} = require("node:test");
 const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const vm = require("node:vm");
 const {webcrypto} = require("node:crypto");
 const {create, clearOwner} = require("../public/js/job_submission.js");
 
@@ -170,4 +173,20 @@ test("a matching UUID cannot clear reviewed obligations without their exact pers
   }
   client.acknowledge({...ack(request), workflow_contract: contract(), workflow_contract_hash: "a".repeat(64)});
   assert.equal(client.pending(), null);
+});
+
+test("the page keeps pending submissions in memory and never touches browser storage", () => {
+  const touched = [];
+  const spy = name => (...args) => { touched.push(name); throw new Error("browser storage must not be used"); };
+  const context = vm.createContext({console, sessionStorage: {getItem: spy("get"), setItem: spy("set"), removeItem: spy("remove")},
+    localStorage: {getItem: spy("get"), setItem: spy("set"), removeItem: spy("remove")}});
+  vm.runInContext(fs.readFileSync(path.join(__dirname, "../public/js/job_submission.js"), "utf8"), context);
+  const pageApi = context.AgenticJobSubmission;
+  const first = pageApi.forPage(webcrypto, "https://backend.example", "owner-a", "chat-a").prepare("Check the service");
+  // The same page sees the same pinned identity after a lost acknowledgement.
+  assert.deepEqual(pageApi.forPage(webcrypto, "https://backend.example", "owner-a", "chat-a").pending(), first);
+  assert.equal(pageApi.forPage(webcrypto, "https://backend.example", "owner-b", "chat-a").pending(), null);
+  pageApi.clearPageOwner("https://backend.example", "owner-a");
+  assert.equal(pageApi.forPage(webcrypto, "https://backend.example", "owner-a", "chat-a").pending(), null);
+  assert.deepEqual(touched, []);
 });

@@ -1,6 +1,9 @@
-/* Pending submissions keep one identity across a lost acknowledgement or reload.
- * Records are scoped to the backend, signed-in owner and chat. No credentials
- * are stored, and an acknowledgement never means the job itself succeeded. */
+/* Pending submissions keep one identity across a lost acknowledgement within
+ * this page. Records live only in page memory, scoped to the backend,
+ * signed-in owner and chat: nothing is written to browser storage, so a
+ * reload drops them and the chat's saved jobs on the server are the record.
+ * No credentials are kept, and an acknowledgement never means the job itself
+ * succeeded. */
 (function (root) {
   "use strict";
   const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
@@ -104,7 +107,7 @@
   }
 
   function clearOwner(storage, backend, owner) {
-    // Explicit sign-out clears pending request text from this browser tab.
+    // Explicit sign-out clears pending request text from this page.
     const keys = [];
     for (let index = 0; index < storage.length; index++) {
       const key = storage.key(index);
@@ -116,6 +119,22 @@
     }
     for (const key of keys) storage.removeItem(key);
   }
-  root.AgenticJobSubmission = Object.freeze({create, clearOwner});
+
+  // Page memory with the Storage interface the records above use.
+  function memoryStorage() {
+    const rows = new Map();
+    return Object.freeze({
+      getItem: key => rows.has(key) ? rows.get(key) : null,
+      setItem: (key, value) => { rows.set(String(key), String(value)); },
+      removeItem: key => { rows.delete(key); },
+      key: index => [...rows.keys()][index] ?? null,
+      get length() { return rows.size; }
+    });
+  }
+
+  const page = memoryStorage();
+  const forPage = (crypto, backend, owner, chat) => create(page, crypto, backend, owner, chat);
+  const clearPageOwner = (backend, owner) => clearOwner(page, backend, owner);
+  root.AgenticJobSubmission = Object.freeze({create, clearOwner, memoryStorage, forPage, clearPageOwner});
   if (typeof module !== "undefined" && module.exports) module.exports = root.AgenticJobSubmission;
 })(globalThis);
