@@ -11,6 +11,7 @@ class SidebarWorkspaceTests(unittest.TestCase):
     setUpClass = navigation.ChatNavigationTests.__dict__["setUpClass"]
     tearDownClass = navigation.ChatNavigationTests.__dict__["tearDownClass"]
     tearDown = navigation.ChatNavigationTests.tearDown
+    route_intent = navigation.ChatNavigationTests.route_intent
 
     def setUp(self):
         self.chats = [

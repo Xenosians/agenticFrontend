@@ -1,4 +1,5 @@
 include karax/prelude
+import request_context
 
 import std/[asyncjs, json, strutils]
 
@@ -6,6 +7,7 @@ import ../api/client
 import ../api/chat_history
 import ../api/job_socket
 import ../api/job_submission
+import ../api/submission_intents
 import workflow_request
 import ../config/runtime_config
 
@@ -390,6 +392,13 @@ proc resumeBackendJob*(
   )
 
 
+proc clearComposerInput(sent: cstring) {.importjs: """
+((sent) => { const input = globalThis.document?.getElementById('messageInput'); if (input && input.value === sent) input.value = ''; })(#)
+""".}
+  ## Karax refreshes a textarea's live value only when its rendered value
+  ## changes; text typed and sent within one frame never rendered, so the
+  ## field the server-reserved request consumed is cleared directly.
+
 proc submitBackendJob*(
   state: AppState,
   message: string,
@@ -420,16 +429,18 @@ proc submitBackendJob*(
 
   let submissionOwner = state.auth.userId
   let submissionChat = state.currentChatId
+  let reservationContext = navigationContext(state)
   let submittedDraft = state.composerDraft
   var submission: PendingSubmission
   try:
     if recovering:
-      submission = pendingSubmission(submissionOwner, submissionChat)
+      submission = serverPendingSubmission(submissionOwner, submissionChat)
       if submission.identity.len == 0 or submission.message != message:
         raise newException(ValueError, "The saved request no longer matches this recovery.")
     else:
-      submission = prepareSubmission(submissionOwner, submissionChat, message,
-        workflowContract(state.workflowSteps))
+      submission = await reserveServerSubmission(submissionOwner, submissionChat, message,
+        state.auth.csrfToken, workflowContract(state.workflowSteps))
+      if not matchesNavigation(state, reservationContext) or state.currentChatId != submissionChat: return
   except CatchableError as exc:
     showToast(state, "No new request was sent. " & exc.msg)
     redraw(kxi)
@@ -441,6 +452,7 @@ proc submitBackendJob*(
   if not recovering and submittedDraft.strip() == message and
       state.composerDraft == submittedDraft:
     setComposerDraft(state, "")
+    clearComposerInput(cstring(submittedDraft))
 
   if not recovering or state.messages.len == 0 or
       state.messages[^1].role != mrUser or state.messages[^1].content != message:
@@ -494,8 +506,10 @@ proc submitBackendJob*(
     if not submissionIsCurrent():
       return
 
-    acknowledgeSubmission(submissionOwner, submissionChat, response.jobId,
-      response.status, response.submissionId, response.workflowContract, response.workflowContractHash)
+    if response.submissionId != submission.identity:
+      raise newException(ValueError, "The response did not confirm the reserved request identity.")
+    await confirmServerSubmission(submissionOwner, submissionChat, submission.identity, state.auth.csrfToken)
+    if not submissionIsCurrent(): return
     clearWorkflowDraft(state)
     # The saved request may have named this chat on the backend.
     discard refreshChatMetadata(state)
@@ -526,14 +540,24 @@ proc submitBackendJob*(
 
   except JobCreateRejectedError as exc:
     if not submissionIsCurrent(): return
+    # Phoenix releases the request only when it refused it before admission.
+    # Its saved slot is the authority; anything else stays recoverable.
+    var released = false
     try:
-      rejectSubmission(submissionOwner, submissionChat, submission.identity)
+      released = (await readIntent(submissionOwner, "chat", submissionChat)).state == "rejected"
     except CatchableError:
-      discard # A confirmed rejection stays rejected even if tab storage is unavailable.
-    state.run.status = "failed"
-    addRunEvent(state, "submission", "Phoenix rejected this submission before acknowledging a job.")
-    addAssistantMessage(state, "The request was rejected. " & exc.msg)
-    showToast(state, "Request rejected. Check the saved response.")
+      discard
+    if not submissionIsCurrent(): return
+    if released:
+      state.run.status = "failed"
+      addRunEvent(state, "submission", "Phoenix rejected this submission before acknowledging a job.")
+      addAssistantMessage(state, "The request was rejected. " & exc.msg)
+      showToast(state, "Request rejected. Check the saved response.")
+    else:
+      state.run.status = "submission_unknown"
+      addRunEvent(state, "submission", "Phoenix refused this attempt; the saved request is still unconfirmed.")
+      addAssistantMessage(state, "This attempt was refused (" & exc.msg & "). The saved request is kept: use Check saved submission to retry it unchanged.")
+      showToast(state, "Attempt refused. Check the saved submission.")
     redraw(kxi)
 
   except CatchableError:
@@ -564,7 +588,7 @@ proc submitBackendJob*(
 proc recoverPendingSubmission*(state: AppState): bool =
   if not state.auth.authenticated or state.currentChatId.len == 0: return false
   try:
-    let submission = pendingSubmission(state.auth.userId, state.currentChatId)
+    let submission = serverPendingSubmission(state.auth.userId, state.currentChatId)
     if submission.identity.len == 0: return false
     discard submitBackendJob(state, submission.message, recovering = true)
     return true

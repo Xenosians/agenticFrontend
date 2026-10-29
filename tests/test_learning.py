@@ -234,6 +234,18 @@ class LearningTests(navigation.ChatNavigationTests):
     def check(self):
         self.page.locator(".learning-panel").get_by_role("button", name="Check readiness", exact=True).click()
 
+    def held(self, routes):
+        """Pop a held route once the fixture handler has captured it.
+
+        A start is sent only after the server reserves its request, so the
+        click returns first; waiting lets the page's queued requests arrive.
+        """
+        for _ in range(100):
+            if routes:
+                return routes.pop()
+            self.page.wait_for_timeout(50)
+        self.fail("the expected request was never sent")
+
     def start_button(self):
         return self.page.get_by_role("button", name="Start candidate run", exact=True)
 
@@ -376,7 +388,7 @@ class LearningTests(navigation.ChatNavigationTests):
         self.hold_start = True
         self.start_button().click()
         expect(self.page.get_by_role("button", name="Starting…", exact=True)).to_be_disabled()
-        route = self.pending_starts.pop()
+        route = self.held(self.pending_starts)
         self.hold_start = False
         self.sign_out_and_back_in()
         route.fulfill(json=run())
@@ -419,9 +431,8 @@ class LearningTests(navigation.ChatNavigationTests):
         self.open_learning()
         self.check()
         self.hold_start = True
-        with self.page.expect_request(lambda req: req.url.endswith("/api/v1/learning/runs") and req.method == "POST"):
-            self.start_button().click()
-        pending = self.pending_starts.pop()
+        self.start_button().click()
+        pending = self.held(self.pending_starts)
         with self.page.expect_request(lambda req: req.url.endswith("/api/v1/learning/runs") and req.method == "GET"):
             self.page.locator(".learning-runs").get_by_role("button", name="Refresh", exact=True).click()
         pending.fulfill(json=run(submission_id=self.starts[-1]["body"]["submission_id"]))
@@ -490,6 +501,27 @@ class LearningTests(navigation.ChatNavigationTests):
         expect(pending).to_be_visible()
         expect(self.page.locator(".learning-run")).to_have_count(0)
         self.assertEqual(len(self.starts), 1)
+
+    def test_reload_with_no_observable_run_retains_original_start_and_never_replays(self):
+        self.start_reply = (503, {"error": "learning_run_outcome_unknown"})
+        self.open_learning()
+        self.check()
+        self.start_button().click()
+        expect(self.page.locator(".learning-pending")).to_be_visible()
+        original = copy.deepcopy(self.starts[0]["body"])
+        self.page.reload(wait_until="networkidle")
+        self.page.keyboard.press("Control+k")
+        self.page.locator("#commandSearch").fill("Learning")
+        self.page.locator("#commandSearch").press("Enter")
+        expect(self.page.locator(".learning-pending")).to_be_visible()
+        self.assertEqual(len(self.starts), 1)
+        self.page.get_by_role("button", name="Check previous start", exact=True).click()
+        expect(self.page.locator(".learning-runs")).to_contain_text("still unconfirmed")
+        self.assertEqual(len(self.starts), 1)
+        self.start_reply = None
+        self.page.get_by_role("button", name="Retry exact start", exact=True).click()
+        expect(self.page.locator(".learning-pending")).to_have_count(0)
+        self.assertEqual([entry["body"] for entry in self.starts], [original, original])
 
     def test_run_list_reconciles_a_lost_start_but_never_dispatches_it(self):
         self.start_reply = (503, {"error": "learning_service_unavailable"})

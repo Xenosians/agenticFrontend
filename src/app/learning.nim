@@ -173,12 +173,19 @@ proc validateLearningRunRequest*(request: JsonNode) =
   for key in ["model_id", "dataset_id", "submission_id"]: discard resourceId(request, key)
   for key in ["dataset_sha256", "preflight_sha256"]: discard digest(request, key)
 
-proc learningRunPayload*(request: JsonNode, receipt: LearningPreflight, submissionId: string): JsonNode =
+proc learningRunProposal*(request: JsonNode, receipt: LearningPreflight): JsonNode =
   ## A run starts only from the exact ready check the owner saw.
   if not receipt.ready or receipt.sha256.len != 64:
     raise newException(ValueError, "Check readiness again before starting a run.")
   result = copy(request)
   result["preflight_sha256"] = %receipt.sha256
+  if result.kind != JObject or result.len != 7 or text(result, "method") != "sft" or
+      text(result, "role") notin ["hub", "specialist"] or text(result, "tuning") notin ["lora", "qlora"]: invalid()
+  for key in ["model_id", "dataset_id"]: discard resourceId(result, key)
+  for key in ["dataset_sha256", "preflight_sha256"]: discard digest(result, key)
+
+proc learningRunPayload*(request: JsonNode, receipt: LearningPreflight, submissionId: string): JsonNode =
+  result = learningRunProposal(request, receipt)
   result["submission_id"] = %submissionId
   validateLearningRunRequest(result)
 

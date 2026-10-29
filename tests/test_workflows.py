@@ -93,6 +93,11 @@ class WorkflowTests(navigation.ChatNavigationTests):
                         receipt = copy.deepcopy(self.run_override or self.run_receipt(identity, body))
                         if self.hold_run:
                             self.pending_runs.append((route, receipt))
+                        elif self.run_http_status == 409:
+                            # Phoenix refused the exact run before admission and released its slot.
+                            slot = self.intent_slots[(self.owner, "workflow", identity)]
+                            slot["state"], slot["receipt"] = "rejected", {"error": "workflow_version_conflict"}
+                            route.fulfill(status=409, json={"error": "workflow_version_conflict"})
                         elif self.run_http_status != 200:
                             route.fulfill(status=self.run_http_status, json={"error": "workflow_unavailable"})
                         else:
@@ -201,6 +206,17 @@ class WorkflowTests(navigation.ChatNavigationTests):
         expect(self.page.get_by_text("Workflow archived. Its past runs and chats are kept.", exact=True)).to_have_count(0)
         self.assert_clean()
 
+    def test_a_run_refused_before_admission_unlocks_the_editor(self):
+        self.run_http_status = 409
+        self.open_workflow()
+        self.start_run()
+        expect(self.page.locator(".workflow-panel [role=alert]")).to_contain_text("This workflow changed since you opened it.")
+        expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_have_count(0)
+        expect(self.page.get_by_role("button", name="Run saved version", exact=True)).to_be_enabled()
+        expect(self.page.locator("#workflowName")).to_be_enabled()
+        self.assertEqual(len(self.runs), 1)
+        self.assert_clean()
+
     def test_lost_run_ack_freezes_edits_navigation_and_exact_retry_after_refresh(self):
         self.run_http_status = 503
         self.open_workflow()
@@ -225,11 +241,12 @@ class WorkflowTests(navigation.ChatNavigationTests):
         self.assertEqual(self.runs[1], first)
         self.assert_clean()
 
-    def test_reload_after_a_lost_run_reply_shows_the_servers_runs_and_never_resends(self):
+    def test_reload_after_a_lost_run_reply_preserves_the_exact_original_request(self):
         self.run_http_status = 503
         self.open_workflow()
         self.start_run()
         expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_be_enabled()
+        original = copy.deepcopy(self.runs[0])
         # The server saved the run; only its answer was lost.
         self.history = [{"job_id": JOB, "chat_id": CHAT, "workflow_id": WORKFLOW, "workflow_version": 2,
                          "definition_sha256": DIGEST, "status": "pending", "created_at": "2026-10-29T12:00:00Z"}]
@@ -238,10 +255,13 @@ class WorkflowTests(navigation.ChatNavigationTests):
         self.page.locator("#workflowOpen").select_option(WORKFLOW)
         expect(self.page.locator(".workflow-run")).to_have_count(1)
         expect(self.page.locator(".workflow-run")).to_contain_text("Queued")
-        # Nothing was kept in the browser: nothing is resent and nothing stays locked.
-        expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_have_count(0)
-        expect(self.page.get_by_role("button", name="Run saved version", exact=True)).to_be_enabled()
+        expect(self.page.get_by_role("button", name="Retry same run", exact=True)).to_be_enabled()
+        expect(self.page.get_by_role("button", name="Run saved version", exact=True)).to_have_count(0)
         self.assertEqual(len(self.runs), 1)
+        self.run_http_status = 200
+        self.page.get_by_role("button", name="Retry same run", exact=True).click()
+        expect(self.page.get_by_text("Run confirmed: Queued. Open its chat for approvals and results.", exact=True)).to_be_visible()
+        self.assertEqual(self.runs, [original, original])
         self.assert_clean()
 
     def test_malformed_run_receipt_keeps_recovery_and_never_claims_started(self):

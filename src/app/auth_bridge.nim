@@ -220,7 +220,13 @@ proc loadChatHistory*(
       return
     applyHistory(state, chatId, history)
 
-    if recoverPendingSubmission(state):
+    # Read-only recovery: opening/reloading a chat must never POST its task.
+    let pending = await readServerSubmission(state.auth.userId, chatId)
+    if not matchesNavigation(state, context): return
+    if pending.identity.len > 0:
+      state.run = RunState(active: true, request: pending.message, status: "submission_unknown",
+        workflowContract: pending.workflowContract)
+      showToast(state, "An earlier request is unconfirmed. Check the saved submission before sending another.")
       return
 
     if (

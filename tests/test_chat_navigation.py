@@ -6,12 +6,15 @@ the frontend with a Python runtime that has Playwright Chromium installed:
 """
 
 import functools
+import copy
+import hashlib
 import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import threading
 import unittest
-from urllib.parse import urlparse
+import uuid
+from urllib.parse import urlparse, parse_qs
 
 from playwright.sync_api import expect, sync_playwright
 
@@ -75,6 +78,10 @@ class ChatNavigationTests(unittest.TestCase):
         self.submissions = []
         self.errors = []
         self.omit_workflow_ack_once = False
+        self.intent_slots = {}
+        self.intent_posts = []
+        self.lose_reservation_once = False
+        self.intent_ack_status = 200
         self.page.on("pageerror", lambda error: self.errors.append(str(error)))
         self.page.route("**/*", self.route)
 
@@ -105,6 +112,10 @@ class ChatNavigationTests(unittest.TestCase):
         # Unexpected origins never reach a real API, even if config regresses.
         if not request.url.startswith(self.base + "/api/"):
             route.abort()
+            return
+
+        if path.startswith("/api/v1/submission-intents"):
+            self.route_intent(route)
             return
 
         if path == "/api/v1/auth/me":
@@ -159,6 +170,64 @@ class ChatNavigationTests(unittest.TestCase):
             route.fulfill(status=404, json={"error": "unexpected_fixture_request"})
             return
         route.fulfill(json=data)
+
+    def route_intent(self, route):
+        """Independent HTTP fixture for the server coordination contract.
+
+        Actual storage/receipt authority is tested against SurrealDB in Phoenix;
+        this fixture lets the built UI exercise lost replies and reloads.
+        """
+        request = route.request
+        query = parse_qs(urlparse(request.url).query)
+        body = request.post_data_json if request.method == "POST" else {
+            "kind": query.get("kind", [None])[0], "target_id": query.get("target_id", [None])[0]}
+        kind, target = body["kind"], body["target_id"]
+        owner = getattr(self, "owner", "fixture-owner")
+        key = (owner, kind, target)
+        current = self.intent_slots.get(key)
+        slot = lambda row: {"schema": "submission-intent-slot.v1", "kind": kind,
+                            "target_id": target, "intent": copy.deepcopy(row)}
+        if request.method == "GET":
+            route.fulfill(json=slot(current))
+            return
+        self.intent_posts.append(copy.deepcopy(body))
+        if urlparse(request.url).path.endswith("/acknowledge"):
+            if not current or current["intent_id"] != body["intent_id"]:
+                route.fulfill(status=409, json={"error": "submission_intent_conflict"})
+                return
+            if self.intent_ack_status != 200:
+                route.fulfill(status=self.intent_ack_status, json={"error": "submission_intent_unavailable"})
+                return
+            current["state"] = "acknowledged"
+            current["receipt"] = {"submission_id": current["request"]["submission_id"]}
+            route.fulfill(json=slot(current))
+            return
+        proposal, expected = body["request"], body["expected_id"]
+        if current and current["state"] == "pending":
+            original = {k: v for k, v in current["request"].items() if k != "submission_id"}
+            if original != proposal or current["previous_id"] != expected:
+                route.fulfill(status=409, json={"error": "submission_intent_conflict"})
+                return
+        elif (current and current["intent_id"] != expected) or (not current and expected is not None):
+            route.fulfill(status=409, json={"error": "submission_intent_conflict"})
+            return
+        elif len(json.dumps(proposal.get("workflow_contract"), ensure_ascii=False).encode()) > 32768:
+            # Phoenix refuses an encoded contract above 32 KiB before storing anything.
+            route.fulfill(status=422, json={"error": "invalid_submission_intent"})
+            return
+        else:
+            identity = uuid.uuid4().hex
+            payload = {**copy.deepcopy(proposal), "submission_id": identity if kind == "learning" else str(uuid.uuid4())}
+            current = {"intent_id": identity, "previous_id": expected, "kind": kind, "target_id": target,
+                       "state": "pending", "request": payload, "receipt": None,
+                       "context": copy.deepcopy(self.records[target]) if kind == "workflow" else None,
+                       "request_sha256": hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()}
+            self.intent_slots[key] = current
+        if self.lose_reservation_once:
+            self.lose_reservation_once = False
+            route.abort()
+        else:
+            route.fulfill(json=slot(current))
 
     def open_first_chat(self):
         self.page.goto(self.base + "/", wait_until="networkidle")
@@ -219,13 +288,20 @@ class ChatNavigationTests(unittest.TestCase):
         expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
         return self.submissions[0]
 
+    def check_saved_submission(self, first):
+        """Reopening never sends; only the explicit check re-sends the server-held request."""
+        check = self.page.get_by_role("button", name="Check saved submission", exact=True)
+        expect(check).to_be_visible()
+        self.assertEqual(self.submissions, [first])
+        check.click()
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual(self.submissions, [first, first])
+
     def test_navigation_preserves_recovery_of_pinned_submission(self):
         first = self.lose_acknowledgement_in_second_chat("Previously submitted fixture request")
         self.begin_second_chat()
         self.release_second_chat()
-        # Reopening the chat re-sends only the request pinned in this page.
-        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
-        self.assertEqual(self.submissions, [first, first])
+        self.check_saved_submission(first)
         self.assertEqual(self.errors, [])
 
     def add_required_identity(self):
@@ -294,27 +370,67 @@ class ChatNavigationTests(unittest.TestCase):
         self.assertEqual(self.submissions[0], self.submissions[1])
         self.assertEqual(self.errors, [])
 
-    def test_a_missing_submission_identity_keeps_the_unsent_composer_text(self):
+    def test_a_request_refused_before_admission_is_released_and_reported(self):
+        self.open_first_chat()
+        self.page.route("**/api/v1/jobs", self.refuse_before_admission)
+        self.page.locator("#messageInput").fill("A request Phoenix refuses")
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        expect(self.page.get_by_text("Request could not be completed.", exact=True)).to_be_visible()
+        expect(self.page.get_by_text("The request was rejected.", exact=False)).to_be_visible()
+        expect(self.page.get_by_role("button", name="Check saved submission", exact=True)).to_have_count(0)
+        self.page.unroute("**/api/v1/jobs", self.refuse_before_admission)
+        self.page.locator("#messageInput").fill("A corrected request")
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual([row["message"] for row in self.submissions],
+                         ["A request Phoenix refuses", "A corrected request"])
+        self.assertEqual(self.errors, [])
+
+    def refuse_before_admission(self, route):
+        """Phoenix's refusal of the exact reserved request releases its slot."""
+        self.submissions.append(route.request.post_data_json)
+        slot = next(row for row in self.intent_slots.values() if row["state"] == "pending")
+        slot["state"], slot["receipt"] = "rejected", {"error": "chat_not_found"}
+        route.fulfill(status=404, json={"error": "chat_not_found"})
+
+    def test_submission_identity_is_allocated_by_the_server_without_browser_uuid(self):
         self.context.add_init_script("Object.defineProperty(globalThis.crypto, 'randomUUID', {value: undefined});")
         self.open_first_chat()
         composer = self.page.locator("#messageInput")
         composer.fill("  Keep this unsent request  ")
         self.page.get_by_role("button", name="Send message", exact=True).click()
-        expect(composer).to_have_value("  Keep this unsent request  ")
-        expect(self.page.get_by_text(
-            "No new request was sent. This browser cannot create a safe submission identity.", exact=True)).to_be_visible()
-        self.assertEqual(self.submissions, [])
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual(len(self.submissions), 1)
+        self.assertEqual(self.submissions[0]["submission_id"], next(iter(self.intent_slots.values()))["request"]["submission_id"])
         self.assertEqual(self.errors, [])
 
-    def test_a_reload_after_a_lost_acknowledgement_never_sends_the_request_again(self):
+    def test_a_reload_after_a_lost_acknowledgement_restores_identity_without_sending(self):
         first = self.lose_acknowledgement_in_second_chat("Request whose answer was lost")
         self.page.reload(wait_until="networkidle")
         self.begin_second_chat()
         self.release_second_chat()
-        # Nothing was kept in the browser: the server's saved jobs are the record.
-        expect(self.page.get_by_role("button", name="Check saved submission", exact=True)).to_have_count(0)
+        expect(self.page.get_by_role("button", name="Check saved submission", exact=True)).to_be_visible()
         self.assertEqual(self.submissions, [first])
+        self.page.get_by_role("button", name="Check saved submission", exact=True).click()
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual(self.submissions, [first, first])
         self.assertEqual(self.errors, [])
+
+    def test_lost_reservation_reply_survives_reload_without_dispatch(self):
+        self.open_first_chat()
+        self.lose_reservation_once = True
+        self.page.locator("#messageInput").fill("Read a reviewed inventory")
+        self.page.get_by_role("button", name="Send message", exact=True).click()
+        expect(self.page.get_by_text("No new request was sent.", exact=False)).to_be_visible()
+        original = copy.deepcopy(next(iter(self.intent_slots.values()))["request"])
+        self.assertEqual(self.submissions, [])
+        self.page.reload(wait_until="networkidle")
+        check = self.page.get_by_role("button", name="Check saved submission", exact=True)
+        expect(check).to_be_visible()
+        self.assertEqual(self.submissions, [])
+        check.click()
+        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
+        self.assertEqual(self.submissions, [original])
 
     def test_oversized_required_operations_keep_the_message_without_posting(self):
         self.open_first_chat()
@@ -327,9 +443,10 @@ class ChatNavigationTests(unittest.TestCase):
         composer.press("Enter")
         expect(composer).to_have_value("Keep this message while I revise the exact targets")
         expect(self.page.get_by_text(
-            "No new request was sent. The required operations are invalid. Review them before sending.",
+            "No new request was sent. The server refused this request as invalid. Review it before sending.",
             exact=True)).to_be_visible()
         self.assertEqual(self.submissions, [])
+        self.assertEqual(self.intent_slots, {})
         self.assertEqual(self.errors, [])
 
     def test_recovery_and_delayed_ack_preserve_an_independent_composer_draft(self):
@@ -447,8 +564,7 @@ class ChatNavigationTests(unittest.TestCase):
         self.assertIn("workflow_contract", first)
         self.begin_second_chat()
         self.release_second_chat()
-        expect(self.page.get_by_text("Fixture job response", exact=True)).to_be_visible()
-        self.assertEqual(self.submissions, [first, first])
+        self.check_saved_submission(first)
         self.assertEqual(self.errors, [])
 
 

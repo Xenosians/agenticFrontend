@@ -1,8 +1,9 @@
 ## Exercise the production submission coordinator without a browser or provider.
-## Node supplies storage/fetch and suppresses painting; application state and
-## local preparation/acknowledgement paths remain the production code.
+## Node supplies fetch (including the server-held request slots) and suppresses
+## painting; application state and the submission flow remain the production code.
 import std/[asyncjs, json]
 import karax/karax
+import ../src/api/job_submission
 import ../src/app/[types, state, backend_bridge, workflow_request]
 
 var app: AppState
@@ -32,3 +33,8 @@ proc submissionFlowSnapshotForTest(): cstring {.exportc.} =
 
 proc submitFlowForTest(message: cstring, recovering: bool): Future[void] {.async, exportc.} =
   await submitBackendJob(app, $message, recovering)
+
+proc readSubmissionForTest(): Future[cstring] {.async, exportc.} =
+  ## Reads the chat's server-held request the way opening the chat does.
+  let pending = await readServerSubmission(app.auth.userId, app.currentChatId)
+  return cstring(pending.message)

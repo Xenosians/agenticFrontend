@@ -199,7 +199,6 @@ type
     automationRuns*: seq[WorkflowRunRow]
     automationLoaded*, automationBusy*, automationSaving*, automationRunning*, automationDirty*: bool
     automationError*, automationNotice*, automationSelectedNode*, automationRunMessage*, automationRecoveryError*: string
-    automationRecoveryChecked*: bool
     automationRunConfirmed*: bool
     automationAddCapability*, automationAddAfter*: string
     automationEpoch*: int

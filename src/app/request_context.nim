@@ -118,7 +118,6 @@ proc clearOperations*(state: AppState) =
   state.automationSelectedNode = ""
   state.automationRunMessage = ""
   state.automationRecoveryError = ""
-  state.automationRecoveryChecked = false
   state.automationRunConfirmed = false
   state.automationAddCapability = ""
   state.automationAddAfter = ""

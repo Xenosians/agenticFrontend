@@ -3,6 +3,7 @@ import std/[
   jsfetch,
   jsheaders,
   json,
+  strutils,
   uri
 ]
 
@@ -112,6 +113,11 @@ proc jsonInt(
 proc parseVerificationStep(
   data: JsonNode
 ): VerificationStep =
+  if data.kind != JObject or not data.hasKey("resend_after_seconds") or
+      data["resend_after_seconds"].kind != JInt or data["resend_after_seconds"].getInt < 0 or
+      not data.hasKey("email_hint") or data["email_hint"].kind != JString or
+      data["email_hint"].getStr.len == 0:
+    raise newException(ValueError, "The verification step was not confirmed. Reload to check its current state.")
   VerificationStep(
     resendAfterSeconds: jsonInt(data, "resend_after_seconds"),
     emailHint: jsonText(data, "email_hint")
@@ -278,6 +284,12 @@ proc register*(
     raise apiError($response.status, response.body)
 
   let data = decodeJson(response.body)
+  if data.kind != JObject or not jsonBool(data, "verification_required") or
+      jsonText(data, "mail_delivery") notin ["sent", "failed"] or
+      not data.hasKey("user") or data["user"].kind != JObject or
+      jsonText(data["user"], "user_id").len == 0 or
+      jsonText(data["user"], "email").toLowerAscii() != email.strip().toLowerAscii():
+    raise newException(ValueError, "Account creation was not confirmed. Sign in to check the account before registering again.")
   var step = parseVerificationStep(data)
   step.pending = true
   step.mailFailed = jsonText(data, "mail_delivery") == "failed"
@@ -307,6 +319,11 @@ proc verifyEmail*(
   if not response.ok:
     raise apiError($response.status, response.body)
 
+  let data = decodeJson(response.body)
+  if data.kind != JObject or not jsonBool(data, "verified") or not data.hasKey("user") or
+      data["user"].kind != JObject or jsonText(data["user"], "user_id").len == 0:
+    raise newException(ValueError, "Email verification was not confirmed. Sign in to check the account.")
+
 
 proc resendVerification*(): Future[VerificationStep] {.async.} =
   ## The server identifies the pending account by its HttpOnly verification
@@ -326,6 +343,10 @@ proc resendVerification*(): Future[VerificationStep] {.async.} =
 
   if response.status == 429:
     let data = decodeJson(response.body)
+    if jsonText(data, "error") != "verification_resend_too_soon" or
+        not data.hasKey("retry_after_seconds") or data["retry_after_seconds"].kind != JInt or
+        data["retry_after_seconds"].getInt < 1:
+      raise newException(ValueError, "The resend wait could not be confirmed. Reload to check the verification step.")
     return VerificationStep(pending: true,
       resendAfterSeconds: max(jsonInt(data, "retry_after_seconds"), 1), tooSoon: true)
 
@@ -333,6 +354,9 @@ proc resendVerification*(): Future[VerificationStep] {.async.} =
     raise apiError($response.status, response.body)
 
   let data = decodeJson(response.body)
+  if jsonText(data, "mail_delivery") notin ["sent", "failed"] or
+      jsonText(data, "status") != jsonText(data, "mail_delivery"):
+    raise newException(ValueError, "The verification email outcome was not confirmed. Reload before requesting another.")
   var step = parseVerificationStep(data)
   step.pending = true
   step.mailFailed = jsonText(data, "mail_delivery") == "failed"
@@ -361,6 +385,8 @@ proc verificationStatus*(): Future[VerificationStep] {.async.} =
   let data = decodeJson(response.body)
   if jsonText(data, "status") == "verified":
     return VerificationStep(pending: false, verified: true)
+  if jsonText(data, "status") != "pending":
+    raise newException(ValueError, "The verification step could not be confirmed. Try signing in again.")
   var step = parseVerificationStep(data)
   step.pending = true
   return step

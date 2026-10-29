@@ -3,18 +3,15 @@
 include karax/prelude
 import std/[asyncjs, json]
 import ../api/workflows as workflowApi
-import ../config/runtime_config
+import ../api/submission_intents
 import workflow_request
 import workflows
-import workflow_recovery
 import types
 import state
 import request_context
 import extension_bridge
 import auth_bridge
 import chat_bridge
-
-proc randomUuid(): cstring {.importjs: "globalThis.crypto.randomUUID()".}
 
 proc workflowBusy*(state: AppState): bool =
   state.automationBusy or state.automationSaving or state.automationRunning
@@ -26,21 +23,9 @@ proc workflowEditingBlocked*(state: AppState): bool =
   workflowBusy(state) or workflowUnconfirmed(state) or state.automationRecoveryError.len > 0
 
 proc restoreWorkflowRecovery(state: AppState): bool =
-  if state.automationRecoveryChecked: return state.automationRecoveryError.len == 0
-  if not state.auth.authenticated: return false
-  state.automationRecoveryChecked = true
-  try:
-    let pending = readPendingWorkflow(state.auth.userId, frontendConfig.backendBaseUrl)
-    if pending.payload != nil:
-      state.automationPendingRun = pending
-      state.automationDraft = pending.draft
-      state.automationDirty = false
-      state.automationRunMessage = pending.payload["message"].getStr
-      state.automationNotice = "An earlier run is unconfirmed. Its request is locked; retry only that same run to reconcile it."
-    result = true
-  except CatchableError:
-    state.automationRecoveryError = "The pending workflow run could not be read. Reload this page; the run list shows what the server saved."
-    state.automationError = state.automationRecoveryError
+  ## A pending run is read from the server when its workflow opens; the page
+  ## keeps nothing of its own, so only a failed read blocks editing.
+  state.auth.authenticated and state.automationRecoveryError.len == 0
 
 proc clearWorkflowEditor(state: AppState) =
   ## Internal reset after a confirmed archive; keep the active request epoch.
@@ -131,6 +116,17 @@ proc openWorkflow*(state: AppState, id: string) {.async.} =
     state.automationDirty = false
     state.automationRuns = @[]
     state.automationRunMessage = ""
+    let slot = await readIntent(request.account.userId, "workflow", id)
+    if not matchesWorkflowRequest(state, request): return
+    if slot.state == "pending":
+      let frozen = parseWorkflow(%*{"workflow": slot.context})
+      let pending = WorkflowPendingRun(draft: frozen, payload: slot.request.copy)
+      if pending.payload != runPayload(frozen, pending.payload{"submission_id"}.getStr(""), pending.payload{"message"}.getStr("")):
+        raise newException(ValueError, "The saved run does not match its original workflow.")
+      state.automationPendingRun = pending
+      state.automationDraft = frozen
+      state.automationRunMessage = slot.request["message"].getStr
+      state.automationNotice = "An earlier run is unconfirmed. Retry only that same run to reconcile it."
     await refreshWorkflowRuns(state, request)
   except CatchableError as exc:
     if matchesWorkflowRequest(state, request): state.automationError = exc.msg
@@ -179,24 +175,30 @@ proc runWorkflowDraft*(state: AppState) {.async.} =
     state.automationError = "Save your changes before running; a run uses the saved version."
     redraw(kxi)
     return
-  # Persist before dispatch; reload only restores the exact request, never sends it.
+  let request = beginWorkflowRequest(state)
+  state.automationRunning = true
+  # The server reserves the exact request before dispatch. A lost reservation
+  # reply is recovered by a read, never by creating another independent ID.
   try:
     if not workflowUnconfirmed(state):
-      let payload = runPayload(state.automationDraft, $randomUuid(), state.automationRunMessage)
-      let frozen = parseWorkflow(workflowSnapshot(state.automationDraft))
-      state.automationPendingRun = WorkflowPendingRun(draft: frozen, payload: payload.copy)
+      var proposal = runPayload(state.automationDraft, "", state.automationRunMessage)
+      proposal.delete("submission_id")
+      let slot = await reserveIntent(request.account.userId, "workflow", state.automationDraft.id,
+        proposal, state.auth.csrfToken)
+      if not matchesWorkflowRequest(state, request): return
+      let frozen = parseWorkflow(%*{"workflow": slot.context})
+      state.automationPendingRun = WorkflowPendingRun(draft: frozen, payload: slot.request.copy)
       state.automationRunConfirmed = false
-    rememberPendingWorkflow(state.auth.userId, frontendConfig.backendBaseUrl, state.automationPendingRun)
   except CatchableError as exc:
-    state.automationError = exc.msg
+    if matchesWorkflowRequest(state, request):
+      state.automationError = exc.msg
+      state.automationRunning = false
     redraw(kxi)
     return
   let pending = state.automationPendingRun
   let draft = pending.draft
   let payload = pending.payload.copy
   let submission = payload["submission_id"].getStr
-  let request = beginWorkflowRequest(state)
-  state.automationRunning = true
   state.automationError = ""
   state.automationNotice = ""
   redraw(kxi)
@@ -210,7 +212,9 @@ proc runWorkflowDraft*(state: AppState) {.async.} =
     state.automationRunConfirmed = true
     state.automationNotice = "Run confirmed: " & runStatusLabel(started.status) & ". Open its chat for approvals and results."
     try:
-      acknowledgePendingWorkflow(request.account.userId, frontendConfig.backendBaseUrl, pending)
+      let slot = cachedIntent(request.account.userId, "workflow", draft.id)
+      discard await acknowledgeIntent(request.account.userId, "workflow", draft.id, slot.id, state.auth.csrfToken)
+      if not matchesWorkflowRequest(state, request): return
       state.automationPendingRun = WorkflowPendingRun()
       state.automationRunMessage = ""
       state.automationRunConfirmed = false
@@ -222,6 +226,17 @@ proc runWorkflowDraft*(state: AppState) {.async.} =
   except CatchableError as exc:
     if matchesWorkflowRequest(state, request):
       state.automationError = exc.msg & " Retrying keeps the same run identity."
+      if not confirmed:
+        # Phoenix releases a run it refused before admission; its saved slot,
+        # read without dispatching anything, is the authority for unlocking.
+        try:
+          let slot = await readIntent(request.account.userId, "workflow", draft.id)
+          if matchesWorkflowRequest(state, request) and slot.state == "rejected" and slot.request == payload:
+            state.automationPendingRun = WorkflowPendingRun()
+            state.automationRunConfirmed = false
+            state.automationError = exc.msg
+        except CatchableError:
+          discard # The run stays locked to its exact request until the server answers.
   finally:
     if matchesWorkflowRequest(state, request): state.automationRunning = false
     redraw(kxi)

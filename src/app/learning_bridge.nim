@@ -1,33 +1,40 @@
 include karax/prelude
-import std/[asyncjs, json, strutils]
+import std/[asyncjs, json]
 import ../api/learning as learningApi
-import ../config/runtime_config
+import ../api/submission_intents
 import learning
-import learning_recovery
 import types
 import state
 import request_context
 
-proc randomUuid(): cstring {.importjs: "globalThis.crypto.randomUUID()".}
-
 proc learningStartPending*(state: AppState): bool = state.learningPendingRequest != nil
 
 proc restoreLearningRecovery(state: AppState): bool =
-  if state.learningRecoveryChecked: return state.learningRecoveryError.len == 0
-  if not state.auth.authenticated: return false
-  state.learningRecoveryChecked = true
+  state.auth.authenticated and state.learningRecoveryChecked and state.learningRecoveryError.len == 0
+
+proc readLearningRecovery(state: AppState) {.async.} =
+  let account = accountContext(state)
+  state.learningRecoveryChecked = false
+  state.learningRecoveryError = ""
   try:
-    state.learningPendingRequest = readPendingLearningRun(state.auth.userId, frontendConfig.backendBaseUrl)
+    let slot = await readIntent(account.userId, "learning", "candidate")
+    if not matchesAccount(state, account): return
+    if slot.state == "pending":
+      validateLearningRunRequest(slot.request)
+      state.learningPendingRequest = slot.request.copy
+    else:
+      state.learningPendingRequest = nil
     state.learningRecoveryError = ""
-    result = true
+    state.learningRecoveryChecked = true
   except CatchableError as exc:
-    state.learningRecoveryError = exc.msg
+    if matchesAccount(state, account): state.learningRecoveryError = exc.msg
+  redraw(kxi)
 
 proc learningMutationBusy(state: AppState): bool =
   state.learningStarting or state.learningCancelling.len > 0 or state.learningReconciling
 
 proc learningEditingBlocked*(state: AppState): bool =
-  learningStartPending(state) or learningMutationBusy(state) or state.learningRecoveryError.len > 0
+  not state.learningRecoveryChecked or learningStartPending(state) or learningMutationBusy(state) or state.learningRecoveryError.len > 0
 
 proc invalidateLearningPreflight*(state: AppState) =
   inc state.learningEpoch
@@ -147,27 +154,30 @@ proc putLearningRun(state: AppState, run: LearningRun) =
   state.learningRuns.insert(run, 0)
   if state.learningRuns.len > 20: state.learningRuns.setLen(20)
 
-proc clearPendingLearning(state: AppState) =
+proc clearPendingLearning(state: AppState) {.async.} =
   if not learningStartPending(state): return
+  let account = accountContext(state)
+  let pending = state.learningPendingRequest.copy
   try:
-    acknowledgePendingLearningRun(state.auth.userId, frontendConfig.backendBaseUrl, state.learningPendingRequest)
+    let slot = cachedIntent(account.userId, "learning", "candidate")
+    discard await acknowledgeIntent(account.userId, "learning", "candidate", slot.id, state.auth.csrfToken)
+    if not matchesAccount(state, account) or state.learningPendingRequest != pending: return
     state.learningPendingRequest = nil
     state.learningRecoveryError = ""
   except CatchableError as exc:
-    state.learningRecoveryError = exc.msg
+    if matchesAccount(state, account): state.learningRecoveryError = exc.msg
 
-proc confirmLearningStart(state: AppState, run: LearningRun, payload: JsonNode) =
+proc confirmLearningStart(state: AppState, run: LearningRun, payload: JsonNode) {.async.} =
   requireMatchingLearningRun(run, payload)
   putLearningRun(state, run)
   # Lists started before this receipt cannot replace its authoritative result.
   inc state.learningRunsEpoch
   invalidateLearningPreflight(state)
-  clearPendingLearning(state)
+  await clearPendingLearning(state)
   state.learningRunError = ""
 
 proc refreshLearningRuns*(state: AppState) {.async.} =
   if not state.auth.authenticated: return
-  discard restoreLearningRecovery(state)
   let request = beginLearningRunsRequest(state)
   try:
     let runs = parseLearningRuns(await learningApi.fetchLearningRuns())
@@ -179,7 +189,7 @@ proc refreshLearningRuns*(state: AppState) {.async.} =
       let pending = state.learningPendingRequest
       for run in runs:
         if run.submissionId == pending["submission_id"].getStr:
-          confirmLearningStart(state, run, pending)
+          await confirmLearningStart(state, run, pending)
           break
   except CatchableError as exc:
     if matchesLearningRunsRequest(state, request): state.learningRunsError = exc.msg
@@ -190,27 +200,31 @@ proc startLearningRun*(state: AppState) {.async.} =
   ## An explicit retry sends the same frozen request; refresh/reload never dispatches.
   if not state.auth.authenticated or learningMutationBusy(state) or not restoreLearningRecovery(state): return
   if not learningStartPending(state) and learningRunActive(state): return
+  let request = beginLearningMutationRequest(state)
+  state.learningStarting = true
   var payload: JsonNode
   try:
     if learningStartPending(state):
       payload = state.learningPendingRequest.copy
     else:
-      payload = learningRunPayload(state.learningCheckedRequest, state.learningPreflight, ($randomUuid()).replace("-", ""))
-      rememberPendingLearningRun(state.auth.userId, frontendConfig.backendBaseUrl, payload)
+      let proposal = learningRunProposal(state.learningCheckedRequest, state.learningPreflight)
+      let slot = await reserveIntent(request.account.userId, "learning", "candidate", proposal, state.auth.csrfToken)
+      if not matchesLearningMutationRequest(state, request): return
+      payload = slot.request.copy
+      validateLearningRunRequest(payload)
       state.learningPendingRequest = payload.copy
-  except ValueError as exc:
-    state.learningRecoveryChecked = false
-    state.learningRunError = exc.msg
+  except CatchableError as exc:
+    if matchesLearningMutationRequest(state, request):
+      state.learningRunError = exc.msg
+      state.learningStarting = false
     redraw(kxi)
     return
-  let request = beginLearningMutationRequest(state)
-  state.learningStarting = true
   state.learningRunError = ""
   redraw(kxi)
   try:
     let run = parseStartedLearningRun(await learningApi.startLearningRun(payload, state.auth.csrfToken), payload)
     if not matchesLearningMutationRequest(state, request): return
-    confirmLearningStart(state, run, payload)
+    await confirmLearningStart(state, run, payload)
   except learningApi.LearningRequestError as exc:
     if matchesLearningMutationRequest(state, request) and learningStartPending(state):
       # Only explicit pre-admission refusals prove that this request did not start.
@@ -218,7 +232,10 @@ proc startLearningRun*(state: AppState) {.async.} =
           "learning_resource_unavailable", "learning_dataset_not_training", "learning_dataset_changed",
           "learning_dataset_superseded", "learning_training_membership_invalid", "learning_check_changed",
           "learning_run_not_ready"]:
-        clearPendingLearning(state)
+        let slot = await readIntent(request.account.userId, "learning", "candidate")
+        if not matchesLearningMutationRequest(state, request): return
+        if slot.state == "rejected" and slot.request == payload:
+          state.learningPendingRequest = nil
         invalidateLearningPreflight(state)
       state.learningRunError = exc.msg
   except CatchableError as exc:
@@ -252,7 +269,7 @@ proc cancelLearningRun*(state: AppState, runId: string) {.async.} =
 
 proc reconcileLearningStart*(state: AppState) {.async.} =
   if not state.auth.authenticated or learningMutationBusy(state): return
-  state.learningRecoveryChecked = false
+  await readLearningRecovery(state)
   if not restoreLearningRecovery(state) or not learningStartPending(state):
     redraw(kxi)
     return
@@ -263,7 +280,7 @@ proc reconcileLearningStart*(state: AppState) {.async.} =
   try:
     let run = parseStartedLearningRun(await learningApi.resolveLearningRun(payload["submission_id"].getStr), payload)
     if not matchesLearningMutationRequest(state, request): return
-    confirmLearningStart(state, run, payload)
+    await confirmLearningStart(state, run, payload)
   except CatchableError as exc:
     if matchesLearningMutationRequest(state, request) and learningStartPending(state):
       state.learningRunError = "The previous start is still unconfirmed; its identity is retained. " & exc.msg
@@ -273,6 +290,6 @@ proc reconcileLearningStart*(state: AppState) {.async.} =
 
 proc openLearning*(state: AppState) =
   setActiveView(state, viewLearning)
-  discard restoreLearningRecovery(state)
+  discard readLearningRecovery(state)
   discard refreshLearning(state)
   discard refreshLearningRuns(state)

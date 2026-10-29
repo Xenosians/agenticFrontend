@@ -36,7 +36,7 @@ class AuthScreenTests(navigation.ChatNavigationTests):
                 route.fulfill(status=401, json={"error": "authentication_required"})
         elif path == "/api/v1/auth/register":
             self.pending = {"status": "pending", "resend_after_seconds": self.wait, "email_hint": "n•••@example.test"}
-            route.fulfill(status=201, json={"user": {"user_id": "new-owner"}, "verification_required": True,
+            route.fulfill(status=201, json={"user": {"user_id": "new-owner", "email": "new@example.test"}, "verification_required": True,
                                             "mail_delivery": "sent", **{k: v for k, v in self.pending.items()
                                                                        if k != "status"}})
         elif path == "/api/v1/auth/login":
@@ -116,6 +116,26 @@ class AuthScreenTests(navigation.ChatNavigationTests):
         self.page.get_by_role("button", name="Back to sign in", exact=True).click()
         expect(self.page.get_by_role("heading", name="Sign in", exact=True)).to_be_visible()
         expect(self.page.get_by_role("button", name="Resend verification email")).to_have_count(0)
+
+    def test_malformed_success_does_not_claim_a_verification_email_was_sent(self):
+        self.wait = 0
+        self.open_sign_in()
+        self.register()
+        self.page.route("**/api/v1/auth/resend-verification", lambda route: route.fulfill(status=202, json={}))
+        self.page.get_by_role("button", name="Resend verification email", exact=True).click()
+        expect(self.page.locator(".auth-error")).to_contain_text("outcome was not confirmed")
+        expect(self.page.locator(".auth-notice")).to_have_count(0)
+
+    def test_malformed_registration_does_not_claim_an_account_was_created(self):
+        self.open_sign_in()
+        self.page.route("**/api/v1/auth/register", lambda route: route.fulfill(status=201, json={}))
+        self.page.get_by_role("button", name="Create account", exact=True).click()
+        self.page.get_by_label("Display name").fill("New Owner")
+        self.page.get_by_label("Email").fill("new@example.test")
+        self.page.get_by_label("Password").fill("correct horse battery staple")
+        self.page.get_by_role("button", name="Register", exact=True).click()
+        expect(self.page.locator(".auth-error")).to_contain_text("Account creation was not confirmed")
+        expect(self.page.get_by_role("heading", name="Verify your email", exact=True)).to_have_count(0)
 
     def test_auth_text_is_readable_at_desktop_and_phone_widths(self):
         self.open_sign_in()

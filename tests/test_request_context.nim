@@ -57,12 +57,10 @@ suite "asynchronous account and chat boundaries":
     let app = signedIn()
     let request = beginWorkflowRequest(app)
     app.automationPendingRun = WorkflowPendingRun(payload: %*{"submission_id": "old-owner-request"})
-    app.automationRecoveryChecked = true
     app.automationRecoveryError = "old recovery"
     app.automationSaving = true
     clearOperations(app)
     check app.automationPendingRun.payload == nil
-    check not app.automationRecoveryChecked
     check app.automationRecoveryError.len == 0
     check not app.automationSaving
     check not matchesWorkflowRequest(app, request)
