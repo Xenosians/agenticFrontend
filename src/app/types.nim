@@ -179,9 +179,13 @@ type
     ## Candidate runs: the newest first, which one is being started or cancelled.
     learningRuns*: seq[LearningRun]
     learningRunsLoaded*, learningStarting*: bool
+    learningReconciling*, learningRecoveryChecked*: bool
     learningCancelling*, learningRunError*: string
+    learningRunsError*, learningRecoveryError*: string
     learningRunsEpoch*: int
+    learningMutationEpoch*: int
     learningCheckedRequest*: JsonNode
+    learningPendingRequest*: JsonNode
     automationWorkflows*: seq[WorkflowSummary]
     automationDraft*: WorkflowDraft
     automationPendingRun*: WorkflowPendingRun

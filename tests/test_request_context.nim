@@ -66,3 +66,20 @@ suite "asynchronous account and chat boundaries":
     check app.automationRecoveryError.len == 0
     check not app.automationSaving
     check not matchesWorkflowRequest(app, request)
+
+  test "learning reads cannot invalidate starts and owner reset clears frozen state":
+    let app = signedIn()
+    let mutation = beginLearningMutationRequest(app)
+    discard beginLearningRunsRequest(app)
+    discard beginLearningRunsRequest(app)
+    check matchesLearningMutationRequest(app, mutation)
+    app.learningPendingRequest = %*{"submission_id": "old"}
+    app.learningRecoveryChecked = true
+    app.learningRecoveryError = "old error"
+    app.learningStarting = true
+    clearOperations(app)
+    check not matchesLearningMutationRequest(app, mutation)
+    check app.learningPendingRequest == nil
+    check not app.learningRecoveryChecked
+    check not app.learningStarting
+    check app.learningRecoveryError == ""

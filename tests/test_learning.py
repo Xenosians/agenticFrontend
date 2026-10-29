@@ -6,6 +6,7 @@ with progress, losses and outcome, can cancel an active run, and never serves
 or promotes a candidate.
 """
 import copy
+import hashlib
 import json
 import unittest
 from urllib.parse import urlparse
@@ -63,7 +64,8 @@ def receipt(selection, blockers=()):
 
 
 def run(identity=RUN, state="running", step=0, **changes):
-    row = {"schema": "learning-run.v1", "run_id": identity, "state": state, "method": "sft", "role": "hub",
+    submission = changes.pop("submission_id", identity)
+    row = {"schema": "learning-run.v2", "run_id": identity, "submission_id": submission, "state": state, "method": "sft", "role": "hub",
            "tuning": "qlora", "model": {"id": MODEL, "backend": "local", "source_kind": "local"},
            "dataset": {"id": CURRENT, "sha256": DIGEST, "version": 2, "train_count": 11, "validation_count": 2},
            "preflight_sha256": CHECK, "progress": {"step": step, "max_steps": 9},
@@ -75,6 +77,9 @@ def run(identity=RUN, state="running", step=0, **changes):
     if state == "completed":
         row.update(candidate_sha256="8" * 64, metrics={"train_loss": 0.4696, "validation_loss": 0.417})
     row.update(changes)
+    request = {key: row[key] for key in ("method", "role", "tuning", "preflight_sha256", "submission_id")}
+    request.update(model_id=row["model"]["id"], dataset_id=row["dataset"]["id"], dataset_sha256=row["dataset"]["sha256"])
+    row["request_sha256"] = hashlib.sha256(json.dumps(request, sort_keys=True, separators=(",", ":")).encode()).hexdigest() if submission is not None else None
     return row
 
 
@@ -91,8 +96,12 @@ class LearningTests(navigation.ChatNavigationTests):
         self.start_reply = None
         self.hold_start = False
         self.pending_starts = []
+        self.hold_cancel = False
+        self.pending_cancels = []
         self.hold_runs = False
         self.pending_runs = []
+        self.resolves = []
+        self.resolve_reply = None
         self.signed_out = False
         self.sessions = 0
         self.run_reads = 0
@@ -101,7 +110,7 @@ class LearningTests(navigation.ChatNavigationTests):
         self.page.set_default_timeout(5000)
 
     def tearDown(self):
-        for route in self.pending_starts + self.pending_runs:
+        for route in self.pending_starts + self.pending_runs + self.pending_cancels:
             route.abort()
         super().tearDown()
 
@@ -165,24 +174,38 @@ class LearningTests(navigation.ChatNavigationTests):
             if self.hold_runs:
                 self.pending_runs.append(route)
                 return
-            route.fulfill(json={"schema": "learning-runs.v1", "runs": self.runs})
+            route.fulfill(json={"schema": "learning-runs.v2", "runs": self.runs})
             return
         if path == "/api/v1/learning/runs" and request.method == "POST":
             self.starts.append({"body": request.post_data_json, "csrf": request.headers.get("x-csrf-token")})
             if self.hold_start:
                 self.pending_starts.append(route)
                 return
-            reply = self.start_reply or run()
+            body = request.post_data_json
+            reply = self.start_reply or run(submission_id=body["submission_id"], role=body["role"], tuning=body["tuning"])
             if isinstance(reply, tuple):
                 route.fulfill(status=reply[0], json=reply[1])
             else:
                 self.runs.insert(0, reply)
                 route.fulfill(json=reply)
             return
+        if path == "/api/v1/learning/runs/resolve":
+            from urllib.parse import parse_qs
+            submission = parse_qs(urlparse(request.url).query).get("submission_id", [None])[0]
+            self.resolves.append(submission)
+            reply = self.resolve_reply or next((row for row in self.runs if row["submission_id"] == submission),
+                                               (404, {"error": "learning_run_unavailable"}))
+            if isinstance(reply, tuple): route.fulfill(status=reply[0], json=reply[1])
+            else: route.fulfill(json=reply)
+            return
         if path.startswith("/api/v1/learning/runs/") and path.endswith("/cancel"):
             identity = path.split("/")[-2]
             self.cancels.append({"run": identity, "csrf": request.headers.get("x-csrf-token")})
-            cancelled = run(identity, "cancelled", step=3)
+            if self.hold_cancel:
+                self.pending_cancels.append(route)
+                return
+            original = next(row for row in self.runs if row["run_id"] == identity)
+            cancelled = {**original, "state": "cancelled", "finished_at": "2026-10-29T07:10:00+00:00"}
             self.runs = [cancelled if row["run_id"] == identity else row for row in self.runs]
             route.fulfill(json=cancelled)
             return
@@ -246,9 +269,11 @@ class LearningTests(navigation.ChatNavigationTests):
         expect(row).to_contain_text("Training")
         expect(row).to_contain_text("Step 0 of 9")
         expect(row.get_by_role("button", name="Cancel run")).to_be_enabled()
+        submission = self.starts[0]["body"]["submission_id"]
+        self.assertRegex(submission, r"^[0-9a-f]{32}$")
         self.assertEqual(self.starts, [{"body": {"method": "sft", "role": "hub", "tuning": "qlora",
                                                  "model_id": MODEL, "dataset_id": CURRENT,
-                                                 "dataset_sha256": DIGEST, "preflight_sha256": CHECK},
+                                                 "dataset_sha256": DIGEST, "preflight_sha256": CHECK, "submission_id": submission},
                                         "csrf": "fixture-csrf"}])
         # A started check is spent: starting again needs a new check.
         expect(self.start_button()).to_have_count(0)
@@ -389,6 +414,122 @@ class LearningTests(navigation.ChatNavigationTests):
         expect(row).to_contain_text("Cancelled")
         expect(row.get_by_role("button", name="Cancel run")).to_have_count(0)
         self.assertEqual(self.cancels, [{"run": RUN, "csrf": "fixture-csrf"}])
+
+    def test_refresh_during_a_start_does_not_discard_its_receipt_or_strand_starting(self):
+        self.open_learning()
+        self.check()
+        self.hold_start = True
+        with self.page.expect_request(lambda req: req.url.endswith("/api/v1/learning/runs") and req.method == "POST"):
+            self.start_button().click()
+        pending = self.pending_starts.pop()
+        with self.page.expect_request(lambda req: req.url.endswith("/api/v1/learning/runs") and req.method == "GET"):
+            self.page.locator(".learning-runs").get_by_role("button", name="Refresh", exact=True).click()
+        pending.fulfill(json=run(submission_id=self.starts[-1]["body"]["submission_id"]))
+        expect(self.page.locator(f'.learning-run[data-run="{RUN}"]')).to_be_visible()
+        expect(self.page.get_by_role("button", name="Starting…", exact=True)).to_have_count(0)
+        self.assertEqual(len(self.starts), 1)
+
+    def test_refresh_during_cancel_does_not_discard_its_receipt_or_strand_cancelling(self):
+        self.runs = [run(step=3)]
+        self.hold_cancel = True
+        self.open_learning()
+        row = self.page.locator(f'.learning-run[data-run="{RUN}"]')
+        with self.page.expect_request(lambda req: req.url.endswith("/cancel")):
+            row.get_by_role("button", name="Cancel run", exact=True).click()
+        pending = self.pending_cancels.pop()
+        with self.page.expect_request(lambda req: req.url.endswith("/api/v1/learning/runs") and req.method == "GET"):
+            self.page.locator(".learning-runs").get_by_role("button", name="Refresh", exact=True).click()
+        pending.fulfill(json=run(state="cancelled", step=3))
+        expect(row).to_contain_text("Cancelled")
+        expect(self.page.get_by_role("button", name="Cancelling…", exact=True)).to_have_count(0)
+
+    def test_a_lost_start_reply_retries_only_the_exact_frozen_submission(self):
+        self.start_reply = (503, {"error": "learning_service_unavailable"})
+        self.open_learning()
+        self.check()
+        self.start_button().click()
+        pending = self.page.locator(".learning-pending")
+        retry = pending.get_by_role("button", name="Retry exact start", exact=True)
+        expect(retry).to_be_enabled()
+        expected = copy.deepcopy(self.starts[0]["body"])
+        expect(self.field("Model")).to_be_disabled()
+        expect(self.start_button()).to_have_count(0)
+        self.start_reply = None
+        retry.click()
+        expect(self.page.locator(f'.learning-run[data-run="{RUN}"]')).to_be_visible()
+        expect(pending).to_have_count(0)
+        self.assertEqual([entry["body"] for entry in self.starts], [expected, expected])
+
+    def test_reload_restores_an_unknown_start_without_dispatch_and_resolves_its_original_run(self):
+        self.start_reply = (503, {"error": "learning_run_outcome_unknown"})
+        self.open_learning()
+        self.check()
+        self.start_button().click()
+        expect(self.page.locator(".learning-pending")).to_be_visible()
+        expected = copy.deepcopy(self.starts[0]["body"])
+        self.page.reload()
+        self.page.keyboard.press("Control+k")
+        self.page.locator("#commandSearch").fill("Learning")
+        self.page.locator("#commandSearch").press("Enter")
+        pending = self.page.locator(".learning-pending")
+        expect(pending).to_be_visible()
+        self.assertEqual(len(self.starts), 1, "reload must never submit")
+        # The known original run may have finished while its acknowledgement was lost.
+        self.resolve_reply = run(state="completed", step=9, submission_id=expected["submission_id"])
+        pending.get_by_role("button", name="Check previous start", exact=True).click()
+        expect(self.page.locator(f'.learning-run[data-run="{RUN}"]')).to_contain_text("Candidate ready")
+        expect(pending).to_have_count(0)
+        self.assertEqual(self.resolves, [expected["submission_id"]])
+        self.assertEqual(len(self.starts), 1)
+
+    def test_a_resolution_for_another_submission_cannot_clear_the_unknown_start(self):
+        self.start_reply = (503, {"error": "learning_service_unavailable"})
+        self.open_learning()
+        self.check()
+        self.start_button().click()
+        pending = self.page.locator(".learning-pending")
+        self.resolve_reply = run(state="completed", step=9, submission_id="6" * 32)
+        pending.get_by_role("button", name="Check previous start", exact=True).click()
+        expect(self.page.locator(".learning-runs").get_by_role("alert")).to_contain_text("still unconfirmed")
+        expect(pending).to_be_visible()
+        expect(self.page.locator(".learning-run")).to_have_count(0)
+        self.assertEqual(len(self.starts), 1)
+
+    def test_run_list_reconciles_a_lost_start_but_never_dispatches_it(self):
+        self.start_reply = (503, {"error": "learning_service_unavailable"})
+        self.open_learning()
+        self.check()
+        self.start_button().click()
+        pending = self.page.locator(".learning-pending")
+        expect(pending).to_be_visible()
+        submission = self.starts[0]["body"]["submission_id"]
+        self.runs = [run(state="completed", step=9, submission_id=submission)]
+        self.page.locator(".learning-runs").get_by_role("button", name="Refresh", exact=True).click()
+        expect(pending).to_have_count(0)
+        expect(self.page.locator(".learning-run")).to_contain_text("Candidate ready")
+        self.assertEqual(len(self.starts), 1)
+
+    def test_storage_failure_prevents_dispatch_before_a_start(self):
+        self.page.add_init_script("""const original=Storage.prototype.setItem;
+        Storage.prototype.setItem=function(key,value){
+          if(key.startsWith('janus.pending-learning-run.v1:')) throw new Error('fixture storage denial');
+          return original.call(this,key,value);
+        };""")
+        self.open_learning()
+        self.check()
+        self.start_button().click()
+        expect(self.page.locator(".learning-runs").get_by_role("alert")).to_contain_text("storage could not be confirmed")
+        self.assertEqual(self.starts, [])
+
+    def test_a_start_receipt_for_another_selection_remains_unknown(self):
+        self.start_reply = run(model={"id": REMOTE, "backend": "local", "source_kind": "local"})
+        self.open_learning()
+        self.check()
+        self.start_button().click()
+        expect(self.page.locator(".learning-pending")).to_be_visible()
+        expect(self.page.locator(".learning-runs").get_by_role("alert")).to_contain_text("unconfirmed")
+        expect(self.page.locator(".learning-run")).to_have_count(0)
+        self.assertEqual(len(self.starts), 1)
 
     def test_a_training_run_updates_itself_and_stops_polling_when_it_ends(self):
         self.health_interval_ms = 60

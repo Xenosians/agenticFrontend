@@ -2,29 +2,7 @@
 ## only an explicit retry sends the original immutable request again.
 import std/json
 import workflows
-
-proc browserRecovery(backend, owner, action, payload: cstring): cstring {.importjs: """
-((backend,owner,action,payload)=>{
-  try {
-    const key='janus.pending-workflow-run.v1:'+JSON.stringify([backend,owner]);
-    const storage=globalThis.sessionStorage;
-    const existing=storage.getItem(key);
-    if(action==='load') return JSON.stringify({value:existing});
-    if(action==='save') {
-      if(existing!==null&&existing!==payload) throw new Error('conflict');
-      storage.setItem(key,payload);
-      if(storage.getItem(key)!==payload) throw new Error('unconfirmed');
-    } else if(action==='clear') {
-      if(existing!==null&&existing!==payload) throw new Error('conflict');
-      storage.removeItem(key);
-      if(storage.getItem(key)!==null) throw new Error('unconfirmed');
-    }
-    return '{"value":null}';
-  } catch(error) {
-    return '{"error":"Workflow recovery storage could not be confirmed. Keep this run unchanged and restore browser storage before retrying."}';
-  }
-})(#,#,#,#)
-""".}
+import request_recovery
 
 proc record(owner, backend: string, pending: WorkflowPendingRun): JsonNode =
   %*{"schema": "pending-workflow-run.v1", "backend": backend,
@@ -32,10 +10,8 @@ proc record(owner, backend: string, pending: WorkflowPendingRun): JsonNode =
 
 proc call(owner, backend, action: string, payload = ""): JsonNode =
   if owner.len == 0: raise newException(ValueError, "A signed-in owner is required for workflow recovery.")
-  let reply = parseJson($browserRecovery(cstring(backend), cstring(owner),
-                                        cstring(action), cstring(payload)))
-  if reply.hasKey("error"): raise newException(ValueError, reply["error"].getStr)
-  reply["value"]
+  recoveryStorage("janus.pending-workflow-run.v1", owner, backend, action, payload,
+    "Workflow recovery storage could not be confirmed. Keep this run unchanged and restore browser storage before retrying.")
 
 proc parsePendingWorkflow*(data: JsonNode, backend, owner: string): WorkflowPendingRun =
   if data == nil or data.kind != JObject or data.len != 5 or

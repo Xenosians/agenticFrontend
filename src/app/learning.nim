@@ -22,14 +22,16 @@ type
     blockers*, laterGates*: seq[string]
   LearningRun* = object
     id*, state*, role*, tuning*, modelId*, datasetId*, error*, candidateSha256*: string
+    submissionId*, requestSha256*, datasetSha256*, preflightSha256*, modelBackend*: string
     trainLoss*, validationLoss*, startedAt*, finishedAt*: string
     datasetVersion*, step*, maxSteps*: int
 
 const
   laterGateCodes = ["fixed_evaluation_required", "separate_promotion_required"]
-  runStates = ["running", "completed", "failed", "interrupted", "cancelled"]
+  activeLearningRunStates* = ["starting", "running", "cancelling", "outcome_unknown"]
+  runStates = ["starting", "running", "cancelling", "outcome_unknown", "completed", "failed", "interrupted", "cancelled"]
   runErrors = ["insufficient_gpu_memory", "chat_template_unsupported", "example_too_long", "cuda_unavailable",
-               "dataset_admission_failed", "training_failed", "trainer_unavailable"]
+               "dataset_admission_failed", "training_failed", "trainer_unavailable", "launch_outcome_unknown"]
 
 proc invalid(message = "The learning response was invalid. Refresh to check again.") =
   raise newException(ValueError, message)
@@ -56,6 +58,10 @@ proc disabled(node: JsonNode, keys: openArray[string]) =
 proc digest(node: JsonNode, key: string): string =
   result = text(node, key)
   if result.len != 64 or not result.allCharsInSet({'0'..'9', 'a'..'f'}): invalid()
+
+proc resourceId(node: JsonNode, key: string): string =
+  result = text(node, key)
+  if result.len != 32 or not result.allCharsInSet({'0'..'9', 'a'..'f'}): invalid()
 
 proc rows(node: JsonNode, key: string): seq[JsonNode] =
   let value = field(node, key)
@@ -160,12 +166,21 @@ proc parseLearningPreflight*(data, request: JsonNode, catalog: LearningCatalog):
     role: text(data, "role"), tuning: text(data, "tuning"), ready: status == "ready", blockers: blockers,
     laterGates: laterGates)
 
-proc learningRunPayload*(request: JsonNode, receipt: LearningPreflight): JsonNode =
+proc validateLearningRunRequest*(request: JsonNode) =
+  if request == nil or request.kind != JObject or request.len != 8: invalid()
+  if text(request, "method") != "sft" or text(request, "role") notin ["hub", "specialist"] or
+      text(request, "tuning") notin ["lora", "qlora"]: invalid()
+  for key in ["model_id", "dataset_id", "submission_id"]: discard resourceId(request, key)
+  for key in ["dataset_sha256", "preflight_sha256"]: discard digest(request, key)
+
+proc learningRunPayload*(request: JsonNode, receipt: LearningPreflight, submissionId: string): JsonNode =
   ## A run starts only from the exact ready check the owner saw.
   if not receipt.ready or receipt.sha256.len != 64:
     raise newException(ValueError, "Check readiness again before starting a run.")
   result = copy(request)
   result["preflight_sha256"] = %receipt.sha256
+  result["submission_id"] = %submissionId
+  validateLearningRunRequest(result)
 
 proc optionalText(node: JsonNode, key: string): string =
   let value = field(node, key)
@@ -182,10 +197,14 @@ proc loss(node: JsonNode, key: string): string =
   else: (invalid(); "")
 
 proc parseLearningRun*(row: JsonNode): LearningRun =
-  if text(row, "schema") != "learning-run.v1" or text(row, "method") != "sft": invalid()
+  if text(row, "schema") != "learning-run.v2" or text(row, "method") != "sft": invalid()
   disabled(row, ["serving_changed", "promotion_enabled"])
-  result.id = text(row, "run_id")
-  if result.id.len != 32 or not result.id.allCharsInSet({'0'..'9', 'a'..'f'}): invalid()
+  result.id = resourceId(row, "run_id")
+  let submission = field(row, "submission_id")
+  let requestHash = field(row, "request_sha256")
+  if submission.kind != JNull or requestHash.kind != JNull:
+    result.submissionId = resourceId(row, "submission_id")
+    result.requestSha256 = digest(row, "request_sha256")
   result.state = text(row, "state")
   if result.state notin runStates: invalid()
   result.role = text(row, "role")
@@ -193,12 +212,14 @@ proc parseLearningRun*(row: JsonNode): LearningRun =
   if result.role notin ["hub", "specialist"] or result.tuning notin ["lora", "qlora"]: invalid()
   let model = field(row, "model")
   if text(model, "source_kind") != "local": invalid()
-  result.modelId = text(model, "id")
+  result.modelBackend = text(model, "backend")
+  if result.modelBackend notin ["local", "uploaded"]: invalid()
+  result.modelId = resourceId(model, "id")
   let dataset = field(row, "dataset")
-  result.datasetId = text(dataset, "id")
-  discard digest(dataset, "sha256")
+  result.datasetId = resourceId(dataset, "id")
+  result.datasetSha256 = digest(dataset, "sha256")
   result.datasetVersion = count(dataset, "version", 1)
-  discard digest(row, "preflight_sha256")
+  result.preflightSha256 = digest(row, "preflight_sha256")
   let progress = field(row, "progress")
   result.maxSteps = count(progress, "max_steps", 1)
   result.step = count(progress, "step")
@@ -211,22 +232,53 @@ proc parseLearningRun*(row: JsonNode): LearningRun =
   result.error = optionalText(row, "error")
   result.candidateSha256 = optionalText(row, "candidate_sha256")
   # Only a completed run has a candidate; only a failed one has an error; only an active one is unfinished.
-  if (result.state == "running") != (result.finishedAt.len == 0): invalid()
+  if (result.state in activeLearningRunStates) != (result.finishedAt.len == 0): invalid()
   if (result.state == "completed") != (result.candidateSha256.len > 0): invalid()
   if result.candidateSha256.len > 0: discard digest(row, "candidate_sha256")
-  if (result.state == "failed") != (result.error.len > 0): invalid()
+  if result.state == "failed":
+    if result.error.len == 0 or result.error == "launch_outcome_unknown": invalid()
+  elif result.state == "outcome_unknown":
+    if result.error notin ["", "launch_outcome_unknown"]: invalid()
+  elif result.error.len > 0: invalid()
   if result.error.len > 0 and result.error notin runErrors: invalid()
 
+proc requireMatchingLearningRun*(run: LearningRun, request: JsonNode) =
+  validateLearningRunRequest(request)
+  if run.submissionId != request["submission_id"].getStr or
+      run.modelId != request["model_id"].getStr or run.datasetId != request["dataset_id"].getStr or
+      run.datasetSha256 != request["dataset_sha256"].getStr or
+      run.preflightSha256 != request["preflight_sha256"].getStr or
+      run.role != request["role"].getStr or run.tuning != request["tuning"].getStr:
+    invalid("The learning receipt does not match this exact start. Reconcile the original request.")
+
+proc parseStartedLearningRun*(row, request: JsonNode): LearningRun =
+  result = parseLearningRun(row)
+  requireMatchingLearningRun(result, request)
+
+proc requireSameLearningRun*(actual, expected: LearningRun) =
+  if actual.id != expected.id or actual.submissionId != expected.submissionId or
+      actual.requestSha256 != expected.requestSha256 or actual.modelId != expected.modelId or
+      actual.modelBackend != expected.modelBackend or actual.datasetId != expected.datasetId or
+      actual.datasetSha256 != expected.datasetSha256 or actual.datasetVersion != expected.datasetVersion or
+      actual.preflightSha256 != expected.preflightSha256 or actual.role != expected.role or actual.tuning != expected.tuning:
+    invalid("The learning cancellation receipt changed its original run. Refresh to reconcile it.")
+
 proc parseLearningRuns*(data: JsonNode): seq[LearningRun] =
-  if text(data, "schema") != "learning-runs.v1": invalid()
+  if text(data, "schema") != "learning-runs.v2": invalid()
   var ids = initHashSet[string]()
+  var submissions = initHashSet[string]()
   for row in rows(data, "runs"):
     let run = parseLearningRun(row)
     unique(ids, run.id)
+    if run.submissionId.len > 0: unique(submissions, run.submissionId)
     result.add run
+  if result.len > 20: invalid()
 
 proc learningRunStateLabel*(state: string): string =
   case state
+  of "starting": "Starting"
+  of "cancelling": "Cancelling"
+  of "outcome_unknown": "Outcome unknown — reconciliation required"
   of "running": "Training"
   of "completed": "Candidate ready"
   of "failed": "Failed"
@@ -236,6 +288,7 @@ proc learningRunStateLabel*(state: string): string =
 
 proc learningRunErrorLabel*(code: string): string =
   case code
+  of "launch_outcome_unknown": "The trainer launch is unconfirmed. Reconcile this run before another start."
   of "insufficient_gpu_memory": "Not enough free GPU memory for this model."
   of "chat_template_unsupported": "This model's chat template cannot separate prompts from answers."
   of "example_too_long": "An example is longer than the training sequence limit."

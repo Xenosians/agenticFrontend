@@ -13,7 +13,7 @@ proc selectField(state: AppState, field, label: string, value: string,
   result = buildHtml(tdiv(class = "learning-field")):
     label(class = "review-label", `for` = cstring(id)): text label
     # Changing a field while a check runs discards that check (see learning_bridge).
-    select(id = cstring(id), class = "learning-select"):
+    select(id = cstring(id), class = "learning-select", disabled = learningEditingBlocked(state)):
       for (optionValue, optionLabel, enabled) in options:
         option(value = cstring(optionValue), selected = optionValue == value, disabled = not enabled):
           text optionLabel
@@ -87,7 +87,7 @@ proc renderReceipt(state: AppState): VNode =
     p(class = "knowledge-meta"):
       span: text "Check "
       code(class = "knowledge-citation"): text receipt.sha256
-    if receipt.ready:
+    if receipt.ready and not learningStartPending(state):
       tdiv(class = "learning-actions"):
         button(`type` = "button", class = "primary-action", disabled = state.learningStarting or busy):
           text (if state.learningStarting: "Starting…" else: "Start candidate run")
@@ -115,9 +115,9 @@ proc renderRun(state: AppState, run: LearningRun): VNode =
         span: text "Candidate "
         code(class = "knowledge-citation"): text run.candidateSha256
       p(class = "operation-note"): text "Not serving. Evaluate and promote it separately."
-    if run.state == "running":
+    if run.state in ["starting", "running", "outcome_unknown"]:
       tdiv(class = "learning-actions"):
-        button(`type` = "button", class = "secondary-action", disabled = state.learningCancelling.len > 0):
+        button(`type` = "button", class = "secondary-action", disabled = state.learningCancelling.len > 0 or state.learningStarting or state.learningReconciling):
           text (if cancelling: "Cancelling…" else: "Cancel run")
           proc onclick(event: Event, node: VNode) = discard cancelLearningRun(state, run.id)
 
@@ -130,6 +130,22 @@ proc renderRuns(state: AppState): VNode =
         proc onclick(event: Event, node: VNode) = discard refreshLearningRuns(state)
     if state.learningRunError.len > 0:
       p(class = "operation-error", role = "alert"): text state.learningRunError
+    if state.learningRunsError.len > 0:
+      p(class = "operation-error", role = "alert"): text state.learningRunsError
+    if state.learningRecoveryError.len > 0:
+      p(class = "operation-error", role = "alert"): text state.learningRecoveryError
+    if learningStartPending(state) or state.learningRecoveryError.len > 0:
+      section(class = "learning-pending", `aria-label` = "Previous candidate start"):
+        p(class = "operation-note"):
+          text "A previous candidate start still needs reconciliation. A new start is blocked; checking never starts a run."
+        tdiv(class = "learning-actions"):
+          button(`type` = "button", class = "secondary-action", disabled = state.learningStarting or state.learningReconciling or state.learningCancelling.len > 0):
+            text (if state.learningReconciling: "Checking previous start…" else: "Check previous start")
+            proc onclick(event: Event, node: VNode) = discard reconcileLearningStart(state)
+          if learningStartPending(state):
+            button(`type` = "button", class = "secondary-action", disabled = state.learningStarting or state.learningReconciling or state.learningCancelling.len > 0):
+              text (if state.learningStarting: "Starting…" else: "Retry exact start")
+              proc onclick(event: Event, node: VNode) = discard startLearningRun(state)
     if state.learningRuns.len == 0:
       p(class = "knowledge-meta"):
         text (if state.learningRunsLoaded: "No runs yet." else: "Loading runs…")
@@ -171,7 +187,7 @@ proc renderLearningPanel*(state: AppState): VNode =
             selectField(state, "model", "Model", state.learningModel, modelOptions(catalog))
             selectField(state, "dataset", "Dataset", state.learningDataset, datasetOptions(catalog))
             tdiv(class = "learning-actions"):
-              button(`type` = "submit", class = "secondary-action", disabled = state.learningChecking):
+              button(`type` = "submit", class = "secondary-action", disabled = state.learningChecking or learningEditingBlocked(state)):
                 text (if state.learningChecking: "Checking…" else: "Check readiness")
           if state.learningPreflight.sha256.len > 0:
             renderReceipt(state)

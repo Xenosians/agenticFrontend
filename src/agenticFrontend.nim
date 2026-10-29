@@ -1125,7 +1125,7 @@ if frontendConfig.healthIntervalMs > 0:
       if appState.auth.authenticated and not appState.system.checking:
         discard refreshServiceHealth(appState)
       if appState.auth.authenticated and appState.activeView == viewLearning and
-          learningRunActive(appState):
+          (learningRunActive(appState) or learningStartPending(appState)):
         discard refreshLearningRuns(appState),
     frontendConfig.healthIntervalMs
   )

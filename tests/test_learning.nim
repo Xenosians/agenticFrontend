@@ -1,5 +1,6 @@
 import std/[json, strutils, unittest]
 import ../src/app/learning
+import ../src/app/learning_recovery
 
 let model = "a".repeat(32)
 let remote = "b".repeat(32)
@@ -40,14 +41,15 @@ proc receiptJson(request: JsonNode, blockers: seq[string] = @[]): JsonNode =
      "model_loaded": false, "live_tool_execution": false, "promotion_enabled": false}
 
 proc runJson(state = "running", step = 0, id = runId): JsonNode =
-  result = %*{"schema": "learning-run.v1", "run_id": id, "state": state, "method": "sft", "role": "hub",
+  result = %*{"schema": "learning-run.v2", "run_id": id, "state": state, "method": "sft", "role": "hub",
+     "submission_id": id, "request_sha256": "7".repeat(64),
      "tuning": "qlora", "model": {"id": model, "backend": "local", "source_kind": "local"},
      "dataset": {"id": current, "sha256": digest, "version": 2, "train_count": 11, "validation_count": 2},
      "preflight_sha256": check, "progress": {"step": step, "max_steps": 9},
      "metrics": {"train_loss": nil, "validation_loss": nil}, "candidate_sha256": nil, "error": nil,
      "started_at": "2026-10-29T07:00:00+00:00", "finished_at": nil,
      "serving_changed": false, "promotion_enabled": false}
-  if state != "running":
+  if state notin activeLearningRunStates:
     result["finished_at"] = %"2026-10-29T07:10:00+00:00"
   if state == "completed":
     result["candidate_sha256"] = %"8".repeat(64)
@@ -159,19 +161,20 @@ suite "candidate runs":
     let catalog = parseLearningCatalog(catalogJson())
     let request = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
     let receipt = parseLearningPreflight(receiptJson(request), request, catalog)
-    let body = learningRunPayload(request, receipt)
+    let body = learningRunPayload(request, receipt, runId)
     check body["preflight_sha256"].getStr == check
     check body["model_id"].getStr == model
-    check body.len == 7
+    check body["submission_id"].getStr == runId
+    check body.len == 8
 
   test "a blocked check cannot start a run":
     let catalog = parseLearningCatalog(catalogJson())
     let request = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
     let receipt = parseLearningPreflight(receiptJson(request, @["local_weights_unavailable"]), request, catalog)
-    expect ValueError: discard learningRunPayload(request, receipt)
+    expect ValueError: discard learningRunPayload(request, receipt, runId)
 
   test "runs are read with progress, metrics and outcome":
-    let runs = parseLearningRuns(%*{"schema": "learning-runs.v1",
+    let runs = parseLearningRuns(%*{"schema": "learning-runs.v2",
       "runs": [runJson("completed", 9, "e".repeat(32)), runJson("running", 3)]})
     check runs.len == 2
     check runs[0].state == "completed"
@@ -181,7 +184,7 @@ suite "candidate runs":
     check runs[1].trainLoss == ""
     # The same run listed twice is a damaged list, not two runs.
     expect ValueError:
-      discard parseLearningRuns(%*{"schema": "learning-runs.v1", "runs": [runJson(), runJson()]})
+      discard parseLearningRuns(%*{"schema": "learning-runs.v2", "runs": [runJson(), runJson()]})
 
   test "a run that claims serving or promotion, or an impossible outcome, is refused":
     var serving = runJson()
@@ -199,10 +202,54 @@ suite "candidate runs":
       expect ValueError: discard parseLearningRun(data)
 
   test "every run state and error has a readable label":
-    for state in ["running", "completed", "failed", "interrupted", "cancelled"]:
+    for state in ["starting", "running", "cancelling", "outcome_unknown", "completed", "failed", "interrupted", "cancelled"]:
       check learningRunStateLabel(state).len > 0
     for code in ["insufficient_gpu_memory", "chat_template_unsupported", "example_too_long", "cuda_unavailable",
                  "dataset_admission_failed", "training_failed", "trainer_unavailable"]:
       let label = learningRunErrorLabel(code)
       check '_' notin label
       check label.endsWith(".")
+
+  test "a start receipt must match every immutable requested identity":
+    let catalog = parseLearningCatalog(catalogJson())
+    let selection = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
+    let receipt = parseLearningPreflight(receiptJson(selection), selection, catalog)
+    let request = learningRunPayload(selection, receipt, runId)
+    check parseStartedLearningRun(runJson(), request).submissionId == runId
+    for key in ["submission_id", "preflight_sha256", "role", "tuning"]:
+      var changed = runJson()
+      changed[key] = %(case key
+        of "submission_id": "e".repeat(32)
+        of "preflight_sha256": "e".repeat(64)
+        of "role": "specialist"
+        else: "lora")
+      expect ValueError: discard parseStartedLearningRun(changed, request)
+    for key in ["id", "sha256"]:
+      var changed = runJson()
+      changed["dataset"][key] = %(if key == "id": "e".repeat(32) else: "e".repeat(64))
+      expect ValueError: discard parseStartedLearningRun(changed, request)
+
+  test "unfinished and legacy states cannot imply a newly confirmed request":
+    for state in activeLearningRunStates:
+      check parseLearningRun(runJson(state)).finishedAt == ""
+      var finished = runJson(state)
+      finished["finished_at"] = %"2026-10-29T07:10:00+00:00"
+      expect ValueError: discard parseLearningRun(finished)
+    var legacy = runJson()
+    legacy["submission_id"] = newJNull()
+    legacy["request_sha256"] = newJNull()
+    check parseLearningRun(legacy).submissionId == ""
+    let selection = %*{"method":"sft", "role":"hub", "tuning":"qlora", "model_id":model,
+                       "dataset_id":current,"dataset_sha256":digest,"preflight_sha256":check,"submission_id":runId}
+    expect ValueError: discard parseStartedLearningRun(legacy, selection)
+
+  test "stored starts are exact owner and backend bound requests":
+    let request = %*{"method":"sft", "role":"hub", "tuning":"qlora", "model_id":model,
+                       "dataset_id":current,"dataset_sha256":digest,"preflight_sha256":check,"submission_id":runId}
+    let stored = %*{"schema":"pending-learning-run.v1", "owner":"owner-a", "backend":"https://itsm.example.test", "request":request}
+    check parsePendingLearningRun(stored, "owner-a", "https://itsm.example.test") == request
+    expect ValueError: discard parsePendingLearningRun(stored, "owner-b", "https://itsm.example.test")
+    expect ValueError: discard parsePendingLearningRun(stored, "owner-a", "https://other.example.test")
+    var malformed = stored.copy
+    malformed["request"]["submission_id"] = %"../run"
+    expect ValueError: discard parsePendingLearningRun(malformed, "owner-a", "https://itsm.example.test")
