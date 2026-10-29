@@ -18,7 +18,8 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Review (administrators only): pending critiques and corrections with the request and answer they describe; each record gets one decision — accept or dismiss — with a reason. A refused decision is stated on the record, and a decision never changes the task.
 - Knowledge: your ready reference datasets with version, digest, source and license, which one is used for your requests, and a search of one chosen source. Each passage is shown as untrusted reference text with its dataset, chunk and citation; searching never changes the selected dataset, and passages never grant permission or change routing.
 - Cited answers: under an answer, the reference passages its model was given (kept with the chat, so they survive a reload). **Show passage** reopens that exact version for you only, quoted as untrusted reference text; a reply for another passage, version or trust level is refused.
-- Learning (command palette → Learning readiness): choose SFT, DPO or PPO, a role, LoRA/QLoRA/full adaptation, one of your models and a current training dataset version, then check readiness. The answer lists every gate that still blocks a candidate run. Checking never starts training, loads a model or changes what serves your requests.
+- Lua row transforms (Data tab → Dataset → Transform rows with Lua, when the AI host supports them): a short Lua script maps each JSON line of the chosen file to a new row, or drops it. **Preview** shows the kept-row count, the first five rows and how the script was isolated, and stores nothing. **Apply and upload** appears only after a preview of the current script, and uploads the result through the same dataset checks as any upload. The script runs in the AI service's isolated worker, never in the browser.
+- Learning (command palette → Learning readiness): choose SFT, DPO or PPO, a role, LoRA/QLoRA/full adaptation, one of your models and a current training dataset version, then check readiness. The answer lists every gate that still blocks a candidate run. A ready check (SFT with LoRA/QLoRA on your local weights) offers **Start candidate run**: one run trains at a time on the host, and its progress, losses and outcome update by themselves while it trains. You can cancel your active run. A finished candidate shows its digest and is never served or promoted from here.
 - Automation (command palette → Automation workflows): draw a workflow from registered capabilities on a canvas, give each step its exact targets and an optional "after the previous step succeeds" dependency, then save it as a version. A run uses the saved version, becomes one ordinary job in its own chat, and asks for approval before any change. An unconfirmed run stays locked in the browser; only an explicit retry sends that same run again, so it is never duplicated.
 - PCB / Infrastructure Simulator (rail, or command palette → Infrastructure topology and drift / PCB netlist inspection): draw the desired topology of containers, endpoints and router interfaces with the properties you expect, save it as a version, then check that exact version for drift. The report is a labelled simulated comparison against what the read tools observe; each source reports its own failure, and nothing is ever changed. The PCB tab inspects a KiCad netlist export for connectivity findings; nothing is fabricated or flashed.
 - Run inspector, owner-scoped Operations queue and recorded inference timings, and backend/AI integration status.
@@ -114,6 +115,7 @@ nim js -r tests/test_learning.nim
 nim js -r tests/test_workflows.nim
 nim js -r tests/test_engineering.nim
 nim js -r tests/test_answer_references.nim
+nim js -r tests/test_lua_transforms.nim
 nim js -r tests/test_integration_setup.nim
 nim js -r tests/test_dataset_versions.nim
 nim js -r tests/test_approval_result.nim
@@ -141,6 +143,7 @@ python tests/test_learning.py
 python tests/test_workflows.py
 python tests/test_engineering.py
 python tests/test_answer_references.py
+python tests/test_lua_transforms.py
 python tests/test_workspace_navigation.py
 python tests/test_connection_actions.py
 ```

@@ -7,6 +7,7 @@ import learning
 import workflows
 import engineering
 import answer_references
+import lua_transforms
 import chat_list
 export chat_list
 
@@ -175,6 +176,12 @@ type
     learningLoaded*, learningBusy*, learningChecking*: bool
     learningError*, learningMethod*, learningRole*, learningTuning*, learningModel*, learningDataset*: string
     learningEpoch*: int
+    ## Candidate runs: the newest first, which one is being started or cancelled.
+    learningRuns*: seq[LearningRun]
+    learningRunsLoaded*, learningStarting*: bool
+    learningCancelling*, learningRunError*: string
+    learningRunsEpoch*: int
+    learningCheckedRequest*: JsonNode
     automationWorkflows*: seq[WorkflowSummary]
     automationDraft*: WorkflowDraft
     automationPendingRun*: WorkflowPendingRun
@@ -225,6 +232,11 @@ type
     datasetApiKey*: string
     datasetReviewed*: bool
     datasetReplaces*: string
+    datasetScript*: string
+    datasetTransformPreview*: TransformPreview
+    datasetTransformPreviewed*: bool
+    datasetTransformEpoch*: int
+    datasetTransformOpen*: bool
     activeView*: AppView
     inspectorTab*: InspectorTab
     composerPanel*: ComposerPanel

@@ -41,7 +41,10 @@ proc choiceOptions(values: seq[string]): seq[(string, string, bool)] =
 
 proc modelOptions(catalog: LearningCatalog): seq[(string, string, bool)] =
   for item in catalog.models:
-    let origin = if item.sourceKind == "local": "local weights" else: "outbound connection"
+    let origin =
+      if item.sourceKind == "outbound": "outbound connection"
+      elif item.trainingAvailable: "local weights"
+      else: "local weights unavailable on this host"
     result.add (item.id, item.name & " · " & origin, item.state == "ready")
 
 proc datasetLabel(item: LearningDataset): string =
@@ -65,18 +68,75 @@ proc renderReceipt(state: AppState): VNode =
   var entrypoint = ""
   for item in state.learningCatalog.methods:
     if item.id == receipt.methodId: entrypoint = item.entrypoint
+  let busy = learningRunActive(state)
   result = buildHtml(section(class = "learning-result", `aria-label` = "Readiness")):
     tdiv(class = "operation-job-heading"):
-      strong: text "Not ready to train"
-      span(class = "review-status"): text $receipt.blockers.len & " gates open"
+      strong: text (if receipt.ready: "Ready for a candidate run" else: "Not ready to train")
+      span(class = "review-status"):
+        text (if receipt.ready: "No blockers" else: $receipt.blockers.len & " blockers")
     p(class = "knowledge-meta"): text datasetText
-    p(class = "knowledge-meta"): text "Trainer " & entrypoint & " · resources " & receipt.resourceState
-    ul(class = "learning-gates"):
-      for code in receipt.blockers:
+    p(class = "knowledge-meta"): text "Trainer " & entrypoint
+    if receipt.blockers.len > 0:
+      ul(class = "learning-gates", `aria-label` = "Blockers"):
+        for code in receipt.blockers:
+          li(class = "learning-gate", `data-gate` = cstring(code)): text learningGateLabel(code)
+    p(class = "knowledge-meta"): text "After a run, still required:"
+    ul(class = "learning-gates learning-later", `aria-label` = "Later gates"):
+      for code in receipt.laterGates:
         li(class = "learning-gate", `data-gate` = cstring(code)): text learningGateLabel(code)
     p(class = "knowledge-meta"):
       span: text "Check "
       code(class = "knowledge-citation"): text receipt.sha256
+    if receipt.ready:
+      tdiv(class = "learning-actions"):
+        button(`type` = "button", class = "primary-action", disabled = state.learningStarting or busy):
+          text (if state.learningStarting: "Starting…" else: "Start candidate run")
+          proc onclick(event: Event, node: VNode) = discard startLearningRun(state)
+      if busy:
+        p(class = "operation-note", role = "status"): text "A run is already training on this host."
+
+proc renderRun(state: AppState, run: LearningRun): VNode =
+  let cancelling = state.learningCancelling == run.id
+  result = buildHtml(li(class = "learning-run", `data-run` = cstring(run.id), `data-state` = cstring(run.state))):
+    tdiv(class = "operation-job-heading"):
+      strong: text "SFT · " & (if run.tuning == "qlora": "QLoRA" else: "LoRA") & " · dataset v" & $run.datasetVersion
+      span(class = "review-status"): text learningRunStateLabel(run.state)
+    tdiv(class = "learning-progress"):
+      progress(max = cstring($run.maxSteps), value = cstring($run.step),
+               `aria-label` = cstring("Training steps " & $run.step & " of " & $run.maxSteps))
+      span(class = "knowledge-meta"): text "Step " & $run.step & " of " & $run.maxSteps
+    p(class = "knowledge-meta"):
+      text "Training loss " & (if run.trainLoss.len > 0: run.trainLoss else: "–") &
+        " · validation loss " & (if run.validationLoss.len > 0: run.validationLoss else: "–")
+    if run.error.len > 0:
+      p(class = "operation-error", role = "alert"): text learningRunErrorLabel(run.error)
+    if run.candidateSha256.len > 0:
+      p(class = "knowledge-meta"):
+        span: text "Candidate "
+        code(class = "knowledge-citation"): text run.candidateSha256
+      p(class = "operation-note"): text "Not serving. Evaluate and promote it separately."
+    if run.state == "running":
+      tdiv(class = "learning-actions"):
+        button(`type` = "button", class = "secondary-action", disabled = state.learningCancelling.len > 0):
+          text (if cancelling: "Cancelling…" else: "Cancel run")
+          proc onclick(event: Event, node: VNode) = discard cancelLearningRun(state, run.id)
+
+proc renderRuns(state: AppState): VNode =
+  result = buildHtml(section(class = "learning-runs", `aria-label` = "Candidate runs")):
+    tdiv(class = "operation-job-heading"):
+      strong: text "Candidate runs"
+      button(`type` = "button", class = "secondary-action"):
+        text "Refresh"
+        proc onclick(event: Event, node: VNode) = discard refreshLearningRuns(state)
+    if state.learningRunError.len > 0:
+      p(class = "operation-error", role = "alert"): text state.learningRunError
+    if state.learningRuns.len == 0:
+      p(class = "knowledge-meta"):
+        text (if state.learningRunsLoaded: "No runs yet." else: "Loading runs…")
+    else:
+      ul(class = "learning-run-list"):
+        for run in state.learningRuns:
+          renderRun(state, run)
 
 proc renderLearningPanel*(state: AppState): VNode =
   let catalog = state.learningCatalog
@@ -85,9 +145,9 @@ proc renderLearningPanel*(state: AppState): VNode =
       tdiv(class = "developer-view-header"):
         tdiv:
           h2: text "Learning"
-          p: text "Choose a model and a training dataset version, then check what a candidate run still needs."
+          p: text "Choose a model and a training dataset version, check readiness, then start a candidate run."
       p(class = "operation-note"):
-        text "Checking readiness never starts training, loads a model or changes what serves your requests. Runs, evaluation and promotion are separate steps."
+        text "A candidate run trains an adapter on this host and never changes what serves your requests. Evaluation and promotion are separate steps."
       if state.learningError.len > 0:
         p(class = "operation-error", role = "alert"): text state.learningError
       if state.learningBusy:
@@ -115,3 +175,4 @@ proc renderLearningPanel*(state: AppState): VNode =
                 text (if state.learningChecking: "Checking…" else: "Check readiness")
           if state.learningPreflight.sha256.len > 0:
             renderReceipt(state)
+      renderRuns(state)

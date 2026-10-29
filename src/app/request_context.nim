@@ -89,6 +89,12 @@ proc clearOperations*(state: AppState) =
   state.learningTuning = ""
   state.learningModel = ""
   state.learningDataset = ""
+  inc state.learningRunsEpoch
+  state.learningRuns = @[]
+  state.learningRunsLoaded = false
+  state.learningStarting = false
+  state.learningCancelling = ""
+  state.learningRunError = ""
   # Saved workflows, the open canvas and its run identity belong to the owner.
   inc state.automationEpoch
   state.automationWorkflows = @[]
@@ -166,6 +172,13 @@ proc beginReferenceRequest*(state: AppState): OperationsRequestContext =
 
 proc matchesReferenceRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.referenceEpoch == request.epoch
+
+proc beginLearningRunsRequest*(state: AppState): OperationsRequestContext =
+  inc state.learningRunsEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.learningRunsEpoch)
+
+proc matchesLearningRunsRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.learningRunsEpoch == request.epoch
 
 proc beginLearningRequest*(state: AppState): OperationsRequestContext =
   inc state.learningEpoch

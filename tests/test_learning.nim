@@ -6,18 +6,20 @@ let remote = "b".repeat(32)
 let current = "c".repeat(32)
 let replaced = "d".repeat(32)
 let digest = "1".repeat(64)
+let check = "9".repeat(64)
+let runId = "f".repeat(32)
 
 proc methodRow(id: string, roles, tuning: seq[string], entrypoint: string): JsonNode =
   %*{"id": id, "roles": roles, "tuning": tuning, "entrypoint": entrypoint, "requires": "reviewed data"}
 
 proc catalogJson(): JsonNode =
-  %*{"schema": "learning-catalog.v1", "execution_enabled": false, "promotion_enabled": false,
+  %*{"schema": "learning-catalog.v2", "promotion_enabled": false,
      "methods": [methodRow("sft", @["hub", "specialist"], @["full", "lora", "qlora"], "scripts/train_recipe.py"),
                  methodRow("dpo", @["specialist"], @["qlora"], "scripts/train_preferences.py"),
                  methodRow("ppo", @["hub"], @["qlora"], "scripts/train_ppo.py")],
      "models": [
        {"id": model, "name": "Hub model", "backend": "local", "state": "ready", "source_kind": "local",
-        "training_available": false},
+        "training_available": true},
        {"id": remote, "name": "Outbound model", "backend": "http", "state": "ready", "source_kind": "outbound",
         "training_available": false}],
      "datasets": [
@@ -26,35 +28,53 @@ proc catalogJson(): JsonNode =
        {"id": current, "name": "Ticket triage", "purpose": "training", "state": "ready", "sha256": digest,
         "lineage_id": replaced, "version": 2, "train_count": 11, "validation_count": 2, "superseded_by": nil}]}
 
-proc receiptJson(request: JsonNode): JsonNode =
-  %*{"schema": "learning-selection-preflight.v1", "status": "blocked", "preflight_sha256": "9".repeat(64),
+proc receiptJson(request: JsonNode, blockers: seq[string] = @[]): JsonNode =
+  %*{"schema": "learning-selection-preflight.v2", "status": (if blockers.len == 0: "ready" else: "blocked"),
+     "preflight_sha256": check,
      "method": request["method"], "role": request["role"], "tuning": request["tuning"],
-     "entrypoint": "scripts/train_recipe.py", "resource_state": "unknown",
+     "entrypoint": "scripts/train_recipe.py",
      "model": {"id": model, "backend": "local", "source_kind": "local", "state": "ready"},
      "dataset": {"id": current, "sha256": digest, "lineage_id": replaced, "version": 2,
                  "train_count": 11, "validation_count": 2},
-     "blockers": ["fixed_evaluation_required", "host_dispatch_not_integrated"],
-     "execution_enabled": false, "model_loaded": false, "live_tool_execution": false, "promotion_enabled": false}
+     "blockers": blockers, "later_gates": ["fixed_evaluation_required", "separate_promotion_required"],
+     "model_loaded": false, "live_tool_execution": false, "promotion_enabled": false}
+
+proc runJson(state = "running", step = 0, id = runId): JsonNode =
+  result = %*{"schema": "learning-run.v1", "run_id": id, "state": state, "method": "sft", "role": "hub",
+     "tuning": "qlora", "model": {"id": model, "backend": "local", "source_kind": "local"},
+     "dataset": {"id": current, "sha256": digest, "version": 2, "train_count": 11, "validation_count": 2},
+     "preflight_sha256": check, "progress": {"step": step, "max_steps": 9},
+     "metrics": {"train_loss": nil, "validation_loss": nil}, "candidate_sha256": nil, "error": nil,
+     "started_at": "2026-10-29T07:00:00+00:00", "finished_at": nil,
+     "serving_changed": false, "promotion_enabled": false}
+  if state != "running":
+    result["finished_at"] = %"2026-10-29T07:10:00+00:00"
+  if state == "completed":
+    result["candidate_sha256"] = %"8".repeat(64)
+    result["metrics"] = %*{"train_loss": 0.5, "validation_loss": 0.75}
+  if state == "failed":
+    result["error"] = %"insufficient_gpu_memory"
 
 suite "learning catalog":
   test "methods, models and dataset versions are read with their identities":
     let catalog = parseLearningCatalog(catalogJson())
     check catalog.methods.len == 3
     check catalog.methods[2].roles == @["hub"]
+    check catalog.models[0].trainingAvailable
+    check not catalog.models[1].trainingAvailable
     check catalog.models[1].sourceKind == "outbound"
     check catalog.datasets[0].supersededBy == current
     check catalog.datasets[1].supersededBy == ""
     check catalog.datasets[1].version == 2
 
-  test "a catalog that claims it can run or promote is refused":
-    for key in ["execution_enabled", "promotion_enabled"]:
-      var data = catalogJson()
-      data[key] = %true
-      expect ValueError: discard parseLearningCatalog(data)
-
-  test "a model that claims it is trainable is refused":
+  test "a catalog that claims it can promote is refused":
     var data = catalogJson()
-    data["models"][0]["training_available"] = %true
+    data["promotion_enabled"] = %true
+    expect ValueError: discard parseLearningCatalog(data)
+
+  test "an outbound connection that claims it is trainable is refused":
+    var data = catalogJson()
+    data["models"][1]["training_available"] = %true
     expect ValueError: discard parseLearningCatalog(data)
 
   test "malformed catalogs are refused, never shown as empty":
@@ -66,7 +86,9 @@ suite "learning catalog":
     shortDigest["datasets"][1]["sha256"] = %"abc"
     var noMethods = catalogJson()
     noMethods["methods"] = newJArray()
-    for data in [unknownMethod, duplicate, shortDigest, noMethods, %*{"detail": "outage"}]:
+    var oldSchema = catalogJson()
+    oldSchema["schema"] = %"learning-catalog.v1"
+    for data in [unknownMethod, duplicate, shortDigest, noMethods, oldSchema, %*{"detail": "outage"}]:
       expect ValueError: discard parseLearningCatalog(data)
 
 suite "learning readiness check":
@@ -84,40 +106,103 @@ suite "learning readiness check":
     expect ValueError: discard learningPreflightPayload(catalog, "ppo", "hub", "lora", model, current)
     expect ValueError: discard learningPreflightPayload(catalog, "rag", "hub", "qlora", model, current)
 
-  test "a receipt for exactly this selection lists its blockers":
+  test "a ready receipt for exactly this selection has no blockers":
     let catalog = parseLearningCatalog(catalogJson())
     let request = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
     let receipt = parseLearningPreflight(receiptJson(request), request, catalog)
-    check receipt.blockers == @["fixed_evaluation_required", "host_dispatch_not_integrated"]
-    check receipt.resourceState == "unknown"
-    check receipt.sha256 == "9".repeat(64)
+    check receipt.ready
+    check receipt.blockers.len == 0
+    check receipt.laterGates == @["fixed_evaluation_required", "separate_promotion_required"]
+    check receipt.sha256 == check
 
-  test "a receipt for anything else, or one that claims a run, is refused":
+  test "a blocked receipt lists its blockers":
+    let catalog = parseLearningCatalog(catalogJson())
+    let request = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
+    let receipt = parseLearningPreflight(receiptJson(request, @["local_weights_unavailable"]), request, catalog)
+    check not receipt.ready
+    check receipt.blockers == @["local_weights_unavailable"]
+
+  test "a receipt for anything else, or with a contradictory status, is refused":
     let catalog = parseLearningCatalog(catalogJson())
     let request = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
     var otherModel = receiptJson(request)
     otherModel["model"]["id"] = %remote
     var otherVersion = receiptJson(request)
     otherVersion["dataset"]["version"] = %1
-    var running = receiptJson(request)
-    running["execution_enabled"] = %true
     var loaded = receiptJson(request)
     loaded["model_loaded"] = %true
-    var ready = receiptJson(request)
-    ready["status"] = %"ready"
-    var unblocked = receiptJson(request)
-    unblocked["blockers"] = newJArray()
+    var promoted = receiptJson(request)
+    promoted["promotion_enabled"] = %true
+    var readyWithBlockers = receiptJson(request, @["local_weights_unavailable"])
+    readyWithBlockers["status"] = %"ready"
+    var blockedWithout = receiptJson(request)
+    blockedWithout["status"] = %"blocked"
     var otherMethod = receiptJson(request)
     otherMethod["tuning"] = %"lora"
-    for data in [otherModel, otherVersion, running, loaded, ready, unblocked, otherMethod]:
+    var noLaterGates = receiptJson(request)
+    noLaterGates["later_gates"] = newJArray()
+    for data in [otherModel, otherVersion, loaded, promoted, readyWithBlockers, blockedWithout, otherMethod,
+                 noLaterGates]:
       expect ValueError: discard parseLearningPreflight(data, request, catalog)
 
   test "every blocker the AI service reports has a readable label":
-    for code in ["trusted_model_identity_required", "trusted_training_configuration_required",
-                 "fixed_evaluation_required", "resource_unknown", "host_dispatch_not_integrated",
-                 "separate_promotion_required", "outbound_connection_is_inference_only",
-                 "reviewed_preference_partitions_required", "evaluated_adapter_checkpoint_required",
-                 "independent_simulator_episodes_required"]:
+    for code in ["local_weights_unavailable", "full_tuning_not_offered", "fixed_evaluation_required",
+                 "host_dispatch_not_integrated", "separate_promotion_required",
+                 "outbound_connection_is_inference_only", "reviewed_preference_partitions_required",
+                 "evaluated_adapter_checkpoint_required", "independent_simulator_episodes_required"]:
       let label = learningGateLabel(code)
+      check '_' notin label
+      check label.endsWith(".")
+
+suite "candidate runs":
+  test "a run request is the checked selection with its check digest":
+    let catalog = parseLearningCatalog(catalogJson())
+    let request = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
+    let receipt = parseLearningPreflight(receiptJson(request), request, catalog)
+    let body = learningRunPayload(request, receipt)
+    check body["preflight_sha256"].getStr == check
+    check body["model_id"].getStr == model
+    check body.len == 7
+
+  test "a blocked check cannot start a run":
+    let catalog = parseLearningCatalog(catalogJson())
+    let request = learningPreflightPayload(catalog, "sft", "hub", "qlora", model, current)
+    let receipt = parseLearningPreflight(receiptJson(request, @["local_weights_unavailable"]), request, catalog)
+    expect ValueError: discard learningRunPayload(request, receipt)
+
+  test "runs are read with progress, metrics and outcome":
+    let runs = parseLearningRuns(%*{"schema": "learning-runs.v1",
+      "runs": [runJson("completed", 9, "e".repeat(32)), runJson("running", 3)]})
+    check runs.len == 2
+    check runs[0].state == "completed"
+    check runs[0].candidateSha256 == "8".repeat(64)
+    check runs[0].validationLoss == "0.750"
+    check runs[1].step == 3 and runs[1].maxSteps == 9
+    check runs[1].trainLoss == ""
+    # The same run listed twice is a damaged list, not two runs.
+    expect ValueError:
+      discard parseLearningRuns(%*{"schema": "learning-runs.v1", "runs": [runJson(), runJson()]})
+
+  test "a run that claims serving or promotion, or an impossible outcome, is refused":
+    var serving = runJson()
+    serving["serving_changed"] = %true
+    var promoted = runJson()
+    promoted["promotion_enabled"] = %true
+    var noCandidate = runJson("completed", 9)
+    noCandidate["candidate_sha256"] = newJNull()
+    var unknownError = runJson("failed")
+    unknownError["error"] = %"Traceback: private"
+    var pastEnd = runJson("running", 10)
+    var outbound = runJson()
+    outbound["model"]["source_kind"] = %"outbound"
+    for data in [serving, promoted, noCandidate, unknownError, pastEnd, outbound]:
+      expect ValueError: discard parseLearningRun(data)
+
+  test "every run state and error has a readable label":
+    for state in ["running", "completed", "failed", "interrupted", "cancelled"]:
+      check learningRunStateLabel(state).len > 0
+    for code in ["insufficient_gpu_memory", "chat_template_unsupported", "example_too_long", "cuda_unavailable",
+                 "dataset_admission_failed", "training_failed", "trainer_unavailable"]:
+      let label = learningRunErrorLabel(code)
       check '_' notin label
       check label.endsWith(".")

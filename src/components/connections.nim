@@ -5,6 +5,7 @@ import std/[json, strutils]
 import ../app/[types, extension_bridge]
 import ../app/connection_draft
 import ../app/dataset_versions
+import ../app/lua_transforms
 import ../api/connection_options
 import brand
 
@@ -2027,6 +2028,47 @@ proc renderLocalModelUpload(
         )
 
 
+proc renderDatasetTransform(state: AppState): VNode =
+  ## The optional Lua entry point: reshape the chosen file's JSON rows before admission.
+  ## The script runs in the AI service's isolated worker, never in the browser.
+  let preview = state.datasetTransformPreview
+  result = buildHtml(section(class = "dataset-api dataset-transform")):
+    # Open state lives in AppState: a notice above re-creates these nodes on every save or error.
+    button(class = "dataset-transform-toggle", `aria-label` = "Transform rows with Lua",
+           `aria-expanded` = cstring($state.datasetTransformOpen)):
+      text "Transform rows with Lua"
+      proc onclick(event: Event, node: VNode) =
+        state.datasetTransformOpen = not state.datasetTransformOpen
+    if state.datasetTransformOpen:
+      tdiv(class = "dataset-api-body"):
+        p(class = "dataset-transform-note"):
+          text "Each JSON line of the chosen file is passed to the script as row. Return a table to keep it, " &
+            "or nil to drop it. The result is checked exactly like an upload."
+        tdiv(class = "plugin-field"):
+          label(`for` = "datasetScript"): text "Lua script"
+          textarea(id = "datasetScript", class = "workflow-target dataset-script", rows = "8",
+                   spellcheck = "false", `aria-label` = "Lua script",
+                   value = cstring(if state.datasetScript.len > 0: state.datasetScript else: starterScript)):
+            proc oninput(event: Event, node: VNode) = changeDatasetScript(state, $node.value)
+        tdiv(class = "learning-actions"):
+          button(class = "plugin-secondary", disabled = state.extensionBusy):
+            text "Preview"
+            proc onclick(event: Event, node: VNode) =
+              if state.datasetScript.len == 0: state.datasetScript = starterScript
+              discard previewDatasetTransform(state)
+          button(class = "plugin-secondary", disabled = state.extensionBusy or not state.datasetTransformPreviewed):
+            text "Apply and upload"
+            proc onclick(event: Event, node: VNode) = discard applyDatasetTransform(state)
+        if state.datasetTransformPreviewed:
+          section(class = "dataset-transform-preview", `aria-label` = "Transform preview"):
+            p(class = "dataset-transform-note", role = "status"):
+              text $preview.outputRows & " of " & $preview.inputRows & " rows kept · " & $preview.elapsedMs & " ms"
+            p(class = "dataset-transform-note"): text isolationLabel(preview)
+            ol(class = "dataset-transform-rows"):
+              for row in preview.rows:
+                li: code: text row
+
+
 proc renderDatasetManager(
   state: AppState
 ): VNode =
@@ -2179,6 +2221,9 @@ proc renderDatasetManager(
         discard saveDatasetFile(
           state
         )
+
+    if transformAvailable(state.extensionCatalog):
+      renderDatasetTransform(state)
 
     details(class = "dataset-api"):
 

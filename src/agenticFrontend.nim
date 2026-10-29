@@ -1118,11 +1118,15 @@ discard refreshSystemStatus(
 
 # Re-read public service health on the configured cadence, so the status bar
 # follows an outage or recovery without a reload. One read at a time.
+# While a candidate run trains, its progress is re-read on the same cadence.
 if frontendConfig.healthIntervalMs > 0:
   discard setInterval(
     proc() =
       if appState.auth.authenticated and not appState.system.checking:
-        discard refreshServiceHealth(appState),
+        discard refreshServiceHealth(appState)
+      if appState.auth.authenticated and appState.activeView == viewLearning and
+          learningRunActive(appState):
+        discard refreshLearningRuns(appState),
     frontendConfig.healthIntervalMs
   )
 

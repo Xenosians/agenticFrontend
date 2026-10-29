@@ -1,5 +1,6 @@
-## Owner-scoped learning readiness data. These receipts never represent a run.
-import std/[json, strutils, sets]
+## Owner-scoped learning data: the catalog, readiness checks and candidate runs.
+## A ready check can start one candidate run; nothing here serves or promotes a model.
+import std/[json, strutils, sets, strformat]
 
 type
   LearningMethod* = object
@@ -7,6 +8,7 @@ type
     roles*, tuning*: seq[string]
   LearningModel* = object
     id*, name*, backend*, state*, sourceKind*: string
+    trainingAvailable*: bool
   LearningDataset* = object
     id*, name*, state*, sha256*, lineageId*, supersededBy*: string
     version*, trainCount*, validationCount*: int
@@ -15,8 +17,19 @@ type
     models*: seq[LearningModel]
     datasets*: seq[LearningDataset]
   LearningPreflight* = object
-    sha256*, methodId*, role*, tuning*, resourceState*: string
-    blockers*: seq[string]
+    sha256*, methodId*, role*, tuning*: string
+    ready*: bool
+    blockers*, laterGates*: seq[string]
+  LearningRun* = object
+    id*, state*, role*, tuning*, modelId*, datasetId*, error*, candidateSha256*: string
+    trainLoss*, validationLoss*, startedAt*, finishedAt*: string
+    datasetVersion*, step*, maxSteps*: int
+
+const
+  laterGateCodes = ["fixed_evaluation_required", "separate_promotion_required"]
+  runStates = ["running", "completed", "failed", "interrupted", "cancelled"]
+  runErrors = ["insufficient_gpu_memory", "chat_template_unsupported", "example_too_long", "cuda_unavailable",
+               "dataset_admission_failed", "training_failed", "trainer_unavailable"]
 
 proc invalid(message = "The learning response was invalid. Refresh to check again.") =
   raise newException(ValueError, message)
@@ -60,8 +73,8 @@ proc unique(ids: var HashSet[string], identity: string) =
   ids.incl identity
 
 proc parseLearningCatalog*(data: JsonNode): LearningCatalog =
-  if text(data, "schema") != "learning-catalog.v1": invalid()
-  disabled(data, ["execution_enabled", "promotion_enabled"])
+  if text(data, "schema") != "learning-catalog.v2": invalid()
+  disabled(data, ["promotion_enabled"])
   var methods, models, datasets = initHashSet[string]()
   for row in rows(data, "methods"):
     let identity = text(row, "id")
@@ -74,11 +87,12 @@ proc parseLearningCatalog*(data: JsonNode): LearningCatalog =
   for row in rows(data, "models"):
     let identity = text(row, "id")
     unique(models, identity)
-    disabled(row, ["training_available"])
     let source = text(row, "source_kind")
     if source notin ["local", "outbound"]: invalid()
+    let available = field(row, "training_available")
+    if available.kind != JBool or (available.getBool and source != "local"): invalid()
     result.models.add LearningModel(id: identity, name: text(row, "name"), backend: text(row, "backend"),
-      state: text(row, "state"), sourceKind: source)
+      state: text(row, "state"), sourceKind: source, trainingAvailable: available.getBool)
   for row in rows(data, "datasets"):
     let identity = text(row, "id")
     unique(datasets, identity)
@@ -116,14 +130,16 @@ proc learningPreflightPayload*(catalog: LearningCatalog, methodId, role, tuning,
      "dataset_id": datasetId, "dataset_sha256": dataset.sha256}
 
 proc parseLearningPreflight*(data, request: JsonNode, catalog: LearningCatalog): LearningPreflight =
-  if text(data, "schema") != "learning-selection-preflight.v1" or text(data, "status") != "blocked": invalid()
-  disabled(data, ["execution_enabled", "model_loaded", "live_tool_execution", "promotion_enabled"])
+  if text(data, "schema") != "learning-selection-preflight.v2": invalid()
+  let status = text(data, "status")
+  if status notin ["ready", "blocked"]: invalid()
+  disabled(data, ["model_loaded", "live_tool_execution", "promotion_enabled"])
   let contract = methodById(catalog, text(request, "method"))
   let model = modelById(catalog, text(request, "model_id"))
   let dataset = datasetById(catalog, text(request, "dataset_id"))
   for key in ["method", "role", "tuning"]:
     if text(data, key) != text(request, key): invalid()
-  if text(data, "entrypoint") != contract.entrypoint or text(data, "resource_state") != "unknown": invalid()
+  if text(data, "entrypoint") != contract.entrypoint: invalid()
   let modelReceipt = field(data, "model")
   for pair in [("id", model.id), ("backend", model.backend), ("source_kind", model.sourceKind), ("state", model.state)]:
     if text(modelReceipt, pair[0]) != pair[1]: invalid()
@@ -136,19 +152,106 @@ proc parseLearningPreflight*(data, request: JsonNode, catalog: LearningCatalog):
   for blocker in rows(data, "blockers"):
     if blocker.kind != JString or blocker.getStr.len == 0 or blocker.getStr.len > 200 or blocker.getStr in blockers: invalid()
     blockers.add blocker.getStr
-  if blockers.len == 0: invalid()
+  # Ready means nothing blocks a run; anything else must say what does.
+  if (status == "ready") != (blockers.len == 0): invalid()
+  let laterGates = choices(data, "later_gates", laterGateCodes)
+  if laterGates != @laterGateCodes: invalid()
   LearningPreflight(sha256: digest(data, "preflight_sha256"), methodId: text(data, "method"),
-    role: text(data, "role"), tuning: text(data, "tuning"), resourceState: "unknown", blockers: blockers)
+    role: text(data, "role"), tuning: text(data, "tuning"), ready: status == "ready", blockers: blockers,
+    laterGates: laterGates)
+
+proc learningRunPayload*(request: JsonNode, receipt: LearningPreflight): JsonNode =
+  ## A run starts only from the exact ready check the owner saw.
+  if not receipt.ready or receipt.sha256.len != 64:
+    raise newException(ValueError, "Check readiness again before starting a run.")
+  result = copy(request)
+  result["preflight_sha256"] = %receipt.sha256
+
+proc optionalText(node: JsonNode, key: string): string =
+  let value = field(node, key)
+  if value.kind == JNull: return ""
+  if value.kind != JString or value.getStr.len == 0 or value.getStr.len > 200: invalid()
+  value.getStr
+
+proc loss(node: JsonNode, key: string): string =
+  let value = field(node, key)
+  case value.kind
+  of JNull: ""
+  of JInt: (if value.getInt < 0: (invalid(); "") else: &"{value.getInt.float:.3f}")
+  of JFloat: (if value.getFloat < 0: (invalid(); "") else: &"{value.getFloat:.3f}")
+  else: (invalid(); "")
+
+proc parseLearningRun*(row: JsonNode): LearningRun =
+  if text(row, "schema") != "learning-run.v1" or text(row, "method") != "sft": invalid()
+  disabled(row, ["serving_changed", "promotion_enabled"])
+  result.id = text(row, "run_id")
+  if result.id.len != 32 or not result.id.allCharsInSet({'0'..'9', 'a'..'f'}): invalid()
+  result.state = text(row, "state")
+  if result.state notin runStates: invalid()
+  result.role = text(row, "role")
+  result.tuning = text(row, "tuning")
+  if result.role notin ["hub", "specialist"] or result.tuning notin ["lora", "qlora"]: invalid()
+  let model = field(row, "model")
+  if text(model, "source_kind") != "local": invalid()
+  result.modelId = text(model, "id")
+  let dataset = field(row, "dataset")
+  result.datasetId = text(dataset, "id")
+  discard digest(dataset, "sha256")
+  result.datasetVersion = count(dataset, "version", 1)
+  discard digest(row, "preflight_sha256")
+  let progress = field(row, "progress")
+  result.maxSteps = count(progress, "max_steps", 1)
+  result.step = count(progress, "step")
+  if result.step > result.maxSteps: invalid()
+  let metrics = field(row, "metrics")
+  result.trainLoss = loss(metrics, "train_loss")
+  result.validationLoss = loss(metrics, "validation_loss")
+  result.startedAt = text(row, "started_at")
+  result.finishedAt = optionalText(row, "finished_at")
+  result.error = optionalText(row, "error")
+  result.candidateSha256 = optionalText(row, "candidate_sha256")
+  # Only a completed run has a candidate; only a failed one has an error; only an active one is unfinished.
+  if (result.state == "running") != (result.finishedAt.len == 0): invalid()
+  if (result.state == "completed") != (result.candidateSha256.len > 0): invalid()
+  if result.candidateSha256.len > 0: discard digest(row, "candidate_sha256")
+  if (result.state == "failed") != (result.error.len > 0): invalid()
+  if result.error.len > 0 and result.error notin runErrors: invalid()
+
+proc parseLearningRuns*(data: JsonNode): seq[LearningRun] =
+  if text(data, "schema") != "learning-runs.v1": invalid()
+  var ids = initHashSet[string]()
+  for row in rows(data, "runs"):
+    let run = parseLearningRun(row)
+    unique(ids, run.id)
+    result.add run
+
+proc learningRunStateLabel*(state: string): string =
+  case state
+  of "running": "Training"
+  of "completed": "Candidate ready"
+  of "failed": "Failed"
+  of "interrupted": "Interrupted"
+  of "cancelled": "Cancelled"
+  else: state
+
+proc learningRunErrorLabel*(code: string): string =
+  case code
+  of "insufficient_gpu_memory": "Not enough free GPU memory for this model."
+  of "chat_template_unsupported": "This model's chat template cannot separate prompts from answers."
+  of "example_too_long": "An example is longer than the training sequence limit."
+  of "cuda_unavailable": "No GPU is available for training."
+  of "dataset_admission_failed": "The dataset version failed training admission."
+  of "trainer_unavailable": "The trainer could not be started."
+  else: "Training failed. The trainer log on the host has details."
 
 proc learningGateLabel*(code: string): string =
-  ## One label per blocker the AI service reports; an unknown code stays readable.
+  ## One label per blocker or later gate the AI service reports; an unknown code stays readable.
   case code
-  of "trusted_model_identity_required": "Verify the model, tokenizer and prompt identities."
-  of "trusted_training_configuration_required": "Admit a reviewed training configuration."
-  of "fixed_evaluation_required": "Bind an independent, fixed evaluation set."
-  of "resource_unknown": "Measure available memory against this training configuration."
-  of "host_dispatch_not_integrated": "Candidate-run dispatch is not connected yet."
-  of "separate_promotion_required": "Promotion needs a separate evaluated decision."
+  of "local_weights_unavailable": "This host cannot read the model's weights; add or re-upload the model."
+  of "full_tuning_not_offered": "Full fine-tuning is not offered here; choose LoRA or QLoRA."
+  of "fixed_evaluation_required": "Evaluate the candidate on a fixed, independent set."
+  of "host_dispatch_not_integrated": "Runs of this method cannot be started from the web yet."
+  of "separate_promotion_required": "Serving a candidate needs a separate, evaluated decision."
   of "outbound_connection_is_inference_only": "This connection uses an outbound model; training needs local weights."
   of "reviewed_preference_partitions_required": "Provide reviewed chosen/rejected preference pairs."
   of "evaluated_adapter_checkpoint_required": "Start from an evaluated adapter checkpoint (SFT, then DPO)."

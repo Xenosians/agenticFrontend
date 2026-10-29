@@ -10,6 +10,7 @@ proc invalidateLearningPreflight*(state: AppState) =
   inc state.learningEpoch
   state.learningChecking = false
   state.learningPreflight = LearningPreflight()
+  state.learningCheckedRequest = nil
   state.learningError = ""
 
 proc normalizeLearningSelection(state: AppState) =
@@ -95,6 +96,7 @@ proc preflightLearning*(state: AppState) {.async.} =
   let catalog = state.learningCatalog
   let request = beginLearningRequest(state)
   state.learningPreflight = LearningPreflight()
+  state.learningCheckedRequest = nil
   state.learningChecking = true
   state.learningError = ""
   redraw(kxi)
@@ -102,12 +104,76 @@ proc preflightLearning*(state: AppState) {.async.} =
     let response = await learningApi.checkLearningReadiness(payload, state.auth.csrfToken)
     if not matchesLearningRequest(state, request): return
     state.learningPreflight = parseLearningPreflight(response, payload, catalog)
+    state.learningCheckedRequest = payload
   except CatchableError as exc:
     if matchesLearningRequest(state, request): state.learningError = exc.msg
   finally:
     if matchesLearningRequest(state, request): state.learningChecking = false
     redraw(kxi)
 
+proc learningRunActive*(state: AppState): bool =
+  for run in state.learningRuns:
+    if run.state == "running": return true
+
+proc refreshLearningRuns*(state: AppState) {.async.} =
+  if not state.auth.authenticated: return
+  let request = beginLearningRunsRequest(state)
+  try:
+    let runs = parseLearningRuns(await learningApi.fetchLearningRuns())
+    if not matchesLearningRunsRequest(state, request): return
+    state.learningRuns = runs
+    state.learningRunsLoaded = true
+    state.learningRunError = ""
+  except CatchableError as exc:
+    if matchesLearningRunsRequest(state, request): state.learningRunError = exc.msg
+  finally:
+    if matchesLearningRunsRequest(state, request): redraw(kxi)
+
+proc startLearningRun*(state: AppState) {.async.} =
+  ## Starts one candidate run from the exact ready check on screen; a refusal is stated, never retried.
+  if not state.auth.authenticated or state.learningStarting or learningRunActive(state): return
+  var payload: JsonNode
+  try:
+    payload = learningRunPayload(state.learningCheckedRequest, state.learningPreflight)
+  except ValueError as exc:
+    state.learningRunError = exc.msg
+    redraw(kxi)
+    return
+  let request = beginLearningRunsRequest(state)
+  state.learningStarting = true
+  state.learningRunError = ""
+  redraw(kxi)
+  try:
+    let run = parseLearningRun(await learningApi.startLearningRun(payload, state.auth.csrfToken))
+    if not matchesLearningRunsRequest(state, request): return
+    state.learningRuns.insert(run, 0)
+    # A started check is spent; the next run needs a fresh check.
+    invalidateLearningPreflight(state)
+  except CatchableError as exc:
+    if matchesLearningRunsRequest(state, request): state.learningRunError = exc.msg
+  finally:
+    if matchesLearningRunsRequest(state, request): state.learningStarting = false
+    redraw(kxi)
+
+proc cancelLearningRun*(state: AppState, runId: string) {.async.} =
+  if not state.auth.authenticated or state.learningCancelling.len > 0: return
+  let request = beginLearningRunsRequest(state)
+  state.learningCancelling = runId
+  state.learningRunError = ""
+  redraw(kxi)
+  try:
+    let run = parseLearningRun(await learningApi.cancelLearningRun(runId, state.auth.csrfToken))
+    if not matchesLearningRunsRequest(state, request): return
+    if run.id != runId: raise newException(ValueError, "The learning response was invalid. Refresh to check again.")
+    for index, row in state.learningRuns:
+      if row.id == runId: state.learningRuns[index] = run
+  except CatchableError as exc:
+    if matchesLearningRunsRequest(state, request): state.learningRunError = exc.msg
+  finally:
+    if matchesLearningRunsRequest(state, request): state.learningCancelling = ""
+    redraw(kxi)
+
 proc openLearning*(state: AppState) =
   setActiveView(state, viewLearning)
   discard refreshLearning(state)
+  discard refreshLearningRuns(state)

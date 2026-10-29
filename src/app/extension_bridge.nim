@@ -2,6 +2,7 @@ include karax/prelude
 import std/[asyncjs, json, strutils]
 import types
 import dataset_versions
+import lua_transforms
 import ../api/extensions
 import ../api/connection_options
 import ../config/runtime_config
@@ -110,6 +111,54 @@ proc saveDatasetFile*(state: AppState) {.async.} =
     let replaces = validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces)
     await changeExtension(state, "dataset", datasetPayload(state.datasetName, content,
       state.datasetSource, state.datasetLicense, state.datasetPurpose, state.datasetReviewed, replaces))
+  except CatchableError as exc:
+    if sameSession(state, session): state.extensionError = exc.msg
+    redraw(kxi)
+
+proc changeDatasetScript*(state: AppState, script: string) =
+  ## A changed script needs a fresh preview before it can be applied.
+  state.datasetScript = script
+  state.datasetTransformPreviewed = false
+  inc state.datasetTransformEpoch
+
+proc previewDatasetTransform*(state: AppState) {.async.} =
+  ## Runs the owner's script over the chosen file in the AI service's isolated worker; admits nothing.
+  if state.extensionBusy or not state.auth.authenticated: return
+  let session = state.auth.sessionId
+  inc state.datasetTransformEpoch
+  let epoch = state.datasetTransformEpoch
+  state.extensionBusy = true
+  state.extensionError = ""
+  state.datasetTransformPreviewed = false
+  redraw(kxi)
+  try:
+    let content = $(await datasetFileText())
+    if not sameSession(state, session) or epoch != state.datasetTransformEpoch: return
+    let preview = parseTransformPreview(await extensionRequest("dataset_transform",
+      transformPayload(state.datasetScript, content), state.auth.csrfToken))
+    if not sameSession(state, session) or epoch != state.datasetTransformEpoch: return
+    state.datasetTransformPreview = preview
+    state.datasetTransformPreviewed = true
+  except CatchableError as exc:
+    if sameSession(state, session) and epoch == state.datasetTransformEpoch: state.extensionError = exc.msg
+  finally:
+    if sameSession(state, session): state.extensionBusy = false
+    redraw(kxi)
+
+proc applyDatasetTransform*(state: AppState) {.async.} =
+  ## Admits the script's output exactly like an upload; only after a preview of this script.
+  if not state.datasetTransformPreviewed: return
+  let session = state.auth.sessionId
+  let epoch = state.datasetTransformEpoch
+  try:
+    let content = $(await datasetFileText())
+    if not sameSession(state, session) or epoch != state.datasetTransformEpoch: return
+    let replaces = validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces)
+    await changeExtension(state, "dataset_transform", transformApplyPayload(state.datasetScript, content,
+      state.datasetName, state.datasetSource, state.datasetLicense, state.datasetPurpose,
+      state.datasetReviewed, replaces))
+    if sameSession(state, session) and state.extensionError.len == 0:
+      state.datasetTransformPreviewed = false
   except CatchableError as exc:
     if sameSession(state, session): state.extensionError = exc.msg
     redraw(kxi)

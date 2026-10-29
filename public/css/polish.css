@@ -2209,6 +2209,20 @@ body {
 .learning-result { padding: 14px 0; border-top: 1px solid var(--border); min-width: 0; }
 .learning-gates { margin: 10px 0 0; padding-left: 18px; }
 .learning-gate { margin: 6px 0 0; color: var(--text); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+/* Gates that apply after a run are listed quieter than blockers. */
+.learning-later .learning-gate { color: var(--text-soft); }
+.learning-result .learning-actions { margin-top: 12px; flex-wrap: wrap; gap: 8px; }
+/* Candidate runs: progress, losses and outcome; state is shown in text, not colour. */
+.learning-runs { padding: 14px 0; border-top: 1px solid var(--border); min-width: 0; }
+.learning-runs > .operation-job-heading { align-items: center; }
+.learning-run-list { margin: 0; padding: 0; list-style: none; }
+.learning-run { padding: 12px 0; border-top: 1px solid var(--border); min-width: 0; }
+.learning-run:first-child { border-top: 0; }
+.learning-run[data-state="running"] { border-left: 2px solid var(--text); padding-left: 12px; }
+.learning-run .knowledge-meta, .learning-run .operation-note { overflow-wrap: anywhere; }
+.learning-run .learning-actions { margin-top: 8px; }
+.learning-progress { display: flex; align-items: center; gap: 12px; margin: 8px 0 0; }
+.learning-progress progress { flex: 1 1 auto; min-width: 0; height: 8px; accent-color: var(--text); }
 
 /* Automation (FR-084): one grid unit (20px) for canvas positions; node size matches workflows.nim. */
 .workflow-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px 12px; margin: 12px 0; }

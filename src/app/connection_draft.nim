@@ -1,4 +1,5 @@
 import types
+import lua_transforms
 import std/json
 import ../api/connection_options
 
@@ -53,3 +54,9 @@ proc clearExtensionDrafts*(state: AppState) =
   state.datasetApiKey = ""
   state.datasetReviewed = false
   state.datasetReplaces = ""
+  # Another account never sees this one's script or a preview of its rows.
+  inc state.datasetTransformEpoch
+  state.datasetScript = ""
+  state.datasetTransformPreview = TransformPreview()
+  state.datasetTransformPreviewed = false
+  state.datasetTransformOpen = false
