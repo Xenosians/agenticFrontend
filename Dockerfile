@@ -9,13 +9,18 @@ RUN nimble install --depsOnly --accept
 COPY src ./src
 COPY scripts ./scripts
 COPY public ./public
-RUN nimble build --accept
+# Build contexts from Windows filesystems arrive world-writable; normalise modes.
+# The development config.js is not shipped: the container renders its own, so a
+# missing runtime configuration fails closed instead of pointing at a dev backend.
+RUN nimble build --accept && rm public/config.js && chmod -R u=rwX,go=rX public
 
 # Runtime image contract: official Alpine-based nginx image, with its nginx user.
 FROM ${NGINX_RUNTIME_IMAGE} AS runtime
 USER root
 RUN apk add --no-cache curl gettext
-COPY --from=build --chown=101:101 /src/public /usr/share/nginx/html
+# The web root stays root-owned and read-only for nginx; the entrypoint renders
+# runtime values onto the container's tmpfs.
+COPY --from=build /src/public /usr/share/nginx/html
 COPY docker/nginx.conf.template /opt/janus/nginx.conf.template
 COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/janus-frontend
 COPY --chmod=755 docker/healthcheck.sh /usr/local/bin/janus-frontend-health

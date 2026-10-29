@@ -40,7 +40,11 @@ http {
             proxy_set_header X-Forwarded-Proto https;
             proxy_read_timeout 75s;
         }
-        location = /config.js { add_header Cache-Control 'no-store' always; }
+        location = /config.js {
+            # Rendered at container start from PUBLIC_ORIGIN; never cached.
+            root ${FRONTEND_RUNTIME_DIR};
+            add_header Cache-Control 'no-store' always;
+        }
         location / { try_files $uri $uri/ =404; }
     }
 
