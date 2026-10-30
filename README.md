@@ -11,8 +11,9 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Live job status and AI progress over authenticated WebSockets, with reconnect recovery and polling fallback.
 - Durable submission identities prevent duplicate jobs when an acknowledgement is lost; the same request can be recovered after reopening its chat.
 - The optional acceptance-only Required operations editor pins capabilities, exact targets and supported success dependencies to a saved request. It is hidden in the normal composer; tool selection and approvals still work normally.
-- Explicit approve/reject decisions bound to the displayed saved action, separate approval for each workflow step, and structured result cards.
+- Explicit approve/reject decisions bound to the displayed saved action, separate approval for each mutating workflow step, and structured result cards.
 - Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
+- Shared UI typography for native controls, Connections and Capabilities, with readable semantic text sizes and intentional monospace for technical content.
 - Display of completed, failed, denied, and unknown-outcome jobs.
 - Feedback on any answer from a saved task: what was wrong and, optionally, the correct result, saved for review. A note that was not confirmed is kept and resent under the same identity.
 - Review (administrators only): pending critiques and corrections with the request and answer they describe; each record gets one decision — accept or dismiss — with a reason. A refused decision is stated on the record, and a decision never changes the task.
@@ -40,7 +41,7 @@ agenticFrontend (this browser app)
 The browser calls Phoenix only. Phoenix owns sessions, chats, jobs, and resource ownership; the AI runtime owns inference and guarded execution. Approval requests refer to a durable job, while the server retains the exact action and arguments.
 The approval card displays that saved action before offering **Approve action** or **Reject action**. Both decisions go through Phoenix and remain disabled while their outcome is pending. An interrupted response requires reading the saved job again; the browser does not retry a mutation or assume a rejection succeeded. Completed decisions restore the saved tool result or rejection reason on reload.
 
-Before creating a job, the browser pins its submission UUID and request text in this tab's session storage, scoped to the backend, account and chat. It removes that temporary record after the exact submission is acknowledged, or on explicit sign-out. If the acknowledgement is interrupted, **Check saved submission** and reopening the chat use the same identity. Phoenix atomically creates one job for that owner and identity and rejects a changed chat or message. Recovering a submission does not replay its tools or reset its existing job state. Browser storage and secure UUID generation must be available before a new request can be sent.
+Before creating a job, the browser reserves an owner-scoped request identity with Phoenix. Phoenix stores the exact request and operation binding; the browser uses neither local nor session storage for recovery. If a reply is interrupted, **Check saved submission** reads the saved server state. An explicit retry uses that same identity and exact request; reopening a chat never automatically dispatches it. Phoenix atomically creates one job for the owner and identity and rejects a changed chat or message. Recovery does not replay tools or reset the existing job state, and sign-out clears only the browser's in-memory view of the server-held request.
 
 For acceptance testing that needs exact reviewed operations, explicitly set `AGENTIC_CONFIG.requiredOperations: true`; the editor then appears above the composer. Other values leave it hidden. Choose registered capabilities, optionally enter exact target values and a supported success dependency. Success dependencies currently support one pair; unsupported graphs are rejected by the servers. The original selection remains bound to the submission and is recovered unchanged after a lost acknowledgement. It never grants permission or approves an action. The Operations view restores any saved operation list from the current job.
 
@@ -129,6 +130,7 @@ python tests/test_answer_references.py
 python tests/test_lua_transforms.py
 python tests/test_workspace_navigation.py
 python tests/test_connection_actions.py
+python tests/test_typography.py
 ```
 
 It delays chat-history responses to verify that clicking Send or pressing Enter
@@ -143,12 +145,16 @@ chat, session, provider or resource target, and keyboard command focus. They
 intercept all API requests with isolated fixtures and never revoke real sessions,
 delete real chats or admit a live provider connection.
 
+Typography checks use computed fonts, contrast, keyboard focus and CSS layout
+zoom at desktop/phone sizes. They are isolated browser checks, not native browser
+chrome zoom or live provider acceptance.
+
 ## Current boundaries
 
 - The composer allows one active job at a time. A reconnect reads saved server state and never repeats inference, a tool, or an approval.
 - Operations shows an owner-scoped snapshot of all task status counts and the most recent 25 tasks. Refresh loads a new snapshot. Queue wait is submission to the current worker claim; task elapsed includes approval waits. Recorded inference calls show measured durations and available token counts for the current attempt only. Missing historical measurements say **Not recorded**, and truncated call lists are labelled. Call times may overlap; they are not a task's wall-clock total.
 - WebSockets carry progress and status notifications; creation and approval stay on the authenticated REST API.
-- The node builder and simulator are design previews. n8n/workflow support is manifest validation only; it does not execute workflows or register webhooks.
+- The workflow canvas submits saved versions through ordinary durable jobs and approvals. Topology drift and PCB netlist checks are read-only advisory features. A general graph/code runtime, visual-to-code export and n8n/webhook execution engine are not implemented.
 - Reference retrieval has no embedding/vector-provider connector yet, and user datasets do not replace the application database.
 - An unknown execution outcome requires server-side reconciliation; the UI does not automatically retry the mutation.
 - Live provider availability depends on the configured backend and AI services. Deployment still requires correct origin, cookie, and service configuration across all three repositories.

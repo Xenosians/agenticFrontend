@@ -44,7 +44,7 @@
 :root {
   --focus-ring: var(--text-soft);
   /* One type size for every text control in the workspace header. */
-  --header-control-size: 11px;
+  --header-control-size: var(--font-size-caption);
 }
 
 button:focus-visible,
@@ -796,14 +796,15 @@ body {
 
 .developer-view-header h2 {
   margin: 0 0 5px;
-  font-size: 22px;
+  font-size: var(--font-size-title);
 }
 
 .developer-view-header p {
   margin: 0;
   /* Secondary, but readable: one token instead of a dimmed literal. */
   color: var(--text-soft);
-  font-size: var(--header-control-size);
+  font-size: var(--font-size-control);
+  line-height: var(--line-height-ui);
 }
 
 .developer-card,
@@ -1095,8 +1096,7 @@ body {
   color: var(--muted);
 }
 
-/* Capabilities page: governed operations grouped by specialist. One type
-   scale (the header control size) and token colours only. */
+/* Capabilities use the shared control, body and caption roles. */
 .capability-toolbar {
   margin-bottom: 18px;
   display: flex;
@@ -1115,7 +1115,7 @@ body {
   background: transparent;
   color: var(--text);
   font: inherit;
-  font-size: var(--header-control-size);
+  font-size: var(--font-size-control);
 }
 
 .capability-summary,
@@ -1151,21 +1151,25 @@ body {
 
 .capability-copy {
   min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 3px;
+  line-height: var(--line-height-ui);
 }
 
 .capability-copy strong {
   color: var(--text);
-  font-size: var(--header-control-size);
+  font-size: var(--font-size-body);
   font-weight: 600;
   word-break: keep-all;
 }
 
 .capability-tags {
   flex: 0 0 auto;
+  max-width: 100%;
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
@@ -1906,6 +1910,7 @@ body {
   50% { opacity: 1; transform: scale(1); }
 }
 @media (max-width: 760px) {
+  .developer-view-header h2 { font-size: var(--font-size-heading); }
   .run-status-chip { max-width: 100px; padding-inline: 8px; gap: 5px; }
   .run-status-label { display: block; }
   .header-controls { flex-shrink: 0; gap: 4px; }
@@ -2109,7 +2114,7 @@ body {
 
 /* Provider setup on the Capabilities page (FR-081): configuration only. */
 .integration-setup { margin-bottom: 20px; }
-.integration-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.integration-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .integration-setup h3 {
   margin: 0;
   color: var(--text-soft);
@@ -2125,11 +2130,13 @@ body {
 .integration-row {
   padding: 10px 0;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   border-top: 1px solid var(--border);
 }
+.integration-row .capability-copy span { overflow-wrap: anywhere; }
 .integration-recheck { background: transparent; cursor: pointer; }
 .integration-recheck:hover { color: var(--text); }
 .integration-recheck:disabled { cursor: default; }
