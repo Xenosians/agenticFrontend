@@ -144,10 +144,10 @@ class ChatSearchTests(navigation.ChatNavigationTests):
         self.page.evaluate("document.fonts.ready.then(() => true)")
         edge = self.page.screenshot(clip={"x": box["x"] + box["width"] - 30, "y": box["y"],
                                           "width": 28, "height": box["height"]}, timeout=20_000)
+        # Decoded from bytes (not a data: URL), so the page's strict img-src stays in force.
         brightest = self.page.evaluate("""async (data) => {
-            const image = new Image();
-            image.src = 'data:image/png;base64,' + data;
-            await image.decode();
+            const bytes = Uint8Array.from(atob(data), character => character.charCodeAt(0));
+            const image = await createImageBitmap(new Blob([bytes], {type: 'image/png'}));
             const canvas = new OffscreenCanvas(image.width, image.height);
             const context = canvas.getContext('2d');
             context.drawImage(image, 0, 0);

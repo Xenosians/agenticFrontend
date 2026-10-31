@@ -110,6 +110,16 @@ proc jsonInt(
     return max(node[key].getInt(), 0)
 
 
+proc signInWaitMessage*(
+  seconds: int
+): string =
+  ## The server's sign-in wait, said the way a person reads it.
+  let wait =
+    if seconds <= 60: "a minute"
+    else: $((seconds + 59) div 60) & " minutes"
+  "Too many sign-in attempts. Try again in " & wait & "."
+
+
 proc parseVerificationStep(
   data: JsonNode
 ): VerificationStep =
@@ -231,6 +241,14 @@ proc login*(
         "This email is not verified yet. Use the link we sent, or send a new one when the wait ends.")
       error.step = step
       raise error
+
+  if response.status == 429:
+    # A proxy's own 429 may carry no JSON; it then keeps the generic HTTP error below.
+    let data =
+      try: decodeJson(response.body)
+      except CatchableError: newJNull()
+    if jsonText(data, "error") == "sign_in_rate_limited":
+      raise newException(ValueError, signInWaitMessage(jsonInt(data, "retry_after_seconds")))
 
   if not response.ok:
     raise apiError($response.status, response.body)

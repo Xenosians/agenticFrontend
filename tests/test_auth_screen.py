@@ -137,6 +137,22 @@ class AuthScreenTests(navigation.ChatNavigationTests):
         expect(self.page.locator(".auth-error")).to_contain_text("Account creation was not confirmed")
         expect(self.page.get_by_role("heading", name="Verify your email", exact=True)).to_have_count(0)
 
+    def test_too_many_sign_in_attempts_says_how_long_to_wait(self):
+        self.open_sign_in()
+        self.page.route("**/api/v1/auth/login", lambda route: route.fulfill(
+            status=429, headers={"Retry-After": "540"},
+            json={"error": "sign_in_rate_limited", "retry_after_seconds": 540,
+                  "message": "Too many sign-in attempts. Wait before trying again."}))
+        self.page.get_by_label("Email").fill("new@example.test")
+        self.page.get_by_label("Password").fill("correct horse battery staple")
+        self.page.get_by_role("button", name="Sign in", exact=True).click()
+        error = self.page.locator(".auth-error")
+        expect(error).to_have_text("Too many sign-in attempts. Try again in 9 minutes.")
+        expect(error).not_to_contain_text("HTTP")
+        expect(self.page.get_by_role("heading", name="Sign in", exact=True)).to_be_visible()
+        self.assert_nothing_stored()
+        self.assertEqual(self.errors, [])
+
     def test_auth_text_is_readable_at_desktop_and_phone_widths(self):
         self.open_sign_in()
         self.register()

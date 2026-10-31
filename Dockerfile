@@ -22,6 +22,7 @@ RUN apk add --no-cache curl gettext
 # runtime values onto the container's tmpfs.
 COPY --from=build /src/public /usr/share/nginx/html
 COPY docker/nginx.conf.template /opt/janus/nginx.conf.template
+COPY docker/security-headers.conf /opt/janus/security-headers.conf
 COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/janus-frontend
 COPY --chmod=755 docker/healthcheck.sh /usr/local/bin/janus-frontend-health
 USER 101:101

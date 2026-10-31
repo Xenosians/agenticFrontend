@@ -2,7 +2,7 @@
 var framePtr = null;
 var excHandler = 0;
 var lastJSError = null;
-var NTI2097152245 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
+var NTI2097152254 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI2986344458 = {size: 0,kind: 25,base: null,node: null,finalizer: null};
 var NTI2986344457 = {size: 0,kind: 25,base: null,node: null,finalizer: null};
 var NTI570429731 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
@@ -152,7 +152,7 @@ var NTI3087007747 = {size: 0, kind: 18, base: null, node: null, finalizer: null}
 var NTI3087007758 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI3070230618 = {size: 0,kind: 25,base: null,node: null,finalizer: null};
 var NTI570427451 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI2097152477 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI2097152486 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI2097152008 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI3070230532 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI3070230531 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
@@ -222,7 +222,7 @@ var NTI1979711503 = {size: 0, kind: 20, base: null, node: null, finalizer: null}
 var NTI1979711507 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
 var NTI956301382 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI1962934387 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
-var NTI2097152441 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
+var NTI2097152450 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI570426852 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
 var NTI570426809 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
 var NTI1912603249 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
@@ -247,11 +247,11 @@ var NTI3204448259 = {size: 0, kind: 18, base: null, node: null, finalizer: null}
 var NTI3204448269 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI3204448383 = {size: 0,kind: 25,base: null,node: null,finalizer: null};
 var NTI570426710 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI2097152387 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
-var NTI2097152361 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
-var NTI2097152189 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
+var NTI2097152396 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
+var NTI2097152370 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
+var NTI2097152198 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI570426676 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
-var NTI2097152588 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
+var NTI2097152597 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI2046820663 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI2046820654 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
 var NTI2046820690 = {size: 0, kind: 24, base: null, node: null, finalizer: null};
@@ -288,7 +288,7 @@ var NTI2113929224 = {size: 0, kind: 14, base: null, node: null, finalizer: null}
 var NTI2113929222 = {size: 0, kind: 14, base: null, node: null, finalizer: null};
 var NTI2113929221 = {size: 0, kind: 14, base: null, node: null, finalizer: null};
 var NTI2113929220 = {size: 0, kind: 14, base: null, node: null, finalizer: null};
-var NTI2097152096 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
+var NTI2097152100 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
 var NTI134217750 = {size: 0, kind: 17, base: null, node: null, finalizer: null};
 var NTI33554444 = {size: 0,kind: 44,base: null,node: null,finalizer: null};
 var NTI1291845957 = {size: 0, kind: 18, base: null, node: null, finalizer: null};
@@ -2249,9 +2249,9 @@ NTI1291845957.node = NNI1291845957;
 var NNI134217750 = {kind: 2, len: 0, offset: 0, typ: null, name: null, sons: []};
 NTI134217750.node = NNI134217750;
 NTI134217750.base = NTI33555184;
-var NNI2097152096 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI2097152100 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
 {kind: 1, offset: "Field1", len: 0, typ: NTI1459617796, name: "Field1", sons: null}]};
-NTI2097152096.node = NNI2097152096;
+NTI2097152100.node = NNI2097152100;
 var NNI2113929220 = {kind: 2, offset: 0, typ: null, name: null, len: 3, sons: {"0": {kind: 1, offset: 0, typ: NTI2113929220, name: "cors", len: 0, sons: null}, 
 "1": {kind: 1, offset: 1, typ: NTI2113929220, name: "no-cors", len: 0, sons: null}, 
 "2": {kind: 1, offset: 2, typ: NTI2113929220, name: "same-origin", len: 0, sons: null}}};
@@ -2381,21 +2381,21 @@ NTI2046820689.base = NTI1442840586;
 NTI2046820690.base = NTI1929379844;
 NTI2046820654.base = NTI1442840586;
 NTI2046820663.base = NTI1929379844;
-var NNI2097152588 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI2097152597 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
 {kind: 1, offset: "Field1", len: 0, typ: NTI1459617796, name: "Field1", sons: null}]};
-NTI2097152588.node = NNI2097152588;
+NTI2097152597.node = NNI2097152597;
 var NNI570426676 = {kind: 1, offset: "state0", len: 0, typ: NTI1442840596, name: "state0", sons: null};
 NTI570426676.node = NNI570426676;
 NTI570426676.base = NTI33555179;
-var NNI2097152189 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI2097152198 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
 {kind: 1, offset: "Field1", len: 0, typ: NTI1459617796, name: "Field1", sons: null}]};
-NTI2097152189.node = NNI2097152189;
-var NNI2097152361 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+NTI2097152198.node = NNI2097152198;
+var NNI2097152370 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
 {kind: 1, offset: "Field1", len: 0, typ: NTI1459617796, name: "Field1", sons: null}]};
-NTI2097152361.node = NNI2097152361;
-var NNI2097152387 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+NTI2097152370.node = NNI2097152370;
+var NNI2097152396 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
 {kind: 1, offset: "Field1", len: 0, typ: NTI1459617796, name: "Field1", sons: null}]};
-NTI2097152387.node = NNI2097152387;
+NTI2097152396.node = NNI2097152396;
 var NNI570426710 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "onToggle0", len: 0, typ: NTI3204448383, name: "onToggle0", sons: null}, 
 {kind: 1, offset: "menu1", len: 0, typ: NTI33554449, name: "menu1", sons: null}]};
 NTI570426710.node = NNI570426710;
@@ -2454,7 +2454,7 @@ var NNI570426852 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{k
 {kind: 1, offset: "target1", len: 0, typ: NTI1442840579, name: "target1", sons: null}]};
 NTI570426852.node = NNI570426852;
 NTI570426852.base = NTI33555179;
-NTI2097152441.base = NTI1962934275;
+NTI2097152450.base = NTI1962934275;
 NTI1962934387.base = NTI1962934275;
 var NNI956301382 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "a", len: 0, typ: NTI33554435, name: "a", sons: null}, 
 {kind: 1, offset: "b", len: 0, typ: NTI33554435, name: "b", sons: null}]};
@@ -2687,7 +2687,7 @@ var NNI3070230531 = {kind: 2, len: 6, offset: 0, typ: null, name: null, sons: [{
 {kind: 1, offset: "epoch", len: 0, typ: NTI33554435, name: "epoch", sons: null}, 
 {kind: 1, offset: "timer", len: 0, typ: NTI855638078, name: "timer", sons: null}]};
 NTI3070230531.node = NNI3070230531;
-NTI2097152477.base = NTI2097152008;
+NTI2097152486.base = NTI2097152008;
 var NNI570427451 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "openChat0", len: 0, typ: NTI3070230618, name: "openChat0", sons: null}, 
 {kind: 1, offset: "chatId1", len: 0, typ: NTI33554449, name: "chatId1", sons: null}]};
 NTI570427451.node = NNI570427451;
@@ -3119,9 +3119,9 @@ var NNI570429731 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{k
 {kind: 1, offset: "toggleInspector1", len: 0, typ: NTI2986344458, name: "toggleInspector1", sons: null}]};
 NTI570429731.node = NNI570429731;
 NTI570429731.base = NTI33555179;
-var NNI2097152245 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
+var NNI2097152254 = {kind: 2, len: 2, offset: 0, typ: null, name: null, sons: [{kind: 1, offset: "Field0", len: 0, typ: NTI33554449, name: "Field0", sons: null}, 
 {kind: 1, offset: "Field1", len: 0, typ: NTI1459617796, name: "Field1", sons: null}]};
-NTI2097152245.node = NNI2097152245;
+NTI2097152254.node = NNI2097152254;
 
 function makeNimstrLit(c_p0) {
       var result = [];
@@ -7063,17 +7063,17 @@ function HEX24__pureZjson_u4507(node_p0) {
 
 }
 
-function jsonHeaders__apiZauth95client_u172(csrfToken_p0) {
-  var result_2097152174 = null;
+function jsonHeaders__apiZauth95client_u176(csrfToken_p0) {
+  var result_2097152178 = null;
 
-    result_2097152174 = new Headers();
-    result_2097152174.set("Content-Type", "application/json");
+    result_2097152178 = new Headers();
+    result_2097152178.set("Content-Type", "application/json");
     if ((0 < (csrfToken_p0).length)) {
-    result_2097152174.set("X-CSRF-Token", toJSStr(csrfToken_p0));
+    result_2097152178.set("X-CSRF-Token", toJSStr(csrfToken_p0));
     }
     
 
-  return result_2097152174;
+  return result_2097152178;
 
 }
 
@@ -7585,35 +7585,54 @@ function jsonInt__apiZauth95client_u69(node_p0, key_p1) {
 
 }
 
-function parseVerificationStep__apiZauth95client_u81(data_p0) {
-  var result_2097152083 = ({pending: false, verified: false, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false});
+function parseVerificationStep__apiZauth95client_u85(data_p0) {
+  var result_2097152087 = ({pending: false, verified: false, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false});
 
     if (((((((!((data_p0.kind == 5)) || !(hasKey__pureZjson_u3232(data_p0, [114,101,115,101,110,100,95,97,102,116,101,114,95,115,101,99,111,110,100,115]))) || !((HEX5BHEX5D__pureZjson_u3119(data_p0, [114,101,115,101,110,100,95,97,102,116,101,114,95,115,101,99,111,110,100,115]).kind == 2))) || (getInt__pureZjson_u253(HEX5BHEX5D__pureZjson_u3119(data_p0, [114,101,115,101,110,100,95,97,102,116,101,114,95,115,101,99,111,110,100,115]), 0) < 0)) || !(hasKey__pureZjson_u3232(data_p0, [101,109,97,105,108,95,104,105,110,116]))) || !((HEX5BHEX5D__pureZjson_u3119(data_p0, [101,109,97,105,108,95,104,105,110,116]).kind == 4))) || ((getStr__pureZjson_u241(HEX5BHEX5D__pureZjson_u3119(data_p0, [101,109,97,105,108,95,104,105,110,116]), [])).length == 0))) {
     raiseException({message: makeNimstrLit("The verification step was not confirmed. Reload to check its current state."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    result_2097152083 = nimCopy(result_2097152083, {resendAfterSeconds: jsonInt__apiZauth95client_u69(data_p0, [114,101,115,101,110,100,95,97,102,116,101,114,95,115,101,99,111,110,100,115]), emailHint: jsonText__apiZauth95client_u47(data_p0, [101,109,97,105,108,95,104,105,110,116]), pending: false, verified: false, tooSoon: false, mailFailed: false}, NTI2097152006);
+    result_2097152087 = nimCopy(result_2097152087, {resendAfterSeconds: jsonInt__apiZauth95client_u69(data_p0, [114,101,115,101,110,100,95,97,102,116,101,114,95,115,101,99,111,110,100,115]), emailHint: jsonText__apiZauth95client_u47(data_p0, [101,109,97,105,108,95,104,105,110,116]), pending: false, verified: false, tooSoon: false, mailFailed: false}, NTI2097152006);
+
+  return result_2097152087;
+
+}
+
+function signInWaitMessage__apiZauth95client_u81(seconds_p0) {
+    var Temporary1;
+
+  var result_2097152083 = [];
+
+    if ((seconds_p0 <= 60)) {
+    Temporary1 = [97,32,109,105,110,117,116,101];
+    }
+    else {
+    Temporary1 = (HEX24__systemZdollars_u14(divInt(addInt(seconds_p0, 59), 60))).concat([32,109,105,110,117,116,101,115]);
+    }
+    
+    var wait_2097152084 = nimCopy(null, Temporary1, NTI33554449);
+    result_2097152083 = nimCopy(null, ([84,111,111,32,109,97,110,121,32,115,105,103,110,45,105,110,32,97,116,116,101,109,112,116,115,46,32,84,114,121,32,97,103,97,105,110,32,105,110,32]).concat(wait_2097152084,[46]), NTI33554449);
 
   return result_2097152083;
 
 }
 
-function apiError__apiZauth95client_u175(responseStatus_p0, responseBody_p1) {
-  var result_2097152178 = null;
+function apiError__apiZauth95client_u179(responseStatus_p0, responseBody_p1) {
+  var result_2097152182 = null;
 
-    var code_2097152179 = [114,101,113,117,101,115,116,95,102,97,105,108,101,100];
-    var message_2097152180 = [84,104,101,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46];
+    var code_2097152183 = [114,101,113,117,101,115,116,95,102,97,105,108,101,100];
+    var message_2097152184 = [84,104,101,32,114,101,113,117,101,115,116,32,99,111,117,108,100,32,110,111,116,32,98,101,32,99,111,109,112,108,101,116,101,100,46];
 ++excHandler;
     try {
-    var data_2097152181 = decodeJson__apiZhttp95call_u207(responseBody_p1);
-    var parsedCode_2097152182 = jsonText__apiZauth95client_u47(data_2097152181, [101,114,114,111,114]);
-    var parsedMessage_2097152183 = jsonText__apiZauth95client_u47(data_2097152181, [109,101,115,115,97,103,101]);
-    if ((0 < (parsedCode_2097152182).length)) {
-    code_2097152179 = nimCopy(null, parsedCode_2097152182, NTI33554449);
+    var data_2097152185 = decodeJson__apiZhttp95call_u207(responseBody_p1);
+    var parsedCode_2097152186 = jsonText__apiZauth95client_u47(data_2097152185, [101,114,114,111,114]);
+    var parsedMessage_2097152187 = jsonText__apiZauth95client_u47(data_2097152185, [109,101,115,115,97,103,101]);
+    if ((0 < (parsedCode_2097152186).length)) {
+    code_2097152183 = nimCopy(null, parsedCode_2097152186, NTI33554449);
     }
     
-    if ((0 < (parsedMessage_2097152183).length)) {
-    message_2097152180 = nimCopy(null, parsedMessage_2097152183, NTI33554449);
+    if ((0 < (parsedMessage_2097152187).length)) {
+    message_2097152184 = nimCopy(null, parsedMessage_2097152187, NTI33554449);
     }
     
 --excHandler;
@@ -7629,58 +7648,85 @@ function apiError__apiZauth95client_u175(responseStatus_p0, responseBody_p1) {
     lastJSError = prevJSError;
     } finally {
     }
-    result_2097152178 = {message: ([72,84,84,80,32]).concat(responseStatus_p0,[32,194,183,32],code_2097152179,[32,194,183,32],message_2097152180), parent: null, m_type: NTI134217746, name: null, trace: [], up: null};
+    result_2097152182 = {message: ([72,84,84,80,32]).concat(responseStatus_p0,[32,194,183,32],code_2097152183,[32,194,183,32],message_2097152184), parent: null, m_type: NTI134217746, name: null, trace: [], up: null};
 
-  return result_2097152178;
-
-}
-
-function parseUser__apiZauth95client_u118(node_p0) {
-  var result_2097152120 = ({userId: [], email: [], displayName: [], role: [], status: []});
-
-    result_2097152120 = nimCopy(result_2097152120, {userId: jsonText__apiZauth95client_u47(node_p0, [117,115,101,114,95,105,100]), email: jsonText__apiZauth95client_u47(node_p0, [101,109,97,105,108]), displayName: jsonText__apiZauth95client_u47(node_p0, [100,105,115,112,108,97,121,95,110,97,109,101]), role: jsonText__apiZauth95client_u47(node_p0, [114,111,108,101]), status: jsonText__apiZauth95client_u47(node_p0, [115,116,97,116,117,115])}, NTI2097152003);
-
-  return result_2097152120;
+  return result_2097152182;
 
 }
 
-function parseAuthResponse__apiZauth95client_u141(data_p0) {
-  var result_2097152143 = ({user: ({userId: [], email: [], displayName: [], role: [], status: []}), sessionId: [], expiresAt: [], csrfToken: []});
+function parseUser__apiZauth95client_u122(node_p0) {
+  var result_2097152124 = ({userId: [], email: [], displayName: [], role: [], status: []});
+
+    result_2097152124 = nimCopy(result_2097152124, {userId: jsonText__apiZauth95client_u47(node_p0, [117,115,101,114,95,105,100]), email: jsonText__apiZauth95client_u47(node_p0, [101,109,97,105,108]), displayName: jsonText__apiZauth95client_u47(node_p0, [100,105,115,112,108,97,121,95,110,97,109,101]), role: jsonText__apiZauth95client_u47(node_p0, [114,111,108,101]), status: jsonText__apiZauth95client_u47(node_p0, [115,116,97,116,117,115])}, NTI2097152003);
+
+  return result_2097152124;
+
+}
+
+function parseAuthResponse__apiZauth95client_u145(data_p0) {
+  var result_2097152147 = ({user: ({userId: [], email: [], displayName: [], role: [], status: []}), sessionId: [], expiresAt: [], csrfToken: []});
 
     if ((!((data_p0.kind == 5)) || !(hasKey__pureZjson_u3232(data_p0, [117,115,101,114])))) {
     raiseException({message: [66,97,99,107,101,110,100,32,97,117,116,104,32,114,101,115,112,111,110,115,101,32,105,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    result_2097152143 = nimCopy(result_2097152143, {user: parseUser__apiZauth95client_u118(HEX5BHEX5D__pureZjson_u3119(data_p0, [117,115,101,114])), sessionId: jsonText__apiZauth95client_u47(data_p0, [115,101,115,115,105,111,110,95,105,100]), expiresAt: jsonText__apiZauth95client_u47(data_p0, [101,120,112,105,114,101,115,95,97,116]), csrfToken: jsonText__apiZauth95client_u47(data_p0, [99,115,114,102,95,116,111,107,101,110])}, NTI2097152004);
+    result_2097152147 = nimCopy(result_2097152147, {user: parseUser__apiZauth95client_u122(HEX5BHEX5D__pureZjson_u3119(data_p0, [117,115,101,114])), sessionId: jsonText__apiZauth95client_u47(data_p0, [115,101,115,115,105,111,110,95,105,100]), expiresAt: jsonText__apiZauth95client_u47(data_p0, [101,120,112,105,114,101,115,95,97,116]), csrfToken: jsonText__apiZauth95client_u47(data_p0, [99,115,114,102,95,116,111,107,101,110])}, NTI2097152004);
 
-  return result_2097152143;
+  return result_2097152147;
 
 }
-async function login__apiZauth95client_u188(email_p0, password_p1) {
-  var result_2097152193 = null;
+async function login__apiZauth95client_u192(email_p0, password_p1) {
+    var Temporary1;
 
-    var payload_2097152219 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1833(email_p0)}, NTI2097152096), nimCopy(null, {Field0: [112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1833(password_p1)}, NTI2097152096)]);
-    var options_2097152220 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152219)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172([]));
-    var response_2097152225 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,108,111,103,105,110]), options_2097152220));
-    if ((response_2097152225.status == 403)) {
-    var data_2097152226 = decodeJson__apiZhttp95call_u207(response_2097152225.body);
-    if (eqStrings(jsonText__apiZauth95client_u47(data_2097152226, [101,114,114,111,114]), [101,109,97,105,108,95,110,111,116,95,118,101,114,105,102,105,101,100])) {
-    var step_2097152227 = parseVerificationStep__apiZauth95client_u81(data_2097152226);
-    step_2097152227.pending = true;
-    var error_2097152229 = {message: makeNimstrLit("This email is not verified yet. Use the link we sent, or send a new one when the wait ends."), parent: null, m_type: NTI2097152007, step: ({pending: false, verified: false, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false}), name: null, trace: [], up: null};
-    error_2097152229.step = nimCopy(error_2097152229.step, step_2097152227, NTI2097152006);
-    raiseException(error_2097152229, "EmailNotVerified");
-    }
-    
-    }
-    
-    if (!(response_2097152225.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152225.status), response_2097152225.body), "ValueError");
-    }
-    
-    result_2097152193 = parseAuthResponse__apiZauth95client_u141(decodeJson__apiZhttp95call_u207(response_2097152225.body));
+  var result_2097152197 = null;
 
-  return result_2097152193;
+    var payload_2097152223 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1833(email_p0)}, NTI2097152100), nimCopy(null, {Field0: [112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1833(password_p1)}, NTI2097152100)]);
+    var options_2097152224 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152223)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176([]));
+    var response_2097152229 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,108,111,103,105,110]), options_2097152224));
+    if ((response_2097152229.status == 403)) {
+    var data_2097152230 = decodeJson__apiZhttp95call_u207(response_2097152229.body);
+    if (eqStrings(jsonText__apiZauth95client_u47(data_2097152230, [101,114,114,111,114]), [101,109,97,105,108,95,110,111,116,95,118,101,114,105,102,105,101,100])) {
+    var step_2097152231 = parseVerificationStep__apiZauth95client_u85(data_2097152230);
+    step_2097152231.pending = true;
+    var error_2097152233 = {message: makeNimstrLit("This email is not verified yet. Use the link we sent, or send a new one when the wait ends."), parent: null, m_type: NTI2097152007, step: ({pending: false, verified: false, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false}), name: null, trace: [], up: null};
+    error_2097152233.step = nimCopy(error_2097152233.step, step_2097152231, NTI2097152006);
+    raiseException(error_2097152233, "EmailNotVerified");
+    }
+    
+    }
+    
+    if ((response_2097152229.status == 429)) {
+++excHandler;
+    try {
+    Temporary1 = decodeJson__apiZhttp95call_u207(response_2097152229.body);
+--excHandler;
+} catch (EXCEPTION) {
+ var prevJSError = lastJSError;
+ lastJSError = EXCEPTION;
+ --excHandler;
+    if (lastJSError && (isObj(lastJSError.m_type, NTI33555185))) {
+    Temporary1 = newJNull__pureZjson_u134();
+    }
+    else {
+    	reraiseException();
+    }
+    lastJSError = prevJSError;
+    } finally {
+    }
+    var data_2097152234 = Temporary1;
+    if (eqStrings(jsonText__apiZauth95client_u47(data_2097152234, [101,114,114,111,114]), [115,105,103,110,95,105,110,95,114,97,116,101,95,108,105,109,105,116,101,100])) {
+    raiseException({message: signInWaitMessage__apiZauth95client_u81(jsonInt__apiZauth95client_u69(data_2097152234, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115])), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
+    }
+    
+    }
+    
+    if (!(response_2097152229.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152229.status), response_2097152229.body), "ValueError");
+    }
+    
+    result_2097152197 = parseAuthResponse__apiZauth95client_u145(decodeJson__apiZhttp95call_u207(response_2097152229.body));
+
+  return result_2097152197;
 
 }
 
@@ -8013,22 +8059,22 @@ function parseChatList__appZchat95list_u59(data_p0) {
   return result_1962934333;
 
 }
-async function listChats__apiZauth95client_u639() {
-  var result_2097152642 = null;
+async function listChats__apiZauth95client_u645() {
+  var result_2097152648 = null;
 
   BeforeRet: {
-    var options_2097152652 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_2097152657 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115]), options_2097152652));
-    if (!(response_2097152657.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152657.status), response_2097152657.body), "ValueError");
+    var options_2097152658 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_2097152663 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115]), options_2097152658));
+    if (!(response_2097152663.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152663.status), response_2097152663.body), "ValueError");
     }
     
-    var data_2097152658 = decodeJson__apiZhttp95call_u207(response_2097152657.body);
-    result_2097152642 = parseChatList__appZchat95list_u59(data_2097152658);
+    var data_2097152664 = decodeJson__apiZhttp95call_u207(response_2097152663.body);
+    result_2097152648 = parseChatList__appZchat95list_u59(data_2097152664);
     break BeforeRet;
   };
 
-  return result_2097152642;
+  return result_2097152648;
 
 }
 
@@ -8060,33 +8106,33 @@ function beginNavigation__appZrequest95context_u61(state_p0) {
 
 }
 
-function newSeq__apiZauth95client_u976(len_p0) {
-  var result_2097152980 = [];
+function newSeq__apiZauth95client_u982(len_p0) {
+  var result_2097152986 = [];
 
-    result_2097152980 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2097152980[i] = ({role: [], content: [], jobId: [], status: [], references: null}); }
-  return result_2097152980;
+    result_2097152986 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2097152986[i] = ({role: [], content: [], jobId: [], status: [], references: null}); }
+  return result_2097152986;
 
 }
-async function getChatHistory__apiZauth95client_u927(chatId_p0) {
+async function getChatHistory__apiZauth95client_u933(chatId_p0) {
         var Temporary3;
               var Temporary6;
 
-  var result_2097152931 = null;
+  var result_2097152937 = null;
 
   BeforeRet: {
-    var options_2097152941 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_2097152946 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,50,47,99,104,97,116,115,47],chatId_p0,[47,104,105,115,116,111,114,121,63,108,105,109,105,116,61,50,48,48]), options_2097152941));
-    if (!(response_2097152946.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152946.status), response_2097152946.body), "ValueError");
+    var options_2097152947 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_2097152952 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,50,47,99,104,97,116,115,47],chatId_p0,[47,104,105,115,116,111,114,121,63,108,105,109,105,116,61,50,48,48]), options_2097152947));
+    if (!(response_2097152952.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152952.status), response_2097152952.body), "ValueError");
     }
     
-    var data_2097152947 = decodeJson__apiZhttp95call_u207(response_2097152946.body);
-    var items_2097153001 = newSeq__apiZauth95client_u976(0);
-    if ((((data_2097152947.kind == 5) && hasKey__pureZjson_u3232(data_2097152947, [109,101,115,115,97,103,101,115])) && (HEX5BHEX5D__pureZjson_u3119(data_2097152947, [109,101,115,115,97,103,101,115]).kind == 6))) {
+    var data_2097152953 = decodeJson__apiZhttp95call_u207(response_2097152952.body);
+    var items_2097153007 = newSeq__apiZauth95client_u982(0);
+    if ((((data_2097152953.kind == 5) && hasKey__pureZjson_u3232(data_2097152953, [109,101,115,115,97,103,101,115])) && (HEX5BHEX5D__pureZjson_u3119(data_2097152953, [109,101,115,115,97,103,101,115]).kind == 6))) {
     Label1: {
-      var node_2097153010 = null;
+      var node_2097153016 = null;
       var colontmp__570426668 = null;
-      colontmp__570426668 = HEX5BHEX5D__pureZjson_u3119(data_2097152947, [109,101,115,115,97,103,101,115]);
+      colontmp__570426668 = HEX5BHEX5D__pureZjson_u3119(data_2097152953, [109,101,115,115,97,103,101,115]);
       if (!((colontmp__570426668.kind == 6))) {
       failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(colontmp__570426668.kind, NTI1459617795)));
       }
@@ -8103,15 +8149,15 @@ async function getChatHistory__apiZauth95client_u927(chatId_p0) {
             Label5: while (true) {
             if (!(i_570426672 < L_570426673)) break Label5;
               i_570426670 = colontmp__570426671[chckIndx(i_570426672, 0, (colontmp__570426671).length - 1)];
-              node_2097153010 = i_570426670;
-              if (((node_2097153010.kind == 5) && hasKey__pureZjson_u3232(node_2097153010, [114,101,102,101,114,101,110,99,101,115]))) {
-              Temporary6 = HEX5BHEX5D__pureZjson_u3119(node_2097153010, [114,101,102,101,114,101,110,99,101,115]);
+              node_2097153016 = i_570426670;
+              if (((node_2097153016.kind == 5) && hasKey__pureZjson_u3232(node_2097153016, [114,101,102,101,114,101,110,99,101,115]))) {
+              Temporary6 = HEX5BHEX5D__pureZjson_u3119(node_2097153016, [114,101,102,101,114,101,110,99,101,115]);
               }
               else {
               Temporary6 = null;
               }
               
-              items_2097153001.push({role: jsonText__apiZauth95client_u47(node_2097153010, [114,111,108,101]), content: jsonText__apiZauth95client_u47(node_2097153010, [99,111,110,116,101,110,116]), jobId: jsonText__apiZauth95client_u47(node_2097153010, [106,111,98,95,105,100]), status: jsonText__apiZauth95client_u47(node_2097153010, [115,116,97,116,117,115]), references: Temporary6});;
+              items_2097153007.push({role: jsonText__apiZauth95client_u47(node_2097153016, [114,111,108,101]), content: jsonText__apiZauth95client_u47(node_2097153016, [99,111,110,116,101,110,116]), jobId: jsonText__apiZauth95client_u47(node_2097153016, [106,111,98,95,105,100]), status: jsonText__apiZauth95client_u47(node_2097153016, [115,116,97,116,117,115]), references: Temporary6});;
               i_570426672 += 1;
               if (!(((colontmp__570426671).length == L_570426673))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
@@ -8123,11 +8169,11 @@ async function getChatHistory__apiZauth95client_u927(chatId_p0) {
     };
     }
     
-    result_2097152931 = items_2097153001;
+    result_2097152937 = items_2097153007;
     break BeforeRet;
   };
 
-  return result_2097152931;
+  return result_2097152937;
 
 }
 
@@ -10646,7 +10692,7 @@ async function loadChatHistory__appZauth95bridge_u198(state_p0, chatId_p1) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var history_2063597781 = (await getChatHistory__apiZauth95client_u927(chatId_p1));
+    var history_2063597781 = (await getChatHistory__apiZauth95client_u933(chatId_p1));
     if (!(matchesNavigation__appZrequest95context_u69(state_p0, context_2063597776))) {
     result_2063597770 = undefined;
     break BeforeRet;
@@ -10699,24 +10745,24 @@ async function loadChatHistory__appZauth95bridge_u198(state_p0, chatId_p1) {
   return result_2063597770;
 
 }
-async function createChat__apiZauth95client_u811(csrfToken_p0, title_p1) {
-  var result_2097152816 = null;
+async function createChat__apiZauth95client_u817(csrfToken_p0, title_p1) {
+  var result_2097152822 = null;
 
-    var payload_2097152842 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,105,116,108,101], Field1: HEX25__pureZjson_u1833(title_p1)}, NTI2097152588)]);
-    var options_2097152843 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152842)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172(csrfToken_p0));
-    var response_2097152848 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115]), options_2097152843));
-    if (!(response_2097152848.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152848.status), response_2097152848.body), "ValueError");
+    var payload_2097152848 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,105,116,108,101], Field1: HEX25__pureZjson_u1833(title_p1)}, NTI2097152597)]);
+    var options_2097152849 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152848)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176(csrfToken_p0));
+    var response_2097152854 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115]), options_2097152849));
+    if (!(response_2097152854.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152854.status), response_2097152854.body), "ValueError");
     }
     
-    var data_2097152849 = decodeJson__apiZhttp95call_u207(response_2097152848.body);
-    if ((!((data_2097152849.kind == 5)) || !(hasKey__pureZjson_u3232(data_2097152849, [99,104,97,116])))) {
+    var data_2097152855 = decodeJson__apiZhttp95call_u207(response_2097152854.body);
+    if ((!((data_2097152855.kind == 5)) || !(hasKey__pureZjson_u3232(data_2097152855, [99,104,97,116])))) {
     raiseException({message: [66,97,99,107,101,110,100,32,99,104,97,116,32,114,101,115,112,111,110,115,101,32,105,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    result_2097152816 = parseChat__appZchat95list_u26(HEX5BHEX5D__pureZjson_u3119(data_2097152849, [99,104,97,116]));
+    result_2097152822 = parseChat__appZchat95list_u26(HEX5BHEX5D__pureZjson_u3119(data_2097152855, [99,104,97,116]));
 
-  return result_2097152816;
+  return result_2097152822;
 
 }
 async function loadChats__appZauth95bridge_u226(state_p0) {
@@ -10729,7 +10775,7 @@ async function loadChats__appZauth95bridge_u226(state_p0) {
     }
     
     var context_2063597803 = navigationContext__appZrequest95context_u40(state_p0);
-    var remoteChats_2063597808 = (await listChats__apiZauth95client_u639());
+    var remoteChats_2063597808 = (await listChats__apiZauth95client_u645());
     if (!(matchesNavigation__appZrequest95context_u69(state_p0, context_2063597803))) {
     result_2063597797 = undefined;
     break BeforeRet;
@@ -10759,7 +10805,7 @@ async function loadChats__appZauth95bridge_u226(state_p0) {
     (await loadChatHistory__appZauth95bridge_u198(state_p0, state_p0.chats[chckIndx(0, 0, (state_p0.chats).length - 1)].chatId));
     }
     else {
-      var created_2063597832 = (await createChat__apiZauth95client_u811(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
+      var created_2063597832 = (await createChat__apiZauth95client_u817(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
       if (!(matchesNavigation__appZrequest95context_u69(state_p0, context_2063597803))) {
       result_2063597797 = undefined;
       break BeforeRet;
@@ -10844,7 +10890,7 @@ async function loginApplication__appZauth95bridge_u322(state_p0) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var auth_2063597906 = (await login__apiZauth95client_u188(email_2063597899, password_2063597900));
+    var auth_2063597906 = (await login__apiZauth95client_u192(email_2063597899, password_2063597900));
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_2063597901))) {
     result_2063597893 = undefined;
     break BeforeRet;
@@ -10995,30 +11041,30 @@ function nsuToLowerAsciiStr(s_p0) {
   return result_905969761;
 
 }
-async function register__apiZauth95client_u318(displayName_p0, email_p1, password_p2) {
-  var result_2097152324 = null;
+async function register__apiZauth95client_u324(displayName_p0, email_p1, password_p2) {
+  var result_2097152330 = null;
 
   BeforeRet: {
-    var payload_2097152350 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [100,105,115,112,108,97,121,95,110,97,109,101], Field1: HEX25__pureZjson_u1833(displayName_p0)}, NTI2097152189), nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1833(email_p1)}, NTI2097152189), nimCopy(null, {Field0: [112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1833(password_p2)}, NTI2097152189)]);
-    var options_2097152351 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152350)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172([]));
-    var response_2097152356 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,103,105,115,116,101,114]), options_2097152351));
-    if (!(response_2097152356.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152356.status), response_2097152356.body), "ValueError");
+    var payload_2097152356 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [100,105,115,112,108,97,121,95,110,97,109,101], Field1: HEX25__pureZjson_u1833(displayName_p0)}, NTI2097152198), nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1833(email_p1)}, NTI2097152198), nimCopy(null, {Field0: [112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1833(password_p2)}, NTI2097152198)]);
+    var options_2097152357 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152356)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176([]));
+    var response_2097152362 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,103,105,115,116,101,114]), options_2097152357));
+    if (!(response_2097152362.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152362.status), response_2097152362.body), "ValueError");
     }
     
-    var data_2097152357 = decodeJson__apiZhttp95call_u207(response_2097152356.body);
-    if (((((((!((data_2097152357.kind == 5)) || !(jsonBool__apiZauth95client_u56(data_2097152357, [118,101,114,105,102,105,99,97,116,105,111,110,95,114,101,113,117,105,114,101,100]))) || !(contains__stdZenumutils_u50([[115,101,110,116], [102,97,105,108,101,100]], jsonText__apiZauth95client_u47(data_2097152357, [109,97,105,108,95,100,101,108,105,118,101,114,121])))) || !(hasKey__pureZjson_u3232(data_2097152357, [117,115,101,114]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152357, [117,115,101,114]).kind == 5))) || ((jsonText__apiZauth95client_u47(HEX5BHEX5D__pureZjson_u3119(data_2097152357, [117,115,101,114]), [117,115,101,114,95,105,100])).length == 0)) || !(eqStrings(nsuToLowerAsciiStr(jsonText__apiZauth95client_u47(HEX5BHEX5D__pureZjson_u3119(data_2097152357, [117,115,101,114]), [101,109,97,105,108])), nsuToLowerAsciiStr(nsuStrip(email_p1, true, true, ConstSet72)))))) {
+    var data_2097152363 = decodeJson__apiZhttp95call_u207(response_2097152362.body);
+    if (((((((!((data_2097152363.kind == 5)) || !(jsonBool__apiZauth95client_u56(data_2097152363, [118,101,114,105,102,105,99,97,116,105,111,110,95,114,101,113,117,105,114,101,100]))) || !(contains__stdZenumutils_u50([[115,101,110,116], [102,97,105,108,101,100]], jsonText__apiZauth95client_u47(data_2097152363, [109,97,105,108,95,100,101,108,105,118,101,114,121])))) || !(hasKey__pureZjson_u3232(data_2097152363, [117,115,101,114]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152363, [117,115,101,114]).kind == 5))) || ((jsonText__apiZauth95client_u47(HEX5BHEX5D__pureZjson_u3119(data_2097152363, [117,115,101,114]), [117,115,101,114,95,105,100])).length == 0)) || !(eqStrings(nsuToLowerAsciiStr(jsonText__apiZauth95client_u47(HEX5BHEX5D__pureZjson_u3119(data_2097152363, [117,115,101,114]), [101,109,97,105,108])), nsuToLowerAsciiStr(nsuStrip(email_p1, true, true, ConstSet72)))))) {
     raiseException({message: makeNimstrLit("Account creation was not confirmed. Sign in to check the account before registering again."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var step_2097152373 = parseVerificationStep__apiZauth95client_u81(data_2097152357);
-    step_2097152373.pending = true;
-    step_2097152373.mailFailed = eqStrings(jsonText__apiZauth95client_u47(data_2097152357, [109,97,105,108,95,100,101,108,105,118,101,114,121]), [102,97,105,108,101,100]);
-    result_2097152324 = step_2097152373;
+    var step_2097152379 = parseVerificationStep__apiZauth95client_u85(data_2097152363);
+    step_2097152379.pending = true;
+    step_2097152379.mailFailed = eqStrings(jsonText__apiZauth95client_u47(data_2097152363, [109,97,105,108,95,100,101,108,105,118,101,114,121]), [102,97,105,108,101,100]);
+    result_2097152330 = step_2097152379;
     break BeforeRet;
   };
 
-  return result_2097152324;
+  return result_2097152330;
 
 }
 async function registerApplication__appZauth95bridge_u346(state_p0) {
@@ -11048,7 +11094,7 @@ async function registerApplication__appZauth95bridge_u346(state_p0) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var step_2063597931 = (await register__apiZauth95client_u318(displayName_2063597923, email_2063597924, password_2063597925));
+    var step_2063597931 = (await register__apiZauth95client_u324(displayName_2063597923, email_2063597924, password_2063597925));
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_2063597926))) {
     result_2063597917 = undefined;
     break BeforeRet;
@@ -11113,22 +11159,22 @@ function HEX3Aanonymous__componentsZauth_u89(value_p0) {
 
   
 }
-async function forgotPassword__apiZauth95client_u528(email_p0) {
-  var result_2097152531 = null;
+async function forgotPassword__apiZauth95client_u534(email_p0) {
+  var result_2097152537 = null;
 
   BeforeRet: {
-    var payload_2097152553 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1833(email_p0)}, NTI2097152361)]);
-    var options_2097152554 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152553)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172([]));
-    var response_2097152559 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,102,111,114,103,111,116,45,112,97,115,115,119,111,114,100]), options_2097152554));
-    if (!(response_2097152559.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152559.status), response_2097152559.body), "ValueError");
+    var payload_2097152559 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [101,109,97,105,108], Field1: HEX25__pureZjson_u1833(email_p0)}, NTI2097152370)]);
+    var options_2097152560 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152559)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176([]));
+    var response_2097152565 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,102,111,114,103,111,116,45,112,97,115,115,119,111,114,100]), options_2097152560));
+    if (!(response_2097152565.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152565.status), response_2097152565.body), "ValueError");
     }
     
-    result_2097152531 = undefined;
+    result_2097152537 = undefined;
     break BeforeRet;
   };
 
-  return result_2097152531;
+  return result_2097152537;
 
 }
 async function forgotPasswordApplication__appZauth95bridge_u388(state_p0) {
@@ -11154,7 +11200,7 @@ async function forgotPasswordApplication__appZauth95bridge_u388(state_p0) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    (await forgotPassword__apiZauth95client_u528(email_2063597965));
+    (await forgotPassword__apiZauth95client_u534(email_2063597965));
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_2063597966))) {
     result_2063597959 = undefined;
     break BeforeRet;
@@ -11211,22 +11257,22 @@ function HEX3Aanonymous__componentsZauth_u97(value_p0) {
 
   
 }
-async function resetPassword__apiZauth95client_u561(token_p0, newPassword_p1) {
-  var result_2097152565 = null;
+async function resetPassword__apiZauth95client_u567(token_p0, newPassword_p1) {
+  var result_2097152571 = null;
 
   BeforeRet: {
-    var payload_2097152587 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,111,107,101,110], Field1: HEX25__pureZjson_u1833(token_p0)}, NTI2097152387), nimCopy(null, {Field0: [110,101,119,95,112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1833(newPassword_p1)}, NTI2097152387)]);
-    var options_2097152588 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152587)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172([]));
-    var response_2097152593 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,115,101,116,45,112,97,115,115,119,111,114,100]), options_2097152588));
-    if (!(response_2097152593.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152593.status), response_2097152593.body), "ValueError");
+    var payload_2097152593 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,111,107,101,110], Field1: HEX25__pureZjson_u1833(token_p0)}, NTI2097152396), nimCopy(null, {Field0: [110,101,119,95,112,97,115,115,119,111,114,100], Field1: HEX25__pureZjson_u1833(newPassword_p1)}, NTI2097152396)]);
+    var options_2097152594 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152593)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176([]));
+    var response_2097152599 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,115,101,116,45,112,97,115,115,119,111,114,100]), options_2097152594));
+    if (!(response_2097152599.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152599.status), response_2097152599.body), "ValueError");
     }
     
-    result_2097152565 = undefined;
+    result_2097152571 = undefined;
     break BeforeRet;
   };
 
-  return result_2097152565;
+  return result_2097152571;
 
 }
 async function resetPasswordApplication__appZauth95bridge_u405(state_p0) {
@@ -11251,7 +11297,7 @@ async function resetPasswordApplication__appZauth95bridge_u405(state_p0) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    (await resetPassword__apiZauth95client_u561(state_p0.auth.resetToken, state_p0.auth.newPasswordDraft));
+    (await resetPassword__apiZauth95client_u567(state_p0.auth.resetToken, state_p0.auth.newPasswordDraft));
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_2063597982))) {
     result_2063597976 = undefined;
     break BeforeRet;
@@ -11298,39 +11344,39 @@ function HEX3Aanonymous__componentsZauth_u99(event_p0, node_p1) {
 
   
 }
-async function resendVerification__apiZauth95client_u455() {
-  var result_2097152457 = null;
+async function resendVerification__apiZauth95client_u461() {
+  var result_2097152463 = null;
 
   BeforeRet: {
-    var options_2097152467 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172([]));
-    var response_2097152472 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,115,101,110,100,45,118,101,114,105,102,105,99,97,116,105,111,110]), options_2097152467));
-    if ((response_2097152472.status == 429)) {
-    var data_2097152473 = decodeJson__apiZhttp95call_u207(response_2097152472.body);
-    if ((((!(eqStrings(jsonText__apiZauth95client_u47(data_2097152473, [101,114,114,111,114]), [118,101,114,105,102,105,99,97,116,105,111,110,95,114,101,115,101,110,100,95,116,111,111,95,115,111,111,110])) || !(hasKey__pureZjson_u3232(data_2097152473, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152473, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]).kind == 2))) || (getInt__pureZjson_u253(HEX5BHEX5D__pureZjson_u3119(data_2097152473, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]), 0) < 1))) {
+    var options_2097152473 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176([]));
+    var response_2097152478 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,114,101,115,101,110,100,45,118,101,114,105,102,105,99,97,116,105,111,110]), options_2097152473));
+    if ((response_2097152478.status == 429)) {
+    var data_2097152479 = decodeJson__apiZhttp95call_u207(response_2097152478.body);
+    if ((((!(eqStrings(jsonText__apiZauth95client_u47(data_2097152479, [101,114,114,111,114]), [118,101,114,105,102,105,99,97,116,105,111,110,95,114,101,115,101,110,100,95,116,111,111,95,115,111,111,110])) || !(hasKey__pureZjson_u3232(data_2097152479, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152479, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]).kind == 2))) || (getInt__pureZjson_u253(HEX5BHEX5D__pureZjson_u3119(data_2097152479, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]), 0) < 1))) {
     raiseException({message: makeNimstrLit("The resend wait could not be confirmed. Reload to check the verification step."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    result_2097152457 = {pending: true, resendAfterSeconds: nimMax(jsonInt__apiZauth95client_u69(data_2097152473, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]), 1), tooSoon: true, verified: false, emailHint: [], mailFailed: false};
+    result_2097152463 = {pending: true, resendAfterSeconds: nimMax(jsonInt__apiZauth95client_u69(data_2097152479, [114,101,116,114,121,95,97,102,116,101,114,95,115,101,99,111,110,100,115]), 1), tooSoon: true, verified: false, emailHint: [], mailFailed: false};
     break BeforeRet;
     }
     
-    if (!(response_2097152472.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152472.status), response_2097152472.body), "ValueError");
+    if (!(response_2097152478.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152478.status), response_2097152478.body), "ValueError");
     }
     
-    var data_2097152482 = decodeJson__apiZhttp95call_u207(response_2097152472.body);
-    if ((!(contains__stdZenumutils_u50([[115,101,110,116], [102,97,105,108,101,100]], jsonText__apiZauth95client_u47(data_2097152482, [109,97,105,108,95,100,101,108,105,118,101,114,121]))) || !(eqStrings(jsonText__apiZauth95client_u47(data_2097152482, [115,116,97,116,117,115]), jsonText__apiZauth95client_u47(data_2097152482, [109,97,105,108,95,100,101,108,105,118,101,114,121]))))) {
+    var data_2097152488 = decodeJson__apiZhttp95call_u207(response_2097152478.body);
+    if ((!(contains__stdZenumutils_u50([[115,101,110,116], [102,97,105,108,101,100]], jsonText__apiZauth95client_u47(data_2097152488, [109,97,105,108,95,100,101,108,105,118,101,114,121]))) || !(eqStrings(jsonText__apiZauth95client_u47(data_2097152488, [115,116,97,116,117,115]), jsonText__apiZauth95client_u47(data_2097152488, [109,97,105,108,95,100,101,108,105,118,101,114,121]))))) {
     raiseException({message: makeNimstrLit("The verification email outcome was not confirmed. Reload before requesting another."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var step_2097152490 = parseVerificationStep__apiZauth95client_u81(data_2097152482);
-    step_2097152490.pending = true;
-    step_2097152490.mailFailed = eqStrings(jsonText__apiZauth95client_u47(data_2097152482, [109,97,105,108,95,100,101,108,105,118,101,114,121]), [102,97,105,108,101,100]);
-    result_2097152457 = step_2097152490;
+    var step_2097152496 = parseVerificationStep__apiZauth95client_u85(data_2097152488);
+    step_2097152496.pending = true;
+    step_2097152496.mailFailed = eqStrings(jsonText__apiZauth95client_u47(data_2097152488, [109,97,105,108,95,100,101,108,105,118,101,114,121]), [102,97,105,108,101,100]);
+    result_2097152463 = step_2097152496;
     break BeforeRet;
   };
 
-  return result_2097152457;
+  return result_2097152463;
 
 }
 
@@ -11364,7 +11410,7 @@ async function resendVerificationApplication__appZauth95bridge_u366(state_p0) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var step_2063597953 = (await resendVerification__apiZauth95client_u455());
+    var step_2063597953 = (await resendVerification__apiZauth95client_u461());
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_2063597948))) {
     result_2063597937 = undefined;
     break BeforeRet;
@@ -11945,7 +11991,7 @@ async function createNewChat__appZauth95bridge_u444(state_p0) {
     state_p0.auth.loading = true;
 ++excHandler;
     try {
-    var created_2063598035 = (await createChat__apiZauth95client_u811(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
+    var created_2063598035 = (await createChat__apiZauth95client_u817(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
     if (!(matchesNavigation__appZrequest95context_u69(state_p0, context_2063598030))) {
     result_2063598015 = undefined;
     break BeforeRet;
@@ -12099,36 +12145,36 @@ function beginSessionsRequest__appZrequest95context_u611(state_p0) {
 
 }
 
-function newSeq__apiZauth95client_u1089(len_p0) {
-  var result_2097153093 = [];
+function newSeq__apiZauth95client_u1095(len_p0) {
+  var result_2097153099 = [];
 
-    result_2097153093 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2097153093[i] = ({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false}); }
-  return result_2097153093;
+    result_2097153099 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2097153099[i] = ({sessionId: [], createdAt: [], lastSeenAt: [], expiresAt: [], revokedAt: [], userAgent: [], current: false}); }
+  return result_2097153099;
 
 }
-async function listSessions__apiZauth95client_u1041() {
+async function listSessions__apiZauth95client_u1047() {
         var Temporary3;
                       var Temporary9;
 
-  var result_2097153044 = null;
+  var result_2097153050 = null;
 
   BeforeRet: {
-    var options_2097153054 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_2097153059 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,115,101,115,115,105,111,110,115]), options_2097153054));
-    if (!(response_2097153059.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097153059.status), response_2097153059.body), "ValueError");
+    var options_2097153060 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_2097153065 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,115,101,115,115,105,111,110,115]), options_2097153060));
+    if (!(response_2097153065.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097153065.status), response_2097153065.body), "ValueError");
     }
     
-    var data_2097153060 = decodeJson__apiZhttp95call_u207(response_2097153059.body);
-    var items_2097153136 = newSeq__apiZauth95client_u1089(0);
-    if (((!((data_2097153060.kind == 5)) || !(hasKey__pureZjson_u3232(data_2097153060, [115,101,115,115,105,111,110,115]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097153060, [115,101,115,115,105,111,110,115]).kind == 6)))) {
+    var data_2097153066 = decodeJson__apiZhttp95call_u207(response_2097153065.body);
+    var items_2097153142 = newSeq__apiZauth95client_u1095(0);
+    if (((!((data_2097153066.kind == 5)) || !(hasKey__pureZjson_u3232(data_2097153066, [115,101,115,115,105,111,110,115]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097153066, [115,101,115,115,105,111,110,115]).kind == 6)))) {
     raiseException({message: [84,104,101,32,115,101,115,115,105,111,110,32,104,105,115,116,111,114,121,32,114,101,115,112,111,110,115,101,32,119,97,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
     Label1: {
-      var node_2097153146 = null;
+      var node_2097153152 = null;
       var colontmp__570426992 = null;
-      colontmp__570426992 = HEX5BHEX5D__pureZjson_u3119(data_2097153060, [115,101,115,115,105,111,110,115]);
+      colontmp__570426992 = HEX5BHEX5D__pureZjson_u3119(data_2097153066, [115,101,115,115,105,111,110,115]);
       if (!((colontmp__570426992.kind == 6))) {
       failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(colontmp__570426992.kind, NTI1459617795)));
       }
@@ -12145,19 +12191,19 @@ async function listSessions__apiZauth95client_u1041() {
             Label5: while (true) {
             if (!(i_570426996 < L_570426997)) break Label5;
               i_570426994 = colontmp__570426995[chckIndx(i_570426996, 0, (colontmp__570426995).length - 1)];
-              node_2097153146 = i_570426994;
-              if ((((((!((node_2097153146.kind == 5)) || !(hasKey__pureZjson_u3232(node_2097153146, [115,101,115,115,105,111,110,95,105,100]))) || !((HEX5BHEX5D__pureZjson_u3119(node_2097153146, [115,101,115,115,105,111,110,95,105,100]).kind == 4))) || ((getStr__pureZjson_u241(HEX5BHEX5D__pureZjson_u3119(node_2097153146, [115,101,115,115,105,111,110,95,105,100]), [])).length == 0)) || !(hasKey__pureZjson_u3232(node_2097153146, [99,117,114,114,101,110,116]))) || !((HEX5BHEX5D__pureZjson_u3119(node_2097153146, [99,117,114,114,101,110,116]).kind == 1)))) {
+              node_2097153152 = i_570426994;
+              if ((((((!((node_2097153152.kind == 5)) || !(hasKey__pureZjson_u3232(node_2097153152, [115,101,115,115,105,111,110,95,105,100]))) || !((HEX5BHEX5D__pureZjson_u3119(node_2097153152, [115,101,115,115,105,111,110,95,105,100]).kind == 4))) || ((getStr__pureZjson_u241(HEX5BHEX5D__pureZjson_u3119(node_2097153152, [115,101,115,115,105,111,110,95,105,100]), [])).length == 0)) || !(hasKey__pureZjson_u3232(node_2097153152, [99,117,114,114,101,110,116]))) || !((HEX5BHEX5D__pureZjson_u3119(node_2097153152, [99,117,114,114,101,110,116]).kind == 1)))) {
               raiseException({message: [84,104,101,32,115,101,115,115,105,111,110,32,104,105,115,116,111,114,121,32,114,101,115,112,111,110,115,101,32,119,97,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
               }
               
               Label6: {
-                var key_2097153202 = [];
+                var key_2097153208 = [];
                 var i_570426990 = 0;
                 Label7: {
                     Label8: while (true) {
                     if (!true) break Label8;
-                      key_2097153202 = (Temporary9 = [[99,114,101,97,116,101,100,95,97,116], [108,97,115,116,95,115,101,101,110,95,97,116], [101,120,112,105,114,101,115,95,97,116], [114,101,118,111,107,101,100,95,97,116], [117,115,101,114,95,97,103,101,110,116]], Temporary9)[chckIndx(i_570426990, 0, (Temporary9).length - 1)];
-                      if ((!(hasKey__pureZjson_u3232(node_2097153146, key_2097153202)) || !((ConstSet75[HEX5BHEX5D__pureZjson_u3119(node_2097153146, key_2097153202).kind] != undefined)))) {
+                      key_2097153208 = (Temporary9 = [[99,114,101,97,116,101,100,95,97,116], [108,97,115,116,95,115,101,101,110,95,97,116], [101,120,112,105,114,101,115,95,97,116], [114,101,118,111,107,101,100,95,97,116], [117,115,101,114,95,97,103,101,110,116]], Temporary9)[chckIndx(i_570426990, 0, (Temporary9).length - 1)];
+                      if ((!(hasKey__pureZjson_u3232(node_2097153152, key_2097153208)) || !((ConstSet75[HEX5BHEX5D__pureZjson_u3119(node_2097153152, key_2097153208).kind] != undefined)))) {
                       raiseException({message: [84,104,101,32,115,101,115,115,105,111,110,32,104,105,115,116,111,114,121,32,114,101,115,112,111,110,115,101,32,119,97,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
                       }
                       
@@ -12169,7 +12215,7 @@ async function listSessions__apiZauth95client_u1041() {
                     }
                 };
               };
-              items_2097153136.push({sessionId: jsonText__apiZauth95client_u47(node_2097153146, [115,101,115,115,105,111,110,95,105,100]), createdAt: jsonText__apiZauth95client_u47(node_2097153146, [99,114,101,97,116,101,100,95,97,116]), lastSeenAt: jsonText__apiZauth95client_u47(node_2097153146, [108,97,115,116,95,115,101,101,110,95,97,116]), expiresAt: jsonText__apiZauth95client_u47(node_2097153146, [101,120,112,105,114,101,115,95,97,116]), revokedAt: jsonText__apiZauth95client_u47(node_2097153146, [114,101,118,111,107,101,100,95,97,116]), userAgent: jsonText__apiZauth95client_u47(node_2097153146, [117,115,101,114,95,97,103,101,110,116]), current: jsonBool__apiZauth95client_u56(node_2097153146, [99,117,114,114,101,110,116])});;
+              items_2097153142.push({sessionId: jsonText__apiZauth95client_u47(node_2097153152, [115,101,115,115,105,111,110,95,105,100]), createdAt: jsonText__apiZauth95client_u47(node_2097153152, [99,114,101,97,116,101,100,95,97,116]), lastSeenAt: jsonText__apiZauth95client_u47(node_2097153152, [108,97,115,116,95,115,101,101,110,95,97,116]), expiresAt: jsonText__apiZauth95client_u47(node_2097153152, [101,120,112,105,114,101,115,95,97,116]), revokedAt: jsonText__apiZauth95client_u47(node_2097153152, [114,101,118,111,107,101,100,95,97,116]), userAgent: jsonText__apiZauth95client_u47(node_2097153152, [117,115,101,114,95,97,103,101,110,116]), current: jsonBool__apiZauth95client_u56(node_2097153152, [99,117,114,114,101,110,116])});;
               i_570426996 += 1;
               if (!(((colontmp__570426995).length == L_570426997))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
@@ -12179,11 +12225,11 @@ async function listSessions__apiZauth95client_u1041() {
         };
       };
     };
-    result_2097153044 = items_2097153136;
+    result_2097153050 = items_2097153142;
     break BeforeRet;
   };
 
-  return result_2097153044;
+  return result_2097153050;
 
 }
 
@@ -12210,7 +12256,7 @@ async function refreshAccountSessions__appZaccount95bridge_u13(state_p0) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var remote_2550136859 = (await listSessions__apiZauth95client_u1041());
+    var remote_2550136859 = (await listSessions__apiZauth95client_u1047());
     if (!(matchesSessionsRequest__appZrequest95context_u619(state_p0, request_2550136854))) {
     result_2550136848 = undefined;
     break BeforeRet;
@@ -16636,13 +16682,13 @@ async function refreshChatMetadata__appZchat95bridge_u29(state_p0) {
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var chats_2516582449 = (await listChats__apiZauth95client_u639());
+    var chats_2516582449 = (await listChats__apiZauth95client_u645());
     if ((!(matchesAccount__appZrequest95context_u36(state_p0, context_2516582438)) || !((state_p0.chatMetadataEpoch == epoch_2516582444)))) {
     result_2516582432 = undefined;
     break BeforeRet;
     }
     
-    state_p0.chats = nimCopy(null, chats_2516582449, NTI2097152441);
+    state_p0.chats = nimCopy(null, chats_2516582449, NTI2097152450);
     state_p0.chatsNeedRefresh = false;
     state_p0.chatActionError = nimCopy(null, [], NTI33554449);
 --excHandler;
@@ -19837,25 +19883,25 @@ function validateChatUpdate__appZchat95list_u91(data_p0, chatId_p1, patch_p2) {
   return result_1962934367;
 
 }
-async function updateChat__apiZauth95client_u877(chatId_p0, patch_p1, csrfToken_p2) {
-  var result_2097152882 = null;
+async function updateChat__apiZauth95client_u883(chatId_p0, patch_p1, csrfToken_p2) {
+  var result_2097152888 = null;
 
   BeforeRet: {
     if (((((chatId_p0).length == 0) || !((patch_p1.kind == 5))) || (len__pureZjson_u3069(patch_p1) == 0))) {
     raiseException({message: [65,32,99,104,97,116,32,97,110,100,32,109,101,116,97,100,97,116,97,32,99,104,97,110,103,101,32,97,114,101,32,114,101,113,117,105,114,101,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var options_2097152897 = newfetchOptions__stdZjsfetch_u115(8, toJSStr(HEX24__pureZjson_u4507(patch_p1)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172(csrfToken_p2));
-    var response_2097152902 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115,47],encodeUrl__pureZuri_u58(chatId_p0, false)), options_2097152897));
-    if (!(response_2097152902.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152902.status), response_2097152902.body), "ValueError");
+    var options_2097152903 = newfetchOptions__stdZjsfetch_u115(8, toJSStr(HEX24__pureZjson_u4507(patch_p1)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176(csrfToken_p2));
+    var response_2097152908 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115,47],encodeUrl__pureZuri_u58(chatId_p0, false)), options_2097152903));
+    if (!(response_2097152908.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152908.status), response_2097152908.body), "ValueError");
     }
     
-    result_2097152882 = validateChatUpdate__appZchat95list_u91(decodeJson__apiZhttp95call_u207(response_2097152902.body), chatId_p0, patch_p1);
+    result_2097152888 = validateChatUpdate__appZchat95list_u91(decodeJson__apiZhttp95call_u207(response_2097152908.body), chatId_p0, patch_p1);
     break BeforeRet;
   };
 
-  return result_2097152882;
+  return result_2097152888;
 
 }
 async function changeChatMetadata__appZchat95bridge_u51(state_p0, chatId_p1, patch_p2) {
@@ -19901,7 +19947,7 @@ async function changeChatMetadata__appZchat95bridge_u51(state_p0, chatId_p1, pat
     redraw__pkgZkaraxZkarax_u1550(kxi__);
 ++excHandler;
     try {
-    var saved_2516582478 = (await updateChat__apiZauth95client_u877(chatId_p1, patch_p2, state_p0.auth.csrfToken));
+    var saved_2516582478 = (await updateChat__apiZauth95client_u883(chatId_p1, patch_p2, state_p0.auth.csrfToken));
     if ((!(matchesAccount__appZrequest95context_u36(state_p0, context_2516582467)) || !((state_p0.chatMetadataEpoch == epoch_2516582473)))) {
     result_2516582456 = undefined;
     break BeforeRet;
@@ -20012,25 +20058,25 @@ function HEX3Aanonymous__componentsZsidebar_u183(event_p0, node_p1) {
 
   
 }
-async function deleteChat__apiZauth95client_u907(chatId_p0, csrfToken_p1) {
-  var result_2097152911 = null;
+async function deleteChat__apiZauth95client_u913(chatId_p0, csrfToken_p1) {
+  var result_2097152917 = null;
 
   BeforeRet: {
     if (((chatId_p0).length == 0)) {
     raiseException({message: [65,32,99,104,97,116,32,73,68,32,105,115,32,114,101,113,117,105,114,101,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var options_2097152918 = newfetchOptions__stdZjsfetch_u115(4, null, 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172(csrfToken_p1));
-    var response_2097152923 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115,47],chatId_p0), options_2097152918));
-    if (!(response_2097152923.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152923.status), response_2097152923.body), "ValueError");
+    var options_2097152924 = newfetchOptions__stdZjsfetch_u115(4, null, 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176(csrfToken_p1));
+    var response_2097152929 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115,47],chatId_p0), options_2097152924));
+    if (!(response_2097152929.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152929.status), response_2097152929.body), "ValueError");
     }
     
-    result_2097152911 = undefined;
+    result_2097152917 = undefined;
     break BeforeRet;
   };
 
-  return result_2097152911;
+  return result_2097152917;
 
 }
 async function deleteChatApplication__appZauth95bridge_u499(state_p0, chatId_p1) {
@@ -20060,7 +20106,7 @@ async function deleteChatApplication__appZauth95bridge_u499(state_p0, chatId_p1)
     var context_2063598083 = accountContext__appZrequest95context_u16(state_p0);
 ++excHandler;
     try {
-    (await deleteChat__apiZauth95client_u907(chatId_p1, state_p0.auth.csrfToken));
+    (await deleteChat__apiZauth95client_u913(chatId_p1, state_p0.auth.csrfToken));
     if (!(matchesAccount__appZrequest95context_u36(state_p0, context_2063598083))) {
     result_2063598071 = undefined;
     break BeforeRet;
@@ -20097,7 +20143,7 @@ async function deleteChatApplication__appZauth95bridge_u499(state_p0, chatId_p1)
     }
     else {
       var navigation_2063598109 = beginNavigation__appZrequest95context_u61(state_p0);
-      var created_2063598114 = (await createChat__apiZauth95client_u811(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
+      var created_2063598114 = (await createChat__apiZauth95client_u817(state_p0.auth.csrfToken, [78,101,119,32,99,104,97,116]));
       if (!(matchesNavigation__appZrequest95context_u69(state_p0, navigation_2063598109))) {
       result_2063598071 = undefined;
       break BeforeRet;
@@ -21328,14 +21374,14 @@ function logoutOutcome__apiZhttp95call_u16(status_p0) {
   return result_2214592530;
 
 }
-async function logout__apiZauth95client_u597(csrfToken_p0) {
-  var result_2097152601 = null;
+async function logout__apiZauth95client_u603(csrfToken_p0) {
+  var result_2097152607 = null;
 
-    var options_2097152611 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172(csrfToken_p0));
-    var response_2097152616 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,108,111,103,111,117,116]), options_2097152611));
-    result_2097152601 = logoutOutcome__apiZhttp95call_u16(response_2097152616.status);
+    var options_2097152617 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176(csrfToken_p0));
+    var response_2097152622 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,108,111,103,111,117,116]), options_2097152617));
+    result_2097152607 = logoutOutcome__apiZhttp95call_u16(response_2097152622.status);
 
-  return result_2097152601;
+  return result_2097152607;
 
 }
 
@@ -21523,7 +21569,7 @@ async function logoutApplication__appZauth95bridge_u421(state_p0) {
     var outcome_2063598001 = 2;
 ++excHandler;
     try {
-    outcome_2063598001 = (await logout__apiZauth95client_u597(csrfToken_2063597999));
+    outcome_2063598001 = (await logout__apiZauth95client_u603(csrfToken_2063597999));
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -24172,35 +24218,35 @@ function setSearchDraft__appZstate_u620(state_p0, value_p1) {
   
 }
 
-function newSeq__apiZauth95client_u739(len_p0) {
-  var result_2097152743 = [];
+function newSeq__apiZauth95client_u745(len_p0) {
+  var result_2097152749 = [];
 
-    result_2097152743 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2097152743[i] = ({chatId: [], title: [], matched: [], excerpt: []}); }
-  return result_2097152743;
+    result_2097152749 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2097152749[i] = ({chatId: [], title: [], matched: [], excerpt: []}); }
+  return result_2097152749;
 
 }
-async function searchChats__apiZauth95client_u681(query_p0) {
+async function searchChats__apiZauth95client_u687(query_p0) {
         var Temporary3;
 
-  var result_2097152685 = null;
+  var result_2097152691 = null;
 
   BeforeRet: {
-    var options_2097152695 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_2097152700 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115,47,115,101,97,114,99,104,63,113,61],encodeUrl__pureZuri_u58(query_p0, false)), options_2097152695));
-    if (!(response_2097152700.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152700.status), response_2097152700.body), "ValueError");
+    var options_2097152701 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_2097152706 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,99,104,97,116,115,47,115,101,97,114,99,104,63,113,61],encodeUrl__pureZuri_u58(query_p0, false)), options_2097152701));
+    if (!(response_2097152706.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152706.status), response_2097152706.body), "ValueError");
     }
     
-    var data_2097152701 = decodeJson__apiZhttp95call_u207(response_2097152700.body);
-    if (((!((data_2097152701.kind == 5)) || !(hasKey__pureZjson_u3232(data_2097152701, [114,101,115,117,108,116,115]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152701, [114,101,115,117,108,116,115]).kind == 6)))) {
+    var data_2097152707 = decodeJson__apiZhttp95call_u207(response_2097152706.body);
+    if (((!((data_2097152707.kind == 5)) || !(hasKey__pureZjson_u3232(data_2097152707, [114,101,115,117,108,116,115]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152707, [114,101,115,117,108,116,115]).kind == 6)))) {
     raiseException({message: [66,97,99,107,101,110,100,32,99,104,97,116,32,115,101,97,114,99,104,32,114,101,115,112,111,110,115,101,32,105,115,32,105,110,118,97,108,105,100,46], parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var items_2097152783 = newSeq__apiZauth95client_u739(0);
+    var items_2097152789 = newSeq__apiZauth95client_u745(0);
     Label1: {
-      var node_2097152784 = null;
+      var node_2097152790 = null;
       var colontmp__570427824 = null;
-      colontmp__570427824 = HEX5BHEX5D__pureZjson_u3119(data_2097152701, [114,101,115,117,108,116,115]);
+      colontmp__570427824 = HEX5BHEX5D__pureZjson_u3119(data_2097152707, [114,101,115,117,108,116,115]);
       if (!((colontmp__570427824.kind == 6))) {
       failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(colontmp__570427824.kind, NTI1459617795)));
       }
@@ -24217,8 +24263,8 @@ async function searchChats__apiZauth95client_u681(query_p0) {
             Label5: while (true) {
             if (!(i_570427828 < L_570427829)) break Label5;
               i_570427826 = colontmp__570427827[chckIndx(i_570427828, 0, (colontmp__570427827).length - 1)];
-              node_2097152784 = i_570427826;
-              items_2097152783.push({chatId: jsonText__apiZauth95client_u47(node_2097152784, [99,104,97,116,95,105,100]), title: jsonText__apiZauth95client_u47(node_2097152784, [116,105,116,108,101]), matched: jsonText__apiZauth95client_u47(node_2097152784, [109,97,116,99,104,101,100]), excerpt: jsonText__apiZauth95client_u47(node_2097152784, [101,120,99,101,114,112,116])});;
+              node_2097152790 = i_570427826;
+              items_2097152789.push({chatId: jsonText__apiZauth95client_u47(node_2097152790, [99,104,97,116,95,105,100]), title: jsonText__apiZauth95client_u47(node_2097152790, [116,105,116,108,101]), matched: jsonText__apiZauth95client_u47(node_2097152790, [109,97,116,99,104,101,100]), excerpt: jsonText__apiZauth95client_u47(node_2097152790, [101,120,99,101,114,112,116])});;
               i_570427828 += 1;
               if (!(((colontmp__570427827).length == L_570427829))) {
               failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
@@ -24228,11 +24274,11 @@ async function searchChats__apiZauth95client_u681(query_p0) {
         };
       };
     };
-    result_2097152685 = items_2097152783;
+    result_2097152691 = items_2097152789;
     break BeforeRet;
   };
 
-  return result_2097152685;
+  return result_2097152691;
 
 }
 async function runSearch__componentsZchat95search_u23(query_p0, epoch_p1) {
@@ -24241,13 +24287,13 @@ async function runSearch__componentsZchat95search_u23(query_p0, epoch_p1) {
   BeforeRet: {
 ++excHandler;
     try {
-    var results_3070230565 = (await searchChats__apiZauth95client_u681(query_p0));
+    var results_3070230565 = (await searchChats__apiZauth95client_u687(query_p0));
     if (!((epoch_p1 == chatSearch_3070230549[0].epoch))) {
     result_3070230555 = undefined;
     break BeforeRet;
     }
     
-    chatSearch_3070230549[0].results = nimCopy(null, results_3070230565, NTI2097152477);
+    chatSearch_3070230549[0].results = nimCopy(null, results_3070230565, NTI2097152486);
     chatSearch_3070230549[0].failed = false;
 --excHandler;
 } catch (EXCEPTION) {
@@ -37443,7 +37489,7 @@ async function writeNotificationPreferences__apiZaccount95settings_u53(csrfToken
     var response_2566914115 = ({ok: false, status: 0, body: []});
 ++excHandler;
     try {
-    response_2566914115 = nimCopy(response_2566914115, (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,112,114,101,102,101,114,101,110,99,101,115]), newfetchOptions__stdZjsfetch_u115(3, toJSStr(HEX24__pureZjson_u4507(HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,97,115,107,95,99,111,109,112,108,101,116,101,100], Field1: HEX25__pureZjson_u1859(taskCompleted_p1)}, NTI2566914104)]))), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172(csrfToken_p0)))), NTI2214592516);
+    response_2566914115 = nimCopy(response_2566914115, (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,112,114,101,102,101,114,101,110,99,101,115]), newfetchOptions__stdZjsfetch_u115(3, toJSStr(HEX24__pureZjson_u4507(HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,97,115,107,95,99,111,109,112,108,101,116,101,100], Field1: HEX25__pureZjson_u1859(taskCompleted_p1)}, NTI2566914104)]))), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176(csrfToken_p0)))), NTI2214592516);
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -37563,7 +37609,7 @@ async function revokeOtherSessions__apiZaccount95settings_u98(csrfToken_p0) {
     var response_2566914160 = ({ok: false, status: 0, body: []});
 ++excHandler;
     try {
-    response_2566914160 = nimCopy(response_2566914160, (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,115,101,115,115,105,111,110,115,47,114,101,118,111,107,101,45,111,116,104,101,114,115]), newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172(csrfToken_p0)))), NTI2214592516);
+    response_2566914160 = nimCopy(response_2566914160, (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,115,101,115,115,105,111,110,115,47,114,101,118,111,107,101,45,111,116,104,101,114,115]), newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176(csrfToken_p0)))), NTI2214592516);
 --excHandler;
 } catch (EXCEPTION) {
  var prevJSError = lastJSError;
@@ -37664,22 +37710,22 @@ function validateSessionRevocation__appZaccount95settings_u52(node_p0, sessionId
 
   
 }
-async function revokeSession__apiZauth95client_u1232(csrfToken_p0, sessionId_p1) {
-  var result_2097153236 = null;
+async function revokeSession__apiZauth95client_u1238(csrfToken_p0, sessionId_p1) {
+  var result_2097153242 = null;
 
   BeforeRet: {
-    var options_2097153242 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172(csrfToken_p0));
-    var response_2097153247 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,115,101,115,115,105,111,110,115,47],sessionId_p1,[47,114,101,118,111,107,101]), options_2097153242));
-    if (!(response_2097153247.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097153247.status), response_2097153247.body), "ValueError");
+    var options_2097153248 = newfetchOptions__stdZjsfetch_u115(2, "{}", 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176(csrfToken_p0));
+    var response_2097153253 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,115,101,115,115,105,111,110,115,47],sessionId_p1,[47,114,101,118,111,107,101]), options_2097153248));
+    if (!(response_2097153253.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097153253.status), response_2097153253.body), "ValueError");
     }
     
-    validateSessionRevocation__appZaccount95settings_u52(decodeJson__apiZhttp95call_u207(response_2097153247.body), sessionId_p1);
-    result_2097153236 = undefined;
+    validateSessionRevocation__appZaccount95settings_u52(decodeJson__apiZhttp95call_u207(response_2097153253.body), sessionId_p1);
+    result_2097153242 = undefined;
     break BeforeRet;
   };
 
-  return result_2097153236;
+  return result_2097153242;
 
 }
 async function revokeAuthSession__appZauth95bridge_u608(state_p0, sessionId_p1) {
@@ -37699,7 +37745,7 @@ async function revokeAuthSession__appZauth95bridge_u608(state_p0, sessionId_p1) 
     var confirmed_2063598187 = false;
 ++excHandler;
     try {
-    (await revokeSession__apiZauth95client_u1232(state_p0.auth.csrfToken, sessionId_p1));
+    (await revokeSession__apiZauth95client_u1238(state_p0.auth.csrfToken, sessionId_p1));
     if (!(matchesSessionsRequest__appZrequest95context_u619(state_p0, context_2063598186))) {
     result_2063598180 = undefined;
     break BeforeRet;
@@ -44699,75 +44745,75 @@ function focusWorkspaceAfterRender__agentic70rontend_u98() {
 
   
 }
-async function verifyEmail__apiZauth95client_u394(token_p0) {
-  var result_2097152397 = null;
+async function verifyEmail__apiZauth95client_u400(token_p0) {
+  var result_2097152403 = null;
 
   BeforeRet: {
-    var payload_2097152419 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,111,107,101,110], Field1: HEX25__pureZjson_u1833(token_p0)}, NTI2097152245)]);
-    var options_2097152420 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152419)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u172([]));
-    var response_2097152425 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,118,101,114,105,102,121,45,101,109,97,105,108]), options_2097152420));
-    if (!(response_2097152425.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152425.status), response_2097152425.body), "ValueError");
+    var payload_2097152425 = HEX25__pureZjson_u1862([nimCopy(null, {Field0: [116,111,107,101,110], Field1: HEX25__pureZjson_u1833(token_p0)}, NTI2097152254)]);
+    var options_2097152426 = newfetchOptions__stdZjsfetch_u115(2, toJSStr(HEX24__pureZjson_u4507(payload_2097152425)), 0, 0, 0, 1, false, 0, "client", "", jsonHeaders__apiZauth95client_u176([]));
+    var response_2097152431 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,118,101,114,105,102,121,45,101,109,97,105,108]), options_2097152426));
+    if (!(response_2097152431.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152431.status), response_2097152431.body), "ValueError");
     }
     
-    var data_2097152426 = decodeJson__apiZhttp95call_u207(response_2097152425.body);
-    if (((((!((data_2097152426.kind == 5)) || !(jsonBool__apiZauth95client_u56(data_2097152426, [118,101,114,105,102,105,101,100]))) || !(hasKey__pureZjson_u3232(data_2097152426, [117,115,101,114]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152426, [117,115,101,114]).kind == 5))) || ((jsonText__apiZauth95client_u47(HEX5BHEX5D__pureZjson_u3119(data_2097152426, [117,115,101,114]), [117,115,101,114,95,105,100])).length == 0))) {
+    var data_2097152432 = decodeJson__apiZhttp95call_u207(response_2097152431.body);
+    if (((((!((data_2097152432.kind == 5)) || !(jsonBool__apiZauth95client_u56(data_2097152432, [118,101,114,105,102,105,101,100]))) || !(hasKey__pureZjson_u3232(data_2097152432, [117,115,101,114]))) || !((HEX5BHEX5D__pureZjson_u3119(data_2097152432, [117,115,101,114]).kind == 5))) || ((jsonText__apiZauth95client_u47(HEX5BHEX5D__pureZjson_u3119(data_2097152432, [117,115,101,114]), [117,115,101,114,95,105,100])).length == 0))) {
     raiseException({message: makeNimstrLit("Email verification was not confirmed. Sign in to check the account."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    result_2097152397 = undefined;
+    result_2097152403 = undefined;
     break BeforeRet;
   };
 
-  return result_2097152397;
+  return result_2097152403;
 
 }
-async function me__apiZauth95client_u294() {
-  var result_2097152296 = null;
+async function me__apiZauth95client_u300() {
+  var result_2097152302 = null;
 
-    var options_2097152306 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_2097152311 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,109,101]), options_2097152306));
-    if (!(response_2097152311.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152311.status), response_2097152311.body), "ValueError");
+    var options_2097152312 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_2097152317 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,109,101]), options_2097152312));
+    if (!(response_2097152317.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152317.status), response_2097152317.body), "ValueError");
     }
     
-    result_2097152296 = parseAuthResponse__apiZauth95client_u141(decodeJson__apiZhttp95call_u207(response_2097152311.body));
+    result_2097152302 = parseAuthResponse__apiZauth95client_u145(decodeJson__apiZhttp95call_u207(response_2097152317.body));
 
-  return result_2097152296;
+  return result_2097152302;
 
 }
-async function verificationStatus__apiZauth95client_u497() {
-  var result_2097152499 = null;
+async function verificationStatus__apiZauth95client_u503() {
+  var result_2097152505 = null;
 
   BeforeRet: {
-    var options_2097152509 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_2097152514 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,118,101,114,105,102,105,99,97,116,105,111,110]), options_2097152509));
-    if ((response_2097152514.status == 404)) {
-    result_2097152499 = {pending: false, verified: false, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false};
+    var options_2097152515 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_2097152520 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2181038128.backendBaseUrl).concat([47,97,112,105,47,118,49,47,97,117,116,104,47,118,101,114,105,102,105,99,97,116,105,111,110]), options_2097152515));
+    if ((response_2097152520.status == 404)) {
+    result_2097152505 = {pending: false, verified: false, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false};
     break BeforeRet;
     }
     
-    if (!(response_2097152514.ok)) {
-    raiseException(apiError__apiZauth95client_u175(HEX24__systemZdollars_u14(response_2097152514.status), response_2097152514.body), "ValueError");
+    if (!(response_2097152520.ok)) {
+    raiseException(apiError__apiZauth95client_u179(HEX24__systemZdollars_u14(response_2097152520.status), response_2097152520.body), "ValueError");
     }
     
-    var data_2097152518 = decodeJson__apiZhttp95call_u207(response_2097152514.body);
-    if (eqStrings(jsonText__apiZauth95client_u47(data_2097152518, [115,116,97,116,117,115]), [118,101,114,105,102,105,101,100])) {
-    result_2097152499 = {pending: false, verified: true, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false};
+    var data_2097152524 = decodeJson__apiZhttp95call_u207(response_2097152520.body);
+    if (eqStrings(jsonText__apiZauth95client_u47(data_2097152524, [115,116,97,116,117,115]), [118,101,114,105,102,105,101,100])) {
+    result_2097152505 = {pending: false, verified: true, resendAfterSeconds: 0, emailHint: [], tooSoon: false, mailFailed: false};
     break BeforeRet;
     }
     
-    if (!(eqStrings(jsonText__apiZauth95client_u47(data_2097152518, [115,116,97,116,117,115]), [112,101,110,100,105,110,103]))) {
+    if (!(eqStrings(jsonText__apiZauth95client_u47(data_2097152524, [115,116,97,116,117,115]), [112,101,110,100,105,110,103]))) {
     raiseException({message: makeNimstrLit("The verification step could not be confirmed. Try signing in again."), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var step_2097152523 = parseVerificationStep__apiZauth95client_u81(data_2097152518);
-    step_2097152523.pending = true;
-    result_2097152499 = step_2097152523;
+    var step_2097152529 = parseVerificationStep__apiZauth95client_u85(data_2097152524);
+    step_2097152529.pending = true;
+    result_2097152505 = step_2097152529;
     break BeforeRet;
   };
 
-  return result_2097152499;
+  return result_2097152505;
 
 }
 async function resumeVerification__appZauth95bridge_u274(state_p0, requestEpoch_p1) {
@@ -44776,7 +44822,7 @@ async function resumeVerification__appZauth95bridge_u274(state_p0, requestEpoch_
   BeforeRet: {
 ++excHandler;
     try {
-    var step_2063597856 = (await verificationStatus__apiZauth95client_u497());
+    var step_2063597856 = (await verificationStatus__apiZauth95client_u503());
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_p1))) {
     result_2063597846 = undefined;
     break BeforeRet;
@@ -44823,7 +44869,7 @@ async function bootstrapApplication__appZauth95bridge_u290(state_p0) {
     if ((0 < (verifyToken_2063597868).length)) {
 ++excHandler;
     try {
-    (await verifyEmail__apiZauth95client_u394(verifyToken_2063597868));
+    (await verifyEmail__apiZauth95client_u400(verifyToken_2063597868));
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_2063597867))) {
     result_2063597861 = undefined;
     break BeforeRet;
@@ -44858,7 +44904,7 @@ async function bootstrapApplication__appZauth95bridge_u290(state_p0) {
     
 ++excHandler;
     try {
-    var auth_2063597879 = (await me__apiZauth95client_u294());
+    var auth_2063597879 = (await me__apiZauth95client_u300());
     if (!(matchesAuthRequest__appZrequest95context_u81(state_p0, requestEpoch_2063597867))) {
     result_2063597861 = undefined;
     break BeforeRet;

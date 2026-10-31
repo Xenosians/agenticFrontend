@@ -11,6 +11,7 @@ import hashlib
 import json
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+import re
 import threading
 import unittest
 import uuid
@@ -40,8 +41,40 @@ BROWSER_WRITE_RECORDER = """(() => {
   }
 })();"""
 
+# Records every Content Security Policy violation the page reports.
+CSP_VIOLATION_RECORDER = """(() => {
+  const violations = [];
+  Object.defineProperty(globalThis, "__cspViolations", {value: violations});
+  document.addEventListener("securitypolicyviolation",
+    event => violations.push(event.violatedDirective + " " + event.blockedURI));
+})();"""
+
+
+def nginx_security_headers():
+    """The security headers the production nginx sends with the application's files.
+
+    Browser tests serve the built frontend with exactly these headers, so every view
+    is exercised under the production Content Security Policy.
+    """
+    docker = Path(__file__).resolve().parents[1] / "docker"
+    headers = dict(re.findall(r"^add_header\s+([A-Za-z-]+)\s+\"([^\"]+)\"\s+always;$",
+                              (docker / "security-headers.conf").read_text(), re.M))
+    # Tests serve the API fixtures from the page's own plain-HTTP origin.
+    headers.pop("Strict-Transport-Security", None)
+    return headers
+
+
+SECURITY_HEADERS = nginx_security_headers()
+
 
 class QuietStaticHandler(SimpleHTTPRequestHandler):
+    """Serves the built frontend with the production nginx security headers."""
+
+    def end_headers(self):
+        for name, value in SECURITY_HEADERS.items():
+            self.send_header(name, value)
+        super().end_headers()
+
     def log_message(self, *_args):
         pass
 
@@ -73,6 +106,7 @@ class ChatNavigationTests(unittest.TestCase):
         # The frontend keeps nothing in the browser: record every storage or
         # cookie write so each test can prove there were none.
         self.context.add_init_script(BROWSER_WRITE_RECORDER)
+        self.context.add_init_script(CSP_VIOLATION_RECORDER)
         self.page = self.context.new_page()
         self.pending_history = []
         self.submissions = []
@@ -92,6 +126,8 @@ class ChatNavigationTests(unittest.TestCase):
             if not self.page.is_closed() and self.page.url.startswith(self.base):
                 self.assertEqual(self.page.evaluate("globalThis.__browserWrites || []"), [],
                                  "the frontend wrote to browser storage or cookies")
+                self.assertEqual(self.page.evaluate("globalThis.__cspViolations || []"), [],
+                                 "the frontend broke the production Content Security Policy")
         finally:
             self.context.close()
 
@@ -101,7 +137,7 @@ class ChatNavigationTests(unittest.TestCase):
         path = url.path
         if request.url.startswith(self.base + "/") and not path.startswith("/api/"):
             if path == "/config.js":
-                route.fulfill(content_type="application/javascript", body=(
+                route.fulfill(content_type="application/javascript", headers=SECURITY_HEADERS, body=(
                     "window.AGENTIC_CONFIG = Object.freeze({backendBaseUrl:"
                     + json.dumps(self.base) + ",pollIntervalMs:10,requiredOperations:true});"
                 ))
@@ -244,6 +280,27 @@ class ChatNavigationTests(unittest.TestCase):
             "messages": [{"role": "user", "content": "Second chat history"}],
         })
         expect(self.page.get_by_text("Second chat history", exact=True)).to_be_visible()
+
+    def test_the_production_headers_lock_the_page_down(self):
+        """The served page runs under a strict policy: own scripts and styles only, no
+        framing, no plugins, no form posts, no base rewrite, and nothing is sniffed."""
+        policy = dict(directive.strip().split(" ", 1) for directive
+                      in SECURITY_HEADERS["Content-Security-Policy"].split(";") if directive.strip())
+        self.assertEqual(policy["default-src"], "'none'")
+        self.assertEqual(policy["script-src"], "'self'")
+        self.assertEqual(policy["style-src"], "'self'")
+        self.assertEqual(policy["object-src"], "'none'")
+        self.assertEqual(policy["frame-ancestors"], "'none'")
+        self.assertEqual(policy["base-uri"], "'none'")
+        self.assertEqual(policy["form-action"], "'none'")
+        self.assertNotIn("unsafe", SECURITY_HEADERS["Content-Security-Policy"])
+        self.assertEqual(SECURITY_HEADERS["X-Content-Type-Options"], "nosniff")
+        self.assertEqual(SECURITY_HEADERS["Referrer-Policy"], "no-referrer")
+        self.assertIn("camera=()", SECURITY_HEADERS["Permissions-Policy"])
+        response = self.page.goto(self.base + "/", wait_until="networkidle")
+        self.assertEqual(response.headers["content-security-policy"], SECURITY_HEADERS["Content-Security-Policy"])
+        expect(self.page.locator(".sidebar")).to_be_visible()
+        self.assertEqual(self.errors, [])
 
     def test_navigation_blocks_keyboard_and_button_without_losing_draft(self):
         self.open_first_chat()
