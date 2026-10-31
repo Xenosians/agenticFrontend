@@ -38,6 +38,14 @@ suite "knowledge sources":
     check knowledgeSources(%*{"detail": "outage"}).len == 0
     check knowledgeSources(nil).len == 0
 
+  test "a crawled source says how many pages it read; an uploaded one says nothing":
+    var crawled = copy(catalog)
+    crawled["resources"][1]["crawl"] = %*{"schema": "knowledge-crawl.v1", "truncated": false,
+      "pages": [{"url": "https://docs.example.org/", "title": "Docs", "sha256": "a"}], "skipped": {}}
+    let sources = knowledgeSources(crawled)
+    check sources[1].crawl == "Read 1 page from https://docs.example.org/"
+    check sources[0].crawl == ""
+
   test "the default source is the chosen one, else the one in use, else the first":
     let sources = knowledgeSources(catalog)
     check defaultKnowledgeSource(sources, "a".repeat(32)) == "a".repeat(32)

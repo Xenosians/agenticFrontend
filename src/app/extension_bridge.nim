@@ -3,6 +3,7 @@ import std/[asyncjs, json, strutils]
 import types
 import dataset_versions
 import lua_transforms
+import knowledge_crawl
 import ../api/extensions
 import ../api/connection_options
 import ../config/runtime_config
@@ -162,6 +163,14 @@ proc applyDatasetTransform*(state: AppState) {.async.} =
   except CatchableError as exc:
     if sameSession(state, session): state.extensionError = exc.msg
     redraw(kxi)
+
+proc crawlSite*(state: AppState) {.async.} =
+  ## Crawls one page tree of a site the machine's profile declares into reference knowledge.
+  ## A start page outside every declared site is never sent.
+  if crawlSiteOf(state.datasetCrawlUrl, crawlSources(state.extensionCatalog)).len == 0: return
+  let replaces = validReplacement(state.extensionCatalog, "rag", state.datasetReplaces)
+  await changeExtension(state, "dataset_crawl", crawlPayload(state.datasetCrawlUrl, state.datasetName,
+    state.datasetLicense, state.datasetReviewed, replaces))
 
 proc uploadUserModel*(state: AppState) {.async.} =
   if state.extensionBusy or not state.auth.authenticated: return

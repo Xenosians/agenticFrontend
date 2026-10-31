@@ -96,6 +96,18 @@ class KnowledgeTests(navigation.ChatNavigationTests):
         expect(self.page.locator(".knowledge-panel")).to_contain_text("never grant permission")
         self.assertEqual(self.errors, [])
 
+    def test_a_crawled_source_says_how_many_pages_it_read(self):
+        self.catalog["resources"][2]["crawl"] = {
+            "schema": "knowledge-crawl.v1", "start_url": "https://docs.example.org/", "truncated": True,
+            "pages": [{"url": "https://docs.example.org/", "title": "Docs", "sha256": "1" * 64},
+                      {"url": "https://docs.example.org/vpn", "title": "VPN", "sha256": "2" * 64}],
+            "skipped": {"robots": 1}}
+        self.open_knowledge()
+        sources = self.page.locator(".knowledge-source")
+        expect(sources.filter(has_text="Router manual (v2)").locator(".knowledge-crawl")).to_have_text(
+            "Read 2 pages from https://docs.example.org/ · stopped at the crawl limit")
+        expect(sources.filter(has_text="Router manual (v1)").locator(".knowledge-crawl")).to_have_count(0)
+
     def test_search_shows_cited_untrusted_hits_from_the_chosen_source_only(self):
         self.open_knowledge()
         self.page.get_by_role("combobox", name="Source", exact=True).select_option(SOURCE)

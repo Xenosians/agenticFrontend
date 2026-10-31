@@ -247,6 +247,8 @@ type
     datasetTransformPreviewed*: bool
     datasetTransformEpoch*: int
     datasetTransformOpen*: bool
+    datasetCrawlOpen*: bool
+    datasetCrawlUrl*: string
     activeView*: AppView
     inspectorTab*: InspectorTab
     composerPanel*: ComposerPanel

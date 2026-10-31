@@ -6,6 +6,7 @@ import ../app/[types, extension_bridge]
 import ../app/connection_draft
 import ../app/dataset_versions
 import ../app/lua_transforms
+import ../app/knowledge_crawl
 import ../api/connection_options
 import brand
 
@@ -2069,6 +2070,43 @@ proc renderDatasetTransform(state: AppState): VNode =
                 li: code: text row
 
 
+proc renderDatasetCrawl(state: AppState): VNode =
+  ## Reads pages of a site this machine's profile declares into reference knowledge.
+  ## The AI service fetches the pages; the browser only chooses where to start.
+  let sites = crawlSources(state.extensionCatalog)
+  let start = if state.datasetCrawlUrl.len > 0: state.datasetCrawlUrl else: sites[0] & "/"
+  let inside = crawlSiteOf(start, sites).len > 0
+  result = buildHtml(section(class = "dataset-api dataset-crawl")):
+    # Open state lives in AppState: a notice above re-creates these nodes on every save or error.
+    button(class = "dataset-transform-toggle", `aria-label` = "Crawl a site",
+           `aria-expanded` = cstring($state.datasetCrawlOpen)):
+      text "Crawl a site"
+      proc onclick(event: Event, node: VNode) =
+        state.datasetCrawlOpen = not state.datasetCrawlOpen
+    if state.datasetCrawlOpen:
+      tdiv(class = "dataset-api-body"):
+        p(class = "dataset-transform-note"):
+          text "Sites this machine allows. Pages beneath the start page are read, up to 25, " &
+            "following the site's robots.txt, and saved as reference knowledge with the name, " &
+            "license and review above."
+        ul(class = "dataset-crawl-sites"):
+          for site in sites:
+            li: text site
+        tdiv(class = "plugin-field"):
+          label(`for` = "datasetCrawlUrl"): text "Start page"
+          input(id = "datasetCrawlUrl", `type` = "url", `aria-label` = "Start page", value = cstring(start),
+                spellcheck = "false"):
+            proc oninput(event: Event, node: VNode) = state.datasetCrawlUrl = $node.value
+        if not inside:
+          p(class = "dataset-transform-note", role = "alert"):
+            text "Choose a page on one of the sites listed above."
+        button(class = "plugin-secondary", disabled = state.extensionBusy or not inside):
+          text "Crawl and save"
+          proc onclick(event: Event, node: VNode) =
+            state.datasetCrawlUrl = start
+            discard crawlSite(state)
+
+
 proc renderDatasetManager(
   state: AppState
 ): VNode =
@@ -2224,6 +2262,9 @@ proc renderDatasetManager(
 
     if transformAvailable(state.extensionCatalog):
       renderDatasetTransform(state)
+
+    if crawlSources(state.extensionCatalog).len > 0:
+      renderDatasetCrawl(state)
 
     details(class = "dataset-api"):
 

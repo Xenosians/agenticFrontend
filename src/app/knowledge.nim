@@ -6,12 +6,14 @@
 
 import std/[json, strutils]
 import dataset_versions
+import knowledge_crawl
 
 const knowledgeQueryLimit* = 200
 
 type
   KnowledgeSource* = object
     id*, title*, version*, source*, license*: string
+    crawl*: string  ## "Read N pages from <site>" for a crawled site; "" for an upload.
     selected*: bool
 
   KnowledgeHit* = object
@@ -42,7 +44,8 @@ proc knowledgeSources*(catalog: JsonNode): seq[KnowledgeSource] =
     let identity = text(row, "id")
     if identity.len == 0: continue
     result.add KnowledgeSource(id: identity, title: datasetTitle(row), version: versionLabel(catalog, row),
-      source: text(row, "source"), license: text(row, "license"), selected: identity == selected)
+      source: text(row, "source"), license: text(row, "license"), crawl: crawlSummary(row),
+      selected: identity == selected)
 
 
 proc defaultKnowledgeSource*(sources: seq[KnowledgeSource], chosen: string): string =

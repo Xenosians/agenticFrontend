@@ -13,6 +13,8 @@ proc renderSource(source: KnowledgeSource): VNode =
         span(class = "review-status"): text "Used for your requests"
     p(class = "knowledge-meta"): text source.version
     p(class = "knowledge-meta"): text source.source & " · " & source.license
+    if source.crawl.len > 0:
+      p(class = "knowledge-meta knowledge-crawl"): text source.crawl
 
 proc renderHit(hit: KnowledgeHit): VNode =
   result = buildHtml(article(class = "knowledge-hit")):
@@ -66,7 +68,8 @@ proc renderKnowledgePanel*(state: AppState): VNode =
         p(class = "operation-note", role = "status"): text "Loading your sources…"
       elif sources.len == 0:
         tdiv(class = "empty-card"):
-          text "No reference datasets yet. Add one under Connections → Data & automation with the purpose Reference."
+          text "No reference datasets yet. Add one under Connections → Data & automation with the purpose " &
+            "Reference, or crawl a site this machine allows."
       else:
         tdiv(class = "section-heading-row"):
           h3: text "Sources"

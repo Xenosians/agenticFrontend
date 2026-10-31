@@ -900,6 +900,17 @@
   color: var(--text);
 }
 
+.dataset-crawl-sites {
+  margin: 0 0 9px;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-caption);
+  overflow-wrap: anywhere;
+}
+
 .automation-panel {
   margin-top: 20px;
 }
