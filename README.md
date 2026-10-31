@@ -92,7 +92,7 @@ Open saved chats with the header's **Chats** button or **Ctrl/Cmd+Alt+C**. Reope
 - Hosted APIs need valid provider access, credentials, and quota. A saved connection does not by itself prove connectivity; use its probe and then test the intended task.
 - Pi and OpenCode are available only when installed on the AI host. They supply inference while application tools remain governed by server policy and approvals.
 - Local model uploads accept supported safetensors folders. The AI service validates their format; this does not guarantee model quality or enough GPU memory.
-- Reference uploads use local full-text retrieval. Training JSONL requires provenance and review; exporting/importing data does not start training or promote a model.
+- Reference uploads use owner-scoped local full-text retrieval and accept UTF-8 documents or common source/config files up to 2 MB. PDF and Word parsing is not supported yet. Training uploads accept JSONL only and require provenance and review; importing data does not start training or promote a model.
 - Networking uses the existing dedicated model by default. Each saved model's **Settings** can explicitly choose **Use this connection for networking**, including local and uploaded models. For an external connection, networking requests and device details go to that provider. Private datasets remain excluded from networking in either mode.
 
 The AI repository's `docs/user-extensions.md` documents formats, limits, storage, and configuration. The frontend uses authenticated `/api/v1/extensions` requests; credentials are stored server-side and omitted from returned catalogs.

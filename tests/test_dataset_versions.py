@@ -119,7 +119,45 @@ class DatasetVersionTests(navigation.ChatNavigationTests):
         self.page.get_by_role("combobox", name="Purpose", exact=True).select_option("training")
         target = self.page.get_by_role("combobox", name="Upload as", exact=True)
         expect(target.locator("option")).to_have_text(["New dataset", "New version of Fixture examples (v1)"])
+        self.assertEqual(self.page.locator("#datasetFile").get_attribute("accept"), ".jsonl")
         self.assertEqual(self.mutations, [])
+        self.assertEqual(self.errors, [])
+
+    def test_reference_upload_offers_common_source_files_and_jsonl(self):
+        self.open_tab("Data & automation")
+        purpose = self.page.get_by_role("combobox", name="Purpose", exact=True)
+        purpose.select_option("rag")
+        self.assertEqual(
+            self.page.locator("#datasetFile").get_attribute("accept"),
+            ".txt,.md,.markdown,.csv,.jsonl,.json,.py,.lua,.ex,.exs,.nim,.js,.jsx,.ts,.tsx,.sql,.sh,.bash,.yaml,.yml,.toml,.ini,.cfg,.conf,.log,.html,.css",
+        )
+        purpose.select_option("training")
+        self.assertEqual(self.page.locator("#datasetFile").get_attribute("accept"), ".jsonl")
+        self.assertEqual(self.mutations, [])
+        self.assertEqual(self.errors, [])
+
+    def test_invalid_encoding_binary_and_wrong_extension_are_rejected(self):
+        self.open_tab("Data & automation")
+        self.page.get_by_role("combobox", name="Purpose", exact=True).select_option("rag")
+        self.page.get_by_placeholder("Dataset name", exact=True).fill("Rejected upload")
+        self.page.get_by_placeholder("Owned documentation", exact=True).fill("fixture")
+        self.page.get_by_placeholder("Internal / owned", exact=True).fill("internal")
+        self.page.locator(".dataset-review input").check()
+
+        cases = [
+            ("unsafe.pdf", b"text pretending to be a PDF", "This file type is not allowed for the selected purpose."),
+            ("binary.py", b"print('hello')\x00", "Binary files are not supported."),
+            ("invalid-utf8.py", b"\xff", "Dataset files must contain valid UTF-8 text."),
+            ("too-large.py", b"x" * 2_000_001, "Dataset files must be under 2 MB."),
+        ]
+        for filename, content, message in cases:
+            with self.subTest(filename=filename):
+                self.page.locator("#datasetFile").set_input_files(
+                    files=[{"name": filename, "mimeType": "text/plain", "buffer": content}])
+                self.page.get_by_role("button", name="Upload dataset", exact=True).click()
+                expect(self.page.locator(".plugin-notice.error")).to_contain_text(message)
+                self.assertEqual(self.mutations, [])
+
         self.assertEqual(self.errors, [])
 
     def test_reference_choices_name_each_version(self):

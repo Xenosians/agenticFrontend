@@ -5,10 +5,19 @@ import std/[json, strutils]
 import ../app/[types, extension_bridge]
 import ../app/connection_draft
 import ../app/dataset_versions
+import ../app/dataset_file_types
 import ../app/lua_transforms
 import ../app/knowledge_crawl
 import ../api/connection_options
 import brand
+
+
+proc updateDatasetFilePicker(accepted: cstring) {.importjs: """
+(() => {
+  const input = document.getElementById('datasetFile');
+  if (input) input.accept = #;
+})()
+""".}
 
 
 proc nodeText(
@@ -2188,6 +2197,7 @@ proc renderDatasetManager(
           state.datasetPurpose =
             $node.value
           state.datasetReplaces = ""
+          updateDatasetFilePicker(cstring(datasetFileAccept(state.datasetPurpose)))
 
     tdiv(class = "plugin-field"):
 
@@ -2222,7 +2232,7 @@ proc renderDatasetManager(
       id = "datasetFile",
       class = "dataset-file",
       `type` = "file",
-      accept = ".txt,.md,.jsonl"
+      accept = cstring(datasetFileAccept(state.datasetPurpose))
     )
 
     label(class = "dataset-review"):

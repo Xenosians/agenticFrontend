@@ -156,7 +156,7 @@ class WorkspaceContextTests(navigation.ChatNavigationTests):
 
     def test_upload_without_a_chosen_file_explains_instead_of_failing_silently(self):
         for label, message in (("Upload", "Choose a model folder first."),
-                               ("Upload dataset", "Choose a text or JSONL file under 2 MB.")):
+                               ("Upload dataset", "Choose a file in one of the listed formats.")):
             with self.subTest(button=label):
                 self.open_view("connections-data")
                 self.page.get_by_role("button", name=label, exact=True).click()

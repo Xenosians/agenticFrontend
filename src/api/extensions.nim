@@ -91,16 +91,27 @@ proc extensionCatalog*(): Future[JsonNode] {.async.} =
     raise newException(ValueError, "Connections could not be loaded.")
   return decodeJson(response.body)
 
-proc datasetFileOutcome(): Future[cstring] {.importjs: """
-(async () => {
+proc datasetFileOutcome(acceptedExtensions: cstring): Future[cstring] {.importjs: """
+(async (accepted) => {
   try {
     const f=document.getElementById('datasetFile').files[0];
-    if(!f || f.size>2000000) throw new Error('Choose a text or JSONL file under 2 MB.');
-    return JSON.stringify({value: await f.text()});
+    if(!f) throw new Error('Choose a file in one of the listed formats.');
+    if(f.size>2000000) throw new Error('Dataset files must be under 2 MB.');
+    const extensions=String(accepted||'').split(',').map(value=>value.trim().toLowerCase()).filter(Boolean);
+    const filename=f.name.toLowerCase();
+    if(!extensions.some(extension=>filename.endsWith(extension))) throw new Error('This file type is not allowed for the selected purpose.');
+    let value;
+    try {
+      value=new TextDecoder('utf-8',{fatal:true}).decode(await f.arrayBuffer());
+    } catch {
+      throw new Error('Dataset files must contain valid UTF-8 text.');
+    }
+    if(value.includes('\u0000')) throw new Error('Binary files are not supported. Choose a plain-text document or source file.');
+    return JSON.stringify({value});
   } catch(error) {
     return JSON.stringify({error: error && typeof error.message==='string' ? error.message : 'The dataset file could not be read.'});
   }
-})()
+})(#)
 """.}
 
 proc modelUploadOutcome(baseUrl, csrf, name: cstring): Future[cstring] {.importjs: """
@@ -138,8 +149,8 @@ proc browserOutcome(raw: cstring): string =
     raise newException(ValueError, outcome["error"].getStr)
   outcome["value"].getStr
 
-proc datasetFileText*(): Future[string] {.async.} =
-  return browserOutcome(await datasetFileOutcome())
+proc datasetFileText*(acceptedExtensions: string): Future[string] {.async.} =
+  return browserOutcome(await datasetFileOutcome(cstring(acceptedExtensions)))
 
 proc uploadModelFiles*(baseUrl, csrf, name: cstring): Future[string] {.async.} =
   return browserOutcome(await modelUploadOutcome(baseUrl, csrf, name))

@@ -2,6 +2,7 @@ include karax/prelude
 import std/[asyncjs, json, strutils]
 import types
 import dataset_versions
+import dataset_file_types
 import lua_transforms
 import knowledge_crawl
 import ../api/extensions
@@ -106,7 +107,7 @@ proc loadProviderModels*(state: AppState) {.async.} =
 proc saveDatasetFile*(state: AppState) {.async.} =
   let session = state.auth.sessionId
   try:
-    let content = $(await datasetFileText())
+    let content = $(await datasetFileText(datasetFileAccept(state.datasetPurpose)))
     if not sameSession(state, session): return
     # A replacement that no longer applies (a newer version arrived) uploads nothing as a version.
     let replaces = validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces)
@@ -133,7 +134,7 @@ proc previewDatasetTransform*(state: AppState) {.async.} =
   state.datasetTransformPreviewed = false
   redraw(kxi)
   try:
-    let content = $(await datasetFileText())
+    let content = $(await datasetFileText(datasetFileAccept(state.datasetPurpose)))
     if not sameSession(state, session) or epoch != state.datasetTransformEpoch: return
     let preview = parseTransformPreview(await extensionRequest("dataset_transform",
       transformPayload(state.datasetScript, content), state.auth.csrfToken))
@@ -152,7 +153,7 @@ proc applyDatasetTransform*(state: AppState) {.async.} =
   let session = state.auth.sessionId
   let epoch = state.datasetTransformEpoch
   try:
-    let content = $(await datasetFileText())
+    let content = $(await datasetFileText(datasetFileAccept(state.datasetPurpose)))
     if not sameSession(state, session) or epoch != state.datasetTransformEpoch: return
     let replaces = validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces)
     await changeExtension(state, "dataset_transform", transformApplyPayload(state.datasetScript, content,
