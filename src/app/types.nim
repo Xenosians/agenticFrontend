@@ -249,6 +249,7 @@ type
     datasetTransformOpen*: bool
     datasetCrawlOpen*: bool
     datasetCrawlUrl*: string
+    datasetCrawlNewSite*: string
     activeView*: AppView
     inspectorTab*: InspectorTab
     composerPanel*: ComposerPanel

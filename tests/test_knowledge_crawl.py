@@ -1,7 +1,8 @@
 """Crawl a site into reference knowledge (SRS 1.9 FR-083/FR-085), with isolated HTTP fixtures.
 
-The machine's Lua profile decides which sites may be crawled, and the catalog lists
-them. The Data tab offers only those sites; the AI service fetches the pages and
+The catalog lists the sites this user may crawl: the machine's own (managed) and, when
+the machine allows it, the ones the user added. The Data tab offers only those sites,
+lets the user add and remove their own, and the AI service fetches the pages and
 admits the text like an upload, as reference knowledge only.
 Run after rebuilding: python tests/test_knowledge_crawl.py
 """
@@ -16,12 +17,14 @@ from test_statusbar import CONTRAST
 from test_workspace_context import CATALOG
 
 SITES = ["https://docs.example.org", "http://wiki.lan:8090"]
+CATALOG_SITES = [{"origin": SITES[0], "managed": True}, {"origin": SITES[1], "managed": False}]
 
 
 class KnowledgeCrawlTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.catalog = copy.deepcopy(CATALOG)
-        self.catalog["crawl_sources"] = list(SITES)
+        self.catalog["crawl_sites"] = copy.deepcopy(CATALOG_SITES)
+        self.catalog["crawl_site_registration"] = True
         self.mutations = []
         self.crawl_reply = {"id": "c" * 32, "kind": "dataset", "purpose": "rag", "state": "ready", "version": 1}
         super().setUp()
@@ -35,6 +38,15 @@ class KnowledgeCrawlTests(navigation.ChatNavigationTests):
                 return
             body = request.post_data_json
             self.mutations.append(body)
+            if body["action"] == "crawl_site_add" and not isinstance(self.crawl_reply, tuple):
+                self.catalog["crawl_sites"].append({"origin": body["payload"]["origin"], "managed": False})
+                route.fulfill(json={"origin": body["payload"]["origin"], "managed": False})
+                return
+            if body["action"] == "crawl_site_remove":
+                self.catalog["crawl_sites"] = [site for site in self.catalog["crawl_sites"]
+                                               if site["origin"] != body["payload"]["origin"]]
+                route.fulfill(json={"removed": True})
+                return
             if isinstance(self.crawl_reply, tuple):
                 route.fulfill(status=self.crawl_reply[0], json=self.crawl_reply[1])
             else:
@@ -62,12 +74,51 @@ class KnowledgeCrawlTests(navigation.ChatNavigationTests):
     def crawl_button(self):
         return self.page.locator(".dataset-crawl").get_by_role("button", name="Crawl and save", exact=True)
 
-    def test_only_the_sites_this_machine_declares_are_offered(self):
+    def sites(self):
+        return self.page.locator(".dataset-crawl-site")
+
+    def test_only_the_users_sites_are_offered_and_only_their_own_can_be_removed(self):
         self.open_crawl()
-        listed = self.page.locator(".dataset-crawl-sites li")
-        expect(listed).to_have_text(SITES)
+        expect(self.sites()).to_have_text(SITES)
         expect(self.start_page()).to_have_value(SITES[0] + "/")
+        # The machine's site has no Remove button; the user's own site has one.
+        expect(self.page.get_by_role("button", name="Remove " + SITES[0], exact=True)).to_have_count(0)
+        expect(self.page.get_by_role("button", name="Remove " + SITES[1], exact=True)).to_be_visible()
         self.assertEqual(self.errors, [])
+
+    def test_a_user_adds_a_site_once_and_can_crawl_it(self):
+        self.open_crawl()
+        self.page.get_by_role("textbox", name="Add site", exact=True).fill("  https://wiki.example.net/  ")
+        self.page.locator(".dataset-crawl-add").get_by_role("button", name="Add", exact=True).click()
+        expect(self.sites()).to_have_text(SITES + ["https://wiki.example.net"])
+        self.assertEqual(self.mutations, [{"action": "crawl_site_add",
+                                           "payload": {"origin": "https://wiki.example.net"}}])
+        # The new site becomes the start page, and the field is cleared for the next one.
+        expect(self.start_page()).to_have_value("https://wiki.example.net/")
+        expect(self.page.get_by_role("textbox", name="Add site", exact=True)).to_have_value("")
+        expect(self.crawl_button()).to_be_enabled()
+
+    def test_a_refused_site_shows_its_reason_and_is_not_listed(self):
+        self.crawl_reply = (422, {"error": "extension_request_rejected", "detail": {
+            "code": "crawl_site_needs_https", "message": "Use https:// for a site on the internet."}})
+        self.open_crawl()
+        self.page.get_by_role("textbox", name="Add site", exact=True).fill("http://wiki.example.net")
+        self.page.locator(".dataset-crawl-add").get_by_role("button", name="Add", exact=True).click()
+        expect(self.page.locator(".plugin-notice.error")).to_contain_text(
+            "Use https:// for a site on the internet. (crawl_site_needs_https)")
+        expect(self.sites()).to_have_text(SITES)
+
+    def test_removing_a_site_forgets_it(self):
+        self.open_crawl()
+        self.page.get_by_role("button", name="Remove " + SITES[1], exact=True).click()
+        expect(self.sites()).to_have_text(SITES[:1])
+        self.assertEqual(self.mutations, [{"action": "crawl_site_remove", "payload": {"origin": SITES[1]}}])
+
+    def test_without_registration_no_site_can_be_added(self):
+        self.catalog["crawl_site_registration"] = False
+        self.open_crawl()
+        expect(self.page.get_by_role("textbox", name="Add site", exact=True)).to_have_count(0)
+        expect(self.sites()).to_have_text(SITES)
 
     def test_crawling_saves_reference_knowledge_with_the_dataset_fields(self):
         self.open_crawl()
@@ -88,7 +139,7 @@ class KnowledgeCrawlTests(navigation.ChatNavigationTests):
             self.start_page().fill(outside)
             expect(self.crawl_button()).to_be_disabled()
             expect(self.page.locator(".dataset-crawl .dataset-transform-note[role=alert]")).to_have_text(
-                "Choose a page on one of the sites listed above.")
+                "Choose a page on one of your sites.")
         self.crawl_button().dispatch_event("click")
         self.page.wait_for_timeout(300)
         self.assertEqual(self.mutations, [])
@@ -103,8 +154,9 @@ class KnowledgeCrawlTests(navigation.ChatNavigationTests):
         expect(self.page.locator(".plugin-notice.error")).to_contain_text(
             "No readable text was found at that address; nothing was saved. (crawl_found_no_text)")
 
-    def test_without_declared_sites_no_crawl_is_offered(self):
-        self.catalog["crawl_sources"] = []
+    def test_without_sites_or_registration_no_crawl_is_offered(self):
+        self.catalog["crawl_sites"] = []
+        self.catalog["crawl_site_registration"] = False
         self.open_first_chat()
         self.page.keyboard.press("Control+,")
         self.page.locator(".plugin-tabs").get_by_role("button", name="Data & automation", exact=True).click()
@@ -115,7 +167,8 @@ class KnowledgeCrawlTests(navigation.ChatNavigationTests):
         for width, height in ((1440, 900), (390, 760)):
             self.page.set_viewport_size({"width": width, "height": height})
             self.open_crawl()
-            for selector in (".dataset-crawl .dataset-transform-note", ".dataset-crawl-sites li"):
+            for selector in (".dataset-crawl .dataset-transform-note", ".dataset-crawl-site",
+                             ".dataset-crawl-remove", ".dataset-crawl-add label"):
                 with self.subTest(width=width, selector=selector):
                     self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
             overflow = self.page.evaluate(

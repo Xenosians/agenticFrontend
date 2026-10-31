@@ -902,13 +902,60 @@
 
 .dataset-crawl-sites {
   margin: 0 0 9px;
-  padding-left: 20px;
+  padding: 0;
+  list-style: none;
   display: grid;
   gap: 4px;
   color: var(--text);
   font-family: var(--font-mono);
   font-size: var(--font-size-caption);
   overflow-wrap: anywhere;
+}
+
+.dataset-crawl-sites li {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dataset-crawl-site {
+  min-width: 0;
+}
+
+.dataset-crawl-remove {
+  flex: none;
+  min-height: 24px;
+  padding: 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-soft);
+  font-family: var(--font-ui);
+  font-size: var(--font-size-caption);
+  cursor: pointer;
+}
+
+.dataset-crawl-remove:hover:not(:disabled) {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+.dataset-crawl-remove:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.dataset-crawl-add {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 8px;
+  align-items: center;
+}
+
+.dataset-crawl-add label {
+  grid-column: 1 / -1;
 }
 
 .automation-panel {

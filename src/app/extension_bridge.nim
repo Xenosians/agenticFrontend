@@ -166,12 +166,26 @@ proc applyDatasetTransform*(state: AppState) {.async.} =
     redraw(kxi)
 
 proc crawlSite*(state: AppState) {.async.} =
-  ## Crawls one page tree of a site the machine's profile declares into reference knowledge.
-  ## A start page outside every declared site is never sent.
-  if crawlSiteOf(state.datasetCrawlUrl, crawlSources(state.extensionCatalog)).len == 0: return
+  ## Crawls one page tree of one of the user's crawl sites into reference knowledge.
+  ## A start page outside every listed site is never sent.
+  if crawlSiteOf(state.datasetCrawlUrl, siteOrigins(crawlSites(state.extensionCatalog))).len == 0: return
   let replaces = validReplacement(state.extensionCatalog, "rag", state.datasetReplaces)
   await changeExtension(state, "dataset_crawl", crawlPayload(state.datasetCrawlUrl, state.datasetName,
     state.datasetLicense, state.datasetReviewed, replaces))
+
+proc addCrawlSite*(state: AppState) {.async.} =
+  ## Remembers a site for this user; the AI service checks the address and stores it encrypted.
+  let origin = siteToAdd(state.datasetCrawlNewSite)
+  if origin.len == 0: return
+  await changeExtension(state, "crawl_site_add", %*{"origin": origin})
+  if state.extensionError.len == 0:
+    state.datasetCrawlNewSite = ""
+    state.datasetCrawlUrl = origin & "/"
+
+proc removeCrawlSite*(state: AppState, origin: string) {.async.} =
+  await changeExtension(state, "crawl_site_remove", %*{"origin": origin})
+  if state.extensionError.len == 0 and crawlSiteOf(state.datasetCrawlUrl, @[origin]).len > 0:
+    state.datasetCrawlUrl = ""
 
 proc uploadUserModel*(state: AppState) {.async.} =
   if state.extensionBusy or not state.auth.authenticated: return

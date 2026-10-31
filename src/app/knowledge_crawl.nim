@@ -1,21 +1,40 @@
-## Crawling a site into reference knowledge (SRS 1.9 FR-083/FR-085). The machine's
-## Lua profile decides which sites may be crawled; the AI service fetches them and
-## admits the text like any upload. The browser only picks a declared site, a start
-## page and the dataset fields.
+## Crawling a site into reference knowledge (SRS 1.9 FR-083/FR-085). The catalog lists
+## the sites this user may crawl: the machine's own and, when the machine's Lua profile
+## allows it, the ones the user added. The AI service fetches the pages and admits the
+## text like any upload; the browser only picks a site, a start page and the dataset fields.
 
 import std/[json, strutils]
 
-proc crawlSources*(catalog: JsonNode): seq[string] =
-  ## The sites this machine's profile lets a user crawl, as the catalog lists them.
-  if catalog == nil or catalog.kind != JObject or not catalog.hasKey("crawl_sources") or
-      catalog["crawl_sources"].kind != JArray:
+type
+  CrawlSite* = object
+    origin*: string
+    managed*: bool  ## Declared by the machine, so the user cannot remove it.
+
+proc crawlSites*(catalog: JsonNode): seq[CrawlSite] =
+  ## The sites this user may crawl, as the catalog lists them.
+  if catalog == nil or catalog.kind != JObject or not catalog.hasKey("crawl_sites") or
+      catalog["crawl_sites"].kind != JArray:
     return
-  for site in catalog["crawl_sources"]:
-    if site.kind == JString and site.getStr.len > 0:
-      result.add site.getStr
+  for site in catalog["crawl_sites"]:
+    if site.kind == JObject and site.hasKey("origin") and site["origin"].kind == JString and
+        site["origin"].getStr.len > 0:
+      let managed = site.hasKey("managed") and site["managed"].kind == JBool and site["managed"].getBool
+      result.add CrawlSite(origin: site["origin"].getStr, managed: managed)
+
+proc siteOrigins*(sites: seq[CrawlSite]): seq[string] =
+  for site in sites: result.add site.origin
+
+proc siteRegistrationOpen*(catalog: JsonNode): bool =
+  ## Whether this machine lets the user add their own sites.
+  catalog != nil and catalog.kind == JObject and catalog.hasKey("crawl_site_registration") and
+    catalog["crawl_site_registration"].kind == JBool and catalog["crawl_site_registration"].getBool
+
+proc siteToAdd*(value: string): string =
+  ## The site address a user typed, trimmed; the AI service checks and normalizes it.
+  value.strip().strip(leading = false, chars = {'/'})
 
 proc crawlSiteOf*(url: string, sites: seq[string]): string =
-  ## The declared site a start page belongs to, or "" when it is outside every one.
+  ## The site a start page belongs to, or "" when it is outside every one.
   let address = url.strip()
   for site in sites:
     if address == site or address.startsWith(site & "/"):
