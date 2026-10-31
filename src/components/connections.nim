@@ -12,12 +12,21 @@ import ../api/connection_options
 import brand
 
 
-proc updateDatasetFilePicker(accepted: cstring) {.importjs: """
+proc updateDatasetFilePicker(accepted, sameAccepted: cstring) {.importjs: """
 (() => {
   const input = document.getElementById('datasetFile');
-  if (input) input.accept = #;
+  if (input && input.accept !== #) input.accept = #;
 })()
 """.}
+
+
+proc syncDatasetFilePicker*(state: AppState) =
+  ## Offers the file types the chosen purpose accepts. Karax renders the picker with a
+  ## fixed `accept`: when Karax patches a file input's attributes it also resets the
+  ## element's value, which would silently drop a file the owner already chose. The
+  ## application calls this after each render instead.
+  let accepted = cstring(datasetFileAccept(state.datasetPurpose))
+  updateDatasetFilePicker(accepted, accepted)
 
 
 proc nodeText(
@@ -2197,7 +2206,7 @@ proc renderDatasetManager(
           state.datasetPurpose =
             $node.value
           state.datasetReplaces = ""
-          updateDatasetFilePicker(cstring(datasetFileAccept(state.datasetPurpose)))
+          syncDatasetFilePicker(state)
 
     tdiv(class = "plugin-field"):
 
@@ -2228,11 +2237,13 @@ proc renderDatasetManager(
           state.datasetReplaces =
             $node.value
 
+    # The accepted types follow the purpose through syncDatasetFilePicker, never through
+    # a re-rendered attribute, so a chosen file survives every redraw.
     input(
       id = "datasetFile",
       class = "dataset-file",
       `type` = "file",
-      accept = cstring(datasetFileAccept(state.datasetPurpose))
+      accept = cstring(datasetFileAccept(""))
     )
 
     label(class = "dataset-review"):

@@ -96,10 +96,15 @@ proc datasetFileOutcome(acceptedExtensions: cstring): Future[cstring] {.importjs
   try {
     const f=document.getElementById('datasetFile').files[0];
     if(!f) throw new Error('Choose a file in one of the listed formats.');
-    if(f.size>2000000) throw new Error('Dataset files must be under 2 MB.');
+    if(f.size>2000000) throw new Error('Dataset files must be 2 MB or smaller.');
     const extensions=String(accepted||'').split(',').map(value=>value.trim().toLowerCase()).filter(Boolean);
     const filename=f.name.toLowerCase();
     if(!extensions.some(extension=>filename.endsWith(extension))) throw new Error('This file type is not allowed for the selected purpose.');
+    if(filename.endsWith('.pdf') || filename.endsWith('.docx')) {
+      const bytes=new Uint8Array(await f.arrayBuffer());
+      let raw=''; for(let i=0;i<bytes.length;i+=8192) raw+=String.fromCharCode(...bytes.subarray(i,i+8192));
+      return JSON.stringify({kind:'document',filename:f.name,base64:btoa(raw)});
+    }
     let value;
     try {
       value=new TextDecoder('utf-8',{fatal:true}).decode(await f.arrayBuffer());
@@ -107,7 +112,7 @@ proc datasetFileOutcome(acceptedExtensions: cstring): Future[cstring] {.importjs
       throw new Error('Dataset files must contain valid UTF-8 text.');
     }
     if(value.includes('\u0000')) throw new Error('Binary files are not supported. Choose a plain-text document or source file.');
-    return JSON.stringify({value});
+    return JSON.stringify({kind:'text',value});
   } catch(error) {
     return JSON.stringify({error: error && typeof error.message==='string' ? error.message : 'The dataset file could not be read.'});
   }
@@ -149,8 +154,20 @@ proc browserOutcome(raw: cstring): string =
     raise newException(ValueError, outcome["error"].getStr)
   outcome["value"].getStr
 
+proc browserJsonOutcome(raw: cstring): JsonNode =
+  let outcome = decodeJson($raw)
+  if outcome.hasKey("error"):
+    raise newException(ValueError, outcome["error"].getStr)
+  outcome
+
+proc datasetFileContent*(acceptedExtensions: string): Future[JsonNode] {.async.} =
+  return browserJsonOutcome(await datasetFileOutcome(cstring(acceptedExtensions)))
+
 proc datasetFileText*(acceptedExtensions: string): Future[string] {.async.} =
-  return browserOutcome(await datasetFileOutcome(cstring(acceptedExtensions)))
+  let outcome = browserJsonOutcome(await datasetFileOutcome(cstring(acceptedExtensions)))
+  if not outcome.hasKey("kind") or outcome["kind"].getStr != "text":
+    raise newException(ValueError, "PDF and DOCX files can be uploaded as RAG sources; Lua row transforms need a text or JSONL file.")
+  return outcome["value"].getStr
 
 proc uploadModelFiles*(baseUrl, csrf, name: cstring): Future[string] {.async.} =
   return browserOutcome(await modelUploadOutcome(baseUrl, csrf, name))

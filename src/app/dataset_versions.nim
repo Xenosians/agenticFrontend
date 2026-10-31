@@ -73,3 +73,21 @@ proc datasetPayload*(name, text, source, license, purpose: string, reviewed: boo
               "purpose": purpose, "reviewed": reviewed}
   if replaces.len > 0:
     result["replaces"] = %replaces
+
+
+proc datasetFilePayload*(name: string, file: JsonNode, source, license, purpose: string,
+                         reviewed: bool, replaces: string): JsonNode =
+  ## Build a text or binary-document upload without mixing payload types.
+  if file == nil or file.kind != JObject or not file.hasKey("kind") or file["kind"].kind != JString:
+    raise newException(ValueError, "The selected file could not be read.")
+  let kind = file["kind"].getStr
+  if kind == "text" and file.hasKey("value") and file["value"].kind == JString:
+    return datasetPayload(name, file["value"].getStr, source, license, purpose, reviewed, replaces)
+  if kind != "document" or not file.hasKey("filename") or not file.hasKey("base64") or
+     file["filename"].kind != JString or file["base64"].kind != JString or purpose != "rag":
+    raise newException(ValueError, "The selected file is not a supported RAG document.")
+  result = %*{"name": name, "filename": file["filename"].getStr,
+              "base64": file["base64"].getStr, "source": source, "license": license,
+              "purpose": purpose, "reviewed": reviewed}
+  if replaces.len > 0:
+    result["replaces"] = %replaces

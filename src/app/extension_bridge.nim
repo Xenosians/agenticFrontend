@@ -107,11 +107,11 @@ proc loadProviderModels*(state: AppState) {.async.} =
 proc saveDatasetFile*(state: AppState) {.async.} =
   let session = state.auth.sessionId
   try:
-    let content = $(await datasetFileText(datasetFileAccept(state.datasetPurpose)))
+    let file = await datasetFileContent(datasetFileAccept(state.datasetPurpose))
     if not sameSession(state, session): return
     # A replacement that no longer applies (a newer version arrived) uploads nothing as a version.
     let replaces = validReplacement(state.extensionCatalog, state.datasetPurpose, state.datasetReplaces)
-    await changeExtension(state, "dataset", datasetPayload(state.datasetName, content,
+    await changeExtension(state, "dataset", datasetFilePayload(state.datasetName, file,
       state.datasetSource, state.datasetLicense, state.datasetPurpose, state.datasetReviewed, replaces))
   except CatchableError as exc:
     if sameSession(state, session): state.extensionError = exc.msg

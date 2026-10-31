@@ -40,6 +40,15 @@ suite "dataset versions":
     check next["replaces"].getStr == "manual-v2"
     check next["reviewed"].getBool
 
+  test "document files become binary RAG payloads and never training text":
+    let file = %*{"kind": "document", "filename": "manual.pdf", "base64": "JVBERi0x"}
+    let payload = datasetFilePayload("Manual", file, "Owned", "Owned", "rag", true, "")
+    check payload["filename"].getStr == "manual.pdf"
+    check payload["base64"].getStr == "JVBERi0x"
+    check not payload.hasKey("text")
+    expect ValueError:
+      discard datasetFilePayload("Manual", file, "Owned", "Owned", "training", true, "")
+
   test "a replaced choice that no longer applies is dropped":
     check validReplacement(catalog, "rag", "manual-v2") == "manual-v2"
     check validReplacement(catalog, "rag", "manual-v1") == ""

@@ -4,6 +4,7 @@ Run after rebuilding: python tests/test_dataset_versions.py
 No deployment service, credentials, provider or model is used.
 """
 import copy
+import base64
 import unittest
 from urllib.parse import urlparse
 
@@ -129,11 +130,48 @@ class DatasetVersionTests(navigation.ChatNavigationTests):
         purpose.select_option("rag")
         self.assertEqual(
             self.page.locator("#datasetFile").get_attribute("accept"),
-            ".txt,.md,.markdown,.csv,.jsonl,.json,.py,.lua,.ex,.exs,.nim,.js,.jsx,.ts,.tsx,.sql,.sh,.bash,.yaml,.yml,.toml,.ini,.cfg,.conf,.log,.html,.css",
+            ".txt,.md,.markdown,.csv,.jsonl,.json,.py,.lua,.ex,.exs,.nim,.js,.jsx,.ts,.tsx,.sql,.sh,.bash,.yaml,.yml,.toml,.ini,.cfg,.conf,.log,.html,.css,.pdf,.docx",
         )
         purpose.select_option("training")
         self.assertEqual(self.page.locator("#datasetFile").get_attribute("accept"), ".jsonl")
         self.assertEqual(self.mutations, [])
+        self.assertEqual(self.errors, [])
+
+    def test_a_chosen_file_survives_redraws_and_a_purpose_change(self):
+        """Choosing the file first and the purpose second must still upload that file.
+
+        Re-rendering the picker's attributes reset its value and silently dropped the file.
+        """
+        self.open_tab("Data & automation")
+        picker = self.page.locator("#datasetFile")
+        picker.set_input_files(files=[{"name": "examples.jsonl", "mimeType": "application/x-ndjson",
+                                       "buffer": b'{"messages": []}\n'}])
+        self.page.get_by_role("combobox", name="Purpose", exact=True).select_option("training")
+        self.page.get_by_placeholder("Dataset name", exact=True).fill("Printer fixes")
+        self.page.locator(".dataset-review input").check()
+        expect(picker).to_have_attribute("accept", ".jsonl")
+        self.assertEqual(picker.evaluate("node => node.files.length"), 1)
+        self.page.get_by_role("combobox", name="Purpose", exact=True).select_option("rag")
+        self.assertEqual(picker.evaluate("node => node.files.length"), 1)
+        self.assertEqual(self.errors, [])
+
+    def test_docx_upload_sends_binary_payload_only_for_rag(self):
+        self.open_tab("Data & automation")
+        self.page.get_by_role("combobox", name="Purpose", exact=True).select_option("rag")
+        self.page.get_by_placeholder("Dataset name", exact=True).fill("Fixture document")
+        self.page.get_by_placeholder("Owned documentation", exact=True).fill("fixture")
+        self.page.get_by_placeholder("Internal / owned", exact=True).fill("internal")
+        self.page.locator("#datasetFile").set_input_files(
+            files=[{"name": "manual.docx", "mimeType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "buffer": b"PK\x03\x04fixture"}])
+        self.page.locator(".dataset-review input").check()
+        with self.page.expect_response(lambda response: urlparse(response.url).path == "/api/v1/extensions"
+                                       and response.request.method == "POST"):
+            self.page.get_by_role("button", name="Upload dataset", exact=True).click()
+        payload = self.mutations[0]["payload"]
+        self.assertEqual(payload["filename"], "manual.docx")
+        self.assertEqual(payload["base64"], base64.b64encode(b"PK\x03\x04fixture").decode("ascii"))
+        self.assertNotIn("text", payload)
         self.assertEqual(self.errors, [])
 
     def test_invalid_encoding_binary_and_wrong_extension_are_rejected(self):
@@ -145,10 +183,10 @@ class DatasetVersionTests(navigation.ChatNavigationTests):
         self.page.locator(".dataset-review input").check()
 
         cases = [
-            ("unsafe.pdf", b"text pretending to be a PDF", "This file type is not allowed for the selected purpose."),
+            ("unsafe.exe", b"text pretending to be a PDF", "This file type is not allowed for the selected purpose."),
             ("binary.py", b"print('hello')\x00", "Binary files are not supported."),
             ("invalid-utf8.py", b"\xff", "Dataset files must contain valid UTF-8 text."),
-            ("too-large.py", b"x" * 2_000_001, "Dataset files must be under 2 MB."),
+            ("too-large.py", b"x" * 2_000_001, "Dataset files must be 2 MB or smaller."),
         ]
         for filename, content, message in cases:
             with self.subTest(filename=filename):

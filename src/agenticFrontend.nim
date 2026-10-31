@@ -91,6 +91,7 @@ proc focusWorkspaceAfterRender() =
   if pendingMenuFocus.len > 0 and appState.auth.authenticated:
     focusElement(cstring(pendingMenuFocus))
   pendingMenuFocus = ""
+  syncDatasetFilePicker(appState)
 
 proc activateFirstSearchResult() =
   let query = appState.commandQuery.toLowerAscii()

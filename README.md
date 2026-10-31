@@ -26,7 +26,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Run inspector, owner-scoped Operations queue and recorded inference timings, and backend/AI integration status.
 - A Capabilities page listing every governed operation by specialist, with its effect, approval need and its provider's setup state (Configured, Simulated, Needs setup with the missing setting names). Setup comes from the AI service's configuration and is labelled as such; it is not a provider check.
 - A connections area for compatible model APIs, including Groq, installed local profiles, and available Pi/OpenCode harnesses.
-- Per-account model selection, connection probes, local model folder uploads, reference datasets, and reviewed training-data exports.
+- Per-account model selection, connection probes, local model folder uploads, reference datasets (including selectable-text PDF/DOCX RAG uploads), and reviewed JSONL training-data exports.
 - Dataset versions: a changed dataset is uploaded as a new version of the latest one (**Upload as**). Each dataset shows its version and digest prefix, a replaced version says which version replaced it, and versions of one dataset are named with their version number.
 - Provider usage settings for shared request/token queues and supported reasoning controls, editable without re-entering the saved API key.
 
