@@ -12,7 +12,10 @@ COPY public ./public
 # Build contexts from Windows filesystems arrive world-writable; normalise modes.
 # The development config.js is not shipped: the container renders its own, so a
 # missing runtime configuration fails closed instead of pointing at a dev backend.
-RUN nimble build --accept && rm public/config.js && chmod -R u=rwX,go=rX public
+# Scripts and styles are compressed once here; nginx serves the .gz copy (gzip_static).
+RUN nimble build --accept && rm public/config.js \
+ && find public -type f \( -name '*.js' -o -name '*.css' -o -name '*.svg' \) -exec gzip -9 -k -n {} + \
+ && chmod -R u=rwX,go=rX public
 
 # Runtime image contract: official Alpine-based nginx image, with its nginx user.
 FROM ${NGINX_RUNTIME_IMAGE} AS runtime

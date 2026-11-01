@@ -49,8 +49,19 @@ http {
             include /opt/janus/security-headers.conf;
             add_header Cache-Control 'no-store' always;
         }
-        location / {
+        location ~* \.(?:js|css|svg)$ {
+            # index.html requests these with a content digest (?v=...), so a new
+            # release has new addresses and a browser may keep each one. The image
+            # ships a gzip copy of each file; nginx sends it when the browser accepts it.
+            gzip_static on;
             include /opt/janus/security-headers.conf;
+            add_header Cache-Control 'public, max-age=31536000, immutable' always;
+            try_files $uri =404;
+        }
+        location / {
+            # The page names the current digests, so it is revalidated on every load.
+            include /opt/janus/security-headers.conf;
+            add_header Cache-Control 'no-cache' always;
             try_files $uri $uri/ =404;
         }
     }
