@@ -44,6 +44,25 @@ export TLS_CERT_PATH TLS_KEY_PATH FRONTEND_RUNTIME_DIR
 mkdir -p "$FRONTEND_RUNTIME_DIR"
 printf 'window.AGENTIC_CONFIG = Object.freeze({backendBaseUrl:"%s",pollIntervalMs:1000,healthIntervalMs:30000});\n' \
   "$PUBLIC_ORIGIN" > "$FRONTEND_RUNTIME_DIR/config.js"
+# Behind a company port forward, a cloud load balancer or another reverse proxy,
+# every connection comes from that proxy. EDGE_TRUSTED_PROXIES lists the exact
+# addresses or ranges (comma separated) allowed to name the real client in
+# X-Forwarded-For, so the per-client sign-in limits still count real clients.
+# Empty (the default) trusts nobody: the connecting address is the client.
+real_ip="$FRONTEND_RUNTIME_DIR/real-ip.conf"
+: > "$real_ip"
+case "${EDGE_TRUSTED_PROXIES:-}" in *"
+"*) echo "Invalid EDGE_TRUSTED_PROXIES entry" >&2; exit 64;; esac
+if [ -n "${EDGE_TRUSTED_PROXIES:-}" ]; then
+  for proxy in $(printf '%s' "$EDGE_TRUSTED_PROXIES" | tr ',' ' '); do
+    if ! printf '%s\n' "$proxy" | grep -Eq '^([0-9]{1,3}(\.[0-9]{1,3}){3}|[0-9A-Fa-f:]*:[0-9A-Fa-f:.]*)(/[0-9]{1,3})?$'; then
+      echo "Invalid EDGE_TRUSTED_PROXIES entry" >&2; exit 64
+    fi
+    case "$proxy" in */0|*/00|*/000) echo "EDGE_TRUSTED_PROXIES must not trust every address" >&2; exit 64;; esac
+    printf 'set_real_ip_from %s;\n' "$proxy" >> "$real_ip"
+  done
+  printf 'real_ip_header X-Forwarded-For;\nreal_ip_recursive on;\n' >> "$real_ip"
+fi
 # Restrict substitution so nginx's request variables survive intact.
 envsubst '${PUBLIC_HOST} ${TLS_CERT_PATH} ${TLS_KEY_PATH} ${FRONTEND_RUNTIME_DIR}' < "$template" > "$output"
 exec "$@"

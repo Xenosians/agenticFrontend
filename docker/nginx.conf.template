@@ -22,6 +22,9 @@ http {
         ssl_protocols TLSv1.2 TLSv1.3;
         root /usr/share/nginx/html;
         client_max_body_size 3m;
+        # Proxies the deployment trusts to name the real client (EDGE_TRUSTED_PROXIES);
+        # empty unless configured.
+        include ${FRONTEND_RUNTIME_DIR}/real-ip.conf;
 
         location ^~ /api/internal/ { return 404; }
         location ^~ /ai_socket { return 404; }
