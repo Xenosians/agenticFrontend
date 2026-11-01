@@ -1,6 +1,12 @@
 import std/[json, strutils, math]
 
-type NetworkingInferenceChoice* = tuple[id, label: string]
+type
+  NetworkingInferenceChoice* = tuple[id, label: string]
+  AnswerSettings* = object
+    ## Form text for the answer and request settings; empty means "not set".
+    answerTokens*, timeout*, retries*, retryWait*, instructions*: string
+
+const MaxInstructionCharacters* = 2000
 
 proc networkingInferenceChoices*(catalog: JsonNode): seq[NetworkingInferenceChoice] =
   if catalog == nil or catalog.kind != JObject or
@@ -69,9 +75,29 @@ proc reasoningEffortsFor*(catalog: JsonNode, backend, model, url: string): seq[s
 proc thinkingModesFor*(catalog: JsonNode, backend, model, url: string): seq[string] =
   allowedChoices(optionRowFor(catalog, backend, model, url), "thinking_modes", ["adaptive", "disabled"])
 
+proc wholeSetting(result: JsonNode, key, text: string, low, high: int, clearEmpty: bool, message: string) =
+  let value = text.strip()
+  if value.len == 0:
+    if clearEmpty: result[key] = newJNull()
+    return
+  let number = parseInt(value)
+  if number < low or number > high:
+    raise newException(ValueError, message)
+  result[key] = %number
+
+proc decimalSetting(result: JsonNode, key, text: string, low, high: float, clearEmpty: bool, message: string) =
+  let value = text.strip()
+  if value.len == 0:
+    if clearEmpty: result[key] = newJNull()
+    return
+  let number = parseFloat(value)
+  if classify(number) in {fcNan, fcInf, fcNegInf} or number < low or number > high:
+    raise newException(ValueError, message)
+  result[key] = %number
+
 proc connectionOptionsPayload*(tokens, requests, wait, reasoning: string,
                                clearEmpty = false, networking = "", backend = "http",
-                               thinking = ""): JsonNode =
+                               thinking = "", settings = AnswerSettings()): JsonNode =
   ## Build only inference settings. Credentials and execution authority are
   ## deliberately outside this payload; the server validates ownership/limits.
   result = newJObject()
@@ -79,6 +105,15 @@ proc connectionOptionsPayload*(tokens, requests, wait, reasoning: string,
     if networking notin ["dedicated_local", "selected_model"]:
       raise newException(ValueError, "Choose an available networking model option.")
     result["networking_inference"] = %networking
+  result.wholeSetting("answer_max_tokens", settings.answerTokens, 32, 1024, clearEmpty,
+                      "Answer length must be between 32 and 1024 tokens.")
+  let instructions = settings.instructions.strip()
+  if instructions.len > MaxInstructionCharacters:
+    raise newException(ValueError, "Instructions must be at most 2000 characters.")
+  if instructions.len > 0:
+    result["custom_instructions"] = %instructions
+  elif clearEmpty:
+    result["custom_instructions"] = newJNull()
   if backend in ["local", "uploaded"]:
     return
   if backend notin ["http", "pi", "opencode"]:
@@ -115,3 +150,9 @@ proc connectionOptionsPayload*(tokens, requests, wait, reasoning: string,
     result["thinking_mode"] = %mode
   else:
     raise newException(ValueError, "Choose an available thinking mode.")
+  result.decimalSetting("request_timeout_seconds", settings.timeout, 5, 600, clearEmpty,
+                        "Request timeout must be between 5 and 600 seconds.")
+  result.wholeSetting("retry_attempts", settings.retries, 0, 3, clearEmpty,
+                      "Retries must be a whole number from 0 to 3.")
+  result.decimalSetting("retry_wait_seconds", settings.retryWait, 0, 10, clearEmpty,
+                        "Retry wait must be between 0 and 10 seconds.")

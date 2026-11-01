@@ -102,7 +102,7 @@ proc renderAddNode(state: AppState): VNode =
     strong(class = "topology-section-title"): text "Add a node"
     label(class = "review-label", `for` = "topologyNodeKind"): text "Type"
     select(id = "topologyNodeKind", class = "learning-select", disabled = engineeringBusy(state)):
-      for kind in ["container", "endpoint", "router", "interface", "host", "service", "switch", "storage"]:
+      for kind in ["container", "endpoint", "router", "interface", "tailnet", "host", "service", "switch", "storage"]:
         option(value = cstring(kind), selected = kind == state.engineeringNewKind): text kind
       proc onchange(event: Event, n: VNode) = state.engineeringNewKind = $n.value
     label(class = "review-label", `for` = "topologyNodeName"): text "Name"
@@ -111,7 +111,7 @@ proc renderAddNode(state: AppState): VNode =
       proc oninput(event: Event, n: VNode) = state.engineeringNewName = $n.value
     button(`type` = "submit", class = "secondary-action", disabled = engineeringBusy(state)): text "Add node"
     p(class = "operation-note"):
-      text "Use the names the read adapters observe: container names, health endpoint names, router interfaces."
+      text "Use the names the read adapters observe: container names, health endpoint names, router interfaces and tailnet device names."
 
 proc renderInspector(state: AppState): VNode =
   let id = state.engineeringSelectedNode

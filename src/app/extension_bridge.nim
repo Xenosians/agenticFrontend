@@ -5,6 +5,7 @@ import dataset_versions
 import dataset_file_types
 import lua_transforms
 import knowledge_crawl
+import connection_draft
 import ../api/extensions
 import ../api/connection_options
 import ../config/runtime_config
@@ -58,7 +59,7 @@ proc saveConnectionOptions*(state: AppState, existing = false) {.async.} =
     let payload = connectionOptionsPayload(state.connectionTpm, state.connectionRpm,
       state.connectionMaxWait, state.connectionReasoning, clearEmpty = existing,
       networking = state.connectionNetworkingInference, backend = state.connectionBackend,
-      thinking = state.connectionThinking)
+      thinking = state.connectionThinking, settings = state.answerSettings())
     if existing:
       payload["id"] = %state.connectionOptionsId
       await changeExtension(state, "model_options", payload)
@@ -74,7 +75,7 @@ proc saveConnectionOptions*(state: AppState, existing = false) {.async.} =
       payload["api_key"] = %state.connectionKey
       await changeExtension(state, "model", payload)
   except CatchableError:
-    state.extensionError = "Check the model settings, usage limits and queue wait, then save again."
+    state.extensionError = "Check the model settings, limits and answer settings, then save again."
     redraw(kxi)
 
 proc loadProviderModels*(state: AppState) {.async.} =

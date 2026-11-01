@@ -1374,6 +1374,40 @@
   grid-column: 1 / -1;
 }
 
+.connection-advanced {
+  padding-top: 10px;
+  border-top: 1px solid #232323;
+}
+
+.connection-advanced > summary {
+  color: var(--text-soft);
+  font-size: var(--font-size-caption);
+  cursor: pointer;
+}
+
+.connection-advanced-body {
+  padding-top: 10px;
+}
+
+.connection-instructions {
+  width: 100%;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid #303030;
+  border-radius: 8px;
+  outline: none;
+  background: #1b1b1b;
+  color: #d1d1d1;
+  font: inherit;
+  font-size: var(--font-size-control);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.connection-instructions:focus {
+  border-color: #484848;
+}
+
 .plugin-field-hint {
   margin-top: -4px;
   grid-column: 1 / -1;

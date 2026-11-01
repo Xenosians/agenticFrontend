@@ -11,6 +11,16 @@ proc clearUsageDraft*(state: AppState) =
   state.connectionReasoning = ""
   state.connectionThinking = ""
   state.connectionNetworkingInference = ""
+  state.connectionAnswerTokens = ""
+  state.connectionTimeout = ""
+  state.connectionRetries = ""
+  state.connectionRetryWait = ""
+  state.connectionInstructions = ""
+
+proc answerSettings*(state: AppState): AnswerSettings =
+  AnswerSettings(answerTokens: state.connectionAnswerTokens, timeout: state.connectionTimeout,
+                 retries: state.connectionRetries, retryWait: state.connectionRetryWait,
+                 instructions: state.connectionInstructions)
 
 proc loadConnectionOptions*(state: AppState, item: JsonNode) =
   state.connectionOptionsId = optionText(item, "id")
@@ -23,6 +33,11 @@ proc loadConnectionOptions*(state: AppState, item: JsonNode) =
   state.connectionMaxWait = optionText(item, "admission_max_wait_seconds")
   state.connectionReasoning = optionText(item, "reasoning_effort")
   state.connectionThinking = optionText(item, "thinking_mode")
+  state.connectionAnswerTokens = optionText(item, "answer_max_tokens")
+  state.connectionTimeout = optionText(item, "request_timeout_seconds")
+  state.connectionRetries = optionText(item, "retry_attempts")
+  state.connectionRetryWait = optionText(item, "retry_wait_seconds")
+  state.connectionInstructions = optionText(item, "custom_instructions")
   state.connectionApiFormat = optionText(item, "api_format")
   state.connectionProviderId = optionText(item, "provider_id")
   let saved = optionText(item, "networking_inference")

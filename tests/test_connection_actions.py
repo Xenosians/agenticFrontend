@@ -101,12 +101,54 @@ class ConnectionActionTests(navigation.ChatNavigationTests):
                     self.assertEqual(mutation["payload"][field], expected)
                 self.assertEqual(self.errors, [])
 
+    def test_answer_settings_are_saved_with_a_new_connection(self):
+        provider = PROVIDERS[0]
+        self.open_connections()
+        card = self.page.locator(".marketplace-card").filter(has_text=provider["name"])
+        card.get_by_title("Configure provider", exact=True).click()
+        self.page.locator('input[type="password"]').fill("fixture-only-key")
+        settings = self.page.locator(".connection-advanced")
+        expect(settings).not_to_have_attribute("open", "")
+        settings.get_by_role("button", name="Answer and request settings", exact=True).click()
+        self.page.get_by_label("Instructions for answers", exact=True).fill("  Answer in Bahasa Indonesia.  ")
+        self.page.get_by_label("Answer length (tokens)", exact=True).fill("600")
+        self.page.get_by_label("Request timeout (seconds)", exact=True).fill("45")
+        self.page.get_by_label("Retries when the provider is busy", exact=True).fill("2")
+        with self.page.expect_response(lambda response:
+                urlparse(response.url).path == "/api/v1/extensions"
+                and response.request.method == "POST"):
+            self.page.get_by_role("button", name="Save connection", exact=True).click()
+        payload = self.connection_mutations[-1]["payload"]
+        self.assertEqual(payload["custom_instructions"], "Answer in Bahasa Indonesia.")
+        self.assertEqual(payload["answer_max_tokens"], 600)
+        self.assertEqual(payload["request_timeout_seconds"], 45)
+        self.assertEqual(payload["retry_attempts"], 2)
+        self.assertNotIn("retry_wait_seconds", payload)
+        overflow = self.page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth")
+        self.assertFalse(overflow)
+        self.assertEqual(self.errors, [])
+
+    def test_out_of_range_settings_are_refused_without_a_request(self):
+        provider = PROVIDERS[0]
+        self.open_connections()
+        card = self.page.locator(".marketplace-card").filter(has_text=provider["name"])
+        card.get_by_title("Configure provider", exact=True).click()
+        self.page.locator('input[type="password"]').fill("fixture-only-key")
+        self.page.get_by_role("button", name="Answer and request settings", exact=True).click()
+        self.page.get_by_label("Retries when the provider is busy", exact=True).fill("9")
+        self.page.get_by_role("button", name="Save connection", exact=True).click()
+        expect(self.page.get_by_text("Check the model settings, limits and answer settings, then save again.")).to_be_visible()
+        self.assertEqual(self.connection_mutations, [])
+        self.assertEqual(self.errors, [])
+
 
 def load_tests(loader, _tests, _pattern):
     # Reuse the fixture lifecycle without rerunning its separate regression suite.
     return unittest.TestSuite(ConnectionActionTests(name) for name in (
         "test_installed_rows_open_the_category_of_the_clicked_resource",
         "test_provider_rows_save_the_clicked_endpoint_model_and_name",
+        "test_answer_settings_are_saved_with_a_new_connection",
+        "test_out_of_range_settings_are_refused_without_a_request",
     ))
 
 

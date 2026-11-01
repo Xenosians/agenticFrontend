@@ -1,4 +1,4 @@
-import std/[json, unittest]
+import std/[json, strutils, unittest]
 import ../src/api/connection_options
 import ../src/app/[types, connection_draft]
 
@@ -106,6 +106,53 @@ suite "connection usage settings":
       state.loadConnectionOptions(%*{"id": "connection-1", "backend": backend, "networking_inference": nil})
       check state.connectionNetworkingInference == "dedicated_local"
 
+  test "answer, timeout and retry settings are typed numbers and instructions are trimmed text":
+    let value = connectionOptionsPayload("", "", "", "", backend = "http",
+      settings = AnswerSettings(answerTokens: " 600 ", timeout: "45", retries: "2", retryWait: "1.5",
+                                instructions: "  Reply in Bahasa Indonesia.  "))
+    check value["answer_max_tokens"].getInt == 600
+    check value["request_timeout_seconds"].getFloat == 45.0
+    check value["retry_attempts"].getInt == 2
+    check value["retry_wait_seconds"].getFloat == 1.5
+    check value["custom_instructions"].getStr == "Reply in Bahasa Indonesia."
+    check not connectionOptionsPayload("", "", "", "").hasKey("answer_max_tokens")
+
+  test "clearing a saved connection sends null for every empty setting":
+    let cleared = connectionOptionsPayload("", "", "", "", clearEmpty = true)
+    for key in ["answer_max_tokens", "request_timeout_seconds", "retry_attempts", "retry_wait_seconds",
+                "custom_instructions"]:
+      check cleared[key].kind == JNull
+
+  test "out-of-range or partially numeric settings are refused before sending":
+    for settings in [AnswerSettings(answerTokens: "31"), AnswerSettings(answerTokens: "1025"),
+                     AnswerSettings(answerTokens: "5k"), AnswerSettings(timeout: "4"),
+                     AnswerSettings(timeout: "601"), AnswerSettings(timeout: "NaN"),
+                     AnswerSettings(retries: "4"), AnswerSettings(retries: "1.5"),
+                     AnswerSettings(retryWait: "11"), AnswerSettings(retryWait: "-1"),
+                     AnswerSettings(instructions: repeat('x', 2001))]:
+      expect ValueError:
+        discard connectionOptionsPayload("", "", "", "", settings = settings)
+
+  test "local models keep answer settings but never send provider request settings":
+    let local = connectionOptionsPayload("", "", "", "", clearEmpty = true, networking = "dedicated_local",
+      backend = "local", settings = AnswerSettings(answerTokens: "256", instructions: "Be brief.",
+                                                   timeout: "30", retries: "2"))
+    check local["answer_max_tokens"].getInt == 256
+    check local["custom_instructions"].getStr == "Be brief."
+    check not local.hasKey("request_timeout_seconds") and not local.hasKey("retry_attempts")
+
+  test "saved answer settings load into the form and a new connection starts empty":
+    let state = AppState()
+    state.loadConnectionOptions(%*{"id": "connection-1", "backend": "http", "answer_max_tokens": 600,
+      "request_timeout_seconds": 45, "retry_attempts": 2, "retry_wait_seconds": 1.5,
+      "custom_instructions": "Be brief."})
+    check state.connectionAnswerTokens == "600" and state.connectionTimeout == "45"
+    check state.connectionRetries == "2" and state.connectionRetryWait == "1.5"
+    check state.connectionInstructions == "Be brief."
+    state.clearConnectionDraft()
+    check state.connectionAnswerTokens == "" and state.connectionInstructions == ""
+    check state.connectionTimeout == "" and state.connectionRetries == "" and state.connectionRetryWait == ""
+
   test "networking options update every model type without credentials or provider-only options on local models":
     for backend in ["http", "pi", "opencode", "local", "uploaded"]:
       let payload = connectionOptionsPayload("", "", "", "", clearEmpty = true,
@@ -113,7 +160,8 @@ suite "connection usage settings":
       check payload["networking_inference"].getStr == "selected_model"
       check not payload.hasKey("api_key") and not payload.hasKey("model")
       if backend in ["local", "uploaded"]:
-        check payload.len == 1
+        check payload.len == 3
+        check payload["answer_max_tokens"].kind == JNull and payload["custom_instructions"].kind == JNull
       else:
         check payload["provider_tokens_per_minute"].kind == JNull
       let reset = connectionOptionsPayload("", "", "", "", networking = "dedicated_local", backend = backend)

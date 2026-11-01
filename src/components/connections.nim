@@ -246,6 +246,39 @@ proc textField(
 proc resetConnectionOptions(state: AppState) =
   state.clearUsageDraft()
 
+proc renderAnswerSettings(state: AppState): VNode =
+  ## Answer length and instructions apply to every connection; the request
+  ## timeout and retries only to providers reached over the network.
+  result = buildHtml(details(class = "connection-advanced plugin-field-wide",
+                             open = state.connectionInstructions.len > 0 or state.connectionAnswerTokens.len > 0)):
+    summary(role = "button", `aria-label` = "Answer and request settings"):
+      text "Answer and request settings"
+    tdiv(class = "plugin-form-grid connection-advanced-body"):
+      tdiv(class = "plugin-field plugin-field-wide"):
+        label(`for` = "connectionInstructions"): text "Instructions for answers"
+        textarea(id = "connectionInstructions", class = "connection-instructions", rows = "3",
+                 maxlength = cstring($MaxInstructionCharacters),
+                 placeholder = "Optional, for example: Answer in Bahasa Indonesia and keep it short.",
+                 value = cstring(state.connectionInstructions)):
+          proc oninput(event: Event, node: VNode) = state.connectionInstructions = $node.value
+      tdiv(class = "plugin-field-hint plugin-field-wide"):
+        text "Shapes the wording of answers only. It cannot change tools, approvals or permissions."
+      textField("Answer length (tokens)", state.connectionAnswerTokens,
+        proc(value: string) = state.connectionAnswerTokens = value,
+        placeholder = "32 to 1024; empty for the default")
+      if state.connectionBackend in ["http", "pi", "opencode"]:
+        textField("Request timeout (seconds)", state.connectionTimeout,
+          proc(value: string) = state.connectionTimeout = value,
+          placeholder = "5 to 600; empty for the default")
+        textField("Retries when the provider is busy", state.connectionRetries,
+          proc(value: string) = state.connectionRetries = value,
+          placeholder = "0 to 3")
+        textField("First retry wait (seconds)", state.connectionRetryWait,
+          proc(value: string) = state.connectionRetryWait = value,
+          placeholder = "0 to 10; doubles each retry")
+        tdiv(class = "plugin-field-hint plugin-field-wide"):
+          text "Only busy or unreachable providers are retried. A timed-out request is not sent twice."
+
 proc renderUsageControls(state: AppState): VNode =
   result = buildHtml(tdiv(class = "plugin-form-grid")):
     let networkingChoices = networkingInferenceChoices(state.extensionCatalog)
@@ -308,6 +341,7 @@ proc renderUsageControls(state: AppState): VNode =
     if state.connectionBackend in ["http", "pi", "opencode"]:
       tdiv(class = "plugin-field-hint plugin-field-wide"):
         text "Use your provider account's limits, or leave them empty."
+    renderAnswerSettings(state)
 
 proc renderUsageSettings(state: AppState): VNode =
   result = buildHtml(tdiv(class = "plugin-content-section")):

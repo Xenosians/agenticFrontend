@@ -229,6 +229,11 @@ type
     connectionMaxWait*: string
     connectionReasoning*: string
     connectionThinking*: string
+    connectionAnswerTokens*: string
+    connectionTimeout*: string
+    connectionRetries*: string
+    connectionRetryWait*: string
+    connectionInstructions*: string
     connectionApiFormat*: string
     connectionProviderId*: string
     connectionModelChoices*: seq[tuple[id, name: string]]
