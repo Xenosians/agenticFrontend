@@ -149,41 +149,6 @@ proc currentChatTitle(): string =
       return chat.title
 
 
-proc activeViewSubtitle(): string =
-  if appState.commandPaletteOpen:
-    return "Quick workspace actions and navigation"
-
-  case appState.activeView
-  of viewChat:
-    "Durable governed assistant workspace"
-  of viewChats:
-    "Your saved conversations"
-  of viewSearch:
-    "Saved chats and the open conversation"
-  of viewJobs, viewRuns, viewLogs:
-    "Your task queue and recorded inference timings"
-  of viewSystem:
-    "Safe service health and application state"
-  of viewPlugin, viewTool:
-    "Models, harnesses, datasets and governed integrations"
-  of viewNodeBuilder:
-    "Saved workflows that run as governed jobs"
-  of viewSimulator:
-    "Desired topologies, drift checks and PCB netlist inspection"
-  of viewAccount:
-    "Profile, notifications and authenticated sessions"
-  of viewCapabilities:
-    "Governed operations by specialist"
-  of viewReview:
-    "Critiques and corrections awaiting a decision"
-  of viewKnowledge:
-    "Reference sources and cited search"
-  of viewLearning:
-    "Training readiness for your models and datasets"
-  of viewHelp:
-    "Workspace actions and keyboard shortcuts"
-
-
 proc renderSearchView(): VNode =
   let query =
     appState.searchDraft
@@ -292,7 +257,7 @@ proc renderActivityView(): VNode =
           h2:
             text "Current task"
           p:
-            text "Current durable job state and frontend-visible lifecycle events."
+            text "The task running in this browser."
 
         button(class = "secondary-action"):
           text "Back to chat"
@@ -308,7 +273,7 @@ proc renderActivityView(): VNode =
 
       if not appState.run.active:
         tdiv(class = "empty-card"):
-          text "No durable job is active in this browser session."
+          text "No task is running."
       else:
         tdiv(class = "activity-summary"):
           tdiv(class = "developer-card"):
@@ -398,7 +363,7 @@ proc renderSystemView(): VNode =
           h2:
             text "System"
           p:
-            text "Public service health only. Model, credential, and provider internals stay server-side."
+            text "Whether each part of Janus is reachable."
 
         button(
           class = "secondary-action",
@@ -421,18 +386,18 @@ proc renderSystemView(): VNode =
         tdiv(class = "system-row"):
           tdiv:
             strong:
-              text "Frontend"
+              text "App"
             span:
-              text "Karax browser application"
+              text "This browser"
           span(class = "capability-badge enabled"):
             text "Running"
 
         tdiv(class = "system-row"):
           tdiv:
             strong:
-              text "Phoenix backend"
+              text "Backend"
             span:
-              text "Authentication, chats, durable jobs, approvals"
+              text "Sign-in, chats, tasks and approvals"
           span(
             class =
               if appState.system.backendConnected:
@@ -449,7 +414,7 @@ proc renderSystemView(): VNode =
             strong:
               text "AI runtime"
             span:
-              text "Governed execution service behind Phoenix"
+              text "Answers and approved actions"
           span(
             class =
               if appState.system.aiReady:
@@ -464,31 +429,15 @@ proc renderSystemView(): VNode =
         tdiv(class = "system-row"):
           tdiv:
             strong:
-              text "Authentication"
+              text "Session"
             span:
-              text "Backend-owned application session"
+              text "You are signed in"
           span(class = "capability-badge enabled"):
             text "Active"
 
       if appState.system.error.len > 0:
         tdiv(class = "empty-card system-warning"):
           text appState.system.error
-
-
-proc pluginDescription(
-  pluginId: string
-): string =
-  case pluginId
-  of "jira":
-    "Jira and Atlassian operations are executed by trusted server-side providers and governed capabilities."
-  of "github":
-    "Repository integration is server managed. Browser code never receives repository credentials."
-  of "directory":
-    "Account and access operations remain behind the backend and governed identity providers."
-  of "knowledge":
-    "Knowledge and runbook retrieval can be exposed through trusted read-only capabilities."
-  else:
-    "Server-managed integration surface."
 
 
 proc renderSavedChat(savedChat: ChatItem): VNode =
@@ -572,15 +521,15 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
       span:
         case command.id
         of "new_chat":
-          text "Create a new durable conversation"
+          text "Start a new conversation"
         of "chats":
           text "Browse your saved conversations"
         of "search":
           text "Search every saved chat"
         of "connections":
-          text "Open models, harnesses, datasets and integrations"
+          text "Models, datasets and connected services"
         of "capabilities":
-          text "Browse governed operations by specialist"
+          text "What Janus can do, by service"
         of "review":
           text "Decide on critiques and corrections"
         of "knowledge":
@@ -862,8 +811,6 @@ proc renderWorkspace(): VNode =
       tdiv(class = "workspace-title"):
         h1:
           text activeViewTitle()
-        span:
-          text activeViewSubtitle()
         # Shown where the sidebar (and its chat list) is hidden. Search covers
         # only the open chat, so it names that chat as well.
         let chatTitle = currentChatTitle()
@@ -900,7 +847,7 @@ proc renderWorkspace(): VNode =
           button(
             class = runStatusClass(appState.run.status),
             `aria-label` = cstring(runStatusLabel(appState.run.status)),
-            title = "Open durable job activity"
+            title = "Open the current task"
           ):
             span(class = "run-status-dot"):
               text ""

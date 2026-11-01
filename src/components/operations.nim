@@ -85,7 +85,7 @@ proc renderOperationsPanel*(state: AppState): VNode =
     tdiv(class = "developer-view-header"):
       tdiv:
         h2: text "Operations"
-        p: text "Your task queue and recorded inference timings."
+        p: text "Your recent tasks and how long each step took."
       button(class = "secondary-action", disabled = state.operationsBusy, `aria-label` = "Refresh operations"):
         text (if state.operationsBusy: "Refreshing…" else: "Refresh")
         proc onclick(event: Event, node: VNode) =

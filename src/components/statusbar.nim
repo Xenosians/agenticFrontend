@@ -55,7 +55,7 @@ proc renderStatusbar*(state: AppState, openView: proc(view: AppView),
           openView(viewSystem)
 
       if observedJob(state.run):
-        button(class = "statusbar-item statusbar-job", title = "Open durable job activity"):
+        button(class = "statusbar-item statusbar-job", title = "Open the current task"):
           span(class = "statusbar-dot", `aria-hidden` = "true"):
             text ""
           text observationLabel(state.run.observationMode)

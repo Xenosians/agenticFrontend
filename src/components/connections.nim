@@ -262,11 +262,11 @@ proc renderUsageControls(state: AppState): VNode =
         tdiv(class = "plugin-field-hint"):
           if state.connectionNetworkingInference == "selected_model":
             if state.connectionBackend in ["local", "uploaded"]:
-              text "Networking uses this local connection. Private datasets remain excluded from networking."
+              text "Network requests use this local model. Private datasets are never sent."
             else:
-              text "Networking requests and device details will be sent to this provider. Private datasets remain excluded from networking."
+              text "Network requests and device details go to this provider. Private datasets are never sent."
           else:
-            text "Uses the existing dedicated networking model. Private datasets remain excluded from networking."
+            text "Network requests use the built-in networking model."
     if state.connectionBackend in ["http", "pi", "opencode"]:
       textField("Provider tokens per minute", state.connectionTpm,
         proc(value: string) = state.connectionTpm = value,
@@ -290,7 +290,7 @@ proc renderUsageControls(state: AppState): VNode =
           proc onchange(event: Event, node: VNode) =
             state.connectionReasoning = $node.value
       tdiv(class = "plugin-field-hint plugin-field-wide"):
-        text "Reasoning effort is optional and must be supported by this model and connection."
+        text "Optional; only for models that support it."
     let thinkingModes = thinkingModesFor(state.extensionCatalog, state.connectionBackend,
                                          state.connectionModel, state.connectionUrl)
     if thinkingModes.len > 0:
@@ -304,15 +304,15 @@ proc renderUsageControls(state: AppState): VNode =
           proc onchange(event: Event, node: VNode) =
             state.connectionThinking = $node.value
       tdiv(class = "plugin-field-hint plugin-field-wide"):
-        text "Automatic turns thinking off when the model allows it, for fast structured proposals. Hidden reasoning is never shown or trusted."
+        text "Automatic turns thinking off when the model allows it, for faster answers."
     if state.connectionBackend in ["http", "pi", "opencode"]:
       tdiv(class = "plugin-field-hint plugin-field-wide"):
-        text "Use the limits from your provider account. Connections sharing a credential and model share the queue. Leave limits empty when unknown."
+        text "Use your provider account's limits, or leave them empty."
 
 proc renderUsageSettings(state: AppState): VNode =
   result = buildHtml(tdiv(class = "plugin-content-section")):
     h3: text "Model settings: " & state.connectionName
-    p: text "Choose how this connection is used. You do not need to enter its credentials again."
+    p: text "Your saved key is kept."
     renderUsageControls(state)
     button(class = "plugin-primary", disabled = state.extensionBusy):
       text (if state.extensionBusy: "Saving…" else: "Save settings")
@@ -367,37 +367,36 @@ proc resourceGlyph(
     "P"
 
 
-proc renderInstalledResource(state: AppState, item: JsonNode): VNode =
+proc resourceStatus(item: JsonNode, inUse: bool): string =
+  ## "Model · Ready · In use": what it is, its state, and whether it serves requests now.
+  result = nodeText(item, "kind").capitalizeAscii() & " · " & nodeText(item, "state").capitalizeAscii()
+  if nodeBool(item, "insecure_transport"): result &= " · Unencrypted"
+  if inUse: result &= " · In use"
+
+
+proc renderInstalledResource(state: AppState, item: JsonNode, inUse: bool): VNode =
   # Procedure arguments give each rendered row its own callback binding.
-  result = buildHtml(button(class = "installed-item")):
+  let section = if nodeText(item, "kind") == "dataset": "data" else: "personal"
+  result = buildHtml(button(class = (if inUse: cstring"installed-item in-use" else: cstring"installed-item"),
+                            `aria-current` = (if inUse: cstring"true" else: cstring(nil)))):
     span(class = "installed-icon"):
       text resourceGlyph(item)
     tdiv:
       strong:
         text (if nodeText(item, "kind") == "dataset": datasetTitle(item) else: nodeText(item, "name"))
       span:
-        text nodeText(item, "kind") & " · " & nodeText(item, "state") &
-          (if nodeBool(item, "insecure_transport"): " · unencrypted" else: "")
+        text resourceStatus(item, inUse)
     proc onclick(event: Event, node: VNode) =
-      setPluginSection(state, if nodeText(item, "kind") == "dataset": "data" else: "personal")
+      setPluginSection(state, section)
 
 
 proc renderInstalledRail(
   state: AppState
 ): VNode =
-
+  ## Each saved model and dataset once; the ones serving requests are marked in place.
   let
-    selectedModel =
-      selection(
-        state,
-        "model_id"
-      )
-
-    selectedDataset =
-      selection(
-        state,
-        "dataset_id"
-      )
+    selectedModel = selection(state, "model_id")
+    selectedDataset = selection(state, "dataset_id")
 
   result = buildHtml(
     aside(class = "plugin-installed")
@@ -416,80 +415,13 @@ proc renderInstalledRail(
           )
         )
 
-    button(
-      class =
-        if state.pluginSection == "personal":
-          cstring"installed-item active"
-        else:
-          cstring"installed-item"
-    ):
-
-      span(class = "installed-icon"):
-        text "AI"
-
-      tdiv:
-
-        strong:
-          text resourceName(
-            state,
-            selectedModel,
-            "Local models"
-          )
-
-        span:
-          text "Active inference"
-
-      proc onclick(
-        event: Event,
-        node: VNode
-      ) =
-
-        setPluginSection(
-          state,
-          "personal"
-        )
-
-    if selectedDataset.len > 0:
-
-      button(
-        class =
-          if state.pluginSection == "data":
-            cstring"installed-item active"
-          else:
-            cstring"installed-item"
-      ):
-
-        span(class = "installed-icon"):
-          text "R"
-
-        tdiv:
-
-          strong:
-            text resourceName(
-              state,
-              selectedDataset,
-              "Reference dataset"
-            )
-
-          span:
-            text "RAG reference"
-
-        proc onclick(
-          event: Event,
-          node: VNode
-        ) =
-
-          setPluginSection(
-            state,
-            "data"
-          )
-
     if state.extensionCatalog != nil and
        state.extensionCatalog.hasKey("resources"):
 
       for row in state.extensionCatalog["resources"]:
         if matchesSearch(state, nodeText(row, "name"), nodeText(row, "kind"), nodeText(row, "backend")):
-          renderInstalledResource(state, row)
+          let id = nodeText(row, "id")
+          renderInstalledResource(state, row, id.len > 0 and id in [selectedModel, selectedDataset])
 
 
 proc renderCurrentSelection(
@@ -779,7 +711,7 @@ proc renderSpecialistModels(
         text "Specialist models"
 
       span:
-        text "The active model routes requests. Each specialist can follow it or use its own connection."
+        text "Each area can use the active model or its own."
 
     tdiv(class = "plugin-role-grid"):
 
@@ -891,7 +823,7 @@ proc renderPublicProviders(state: AppState): VNode =
         h3:
           text "Available providers"
         p:
-          text "Inference providers that can be connected to this workspace."
+          text "Connect a model provider."
     if not state.extensionCatalog.hasKey("provider_presets"):
       tdiv(class = "plugin-empty"):
         text "No provider presets are available."
@@ -1082,7 +1014,7 @@ proc renderPersonal(
           text "Personal"
 
         p:
-          text "Models and datasets connected specifically to your account."
+          text "Your models and datasets."
 
     renderCurrentSelection(
       state
@@ -1171,7 +1103,7 @@ proc renderPersonal(
             text "Nothing here yet"
 
           p:
-            text "Add a provider, local model, or dataset to create a personal resource."
+            text "Add a model provider, a local model or a dataset."
 
 
 proc connectionPresetId(
@@ -1487,7 +1419,7 @@ proc renderConnectionForm(
           text "Provider path"
 
         span:
-          text "Pi and OpenCode are isolated inference harnesses. Their API credential still belongs to the underlying provider."
+          text "Pi and OpenCode run in a sandbox and use your provider's key."
 
       tdiv(class = "plugin-form-grid"):
 
@@ -1613,9 +1545,9 @@ proc renderConnectionForm(
                 ):
 
                   if harnessId == "pi":
-                    text "Pi harness"
+                    text "Pi"
                   elif harnessId == "opencode":
-                    text "OpenCode harness"
+                    text "OpenCode"
                   else:
                     text harnessId
 
@@ -1731,11 +1663,11 @@ proc renderConnectionForm(
 
               if state.connectionBackend == "pi":
 
-                text "Stored form: provider/model. Example: openrouter/openrouter/free → Pi receives provider=openrouter and model=openrouter/free."
+                text "Write provider/model, for example openrouter/openrouter/free."
 
               else:
 
-                text "OpenCode uses provider-prefixed model IDs such as openrouter/openrouter/free."
+                text "Write provider/model, for example openrouter/openrouter/free."
 
         if state.connectionBackend == "http":
 
@@ -1830,7 +1762,7 @@ proc renderConnectionForm(
                 redraw(kxi)
 
             tdiv(class = "plugin-field-hint"):
-              text "Gateways that serve Claude in Anthropic's format need Anthropic Messages API. The server must allow the gateway's origin."
+              text "Choose Anthropic Messages API for gateways that serve Claude in Anthropic's format."
 
         if state.connectionBackend in [
           "http",
@@ -1873,19 +1805,19 @@ proc renderConnectionForm(
 
               if state.connectionBackend == "pi":
 
-                text "Pi receives only this provider credential inside its temporary isolated process. No Pi-specific key is needed."
+                text "Only this key is given to Pi, inside its sandbox."
 
               elif state.connectionBackend == "opencode":
 
-                text "OpenCode receives only this provider credential inside its isolated temporary HOME. Your normal OpenCode login is not reused."
+                text "Only this key is given to OpenCode, inside its sandbox. Your own OpenCode login is not used."
 
               elif credentialRequired:
 
-                text "The key is sent to Phoenix and stored encrypted in the owner-scoped extension store. It is not returned by catalog/list requests."
+                text "Stored encrypted for your account only, and never shown again."
 
               else:
 
-                text "Local OpenAI-compatible endpoints can remain credential-free."
+                text "Local servers usually need no key."
 
       if connectionUsesMessagesApi(state):
 
@@ -1962,17 +1894,17 @@ proc renderConnectionForm(
             text "Credential required"
 
           span:
-            text "This hosted provider cannot be saved until its API key is supplied."
+            text "Enter the API key to save this provider."
 
       tdiv(class = "plugin-form-footer"):
 
         tdiv:
 
           strong:
-            text "Governed inference"
+            text "Approval stays with you"
 
           span:
-            text "The external model supplies inference only. SemanticGuard, approvals and ToolGateway remain authoritative."
+            text "The model only suggests actions; changes still need your approval."
 
         button(
           class = "plugin-primary",
@@ -2016,7 +1948,7 @@ proc renderLocalModelUpload(
           text "Transformers + safetensors"
 
     p:
-      text "Upload a model folder. Executable custom model code is rejected."
+      text "Upload a model folder. Folders with custom code are refused."
 
     tdiv(class = "file-surface"):
 
@@ -2061,8 +1993,7 @@ proc renderDatasetTransform(state: AppState): VNode =
     if state.datasetTransformOpen:
       tdiv(class = "dataset-api-body"):
         p(class = "dataset-transform-note"):
-          text "Each JSON line of the chosen file is passed to the script as row. Return a table to keep it, " &
-            "or nil to drop it. The result is checked exactly like an upload."
+          text "The script gets each JSON line as row. Return a table to keep it, or nil to drop it."
         tdiv(class = "plugin-field"):
           label(`for` = "datasetScript"): text "Lua script"
           textarea(id = "datasetScript", class = "workflow-target dataset-script", rows = "8",
@@ -2389,6 +2320,8 @@ proc renderDatasetManager(
 proc renderDataAutomation(
   state: AppState
 ): VNode =
+  ## Your own local models and datasets. The operations Janus can run are
+  ## listed once, on the Capabilities page.
 
   result = buildHtml(
     tdiv(class = "plugin-content-section")
@@ -2402,7 +2335,7 @@ proc renderDataAutomation(
           text "Data & automation"
 
         p:
-          text "Bring your own local models, reference data, and future orchestration connections."
+          text "Add your own local models and reference data."
 
     tdiv(class = "data-grid"):
 
@@ -2413,105 +2346,6 @@ proc renderDataAutomation(
       renderDatasetManager(
         state
       )
-
-    tdiv(class = "automation-panel"):
-
-      tdiv(class = "plugin-section-heading compact"):
-
-        tdiv:
-
-          h3:
-            text "Automation connections"
-
-          p:
-            text "Prepared orchestration surfaces. Execution remains governed."
-
-      if arrayLength(
-           state,
-           "connections"
-         ) == 0:
-
-        tdiv(class = "plugin-empty"):
-          text "No automation connectors are currently exposed."
-
-      else:
-
-        for row in
-            state.extensionCatalog[
-              "connections"
-            ]:
-
-          tdiv(class = "automation-row"):
-
-            span(class = "automation-dot"):
-              text ""
-
-            tdiv:
-
-              strong:
-                text nodeText(
-                  row,
-                  "id"
-                )
-
-              span:
-                text nodeText(
-                  row,
-                  "state"
-                )
-
-    details(class = "developer-capabilities"):
-
-      summary(role = "button", `aria-label` = "Developer capabilities"):
-
-        tdiv:
-
-          strong:
-            text "Developer capabilities"
-
-          span:
-            text "Typed server-side capability catalog"
-
-        span(class = "plugin-count"):
-          text (
-            $arrayLength(
-              state,
-              "capabilities"
-            )
-          )
-
-      tdiv(class = "capability-grid"):
-
-        for row in
-            state.extensionCatalog[
-              "capabilities"
-            ]:
-
-          if matchesSearch(
-               state,
-               nodeText(
-                 row,
-                 "id"
-               ),
-               nodeText(
-                 row,
-                 "description"
-               )
-             ):
-
-            details(class = "capability-item"):
-
-              summary(role = "button", `aria-label` = cstring(nodeText(row, "id"))):
-                text nodeText(
-                  row,
-                  "id"
-                )
-
-              p:
-                text nodeText(
-                  row,
-                  "description"
-                )
 
 
 proc renderMainContent(
@@ -2573,7 +2407,7 @@ proc renderConnections*(
             text "Plugins"
 
           p:
-            text "Connect models, data sources and automation services to your " & productName & " workspace."
+            text "Models, data and services " & productName & " can use."
 
         tdiv(class = "plugin-header-actions"):
 

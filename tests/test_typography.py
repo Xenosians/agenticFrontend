@@ -56,7 +56,7 @@ class TypographyTests(CapabilitiesPageTests):
     def test_capabilities_use_readable_body_and_caption_roles(self):
         self.open_capabilities()
         self.assert_type([".capability-search", ".capability-copy strong"], 13)
-        self.assert_type([".capability-copy span", ".capability-tag", ".capability-group h3"], 12)
+        self.assert_type([".capability-copy span", ".capability-tag", ".capability-group-meta"], 12)
         self.assertGreaterEqual(self.page.evaluate(CONTRAST, ".capability-copy span"), 4.5)
         self.assertEqual(self.errors, [])
 

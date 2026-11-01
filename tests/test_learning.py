@@ -480,7 +480,8 @@ class LearningTests(navigation.ChatNavigationTests):
         expected = copy.deepcopy(self.starts[0]["body"])
         # The server started the run; only its answer was lost.
         self.runs = [run(state="completed", step=9, submission_id=expected["submission_id"])]
-        self.page.reload()
+        # Shortcuts work once the restored session is signed in, so wait for the reload to settle.
+        self.page.reload(wait_until="networkidle")
         self.page.keyboard.press("Control+k")
         self.page.locator("#commandSearch").fill("Learning")
         self.page.locator("#commandSearch").press("Enter")

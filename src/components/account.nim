@@ -28,7 +28,7 @@ proc renderAccountView*(state: AppState): VNode =
           h2:
             text "Account"
           p:
-            text "Application identity, notifications and server-side sessions."
+            text "Your profile, notifications and signed-in devices."
         button(class = "secondary-action", disabled = state.auth.loading):
           text (if state.auth.loading: "Signing out…" else: "Sign out")
           proc onclick(event: Event, node: VNode) =
@@ -87,7 +87,7 @@ proc renderAccountView*(state: AppState): VNode =
           p(class = "account-notice", role = "status"):
             text state.preferencesNotice
         p(class = "account-setting-help"):
-          text "Applies to future task completions. Already queued emails, authentication, approval, failure and reconciliation messages, and notifications you request are unchanged. Delivery also depends on the deployment's mail settings."
+          text "Applies to tasks that finish from now on. Sign-in and approval emails are always sent."
       tdiv(class = "developer-card wide account-session-panel"):
         tdiv(class = "developer-view-header compact"):
           tdiv:

@@ -59,9 +59,9 @@ proc renderKnowledgePanel*(state: AppState): VNode =
       tdiv(class = "developer-view-header"):
         tdiv:
           h2: text "Knowledge"
-          p: text "Your reference datasets and what a search finds in them."
+          p: text "Search your reference data. Answers cite what they use."
       p(class = "operation-note"):
-        text "Results are untrusted reference text with a citation. They can inform an answer but never grant permission, approve an action or change routing."
+        text "Results are reference only: they never approve or permit an action."
       if state.extensionError.len > 0:
         p(class = "operation-error", role = "alert"): text state.extensionError
       if state.extensionCatalog == nil:

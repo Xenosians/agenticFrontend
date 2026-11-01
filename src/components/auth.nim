@@ -64,7 +64,7 @@ proc renderAuthScreen*(
             text "Sign in"
 
           p(class = "auth-subtitle"):
-            text "Use your application account to access owned chats and governed jobs."
+            text "Sign in to your chats and tasks."
 
           authInput(
             "Email",
@@ -111,7 +111,7 @@ proc renderAuthScreen*(
             text "Create account"
 
           p(class = "auth-subtitle"):
-            text "This account identifies the person requesting AI and ITSM operations."
+            text "Your account shows who asked for each action."
 
           authInput(
             "Display name",
@@ -154,7 +154,7 @@ proc renderAuthScreen*(
             text "Reset password"
 
           p(class = "auth-subtitle"):
-            text "Enter your email. If the account exists, the backend mailer will send a reset link."
+            text "Enter your email. If it has an account, we will send a reset link."
 
           authInput(
             "Email",
@@ -181,7 +181,7 @@ proc renderAuthScreen*(
             text "Choose new password"
 
           p(class = "auth-subtitle"):
-            text "This reset link is single-purpose and expires automatically."
+            text "This link works once and expires."
 
           authInput(
             "New password",

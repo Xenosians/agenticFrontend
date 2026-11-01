@@ -131,7 +131,7 @@ proc renderApprovalAction(
 
         if reviewableProposal(state.run.proposal):
           p:
-            text "Review these saved action details. Approve to execute them, or reject to stop this proposal."
+            text "Check the details, then approve to run this action or reject to stop it."
           strong:
             text "Action details"
           p:
@@ -143,7 +143,7 @@ proc renderApprovalAction(
               text state.run.decisionError
             button(
               class = "approval-recovery-button",
-              title = "Read the durable job again without resubmitting the decision"
+              title = "Check this task again without sending the decision twice"
             ):
               text "Check saved outcome"
               proc onclick(event: Event, node: VNode) =
@@ -152,7 +152,7 @@ proc renderApprovalAction(
           tdiv(class = "approval-actions"):
             button(
               class = "approval-action-button",
-              title = "Approve and execute this governed action",
+              title = "Approve and run this action",
               disabled = not canDecideJob(state)
             ):
               if state.run.status == "approving":
@@ -174,7 +174,7 @@ proc renderApprovalAction(
                 discard rejectPendingJob(state)
         else:
           p:
-            text "The saved action details are unavailable. Reload this chat to check its job before approving."
+            text "The action details could not be loaded. Reload this chat before approving."
 
 
 proc renderChat*(

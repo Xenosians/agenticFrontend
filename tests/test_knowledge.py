@@ -93,7 +93,7 @@ class KnowledgeTests(navigation.ChatNavigationTests):
         expect(first).to_contain_text("Owned manual · Owned")
         expect(first).to_contain_text("Used for your requests")
         expect(sources.filter(has_text="Router manual (v2)")).not_to_contain_text("Used for your requests")
-        expect(self.page.locator(".knowledge-panel")).to_contain_text("never grant permission")
+        expect(self.page.locator(".knowledge-panel")).to_contain_text("never approve or permit an action")
         self.assertEqual(self.errors, [])
 
     def test_a_crawled_source_says_how_many_pages_it_read(self):
