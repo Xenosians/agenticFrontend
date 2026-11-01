@@ -447,8 +447,7 @@
   gap: 2px;
 }
 
-.plugin-role-heading span,
-.plugin-role-copy span {
+.plugin-role-heading span {
   color: var(--text-soft);
   font-size: var(--font-size-caption);
 }
@@ -470,9 +469,6 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-}
-
-.plugin-role-copy span {
   overflow-wrap: anywhere;
 }
 

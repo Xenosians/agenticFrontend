@@ -230,11 +230,6 @@ proc parseWorkflowArchive*(data: JsonNode, identity: string) =
       not data.hasKey("archived") or data["archived"].kind != JBool or not data["archived"].getBool:
     raise newException(ValueError, "The archive response did not confirm this workflow. Refresh before trying again.")
 
-proc workflowSnapshot*(draft: WorkflowDraft): JsonNode =
-  %*{"workflow": {"workflow_id": draft.id, "name": draft.name, "version": draft.version,
-    "definition_sha256": draft.digest, "execution": "durable_job",
-    "definition": workflowContract(draft.steps), "layout": layoutJson(draft)}}
-
 proc runPayload*(draft: WorkflowDraft, submissionId, message: string): JsonNode =
   if draft.version == 0 or draft.id.len == 0:
     raise newException(ValueError, "Save the workflow before running it.")

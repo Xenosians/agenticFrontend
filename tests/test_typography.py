@@ -43,9 +43,9 @@ class TypographyTests(CapabilitiesPageTests):
         self.assert_type([".plugin-select", ".plugin-select option", ".plugin-tab",
                           ".plugin-search input"], 13)
         self.assert_type([".plugin-role-copy strong", ".personal-resource-copy strong"], 13)
-        self.assert_type([".plugin-role-copy span", ".personal-resource-copy span",
+        self.assert_type([".plugin-role-heading span", ".personal-resource-copy span",
                           ".selection-heading span:not(.plugin-icon)"], 12)
-        for selector in (".plugin-role-copy span", ".personal-resource-copy span",
+        for selector in (".plugin-role-heading span", ".personal-resource-copy span",
                          ".plugin-section-heading p"):
             self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5, selector)
         self.page.locator(".plugin-add-button").click()

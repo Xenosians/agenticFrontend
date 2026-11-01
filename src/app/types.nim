@@ -33,7 +33,6 @@ type
 
   InspectorTab* = enum
     tabRun,
-    tabTools,
     tabEvents,
     tabRaw
 

@@ -72,6 +72,10 @@ class PlainLanguageTests(navigation.ChatNavigationTests):
         self.assertEqual(self.errors, [])
 
     def test_settings_show_resources_once_and_no_internal_catalogs(self):
+        # Specialist descriptions are written for the model that routes requests.
+        self.catalog["specialist_roles"] = [
+            {"id": "fixture-identity", "local_model": "fixture-local",
+             "description": "Handles governed directory identities and account lifecycle operations."}]
         self.open_first_chat()
         self.page.keyboard.press("Control+,")
         rail = self.page.locator(".plugin-installed")
@@ -97,6 +101,10 @@ class PlainLanguageTests(navigation.ChatNavigationTests):
                 self.assertNotIn("fixture_identity_create", text)
                 # Internal connection contracts are not shown as if they were things to connect.
                 self.assertNotIn("Automation connections", text)
+        # Each area is named in words; its model picker needs no model-facing description.
+        self.page.locator(".plugin-tabs").get_by_role("button", name="Personal", exact=True).click()
+        expect(self.page.locator(".plugin-role-copy strong")).to_have_text(["Fixture identity"])
+        expect(self.page.locator(".plugin-role-section")).not_to_contain_text("account lifecycle")
         self.assertEqual(self.errors, [])
 
 

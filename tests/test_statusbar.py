@@ -164,6 +164,17 @@ class StatusbarTests(navigation.ChatNavigationTests):
         expect(toggle).to_be_hidden()
         self.assertEqual(self.errors, [])
 
+    def test_the_inspector_shows_this_run_not_the_tool_catalog(self):
+        # The full operation list belongs to the Capabilities page; the inspector
+        # shows only what happened in this run.
+        self.page.set_viewport_size({"width": 1440, "height": 900})
+        self.open_first_chat()
+        self.bar().get_by_role("button", name="Run inspector", exact=True).click()
+        tabs = self.page.locator(".inspector-tabs button")
+        expect(tabs).to_have_text(["Run", "Events", "Raw"])
+        expect(self.page.locator(".tool-inspector-row")).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
 
 def load_tests(loader, _tests, _pattern):
     return unittest.TestSuite(StatusbarTests(name) for name in loader.getTestCaseNames(StatusbarTests)

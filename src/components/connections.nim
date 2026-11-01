@@ -645,11 +645,10 @@ proc renderRoleRow(
 
     tdiv(class = "plugin-role-copy"):
 
+      # The role's description is written for the model that routes requests;
+      # its name is enough to choose a model here.
       strong:
         text roleLabel(roleId)
-
-      span:
-        text nodeText(role, "description")
 
     select(
       class = "plugin-select",

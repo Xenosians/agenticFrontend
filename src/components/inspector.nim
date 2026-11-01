@@ -143,71 +143,6 @@ tool usage and execution state.
                 )
 
 
-proc renderInspectorTool(
-  state: AppState,
-  tool: ToolItem
-): VNode =
-
-  result = buildHtml(
-    button(class = "tool-inspector-row")
-  ):
-
-    tdiv:
-
-      strong:
-        text tool.name
-
-      span:
-        text tool.id
-
-
-    if tool.enabled:
-
-      span(class = "capability-badge enabled"):
-        text "Enabled"
-
-    else:
-
-      span(class = "capability-badge disabled"):
-        text "Preview"
-
-
-    proc onclick(
-      event: Event,
-      node: VNode
-    ) =
-
-      openToolView(
-        state,
-        tool.id
-      )
-
-
-proc renderToolsTab(
-  state: AppState
-): VNode =
-
-  result = buildHtml(
-    tdiv(class = "inspector-panel")
-  ):
-
-    tdiv(class = "inspector-section-heading"):
-
-      strong:
-        text "Capabilities"
-
-      span:
-        text "Select a tool to inspect it."
-
-
-    for tool in state.tools:
-
-      renderInspectorTool(
-        state,
-        tool
-      )
-
-
 proc renderEventsTab(
   state: AppState
 ): VNode =
@@ -359,27 +294,6 @@ proc renderInspector*(
         class =
           tabClass(
             state.inspectorTab,
-            tabTools
-          )
-      ):
-
-        text "Tools"
-
-        proc onclick(
-          event: Event,
-          node: VNode
-        ) =
-
-          setInspectorTab(
-            state,
-            tabTools
-          )
-
-
-      button(
-        class =
-          tabClass(
-            state.inspectorTab,
             tabEvents
           )
       ):
@@ -425,12 +339,6 @@ proc renderInspector*(
       of tabRun:
 
         renderRunTab(
-          state
-        )
-
-      of tabTools:
-
-        renderToolsTab(
           state
         )
 
