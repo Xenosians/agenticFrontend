@@ -141,7 +141,7 @@ class StatusbarTests(navigation.ChatNavigationTests):
         job = self.bar().locator(".statusbar-job")
         # The fixture has no WebSocket, so the job is observed by polling.
         expect(job).to_contain_text("Checking for updates")
-        self.page.locator(".sidebar").get_by_role("button", name="Capabilities", exact=True).click()
+        self.page.locator(".sidebar").get_by_role("button", name="Skills", exact=True).click()
         expect(job).to_be_visible()
         job.click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Operations")
@@ -165,7 +165,7 @@ class StatusbarTests(navigation.ChatNavigationTests):
         self.assertEqual(self.errors, [])
 
     def test_the_inspector_shows_this_run_not_the_tool_catalog(self):
-        # The full operation list belongs to the Capabilities page; the inspector
+        # The full operation list belongs to the capabilities documentation page; the inspector
         # shows only what happened in this run.
         self.page.set_viewport_size({"width": 1440, "height": 900})
         self.open_first_chat()

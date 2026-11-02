@@ -17,11 +17,12 @@ proc menuActions(menu: string): seq[MenuAction] =
       MenuAction(action: "palette", label: "Commands", shortcut: "Ctrl/⌘ K"),
       MenuAction(action: "knowledge", label: "Knowledge"),
       MenuAction(action: "operations", label: "Operations"),
-      MenuAction(action: "capabilities", label: "Capabilities"),
+      MenuAction(action: "skills", label: "Skills"),
       MenuAction(action: "inspector", label: "Run inspector", shortcut: "Ctrl/⌘ Alt I"),
       MenuAction(action: "system", label: "System status")]
   of "Help":
-    @[MenuAction(action: "help", label: "Keyboard shortcuts and help")]
+    @[MenuAction(action: "help", label: "Keyboard shortcuts and help"),
+      MenuAction(action: "docs", label: "Capabilities documentation")]
   else: @[]
 
 proc renderMenuAction(item: MenuAction, onAction: proc(action: string)): VNode =

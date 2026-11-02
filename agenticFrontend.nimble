@@ -7,8 +7,8 @@ license       = "MIT"
 
 srcDir        = "src"
 
-# Browser application
-bin           = @["agenticFrontend"]
+# Browser application, and the capabilities documentation page beside it
+bin           = @["agenticFrontend", "docs"]
 backend       = "js"
 binDir        = "public/js"
 

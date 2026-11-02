@@ -1,9 +1,10 @@
-"""The Capabilities page (FR-081, NFR-036): what Janus can do, by the service it touches.
+"""The capabilities page (FR-081, NFR-036): what Janus can do, by the service it touches.
 
-Every row comes from the trusted capability catalog: grouped under the service
-whose setup it needs, named in words with a one-line summary, labelled read or
-change, and marked when a change needs approval. Groups start collapsed so the
-page opens on the services and their setup; a search opens every matching group.
+The page is the documentation page docs.html, beside the workspace. Every row
+comes from the trusted capability catalog: grouped under the service whose setup
+it needs, named in words with a one-line summary, labelled read or change, and
+marked when a change needs approval. Groups start collapsed so the page opens on
+the services and their setup; a search opens every matching group.
 Isolated HTTP fixtures only; no deployment service, credential, provider or model.
 Run after rebuilding: python tests/test_capabilities_page.py
 """
@@ -87,9 +88,8 @@ class CapabilitiesPageTests(navigation.ChatNavigationTests):
         super().route(route)
 
     def open_capabilities(self):
-        self.open_first_chat()
-        self.page.locator(".sidebar").get_by_role("button", name="Capabilities", exact=True).click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Capabilities")
+        self.page.goto(self.base + "/docs.html", wait_until="networkidle")
+        expect(self.page.get_by_role("heading", name="What Janus can do", exact=True)).to_be_visible()
 
     def group(self, name):
         return self.page.locator(".capability-group").filter(
@@ -179,13 +179,9 @@ class CapabilitiesPageTests(navigation.ChatNavigationTests):
                 self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
         self.assertEqual(self.errors, [])
 
-    def test_palette_and_narrow_screens_reach_the_page(self):
+    def test_narrow_screens_read_the_page(self):
         self.page.set_viewport_size({"width": 390, "height": 760})
-        self.open_first_chat()
-        self.page.keyboard.press("Control+k")
-        self.page.locator("#commandSearch").fill("Capabilities")
-        self.page.keyboard.press("Enter")
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Capabilities")
+        self.open_capabilities()
         self.open_group("Fixture directory")
         expect(self.row("Fixture identity create")).to_be_visible()
         overflow = self.page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth")
@@ -219,25 +215,9 @@ class CapabilitiesPageTests(navigation.ChatNavigationTests):
         self.assertGreaterEqual(indent, 20)
         self.assertEqual(self.errors, [])
 
-    def test_sidebar_marks_only_the_page_in_view(self):
-        # The open chat stays marked as current, but the full highlight
-        # belongs to the page in view; elsewhere the chat row is quieter.
-        self.open_capabilities()
-        nav = self.page.locator(".sidebar").get_by_role("button", name="Capabilities", exact=True)
-        expect(nav).to_have_attribute("aria-current", "page")
-        chat = self.page.locator(".chat-nav-main").filter(has_text="First fixture chat")
-        expect(chat).to_have_attribute("aria-current", "true")
-        backgrounds = self.page.evaluate("""() => ['.nav-item.active', '.chat-nav-main.active']
-            .map((selector) => getComputedStyle(document.querySelector(selector)).backgroundColor)""")
-        self.assertNotEqual(backgrounds[0], backgrounds[1], backgrounds)
-        self.page.locator(".sidebar").get_by_role("button", name="Chat", exact=True).click()
-        expect(chat).to_have_attribute("aria-current", "page")
-        self.assertEqual(self.errors, [])
-
     def test_unavailable_catalog_is_stated_not_hidden(self):
         self.catalog = {"detail": "fixture outage"}
-        self.open_first_chat()
-        self.page.locator(".sidebar").get_by_role("button", name="Capabilities", exact=True).click()
+        self.open_capabilities()
         expect(self.page.locator(".capability-empty")).to_be_visible()
         expect(self.page.locator(".capability-row")).to_have_count(0)
         self.assertEqual(self.errors, [])

@@ -20,7 +20,7 @@ from test_workspace_context import CATALOG
 # Implementation names and internal vocabulary that mean nothing to a person using the product.
 INTERNAL = re.compile(r"\b(Phoenix|Karax|SemanticGuard|ToolGateway|durable|harness(es)?|owner-scoped|"
                       r"frontend-visible|backend mailer|governed|orchestration|[a-z]+(-[a-z]+)*\.v\d)\b")
-VIEWS = ("Chat", "Search", "Capabilities", "Knowledge", "Operations", "System")
+VIEWS = ("Chat", "Search", "Skills", "Knowledge", "Operations", "System")
 
 
 class PlainLanguageTests(navigation.ChatNavigationTests):
@@ -96,7 +96,7 @@ class PlainLanguageTests(navigation.ChatNavigationTests):
                 text = self.page.locator(".plugin-library-page").inner_text()
                 found = sorted({match.group(0) for match in INTERNAL.finditer(text)})
                 self.assertEqual(found, [], f"{tab} shows internal names")
-                # The capability list lives on the Capabilities page, not repeated here.
+                # The capability list lives on the capabilities documentation page, not here.
                 self.assertNotIn("Developer capabilities", text)
                 self.assertNotIn("fixture_identity_create", text)
                 # Internal connection contracts are not shown as if they were things to connect.

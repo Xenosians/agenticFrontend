@@ -43,6 +43,8 @@ type
     error*: string
     ## Citations of the reference passages the answer's model was given.
     references*: JsonNode
+    ## The owner's skill versions that guided the answer (identities only).
+    skills*: JsonNode
 
     presentations*: seq[
       ResultCard
@@ -667,6 +669,10 @@ proc parseJobResponse(
       references:
         (if data.kind == JObject and data.hasKey("result") and data["result"].kind == JObject and
             data["result"].hasKey("references"): data["result"]["references"] else: nil),
+
+      skills:
+        (if data.kind == JObject and data.hasKey("result") and data["result"].kind == JObject and
+            data["result"].hasKey("skills"): data["result"]["skills"] else: nil),
 
       presentations:
         extractPresentations(

@@ -8,7 +8,7 @@ const workspaceCommands* = [
   WorkspaceCommand(id: "search", label: "Search chats", shortcut: "Ctrl/Meta+Shift+F"),
   WorkspaceCommand(id: "connections", label: "Models and datasets", shortcut: "Ctrl/Meta+,"),
   WorkspaceCommand(id: "account", label: "Account settings and sessions", shortcut: ""),
-  WorkspaceCommand(id: "capabilities", label: "Capabilities", shortcut: ""),
+  WorkspaceCommand(id: "skills", label: "Skills", shortcut: ""),
   WorkspaceCommand(id: "knowledge", label: "Knowledge and cited search", shortcut: ""),
   WorkspaceCommand(id: "learning", label: "Learning readiness", shortcut: ""),
   WorkspaceCommand(id: "automation", label: "Automation workflows", shortcut: ""),

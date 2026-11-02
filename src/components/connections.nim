@@ -2354,7 +2354,7 @@ proc renderDataAutomation(
   state: AppState
 ): VNode =
   ## Your own local models and datasets. The operations Janus can run are
-  ## listed once, on the Capabilities page.
+  ## listed once, on the capabilities documentation page (docs.html).
 
   result = buildHtml(
     tdiv(class = "plugin-content-section")

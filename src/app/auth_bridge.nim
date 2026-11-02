@@ -17,6 +17,7 @@ import request_context
 import account_bridge
 import chat_bridge
 import answer_references
+import skills
 
 
 proc browserQueryParam(
@@ -181,7 +182,8 @@ proc applyHistory(
         role: role,
         content: item.content,
         cards: @[],
-        references: parseAnswerReferences(item.references)
+        references: parseAnswerReferences(item.references),
+        skills: parseAnswerSkills(item.skills)
       )
     )
 

@@ -86,8 +86,8 @@ class TypographyTests(CapabilitiesPageTests):
                         document.documentElement.scrollWidth > window.innerWidth + 1"""))
                     self.assert_no_content_overflow()
                     self.open_capabilities()
-                    # This navigation reloads the fixture page, so explicitly
-                    # restore zoom before measuring the second real view.
+                    # The capabilities page is its own document, so explicitly
+                    # restore zoom before measuring it.
                     self.page.evaluate("zoom => document.documentElement.style.zoom = zoom", zoom)
                     self.assert_type([".capability-search", ".capability-copy strong"], 13)
                     self.assertFalse(self.page.evaluate("""() =>

@@ -18,7 +18,7 @@ import app/engineering_bridge
 import app/request_context
 
 import components/connections
-import components/capabilities
+import components/skills
 import app/extension_bridge
 import components/auth
 import components/account
@@ -59,6 +59,7 @@ var workspaceHelpPreviousView = viewChat
 var pendingMenuFocus: string
 
 proc activeElementId(): cstring {.importjs: "(() => document.activeElement?.id || '')()".}
+proc openDocumentationPage() {.importjs: "window.location.assign('./docs.html')".}
 proc focusElement(id: cstring) {.importjs: "document.getElementById(#)?.focus()".}
 proc activateSearchCommand(event: Event): bool {.
   importjs: "((e) => e.key === 'Enter' && !e.isComposing && !e.repeat)(#)".}
@@ -131,8 +132,8 @@ proc activeViewTitle(): string =
     "PCB / Infrastructure Simulator"
   of viewAccount:
     "Account"
-  of viewCapabilities:
-    "Capabilities"
+  of viewSkills:
+    "Skills"
   of viewReview:
     "Review"
   of viewKnowledge:
@@ -501,8 +502,8 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         text "⌕"
       of "connections":
         text "◇"
-      of "capabilities":
-        text "▤"
+      of "skills":
+        text "✎"
       of "knowledge":
         text "❏"
       of "inspector":
@@ -528,8 +529,8 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
           text "Search every saved chat"
         of "connections":
           text "Models, datasets and connected services"
-        of "capabilities":
-          text "What Janus can do, by service"
+        of "skills":
+          text "Your written guidance for answers"
         of "review":
           text "Decide on critiques and corrections"
         of "knowledge":
@@ -681,8 +682,8 @@ proc renderWorkspaceBody(): VNode =
     renderEngineeringPanel(appState)
   of viewAccount:
     renderAccountView(appState)
-  of viewCapabilities:
-    renderCapabilitiesView(appState)
+  of viewSkills:
+    renderSkillsView(appState)
   of viewReview:
     renderReviewPanel(appState)
   of viewKnowledge:
@@ -969,8 +970,8 @@ proc runWorkspaceCommand(action: string) =
   of "account":
     setActiveView(appState, viewAccount)
     discard loadAuthSessions(appState)
-  of "capabilities":
-    setActiveView(appState, viewCapabilities)
+  of "skills":
+    setActiveView(appState, viewSkills)
     discard refreshExtensions(appState)
   of "operations": openOperations(appState)
   of "review": openReview(appState)
@@ -979,6 +980,9 @@ proc runWorkspaceCommand(action: string) =
   of "automation": openWorkflows(appState)
   of "engineering": openEngineering(appState)
   of "pcb": openEngineering(appState, "pcb")
+  of "docs":
+    # The capabilities documentation is its own page beside the workspace.
+    openDocumentationPage()
   of "help":
     if not wasHelp: workspaceHelpPreviousView = appState.activeView
     setActiveView(appState, viewHelp)

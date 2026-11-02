@@ -23,12 +23,12 @@ class WorkspaceMenuTests(ChatNavigationTests):
     def menu(self, name):
         return self.page.get_by_role("menubar", name="Application menu").get_by_role("menuitem", name=name, exact=True)
 
-    def test_normal_composer_hides_required_operations_without_removing_capabilities(self):
+    def test_normal_composer_hides_required_operations_without_removing_skills(self):
         self.open_first_chat()
         expect(self.page.get_by_role("button", name="Required operations", exact=True)).to_have_count(0)
         self.menu("View").click()
-        self.page.get_by_role("menu", name="View", exact=True).get_by_role("menuitem", name="Capabilities", exact=True).click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Capabilities")
+        self.page.get_by_role("menu", name="View", exact=True).get_by_role("menuitem", name="Skills", exact=True).click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Skills")
         self.assertEqual(self.submissions, [])
         self.assertEqual(self.errors, [])
 
@@ -66,7 +66,8 @@ class WorkspaceMenuTests(ChatNavigationTests):
         self.page.get_by_role("menu", name="Edit", exact=True).get_by_role("menuitem", name="Search chats", exact=True).click()
         expect(self.page.locator("#chatSearch")).to_be_focused()
         self.menu("Help").click()
-        self.page.get_by_role("menu", name="Help", exact=True).get_by_role("menuitem").click()
+        self.page.get_by_role("menu", name="Help", exact=True).get_by_role(
+            "menuitem", name="Keyboard shortcuts and help", exact=True).click()
         expect(self.page.locator(".workspace-help")).to_be_visible()
         expect(self.page.locator("#messageInput")).to_have_count(0)
         self.page.get_by_role("button", name="Back to workspace", exact=True).click()

@@ -1,5 +1,6 @@
 import types
 import answer_references
+import skills
 
 proc clearWorkflowDraft*(state: AppState) =
   state.workflowSteps.setLen(0)
@@ -267,7 +268,8 @@ proc addAssistantMessage*(
     ResultCard
   ] = @[],
   jobId: string = "",
-  references: seq[AnswerReference] = @[]
+  references: seq[AnswerReference] = @[],
+  skills: seq[AnswerSkill] = @[]
 ) =
 
   state.messages.add(
@@ -286,7 +288,9 @@ proc addAssistantMessage*(
       cards:
         cards,
 
-      references: references
+      references: references,
+
+      skills: skills
     )
   )
 
@@ -294,7 +298,8 @@ proc addAssistantMessage*(
 
 
 proc restoreAssistantJobMessage*(state: AppState, jobId, content: string,
-                                 cards: seq[ResultCard], references: seq[AnswerReference] = @[]) =
+                                 cards: seq[ResultCard], references: seq[AnswerReference] = @[],
+                                 skills: seq[AnswerSkill] = @[]) =
   ## Replace the saved response for this exact job, preserving other turns.
   ## If history has only its request, append the newly observed response.
   ## Citations restored from history stay unless the job read carries its own.
@@ -305,5 +310,7 @@ proc restoreAssistantJobMessage*(state: AppState, jobId, content: string,
         state.messages[index].cards = cards
         if references.len > 0:
           state.messages[index].references = references
+        if skills.len > 0:
+          state.messages[index].skills = skills
         return
-  addAssistantMessage(state, content, cards, jobId, references)
+  addAssistantMessage(state, content, cards, jobId, references, skills)

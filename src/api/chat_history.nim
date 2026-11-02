@@ -7,6 +7,8 @@ type ChatHistoryMessage* = object
   status*: string
   ## Citations of the reference passages this answer's model was given.
   references*: JsonNode
+  ## The owner's skill versions that guided this answer (identities only).
+  skills*: JsonNode
 
 const observableJobStates* = [
   "pending", "processing", "waiting_approval", "approving",

@@ -7,6 +7,7 @@ import learning
 import workflows
 import engineering
 import answer_references
+import skills
 import lua_transforms
 import chat_list
 export chat_list
@@ -25,7 +26,7 @@ type
     viewNodeBuilder,
     viewSimulator,
     viewAccount,
-    viewCapabilities,
+    viewSkills,
     viewReview,
     viewKnowledge,
     viewLearning,
@@ -77,6 +78,7 @@ type
     content*: string
     cards*: seq[ResultCard]
     references*: seq[AnswerReference]
+    skills*: seq[AnswerSkill]
 
   RunEvent* = object
     id*: int
@@ -265,7 +267,6 @@ type
     workflowArgumentDrafts*: JsonNode
     workflowSteps*: seq[WorkflowStep]
     searchDraft*: string
-    capabilityQuery*: string
     composerSelectedToolId*: string
     selectedToolId*: string
     selectedPluginId*: string

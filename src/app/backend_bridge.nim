@@ -17,6 +17,7 @@ import job_decision
 import extension_bridge
 import chat_bridge
 import answer_references
+import skills
 
 
 proc applyJobState(
@@ -59,10 +60,11 @@ proc finishCompletedJob(
       "Job completed successfully."
 
   let references = parseAnswerReferences(job.references)
+  let skills = parseAnswerSkills(job.skills)
   if restoreHistory:
-    restoreAssistantJobMessage(state, job.jobId, answer, job.presentations, references)
+    restoreAssistantJobMessage(state, job.jobId, answer, job.presentations, references, skills)
   else:
-    addAssistantMessage(state, answer, job.presentations, job.jobId, references)
+    addAssistantMessage(state, answer, job.presentations, job.jobId, references, skills)
 
   if job.presentations.len > 0:
     addRunEvent(

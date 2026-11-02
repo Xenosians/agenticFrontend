@@ -9,6 +9,7 @@ import ../app/job_decision
 
 import result_card
 import answer_references
+import ../app/skills
 import message_body
 import message_feedback
 import brand
@@ -100,6 +101,9 @@ proc renderMessage(
 
         if message.references.len > 0:
           renderAnswerReferences(state, message.references)
+
+        if message.skills.len > 0:
+          renderAnswerSkills(message.skills)
 
         # Only answers from a saved task can be linked for review.
         if message.jobId.len > 0 and message.content.len > 0:

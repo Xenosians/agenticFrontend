@@ -21,7 +21,7 @@ proc renderViewButton(state: AppState, icon, label: string, target: AppView,
     span(class = "rail-label"): text label
     proc onclick(event: Event, node: VNode) =
       setActiveView(state, target)
-      if target in [viewPlugin, viewTool, viewCapabilities, viewKnowledge]:
+      if target in [viewPlugin, viewTool, viewSkills, viewKnowledge]:
         discard refreshExtensions(state)
       elif target == viewJobs: discard refreshOperations(state)
       elif target == viewReview: discard refreshReview(state)
@@ -106,7 +106,7 @@ proc renderSidebar*(state: AppState): VNode =
         renderViewButton(state, "◈", "Chat", viewChat)
         renderViewButton(state, "⌕", "Search", viewSearch)
         renderViewButton(state, "◇", "Connections", viewPlugin)
-        renderViewButton(state, "▤", "Capabilities", viewCapabilities)
+        renderViewButton(state, "✎", "Skills", viewSkills)
         renderViewButton(state, "❏", "Knowledge", viewKnowledge)
         renderViewButton(state, "◌", "Operations", viewJobs)
         if isReviewer(state): renderViewButton(state, "✓", "Review", viewReview)

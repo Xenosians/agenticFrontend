@@ -3,6 +3,7 @@
 include karax/prelude
 import ../app/types
 import ../app/answer_references
+import ../app/skills
 import ../app/knowledge_bridge
 
 proc renderReference(state: AppState, row: AnswerReference): VNode =
@@ -24,6 +25,14 @@ proc renderReference(state: AppState, row: AnswerReference): VNode =
         code(class = "knowledge-citation"): text row.locator
     if state.referenceError.len > 0 and state.referenceErrorLocator == row.locator:
       p(class = "operation-error", role = "alert"): text state.referenceError
+
+proc renderAnswerSkills*(skills: seq[AnswerSkill]): VNode =
+  ## The owner's skill versions that guided this answer; the skills page shows their text.
+  result = buildHtml(p(class = "answer-skills")):
+    text (if skills.len == 1: "Guided by your skill " else: "Guided by your skills ")
+    for index, row in skills:
+      if index > 0: text ", "
+      span(class = "answer-skill"): text skillLabel(row)
 
 proc renderAnswerReferences*(state: AppState, references: seq[AnswerReference]): VNode =
   result = buildHtml(section(class = "answer-references", `aria-label` = "Reference passages")):
