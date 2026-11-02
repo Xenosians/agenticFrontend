@@ -91,8 +91,8 @@ class KnowledgeTests(navigation.ChatNavigationTests):
         first = sources.filter(has_text="Router manual (v1)")
         expect(first).to_contain_text("v1 · 1111aaaa · replaced by v2")
         expect(first).to_contain_text("Owned manual · Owned")
-        expect(first).to_contain_text("Used for your requests")
-        expect(sources.filter(has_text="Router manual (v2)")).not_to_contain_text("Used for your requests")
+        expect(first).to_contain_text("Only source for answers")
+        expect(sources.filter(has_text="Router manual (v2)")).not_to_contain_text("Only source for answers")
         expect(self.page.locator(".knowledge-panel")).to_contain_text("never approve or permit an action")
         self.assertEqual(self.errors, [])
 
@@ -127,7 +127,7 @@ class KnowledgeTests(navigation.ChatNavigationTests):
                                           "csrf": "fixture-csrf"}])
         # Searching a source never changes which dataset is used for requests.
         expect(self.page.locator(".knowledge-source", has_text="Router manual (v1)")).to_contain_text(
-            "Used for your requests")
+            "Only source for answers")
         self.assertEqual(self.errors, [])
 
     def test_search_defaults_to_the_source_used_for_requests(self):
@@ -202,6 +202,14 @@ class KnowledgeTests(navigation.ChatNavigationTests):
         expect(self.page.locator(".knowledge-panel")).to_contain_text("No reference datasets yet")
         expect(self.page.get_by_role("searchbox", name="Search knowledge", exact=True)).to_have_count(0)
         self.assertEqual(self.searches, [])
+
+    def test_without_a_chosen_source_the_page_says_answers_use_all_of_it(self):
+        self.catalog["selected"] = {"model_id": "fixture-model", "dataset_id": None}
+        self.open_knowledge()
+        expect(self.page.locator(".knowledge-panel")).to_contain_text(
+            "Answers use all of these sources and cite the passages they use.")
+        expect(self.page.locator(".knowledge-source")).not_to_contain_text(["Only source for answers"])
+        self.assertEqual(self.errors, [])
 
     def test_knowledge_text_meets_wcag_aa_contrast_without_overflow(self):
         for width, height in ((1440, 900), (390, 760)):

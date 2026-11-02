@@ -571,7 +571,7 @@ proc renderCurrentSelection(
             text resourceName(
               state,
               datasetId,
-              "None"
+              "All reference data"
             )
 
       select(
@@ -585,7 +585,7 @@ proc renderCurrentSelection(
           selected =
             datasetId == ""
         ):
-          text "No additional dataset"
+          text "All reference data"
 
         for row in state.extensionCatalog["resources"]:
 

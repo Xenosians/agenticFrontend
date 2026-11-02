@@ -201,7 +201,7 @@ class DatasetVersionTests(navigation.ChatNavigationTests):
     def test_reference_choices_name_each_version(self):
         self.open_tab("Personal")
         options = self.page.get_by_role("combobox", name="Reference dataset", exact=True).locator("option")
-        expect(options).to_have_text(["No additional dataset", "Fixture manual (v1)", "Fixture manual (v2)"])
+        expect(options).to_have_text(["All reference data", "Fixture manual (v1)", "Fixture manual (v2)"])
         self.assertEqual(self.errors, [])
 
 

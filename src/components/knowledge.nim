@@ -1,5 +1,6 @@
 ## The Knowledge surface (FR-083): reference sources and cited search.
 include karax/prelude
+import std/sequtils
 import karax/kdom
 import ../app/types
 import ../app/knowledge
@@ -10,7 +11,7 @@ proc renderSource(source: KnowledgeSource): VNode =
     tdiv(class = "operation-job-heading"):
       strong: text source.title
       if source.selected:
-        span(class = "review-status"): text "Used for your requests"
+        span(class = "review-status"): text "Only source for answers"
     p(class = "knowledge-meta"): text source.version
     p(class = "knowledge-meta"): text source.source & " · " & source.license
     if source.crawl.len > 0:
@@ -73,6 +74,8 @@ proc renderKnowledgePanel*(state: AppState): VNode =
       else:
         tdiv(class = "section-heading-row"):
           h3: text "Sources"
+        if not sources.anyIt(it.selected):
+          p(class = "operation-note"): text "Answers use all of these sources and cite the passages they use."
         for source in sources:
           renderSource(source)
         tdiv(class = "section-heading-row"):
