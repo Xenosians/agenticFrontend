@@ -120,7 +120,8 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
     def test_revoke_targets_clicked_session_and_preserves_current(self):
         self.open_first_chat()
         self.page.get_by_title("More", exact=True).click()
-        self.page.get_by_role("button", name="Settings", exact=True).click()
+        # The rail has a Settings button too; this test opens Settings from the More menu.
+        self.page.locator(".header-menu").get_by_role("button", name="Settings", exact=True).click()
         for key in ("one", "two", "three"):
             with self.subTest(key=key):
                 row = self.page.locator(".account-session-row").filter(has_text=key.title() + " fixture browser")
