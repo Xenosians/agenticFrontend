@@ -8,6 +8,7 @@ import app/commands
 import app/types
 import app/state
 import app/auth_bridge
+import app/account_bridge
 import app/backend_bridge
 import app/operations_bridge
 import app/review_bridge
@@ -21,7 +22,7 @@ import components/connections
 import components/skills
 import app/extension_bridge
 import components/auth
-import components/account
+import components/settings
 import components/sidebar
 import components/chat
 import components/composer
@@ -38,6 +39,7 @@ import components/learning
 import components/workflows
 import components/engineering
 import components/workspace_menu
+import components/answer_actions
 import config/runtime_config
 
 
@@ -122,16 +124,14 @@ proc activeViewTitle(): string =
     "Search"
   of viewJobs, viewRuns, viewLogs:
     "Operations"
-  of viewSystem:
-    "System"
+  of viewSettings:
+    "Settings"
   of viewPlugin, viewTool:
     "Connections"
   of viewNodeBuilder:
     "AI Node Builder"
   of viewSimulator:
     "PCB / Infrastructure Simulator"
-  of viewAccount:
-    "Account"
   of viewSkills:
     "Skills"
   of viewReview:
@@ -331,116 +331,6 @@ proc renderActivityView(): VNode =
                 )
 
 
-proc renderSystemView(): VNode =
-  let
-    backendLabel =
-      if appState.system.checking:
-        "Checking"
-      elif not appState.system.checked:
-        "Not checked"
-      elif appState.system.backendConnected:
-        "Connected"
-      else:
-        "Unavailable"
-
-    aiLabel =
-      if appState.system.checking:
-        "Checking"
-      elif not appState.system.checked:
-        "Not checked"
-      elif appState.system.aiReady:
-        "Ready"
-      elif appState.system.aiReachable:
-        "Starting"
-      else:
-        "Unavailable"
-
-  result = buildHtml(
-    section(class = "conversation")
-  ):
-    tdiv(class = "developer-view"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2:
-            text "System"
-          p:
-            text "Whether each part of Janus is reachable."
-
-        button(
-          class = "secondary-action",
-          disabled = appState.system.checking
-        ):
-          if appState.system.checking:
-            text "Checking…"
-          else:
-            text "Refresh"
-
-          proc onclick(
-            event: Event,
-            node: VNode
-          ) =
-            discard refreshSystemStatus(
-              appState
-            )
-
-      tdiv(class = "system-list"):
-        tdiv(class = "system-row"):
-          tdiv:
-            strong:
-              text "App"
-            span:
-              text "This browser"
-          span(class = "capability-badge enabled"):
-            text "Running"
-
-        tdiv(class = "system-row"):
-          tdiv:
-            strong:
-              text "Backend"
-            span:
-              text "Sign-in, chats, tasks and approvals"
-          span(
-            class =
-              if appState.system.backendConnected:
-                cstring"capability-badge enabled"
-              elif not appState.system.checked:
-                cstring"capability-badge preview"
-              else:
-                cstring"capability-badge disabled"
-          ):
-            text backendLabel
-
-        tdiv(class = "system-row"):
-          tdiv:
-            strong:
-              text "AI runtime"
-            span:
-              text "Answers and approved actions"
-          span(
-            class =
-              if appState.system.aiReady:
-                cstring"capability-badge enabled"
-              elif appState.system.aiReachable:
-                cstring"capability-badge preview"
-              else:
-                cstring"capability-badge disabled"
-          ):
-            text aiLabel
-
-        tdiv(class = "system-row"):
-          tdiv:
-            strong:
-              text "Session"
-            span:
-              text "You are signed in"
-          span(class = "capability-badge enabled"):
-            text "Active"
-
-      if appState.system.error.len > 0:
-        tdiv(class = "empty-card system-warning"):
-          text appState.system.error
-
-
 proc renderSavedChat(savedChat: ChatItem): VNode =
   result = buildHtml(button(class =
       if savedChat.chatId == appState.currentChatId:
@@ -544,9 +434,9 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         else:
           text "Workspace action"
 
-    if command.shortcut.len > 0:
+    if command.keys.len > 0:
       kbd:
-        text command.shortcut
+        text shortcutText(command.keys)
     else:
       span(class = "command-enter", `aria-hidden` = "true"):
         text "↵"
@@ -618,7 +508,7 @@ proc renderCommandCenter(): VNode =
             text "Quick actions"
 
           span:
-            text "Ctrl/⌘ K"
+            text shortcutText(paletteKeys)
 
         tdiv(class = "command-center-list"):
           for command in workspaceCommands:
@@ -641,13 +531,13 @@ proc renderWorkspaceHelp(): VNode =
       h3: text "Keyboard shortcuts"
       dl:
         for command in workspaceCommands:
-          if command.shortcut.len > 0 and (not command.reviewerOnly or isReviewer(appState)):
+          if command.keys.len > 0 and (not command.reviewerOnly or isReviewer(appState)):
             dt: text command.label
             dd:
-              kbd: text command.shortcut
+              kbd: text shortcutText(command.keys)
         dt: text "Commands"
         dd:
-          kbd: text "Ctrl/⌘ K"
+          kbd: text shortcutText(paletteKeys)
         dt: text "Close menu or commands"
         dd:
           kbd: text "Escape"
@@ -672,16 +562,14 @@ proc renderWorkspaceBody(): VNode =
     renderSearchView()
   of viewJobs, viewRuns, viewLogs:
     renderActivityView()
-  of viewSystem:
-    renderSystemView()
+  of viewSettings:
+    renderSettingsView(appState)
   of viewPlugin, viewTool:
     renderConnections(appState)
   of viewNodeBuilder:
     renderWorkflowPanel(appState)
   of viewSimulator:
     renderEngineeringPanel(appState)
-  of viewAccount:
-    renderAccountView(appState)
   of viewSkills:
     renderSkillsView(appState)
   of viewReview:
@@ -749,34 +637,20 @@ proc renderHeaderMenu(): VNode =
         )
 
     button:
-      text "Account"
+      text "Settings"
       proc onclick(
         event: Event,
         node: VNode
       ) =
         appState.headerMenuOpen = false
-        setActiveView(
-          appState,
-          viewAccount
-        )
-        discard loadAuthSessions(
-          appState
-        )
+        runWorkspaceCommand("settings")
 
-    button:
-      text "Refresh system status"
-      proc onclick(
-        event: Event,
-        node: VNode
-      ) =
-        appState.headerMenuOpen = false
-        setActiveView(
-          appState,
-          viewSystem
-        )
-        discard refreshSystemStatus(
-          appState
-        )
+    if appState.messages.len > 0:
+      button:
+        text "Export chat as Markdown"
+        proc onclick(event: Event, node: VNode) =
+          appState.headerMenuOpen = false
+          exportChat(currentChatTitle(), appState.messages)
 
     button:
       if appState.inspectorOpen:
@@ -859,7 +733,7 @@ proc renderWorkspace(): VNode =
 
         button(
           class = "header-action chats-header-action",
-          title = "Saved chats (Ctrl/Cmd+Alt+C)"
+          title = cstring("Saved chats (" & shortcutText(["Mod", "Alt", "C"]) & ")")
         ):
           text "Chats"
           proc onclick(event: Event, node: VNode) =
@@ -868,9 +742,9 @@ proc renderWorkspace(): VNode =
         button(
           id = "commandPaletteButton",
           class = "header-action command-header-action",
-          title = "Commands (Ctrl/Cmd+K)"
+          title = cstring("Commands (" & shortcutText(paletteKeys) & ")")
         ):
-          text "⌘ K"
+          text shortcutText(paletteKeys)
 
           proc onclick(
             event: Event,
@@ -879,23 +753,6 @@ proc renderWorkspace(): VNode =
             runWorkspaceCommand(
               "palette"
             )
-
-        if appState.activeView == viewSystem and
-           not appState.commandPaletteOpen:
-          button(
-            class = "header-action",
-            title = "Refresh system status",
-            `aria-label` = "Refresh system status"
-          ):
-            text "↻"
-
-            proc onclick(
-              event: Event,
-              node: VNode
-            ) =
-              discard refreshSystemStatus(
-                appState
-              )
 
         button(
           class = "header-action",
@@ -967,9 +824,10 @@ proc runWorkspaceCommand(action: string) =
   of "connections":
     setActiveView(appState, viewPlugin)
     discard refreshExtensions(appState)
-  of "account":
-    setActiveView(appState, viewAccount)
+  of "settings":
+    setActiveView(appState, viewSettings)
     discard loadAuthSessions(appState)
+    discard refreshSystemStatus(appState)
   of "skills":
     setActiveView(appState, viewSkills)
     discard refreshExtensions(appState)
@@ -986,9 +844,6 @@ proc runWorkspaceCommand(action: string) =
   of "help":
     if not wasHelp: workspaceHelpPreviousView = appState.activeView
     setActiveView(appState, viewHelp)
-  of "system":
-    setActiveView(appState, viewSystem)
-    discard refreshSystemStatus(appState)
   of "inspector": appState.inspectorOpen = not appState.inspectorOpen
   of "refresh": discard refreshSystemStatus(appState)
   of "compose":
@@ -1058,6 +913,9 @@ setRenderer(
   clientPostRenderCallback = focusWorkspaceAfterRender
 )
 
+# Paint the default theme now; the owner's saved one replaces it at sign-in.
+applyAppearance(appState)
+followSystemTheme(appState)
 
 discard bootstrapApplication(
   appState

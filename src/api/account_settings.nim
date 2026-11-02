@@ -9,22 +9,26 @@ proc readNotificationPreferences*(): Future[NotificationPreferences] {.async.} =
   let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/auth/preferences",
     newFetchOptions(metod = HttpGet, mode = fmCors, credentials = fcInclude))
   if not response.ok:
-    raise newException(ValueError, "Notification settings could not be loaded (HTTP " & $response.status & ").")
+    raise newException(ValueError, "Settings could not be loaded (HTTP " & $response.status & ").")
   return parseNotificationPreferences(decodeJson(response.body))
 
-proc writeNotificationPreferences*(csrfToken: string, taskCompleted: bool): Future[NotificationPreferences] {.async.} =
+proc writePreferences*(csrfToken: string, changes: JsonNode): Future[NotificationPreferences] {.async.} =
+  ## Saves only the settings in `changes`; the server keeps the others and
+  ## returns all of them. Each requested value must come back as sent.
   var response: HttpReply
   try:
     response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/auth/preferences",
-      newFetchOptions(metod = HttpPut, body = ($(%*{"task_completed": taskCompleted})).cstring,
+      newFetchOptions(metod = HttpPut, body = ($changes).cstring,
         mode = fmCors, credentials = fcInclude, headers = jsonHeaders(csrfToken)))
   except CatchableError:
     raise newException(ValueError, "Settings could not be confirmed. Reload settings to check the saved choice.")
   if not response.ok:
     raise newException(ValueError, "Settings were not confirmed (HTTP " & $response.status & "). Reload settings to check the saved choice.")
-  let preferences = parseNotificationPreferences(decodeJson(response.body))
-  if preferences.taskCompleted != taskCompleted:
-    raise newException(ValueError, "The saved setting did not match your choice. Reload settings to check it.")
+  let receipt = decodeJson(response.body)
+  let preferences = parseNotificationPreferences(receipt)
+  for key, value in changes.pairs:
+    if receipt["preferences"][key] != value:
+      raise newException(ValueError, "The saved setting did not match your choice. Reload settings to check it.")
   return preferences
 
 proc revokeOtherSessions*(csrfToken: string): Future[int] {.async.} =

@@ -102,12 +102,13 @@ class StatusbarTests(navigation.ChatNavigationTests):
                     self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5, selector)
                 self.assertEqual(self.errors, [])
 
-    def test_service_health_is_named_and_opens_system_status(self):
+    def test_service_health_is_named_and_opens_service_status(self):
         self.open_first_chat()
         health = self.bar().get_by_role("button", name="Services ready", exact=True)
         expect(health).to_be_visible()
         health.click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("System")
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Settings")
+        expect(self.page.get_by_role("region", name="Services")).to_be_visible()
         self.assertEqual(self.errors, [])
 
     def test_health_changes_appear_without_a_reload(self):

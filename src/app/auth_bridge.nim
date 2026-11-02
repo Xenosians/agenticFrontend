@@ -121,6 +121,7 @@ proc clearAuthenticatedState(
   inc state.chatNavigationEpoch
   inc state.jobObservationEpoch
   clearOperations(state)
+  applyAppearance(state)
   state.auth.authenticated = false
   clearWorkflowDraft(state)
   state.extensionCatalog = nil
@@ -336,6 +337,7 @@ proc bootstrapApplication*(
     applyAuth(state, auth)
     # The header shows the active model and dataset from the owner's catalog.
     discard refreshExtensions(state)
+    discard loadAccountPreferences(state)
     await loadChats(state)
   except CatchableError as exc:
     if matchesAuthRequest(state, requestEpoch):
@@ -376,6 +378,7 @@ proc loginApplication*(
     state.auth.passwordDraft = ""
     state.auth.notice = ""
     discard refreshExtensions(state)
+    discard loadAccountPreferences(state)
     await loadChats(state)
   except EmailNotVerified as exc:
     if matchesAuthRequest(state, requestEpoch):
@@ -816,7 +819,7 @@ proc selectChat*(
 proc loadAuthSessions*(
   state: AppState
 ) {.async.} =
-  discard loadAccountPreferences(state)
+  if not state.preferencesLoaded: discard loadAccountPreferences(state)
   await refreshAccountSessions(state)
 
 

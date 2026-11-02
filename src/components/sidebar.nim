@@ -2,7 +2,7 @@ import std/[strutils, unicode]
 include karax/prelude
 import karax/kdom
 import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge,
-  operations_bridge, review_bridge, request_context, engineering_bridge]
+  operations_bridge, review_bridge, request_context, engineering_bridge, backend_bridge]
 import brand
 
 proc currentCalendarDay(): cstring {.importjs: "(() => {const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');})()".}
@@ -26,6 +26,9 @@ proc renderViewButton(state: AppState, icon, label: string, target: AppView,
       elif target == viewJobs: discard refreshOperations(state)
       elif target == viewReview: discard refreshReview(state)
       elif target == viewSimulator and not state.engineeringLoaded: discard refreshTopologies(state)
+      elif target == viewSettings:
+        discard loadAuthSessions(state)
+        discard refreshSystemStatus(state)
 
 proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
   # Each invocation captures one immutable identity, including all row actions.
@@ -110,18 +113,19 @@ proc renderSidebar*(state: AppState): VNode =
         renderViewButton(state, "❏", "Knowledge", viewKnowledge)
         renderViewButton(state, "◌", "Operations", viewJobs)
         if isReviewer(state): renderViewButton(state, "✓", "Review", viewReview)
-        renderViewButton(state, "⚙", "System", viewSystem)
+        renderViewButton(state, "⚙", "Settings", viewSettings)
         span(class = "rail-divider", `aria-hidden` = "true")
         renderViewButton(state, "⌘", "AI Node Builder", viewNodeBuilder, true)
         renderViewButton(state, "▦", "PCB / Infra Simulator", viewSimulator, true)
       let ownerName = if state.auth.displayName.len > 0: state.auth.displayName else: state.auth.email
-      button(class = "sidebar-footer", title = cstring("Account · " & ownerName), `aria-label` = "Account settings"):
+      button(class = "sidebar-footer", title = cstring("Settings · " & ownerName), `aria-label` = "Account settings"):
         tdiv(class = "avatar"):
           text (if state.auth.displayName.len > 0: $state.auth.displayName.runeAt(0).toUpper() else: "U")
         span(class = "rail-label"): text ownerName
         proc onclick(event: Event, node: VNode) =
-          setActiveView(state, viewAccount)
+          setActiveView(state, viewSettings)
           discard loadAuthSessions(state)
+          discard refreshSystemStatus(state)
     tdiv(class = "chats-sidebar"):
       tdiv(class = "chats-sidebar-heading"):
         strong: text productName
@@ -152,5 +156,3 @@ proc renderSidebar*(state: AppState): VNode =
           tdiv(class = "chat-date-group"):
             span(class = "section-label"): text group.title
             for chat in group.chats: renderSavedChat(state, chat)
-      tdiv(class = "chat-sidebar-footnote"):
-        text "Your conversations"

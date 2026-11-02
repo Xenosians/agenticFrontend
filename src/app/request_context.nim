@@ -157,6 +157,9 @@ proc clearOperations*(state: AppState) =
   state.completionMailDraft = false
   state.preferencesError = ""
   state.preferencesNotice = ""
+  # The next owner starts from the default appearance until their own loads.
+  state.themeMode = themeDark
+  state.accent = accentMono
 
 proc beginReviewRequest*(state: AppState): OperationsRequestContext =
   inc state.reviewEpoch

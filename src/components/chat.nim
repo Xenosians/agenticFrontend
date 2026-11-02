@@ -12,6 +12,7 @@ import answer_references
 import ../app/skills
 import message_body
 import message_feedback
+import answer_actions
 import brand
 import statusbar
 
@@ -87,6 +88,9 @@ proc renderMessage(
 
           tdiv(class = "message-bubble assistant"):
             renderMessageBody(message.content)
+
+          tdiv(class = "message-actions"):
+            renderCopyAnswer(message)
 
 
         if message.cards.len > 0:

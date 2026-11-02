@@ -1,25 +1,27 @@
 include karax/prelude
+import ../app/commands
 
 type MenuAction = object
-  action, label, shortcut: string
+  action, label: string
+  keys: seq[string]
 
 proc menuActions(menu: string): seq[MenuAction] =
   case menu
   of "File":
-    @[MenuAction(action: "new_chat", label: "New chat", shortcut: "Ctrl/⌘ Alt N"),
+    @[MenuAction(action: "new_chat", label: "New chat", keys: @["Mod", "Alt", "N"]),
       MenuAction(action: "chats", label: "Recent chats"),
       MenuAction(action: "connections", label: "Models and datasets")]
   of "Edit":
     @[MenuAction(action: "compose", label: "Focus message"),
-      MenuAction(action: "search", label: "Search chats", shortcut: "Ctrl/⌘ Shift F")]
+      MenuAction(action: "search", label: "Search chats", keys: @["Mod", "Shift", "F"])]
   of "View":
     @[MenuAction(action: "compose", label: "Chat"),
-      MenuAction(action: "palette", label: "Commands", shortcut: "Ctrl/⌘ K"),
+      MenuAction(action: "palette", label: "Commands", keys: @paletteKeys),
       MenuAction(action: "knowledge", label: "Knowledge"),
       MenuAction(action: "operations", label: "Operations"),
       MenuAction(action: "skills", label: "Skills"),
-      MenuAction(action: "inspector", label: "Run inspector", shortcut: "Ctrl/⌘ Alt I"),
-      MenuAction(action: "system", label: "System status")]
+      MenuAction(action: "inspector", label: "Run inspector", keys: @["Mod", "Alt", "I"]),
+      MenuAction(action: "settings", label: "Settings")]
   of "Help":
     @[MenuAction(action: "help", label: "Keyboard shortcuts and help"),
       MenuAction(action: "docs", label: "Capabilities documentation")]
@@ -28,8 +30,8 @@ proc menuActions(menu: string): seq[MenuAction] =
 proc renderMenuAction(item: MenuAction, onAction: proc(action: string)): VNode =
   result = buildHtml(button(class = "workspace-menu-item", role = "menuitem", tabindex = "-1", `aria-label` = cstring(item.label))):
     span: text item.label
-    if item.shortcut.len > 0:
-      kbd: text item.shortcut
+    if item.keys.len > 0:
+      kbd: text shortcutText(item.keys)
     proc onclick(event: Event, node: VNode) = onAction(item.action)
 
 proc renderMenu(menu, openMenu: string, onToggle: proc(menu: string),

@@ -87,7 +87,7 @@ class EngineeringTests(navigation.ChatNavigationTests):
                 route.fulfill(json={"status": "logged_out"})
                 return
             if path == "/api/v1/auth/preferences":
-                route.fulfill(json={"preferences": {"task_completed": False}})
+                route.fulfill(json={"preferences": {"task_completed": False, "theme": "dark", "accent": "mono"}})
                 return
             if path == "/api/v1/auth/sessions":
                 route.fulfill(json={"sessions": []})
@@ -248,15 +248,15 @@ class EngineeringTests(navigation.ChatNavigationTests):
         self.page.wait_for_function("document.querySelector('#topologyName').disabled")
         route = self.pending_checks.pop()
         self.page.keyboard.press("Control+k")
-        self.page.locator("#commandSearch").fill("Account settings")
+        self.page.locator("#commandSearch").fill("Settings")
         self.page.locator("#commandSearch").press("Enter")
-        self.page.locator(".account-view").get_by_role("button", name="Sign out", exact=True).click()
+        self.page.get_by_role("region", name="Profile").get_by_role("button", name="Sign out", exact=True).click()
         expect(self.page.get_by_role("heading", name="Sign in", exact=True)).to_be_visible()
         self.owner = "second-owner"
         self.page.get_by_placeholder("you@example.com").fill("second@example.test")
         self.page.get_by_placeholder("Password", exact=True).fill("fixture-password")
         self.page.get_by_role("button", name="Sign in", exact=True).click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Account")
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Settings")
         route.fulfill(json=drift())
         # If the new owner's list cannot load, the previous owner's rows must not be offered.
         self.fail_list = True

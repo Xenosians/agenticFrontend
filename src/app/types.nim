@@ -11,6 +11,8 @@ import skills
 import lua_transforms
 import chat_list
 export chat_list
+import appearance
+export appearance
 
 type
   AppView* = enum
@@ -20,12 +22,11 @@ type
     viewJobs,
     viewRuns,
     viewLogs,
-    viewSystem,
+    viewSettings,
     viewTool,
     viewPlugin,
     viewNodeBuilder,
     viewSimulator,
-    viewAccount,
     viewSkills,
     viewReview,
     viewKnowledge,
@@ -297,5 +298,8 @@ type
     completionMail*, completionMailDraft*: bool
     preferencesError*, preferencesNotice*: string
     preferencesEpoch*: int
+    # Appearance as saved on the server; shown before sign-in as the default.
+    themeMode*: ThemeMode
+    accent*: Accent
     nextMessageId*: int
     nextEventId*: int

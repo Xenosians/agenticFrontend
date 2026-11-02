@@ -1,15 +1,26 @@
 import std/json
+import appearance
 
 type NotificationPreferences* = object
+  ## Every setting the server keeps for the owner, as saved.
   taskCompleted*: bool
+  theme*: ThemeMode
+  accent*: Accent
 
 proc parseNotificationPreferences*(node: JsonNode): NotificationPreferences =
-  if node.kind != JObject or not node.hasKey("preferences") or
-      node["preferences"].kind != JObject or
-      not node["preferences"].hasKey("task_completed") or
-      node["preferences"]["task_completed"].kind != JBool:
-    raise newException(ValueError, "The notification settings response was invalid.")
-  NotificationPreferences(taskCompleted: node["preferences"]["task_completed"].getBool())
+  if node.kind != JObject or not node.hasKey("preferences") or node["preferences"].kind != JObject:
+    raise newException(ValueError, "The settings response was invalid.")
+  let saved = node["preferences"]
+  if not saved.hasKey("task_completed") or saved["task_completed"].kind != JBool or
+      not saved.hasKey("theme") or saved["theme"].kind != JString or
+      not saved.hasKey("accent") or saved["accent"].kind != JString:
+    raise newException(ValueError, "The settings response was invalid.")
+  let theme = parseThemeMode(saved["theme"].getStr())
+  let accent = parseAccent(saved["accent"].getStr())
+  if theme.isNone or accent.isNone:
+    raise newException(ValueError, "The settings response was invalid.")
+  NotificationPreferences(taskCompleted: saved["task_completed"].getBool(),
+    theme: theme.get, accent: accent.get)
 
 proc parseOtherSessionRevocation*(node: JsonNode): int =
   if node.kind != JObject or not node.hasKey("status") or

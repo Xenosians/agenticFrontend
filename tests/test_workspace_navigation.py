@@ -120,15 +120,15 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
     def test_revoke_targets_clicked_session_and_preserves_current(self):
         self.open_first_chat()
         self.page.get_by_title("More", exact=True).click()
-        self.page.get_by_role("button", name="Account", exact=True).click()
+        self.page.get_by_role("button", name="Settings", exact=True).click()
         for key in ("one", "two", "three"):
             with self.subTest(key=key):
                 row = self.page.locator(".account-session-row").filter(has_text=key.title() + " fixture browser")
-                row.get_by_role("button", name="Revoke", exact=True).click()
+                row.get_by_role("button", name="Sign out " + key.title() + " fixture browser", exact=True).click()
                 expect(row.get_by_text("Revoked", exact=True)).to_be_visible()
                 self.assertEqual(self.revoked[-1], key)
         expect(self.page.locator(".account-session-row").filter(has_text="Session fixture browser")
-               .get_by_text("Current", exact=True)).to_be_visible()
+               .get_by_text("This browser", exact=True)).to_be_visible()
         expect(self.page.locator("#messageInput")).to_have_count(0)
         self.assert_no_side_effects()
 
@@ -162,7 +162,8 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
 
     def test_button_palette_escape_and_compose_restore_focus_after_render(self):
         self.open_first_chat()
-        button = self.page.get_by_title("Commands (Ctrl/Cmd+K)", exact=True)
+        # The test browser runs on Linux, which writes the shortcut as Ctrl+K.
+        button = self.page.get_by_title("Commands (Ctrl+K)", exact=True)
         button.click()
         expect(self.page.locator("#commandSearch")).to_be_focused()
         self.page.keyboard.press("Escape")
@@ -181,9 +182,9 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
     def test_navigation_dismisses_command_page(self):
         self.open_first_chat()
         self.page.keyboard.press("Control+k")
-        self.page.locator(".nav-item").filter(has=self.page.get_by_text("System", exact=True)).click()
+        self.page.locator(".nav-item").filter(has=self.page.get_by_text("Settings", exact=True)).click()
         expect(self.page.locator(".command-center")).to_have_count(0)
-        expect(self.page.locator(".workspace-title h1")).to_have_text("System")
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Settings")
         self.assert_no_side_effects()
 
     def test_palette_confirmation_ignores_ime_repeated_and_unmatched_input(self):

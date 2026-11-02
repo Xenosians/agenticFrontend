@@ -5,9 +5,10 @@ import std/[md5, os, strutils]
 # Each page names the assets it loads; every one must be present.
 let publicDir = currentSourcePath().parentDir.parentDir / "public"
 const pages = [
-  ("index.html", @["config.js", "js/job_socket.js", "js/app.js", "css/app.css", "css/polish.css",
+  ("index.html", @["config.js", "js/job_socket.js", "js/app.js", "css/theme.css", "css/app.css", "css/polish.css",
                    "css/desktop-ui.css", "css/workspace.css", "css/workspace-menu.css"]),
-  ("docs.html", @["config.js", "js/docs.js", "css/app.css", "css/polish.css", "css/desktop-ui.css"])]
+  ("docs.html", @["config.js", "js/docs.js", "css/theme.css", "css/app.css", "css/polish.css",
+                  "css/desktop-ui.css"])]
 for (page, assets) in pages:
   let pagePath = publicDir / page
   var html = readFile(pagePath)

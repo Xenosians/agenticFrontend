@@ -9,6 +9,7 @@
 include karax/prelude
 
 import ../app/types
+import ../app/commands
 
 proc healthLabel*(system: SystemState): string =
   ## One label for the public health summary. An unread result stays unknown.
@@ -47,12 +48,12 @@ proc renderStatusbar*(state: AppState, openView: proc(view: AppView),
                       toggleInspector: proc()): VNode =
   result = buildHtml(footer(class = "statusbar", `aria-label` = "Status")):
     tdiv(class = "statusbar-group"):
-      button(class = healthClass(state.system), title = "Open system status"):
+      button(class = healthClass(state.system), title = "Open service status in Settings"):
         span(class = "statusbar-dot", `aria-hidden` = "true"):
           text ""
         text healthLabel(state.system)
         proc onclick(event: Event, node: VNode) =
-          openView(viewSystem)
+          openView(viewSettings)
 
       if observedJob(state.run):
         button(class = "statusbar-item statusbar-job", title = "Open the current task"):
@@ -66,7 +67,7 @@ proc renderStatusbar*(state: AppState, openView: proc(view: AppView),
       button(
         class = "statusbar-item statusbar-inspector",
         `aria-pressed` = cstring($state.inspectorOpen),
-        title = "Run inspector (Ctrl/Cmd+Alt+I)"
+        title = cstring("Run inspector (" & shortcutText(["Mod", "Alt", "I"]) & ")")
       ):
         text "Run inspector"
         proc onclick(event: Event, node: VNode) =

@@ -67,7 +67,7 @@ class WorkflowTests(navigation.ChatNavigationTests):
                 route.fulfill(json={"status": "logged_out"})
                 return
             if path == "/api/v1/auth/preferences":
-                route.fulfill(json={"preferences": {"task_completed": False}})
+                route.fulfill(json={"preferences": {"task_completed": False, "theme": "dark", "accent": "mono"}})
                 return
             if path == "/api/v1/auth/sessions":
                 route.fulfill(json={"sessions": []})
@@ -146,16 +146,16 @@ class WorkflowTests(navigation.ChatNavigationTests):
 
     def change_owner(self):
         self.page.keyboard.press("Control+k")
-        self.page.locator("#commandSearch").fill("Account settings")
+        self.page.locator("#commandSearch").fill("Settings")
         self.page.locator("#commandSearch").press("Enter")
-        self.page.locator(".account-view").get_by_role("button", name="Sign out", exact=True).click()
+        self.page.get_by_role("region", name="Profile").get_by_role("button", name="Sign out", exact=True).click()
         expect(self.page.get_by_role("heading", name="Sign in", exact=True)).to_be_visible()
         self.owner = "second-owner"
         self.hold_list = False
         self.page.get_by_placeholder("you@example.com").fill("second@example.test")
         self.page.get_by_placeholder("Password", exact=True).fill("fixture-password")
         self.page.get_by_role("button", name="Sign in", exact=True).click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Account")
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Settings")
         self.open_automation_page()
         expect(self.page.locator("#workflowOpen")).to_be_enabled()
         expect(self.page.locator("#workflowName")).to_have_value("New workflow")

@@ -1,24 +1,48 @@
 type WorkspaceCommand* = object
-  id*, label*, shortcut*: string
+  id*, label*: string
+  keys*: seq[string]  ## Shortcut as keys, e.g. @["Mod", "Alt", "N"]; "Mod" is Ctrl or ⌘.
   reviewerOnly*: bool  ## Shown only to reviewers; the backend still enforces it.
 
-const workspaceCommands* = [
-  WorkspaceCommand(id: "new_chat", label: "New chat", shortcut: "Ctrl/Meta+Alt+N"),
-  WorkspaceCommand(id: "chats", label: "Browse saved chats", shortcut: "Ctrl/Meta+Alt+C"),
-  WorkspaceCommand(id: "search", label: "Search chats", shortcut: "Ctrl/Meta+Shift+F"),
-  WorkspaceCommand(id: "connections", label: "Models and datasets", shortcut: "Ctrl/Meta+,"),
-  WorkspaceCommand(id: "account", label: "Account settings and sessions", shortcut: ""),
-  WorkspaceCommand(id: "skills", label: "Skills", shortcut: ""),
-  WorkspaceCommand(id: "knowledge", label: "Knowledge and cited search", shortcut: ""),
-  WorkspaceCommand(id: "learning", label: "Learning readiness", shortcut: ""),
-  WorkspaceCommand(id: "automation", label: "Automation workflows", shortcut: ""),
-  WorkspaceCommand(id: "engineering", label: "Infrastructure topology and drift", shortcut: ""),
-  WorkspaceCommand(id: "pcb", label: "PCB netlist inspection", shortcut: ""),
-  WorkspaceCommand(id: "operations", label: "Operations and recorded timings", shortcut: ""),
-  WorkspaceCommand(id: "review", label: "Review feedback", shortcut: "", reviewerOnly: true),
-  WorkspaceCommand(id: "inspector", label: "Toggle run inspector", shortcut: "Ctrl/Meta+Alt+I"),
-  WorkspaceCommand(id: "refresh", label: "Refresh system and connections", shortcut: ""),
-  WorkspaceCommand(id: "compose", label: "Focus message composer", shortcut: "")]
+const
+  paletteKeys* = ["Mod", "K"]
+  workspaceCommands* = [
+    WorkspaceCommand(id: "new_chat", label: "New chat", keys: @["Mod", "Alt", "N"]),
+    WorkspaceCommand(id: "chats", label: "Browse saved chats", keys: @["Mod", "Alt", "C"]),
+    WorkspaceCommand(id: "search", label: "Search chats", keys: @["Mod", "Shift", "F"]),
+    WorkspaceCommand(id: "connections", label: "Models and datasets", keys: @["Mod", ","]),
+    WorkspaceCommand(id: "settings", label: "Settings: theme, notifications and devices"),
+    WorkspaceCommand(id: "skills", label: "Skills"),
+    WorkspaceCommand(id: "knowledge", label: "Knowledge and cited search"),
+    WorkspaceCommand(id: "learning", label: "Learning readiness"),
+    WorkspaceCommand(id: "automation", label: "Automation workflows"),
+    WorkspaceCommand(id: "engineering", label: "Infrastructure topology and drift"),
+    WorkspaceCommand(id: "pcb", label: "PCB netlist inspection"),
+    WorkspaceCommand(id: "operations", label: "Operations and recorded timings"),
+    WorkspaceCommand(id: "review", label: "Review feedback", reviewerOnly: true),
+    WorkspaceCommand(id: "inspector", label: "Toggle run inspector", keys: @["Mod", "Alt", "I"]),
+    WorkspaceCommand(id: "refresh", label: "Check service status"),
+    WorkspaceCommand(id: "compose", label: "Focus message composer")]
+
+proc shortcutLabel*(keys: openArray[string], apple: bool): string =
+  ## How the platform writes a shortcut: "Ctrl+Alt+N" on Windows and Linux,
+  ## "⌥⌘N" on Apple keyboards (modifiers in Apple's order, then the key).
+  if keys.len == 0: return ""
+  if not apple:
+    for i, key in keys:
+      if i > 0: result.add "+"
+      result.add(if key == "Mod": "Ctrl" else: key)
+    return
+  for (name, symbol) in [("Alt", "⌥"), ("Shift", "⇧"), ("Mod", "⌘")]:
+    if name in keys: result.add symbol
+  result.add keys[^1]
+
+when defined(js):
+  proc isApplePlatform(): bool {.importjs:
+    "(() => /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent || ''))()".}
+
+  proc shortcutText*(keys: openArray[string]): string =
+    ## The label for the keyboard of the browser in use.
+    shortcutLabel(keys, isApplePlatform())
 
 proc shortcutAction*(key: string, modifier, shift, composing, repeated: bool, alt = false): string =
   if composing or repeated: return ""

@@ -3,11 +3,11 @@ import ../src/app/[account_settings, types, state, request_context]
 
 suite "authoritative account settings receipts":
   test "notification choices are explicit server booleans":
-    check parseNotificationPreferences(%*{"preferences": {"task_completed": true}}).taskCompleted
-    check not parseNotificationPreferences(%*{"preferences": {"task_completed": false}}).taskCompleted
+    check parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark", "accent": "mono"}}).taskCompleted
+    check not parseNotificationPreferences(%*{"preferences": {"task_completed": false, "theme": "dark", "accent": "mono"}}).taskCompleted
   test "missing or malformed choices never become a default":
-    for node in [%*{}, %*{"preferences": {}}, %*{"preferences": {"task_completed": "false"}},
-                 %*{"preferences": {"task_completed": nil}}]:
+    for node in [%*{}, %*{"preferences": {}}, %*{"preferences": {"task_completed": "false", "theme": "dark", "accent": "mono"}},
+                 %*{"preferences": {"task_completed": nil, "theme": "dark", "accent": "mono"}}]:
       expect ValueError: discard parseNotificationPreferences(node)
   test "bulk revoke needs a nonnegative confirmed count":
     check parseOtherSessionRevocation(%*{"status": "revoked", "revoked_count": 3}) == 3

@@ -160,6 +160,8 @@ class ChatNavigationTests(unittest.TestCase):
                          "display_name": "Fixture Owner", "role": "user"},
                 "session_id": "fixture-session", "csrf_token": "fixture-csrf",
             }
+        elif path == "/api/v1/auth/preferences" and request.method == "GET":
+            data = {"preferences": {"task_completed": True, "theme": "dark", "accent": "mono"}}
         elif path == "/api/health":
             data = {"status": "ok", "ai_service": {"reachable": True, "healthy": True, "ready": True}}
         elif path == "/api/v1/integrations":

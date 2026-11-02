@@ -64,7 +64,6 @@
 .chat-delete-confirm button, .chat-rename button { border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 4px 8px; background: var(--panel-soft); color: var(--text); font-size: 11px; }
 .chat-rename-input { width: 100%; min-width: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); padding: 6px; font-size: 12px; }
 .chat-metadata-error { margin: 0 3px 10px; color: var(--text); font-size: 11px; line-height: 1.5; }
-.chat-sidebar-footnote { margin: 0; padding: 8px 6px 0; color: var(--text-soft); font-size: 10px; flex-shrink: 0; }
 .chats-sidebar .sidebar-empty { display: block; color: var(--text-soft); font-size: 12px; padding: 8px; }
 @media (max-width: 1180px) {
   :root { --chat-list-width: 220px; }
@@ -78,3 +77,79 @@
   .rail-navigation .nav-item, .workspace-rail .sidebar-footer { width: 36px; }
   .chats-sidebar { display: none; }
 }
+/* Saved chats live in the sidebar; the header button stands in only where that list is hidden. */
+@media (min-width: 761px) { .chats-header-action { display: none; } }
+
+/* Settings: one column of titled sections on the 20 px grid. */
+.settings-view { box-sizing: border-box; width: min(100%, 760px); margin: 0 auto; padding: 28px 20px 80px; display: grid; gap: 20px; }
+.settings-section { border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--panel); padding: 20px; }
+.settings-section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+.settings-section-heading > div { min-width: 0; }
+.settings-section-heading h3 { margin: 0; font-size: var(--font-size-body); font-weight: 600; color: var(--text); }
+.settings-section-heading p, .settings-help { margin: 4px 0 0; font-size: var(--font-size-control); line-height: 1.5; color: var(--muted); }
+.settings-body { display: grid; gap: 14px; }
+.settings-field { display: grid; gap: 8px; }
+.settings-field-label { font-size: var(--font-size-caption); font-weight: 600; letter-spacing: .02em; color: var(--text-mid); }
+.settings-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings-choice { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 12px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-1); color: var(--text-soft); font-size: var(--font-size-control); cursor: pointer; }
+.settings-choice:hover { background: var(--panel-hover); color: var(--text); }
+.settings-choice.selected { border-color: var(--accent); background: var(--panel-active); color: var(--text); }
+.settings-choice input { position: absolute; inset: 0; margin: 0; opacity: 0; cursor: pointer; }
+.settings-choice input:disabled { cursor: progress; }
+.settings-choice:has(input:focus-visible) { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.settings-swatch { width: 12px; height: 12px; border-radius: 50%; border: 1px solid var(--border-max); }
+.settings-swatch.accent-mono { background: var(--text); }
+.settings-swatch.accent-blue { background: #3b82f6; }
+.settings-swatch.accent-teal { background: #14b8a6; }
+.settings-swatch.accent-green { background: #22c55e; }
+.settings-swatch.accent-amber { background: #f59e0b; }
+.settings-swatch.accent-rose { background: #f43f5e; }
+.settings-swatch.accent-violet { background: #8b5cf6; }
+.settings-toggle { display: inline-flex; align-items: flex-start; gap: 10px; cursor: pointer; }
+.settings-toggle input { width: 16px; height: 16px; margin: 2px 0 0; accent-color: var(--accent); }
+.settings-toggle span { display: grid; gap: 2px; }
+.settings-toggle strong { font-size: var(--font-size-body); font-weight: 500; color: var(--text); }
+.settings-toggle small { font-size: var(--font-size-control); color: var(--muted); }
+.settings-list { gap: 0; }
+.settings-list > .settings-row:first-of-type { border-top: 0; padding-top: 0; }
+.settings-list > .settings-error, .settings-list > .settings-notice, .settings-list > .settings-help { margin-bottom: 12px; }
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 0; border-top: 1px solid var(--border-subtle); }
+.settings-row-copy { display: grid; gap: 2px; min-width: 0; }
+.settings-row-copy strong { font-size: var(--font-size-body); font-weight: 500; color: var(--text); overflow-wrap: anywhere; }
+.settings-row-copy span { font-size: var(--font-size-caption); color: var(--muted); overflow-wrap: anywhere; }
+.settings-badge { flex: none; padding: 2px 8px; border: 1px solid var(--border-strong); border-radius: 999px; font-size: var(--font-size-caption); color: var(--muted); }
+.settings-badge.active { border-color: var(--success-line); color: var(--success); }
+.settings-badge.attention { border-color: var(--warning-line); color: var(--warning); }
+.settings-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.settings-error, .settings-notice { margin: 0; padding: 9px 12px; border-radius: var(--radius-sm); font-size: var(--font-size-control); line-height: 1.5; }
+.settings-error { border: 1px solid var(--danger-line); background: var(--danger-surface); color: var(--danger); }
+.settings-notice { border: 1px solid var(--border-strong); background: var(--surface-1); color: var(--text-soft); }
+.settings-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.settings-banner .settings-error { flex: 1 1 260px; }
+.settings-profile { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 0; }
+.settings-profile dt { font-size: var(--font-size-caption); color: var(--muted); }
+.settings-profile dd { margin: 2px 0 0; font-size: var(--font-size-body); color: var(--text); overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .settings-view { padding: 20px 12px 60px; }
+  .settings-section { padding: 16px; }
+  .settings-row { align-items: flex-start; flex-direction: column; gap: 8px; }
+  .settings-section-heading { flex-direction: column; }
+}
+
+/* Errors announced as alerts look like errors in every view, in both themes. */
+.operation-error[role="alert"], .chat-metadata-error, .required-operations-error {
+  padding: 8px 12px;
+  border: 1px solid var(--danger-line);
+  border-radius: var(--radius-sm);
+  background: var(--danger-surface);
+  color: var(--danger);
+}
+/* The selected choice reads at a glance: a filled accent bar, not only a border.
+   Drawn as a shape, so the option's accessible name stays exactly its label. */
+.settings-choice.selected { box-shadow: inset 0 -2px 0 var(--accent); font-weight: 600; }
+.settings-list-footer { padding-top: 12px; border-top: 1px solid var(--border-subtle); }
+.settings-section-heading .secondary-action { flex: none; }
+/* Signing out is consequential: a danger outline, never a fill, so it stays quiet until needed. */
+.account-session-panel .secondary-action:not(:disabled) { border-color: var(--danger-line); color: var(--danger); }
+.account-session-panel .secondary-action:not(:disabled):hover { background: var(--danger-surface); }
+.settings-list-footer { display: flex; justify-content: flex-end; }
