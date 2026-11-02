@@ -102,6 +102,11 @@ proc clearOperations*(state: AppState) =
   state.learningReconciling = false
   state.learningRecoveryChecked = false
   state.learningPendingRequest = nil
+  inc state.learningCorrectionsEpoch
+  state.learningCorrections = LearningCorrections()
+  state.learningCorrectionsLoaded = false
+  state.learningCorrectionsSaving = false
+  state.learningCorrectionsError = ""
   # Saved workflows, the open canvas and its run identity belong to the owner.
   inc state.automationEpoch
   state.automationWorkflows = @[]
@@ -195,6 +200,13 @@ proc beginLearningMutationRequest*(state: AppState): OperationsRequestContext =
 
 proc matchesLearningMutationRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.learningMutationEpoch == request.epoch
+
+proc beginLearningCorrectionsRequest*(state: AppState): OperationsRequestContext =
+  inc state.learningCorrectionsEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.learningCorrectionsEpoch)
+
+proc matchesLearningCorrectionsRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.learningCorrectionsEpoch == request.epoch
 
 proc beginLearningRequest*(state: AppState): OperationsRequestContext =
   inc state.learningEpoch

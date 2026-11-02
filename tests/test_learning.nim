@@ -241,3 +241,35 @@ suite "candidate runs":
     let selection = %*{"method":"sft", "role":"hub", "tuning":"qlora", "model_id":model,
                        "dataset_id":current,"dataset_sha256":digest,"preflight_sha256":check,"submission_id":runId}
     expect ValueError: discard parseStartedLearningRun(legacy, selection)
+
+proc correctionsJson(status: string, dataset: JsonNode = newJNull(), usable = 12): JsonNode =
+  %*{"schema": "learning-corrections.v1", "status": status, "usable": usable, "withheld": 1, "minimum": 10,
+     "dataset": dataset}
+
+proc correctionsDataset(version = 1): JsonNode =
+  %*{"id": current, "name": "Accepted corrections", "version": version, "lineage_id": replaced, "sha256": digest,
+     "train_count": 10, "validation_count": 2}
+
+suite "accepted corrections":
+  test "a preview is read with its counts and the latest saved version":
+    let preview = parseLearningCorrections(correctionsJson("ready", correctionsDataset()), saved = false)
+    check preview.status == "ready" and preview.usable == 12 and preview.withheld == 1 and preview.minimum == 10
+    check preview.dataset.version == 1 and preview.dataset.trainCount == 10 and preview.dataset.validationCount == 2
+    check parseLearningCorrections(correctionsJson("too_few", usable = 3), saved = false).dataset.id == ""
+
+  test "a save must report the version it added":
+    check parseLearningCorrections(correctionsJson("saved", correctionsDataset(2)), saved = true).dataset.version == 2
+    expect ValueError: discard parseLearningCorrections(correctionsJson("saved"), saved = true)
+    expect ValueError: discard parseLearningCorrections(correctionsJson("ready", correctionsDataset()), saved = true)
+    expect ValueError: discard parseLearningCorrections(correctionsJson("saved", correctionsDataset()), saved = false)
+
+  test "unknown statuses, schemas and negative counts are refused":
+    expect ValueError: discard parseLearningCorrections(correctionsJson("trained"), saved = false)
+    var changed = correctionsJson("ready")
+    changed["schema"] = %"learning-corrections.v2"
+    expect ValueError: discard parseLearningCorrections(changed, saved = false)
+    changed = correctionsJson("ready")
+    changed["usable"] = %(-1)
+    expect ValueError: discard parseLearningCorrections(changed, saved = false)
+    changed = correctionsJson("unchanged")
+    expect ValueError: discard parseLearningCorrections(changed, saved = false)

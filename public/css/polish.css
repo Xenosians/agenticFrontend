@@ -2256,6 +2256,9 @@ body {
 /* Gates that apply after a run are listed quieter than blockers. */
 .learning-later .learning-gate { color: var(--text-soft); }
 .learning-result .learning-actions { margin-top: 12px; flex-wrap: wrap; gap: 8px; }
+/* Accepted corrections: saved as training data only on request. */
+.learning-corrections { padding: 14px 0; border-top: 1px solid var(--border); min-width: 0; }
+.learning-corrections .learning-actions { margin-top: 12px; }
 /* Candidate runs: progress, losses and outcome; state is shown in text, not colour. */
 .learning-runs { padding: 14px 0; border-top: 1px solid var(--border); min-width: 0; }
 .learning-runs > .operation-job-heading { align-items: center; }

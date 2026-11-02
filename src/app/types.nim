@@ -195,6 +195,11 @@ type
     learningMutationEpoch*: int
     learningCheckedRequest*: JsonNode
     learningPendingRequest*: JsonNode
+    ## Accepted corrections as training data: the latest preview and a save in flight.
+    learningCorrections*: LearningCorrections
+    learningCorrectionsLoaded*, learningCorrectionsSaving*: bool
+    learningCorrectionsError*: string
+    learningCorrectionsEpoch*: int
     automationWorkflows*: seq[WorkflowSummary]
     automationDraft*: WorkflowDraft
     automationPendingRun*: WorkflowPendingRun

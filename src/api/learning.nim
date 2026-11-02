@@ -67,3 +67,12 @@ proc resolveLearningRun*(submissionId: string): Future[JsonNode] {.async.} =
     newFetchOptions(metod = HttpGet, credentials = fcInclude, mode = fmCors))
   if not response.ok: raise requestError(response.body, response.status)
   return decodeJson(response.body)
+
+proc fetchLearningCorrections*(): Future[JsonNode] {.async.} =
+  let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/learning/corrections",
+    newFetchOptions(metod = HttpGet, credentials = fcInclude, mode = fmCors))
+  if not response.ok: raise requestError(response.body, response.status)
+  return decodeJson(response.body)
+
+proc saveLearningCorrections*(csrf: string): Future[JsonNode] =
+  postLearning("/api/v1/learning/corrections", newJObject(), csrf)

@@ -83,6 +83,19 @@ def run(identity=RUN, state="running", step=0, **changes):
     return row
 
 
+CORRECTIONS = "7" * 32
+
+
+def corrections_dataset(version=1):
+    return {"id": CORRECTIONS, "name": "Accepted corrections", "version": version,
+            "lineage_id": CORRECTIONS, "sha256": "6" * 64, "train_count": 10, "validation_count": 2}
+
+
+def corrections(status, usable=12, dataset=None, withheld=0):
+    return {"schema": "learning-corrections.v1", "status": status, "usable": usable,
+            "withheld": withheld, "minimum": 10, "dataset": dataset}
+
+
 class LearningTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.catalog = copy.deepcopy(CATALOG)
@@ -106,6 +119,9 @@ class LearningTests(navigation.ChatNavigationTests):
         self.sessions = 0
         self.run_reads = 0
         self.health_interval_ms = None
+        self.corrections = corrections("ready", usable=12)
+        self.correction_saves = []
+        self.correction_reads = 0
         super().setUp()
         self.page.set_default_timeout(5000)
 
@@ -197,6 +213,20 @@ class LearningTests(navigation.ChatNavigationTests):
                                                (404, {"error": "learning_run_unavailable"}))
             if isinstance(reply, tuple): route.fulfill(status=reply[0], json=reply[1])
             else: route.fulfill(json=reply)
+            return
+        if path == "/api/v1/learning/corrections":
+            if request.method == "GET":
+                self.correction_reads += 1
+                route.fulfill(json=self.corrections)
+                return
+            self.correction_saves.append({"body": request.post_data_json,
+                                          "csrf": request.headers.get("x-csrf-token")})
+            saved = corrections("saved", dataset=corrections_dataset(
+                version=(self.corrections["dataset"] or {"version": 0})["version"] + 1))
+            self.corrections = {**saved, "status": "unchanged"}
+            self.catalog["datasets"].append({**saved["dataset"], "purpose": "training", "state": "ready",
+                                             "superseded_by": None})
+            route.fulfill(json=saved)
             return
         if path.startswith("/api/v1/learning/runs/") and path.endswith("/cancel"):
             identity = path.split("/")[-2]
@@ -610,12 +640,46 @@ class LearningTests(navigation.ChatNavigationTests):
                              ".learning-select", ".learning-gate", ".learning-later .learning-gate",
                              ".learning-result .knowledge-meta", ".learning-panel .secondary-action",
                              ".learning-panel .primary-action", ".learning-run .knowledge-meta",
-                             ".learning-run .review-status"):
+                             ".learning-run .review-status", ".learning-corrections .knowledge-meta"):
                 with self.subTest(width=width, selector=selector):
                     self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
             overflow = self.page.evaluate(
                 "document.documentElement.scrollWidth > document.documentElement.clientWidth")
             self.assertFalse(overflow, f"horizontal overflow at {width}px")
+
+
+    def corrections_section(self):
+        return self.page.locator(".learning-panel").get_by_role("region", name="Accepted corrections")
+
+    def test_accepted_corrections_are_saved_as_a_training_dataset_version_and_never_start_a_run(self):
+        self.open_learning()
+        section = self.corrections_section()
+        expect(section).to_contain_text("12 accepted corrections can be saved as training data.")
+        save = section.get_by_role("button", name="Save as training data", exact=True)
+        save.click()
+        expect(section).to_contain_text("Saved as Accepted corrections v1 · 10 training · 2 validation")
+        expect(section.get_by_role("button", name="Save as training data", exact=True)).to_have_count(0)
+        self.assertEqual(self.correction_saves, [{"body": {}, "csrf": "fixture-csrf"}])
+        # The saved version is offered for a readiness check; nothing started.
+        expect(self.field("Dataset").locator(f"option[value='{CORRECTIONS}']")).to_have_count(1)
+        self.assertEqual((self.checks, self.starts), ([], []))
+        self.assertEqual(self.errors, [])
+
+    def test_too_few_accepted_corrections_say_how_many_are_needed(self):
+        self.corrections = corrections("too_few", usable=3, withheld=1)
+        self.open_learning()
+        section = self.corrections_section()
+        expect(section).to_contain_text("3 accepted corrections; training data needs at least 10 different requests.")
+        expect(section).to_contain_text("1 correction was left out because it contains a possible secret or personal identifier.")
+        expect(section.get_by_role("button", name="Save as training data", exact=True)).to_have_count(0)
+        self.assertEqual(self.correction_saves, [])
+
+    def test_already_saved_corrections_offer_no_save(self):
+        self.corrections = corrections("unchanged", dataset=corrections_dataset())
+        self.open_learning()
+        section = self.corrections_section()
+        expect(section).to_contain_text("Every accepted correction is in Accepted corrections v1.")
+        expect(section.get_by_role("button", name="Save as training data", exact=True)).to_have_count(0)
 
 
 def load_tests(loader, _tests, _pattern):

@@ -25,6 +25,12 @@ type
     submissionId*, requestSha256*, datasetSha256*, preflightSha256*, modelBackend*: string
     trainLoss*, validationLoss*, startedAt*, finishedAt*: string
     datasetVersion*, step*, maxSteps*: int
+  ## The owner's accepted corrections as training data: how many can be saved,
+  ## how many the privacy scan left out, and the latest saved version (if any).
+  LearningCorrections* = object
+    status*: string
+    usable*, withheld*, minimum*: int
+    dataset*: LearningDataset
 
 const
   laterGateCodes = ["fixed_evaluation_required", "separate_promotion_required"]
@@ -317,3 +323,21 @@ proc learningGateLabel*(code: string): string =
   of "evaluated_adapter_checkpoint_required": "Start from an evaluated adapter checkpoint (SFT, then DPO)."
   of "independent_simulator_episodes_required": "Provide independent simulator episodes; PPO never calls live tools."
   else: code.replace('_', ' ').capitalizeAscii() & "."
+
+proc parseLearningCorrections*(data: JsonNode, saved: bool): LearningCorrections =
+  ## A preview saves nothing (ready, too_few or unchanged); a save reports the
+  ## version it added. Anything else is refused, never shown as a result.
+  if text(data, "schema") != "learning-corrections.v1": invalid()
+  result.status = text(data, "status")
+  result.usable = count(data, "usable")
+  result.withheld = count(data, "withheld")
+  result.minimum = count(data, "minimum", 1)
+  let row = field(data, "dataset")
+  let expected = if saved: @["saved"] else: @["ready", "too_few", "unchanged"]
+  if result.status notin expected: invalid()
+  if row.kind == JNull:
+    if result.status in ["saved", "unchanged"]: invalid()
+    return
+  result.dataset = LearningDataset(id: resourceId(row, "id"), name: text(row, "name"), state: "ready",
+    sha256: digest(row, "sha256"), lineageId: resourceId(row, "lineage_id"), version: count(row, "version", 1),
+    trainCount: count(row, "train_count", 1), validationCount: count(row, "validation_count", 1))

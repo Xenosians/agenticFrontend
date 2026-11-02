@@ -154,6 +154,47 @@ proc renderRuns(state: AppState): VNode =
         for run in state.learningRuns:
           renderRun(state, run)
 
+proc correctionCount(count: int): string =
+  $count & (if count == 1: " accepted correction" else: " accepted corrections")
+
+proc correctionsDatasetLabel(dataset: LearningDataset): string =
+  dataset.name & " v" & $dataset.version & " · " & $dataset.trainCount & " training · " &
+    $dataset.validationCount & " validation"
+
+proc renderCorrections(state: AppState): VNode =
+  ## The owner's corrections a reviewer accepted, saved as training data on request.
+  let corrections = state.learningCorrections
+  result = buildHtml(section(class = "learning-corrections", `aria-label` = "Accepted corrections")):
+    tdiv(class = "operation-job-heading"):
+      strong: text "Accepted corrections"
+    if state.learningCorrectionsError.len > 0:
+      p(class = "operation-error", role = "alert"): text state.learningCorrectionsError
+    if not state.learningCorrectionsLoaded:
+      p(class = "knowledge-meta"): text "Loading accepted corrections…"
+    else:
+      case corrections.status
+      of "saved":
+        p(class = "knowledge-meta", role = "status"):
+          text "Saved as " & correctionsDatasetLabel(corrections.dataset) & ". Choose it above to check readiness."
+      of "unchanged":
+        p(class = "knowledge-meta"):
+          text "Every accepted correction is in " & corrections.dataset.name & " v" & $corrections.dataset.version & "."
+      of "too_few":
+        p(class = "knowledge-meta"):
+          text correctionCount(corrections.usable) & "; training data needs at least " & $corrections.minimum &
+            " different requests."
+      else:
+        p(class = "knowledge-meta"):
+          text correctionCount(corrections.usable) & " can be saved as training data."
+        tdiv(class = "learning-actions"):
+          button(`type` = "button", class = "secondary-action", disabled = state.learningCorrectionsSaving):
+            text (if state.learningCorrectionsSaving: "Saving…" else: "Save as training data")
+            proc onclick(event: Event, node: VNode) = discard saveLearningCorrections(state)
+      if corrections.withheld > 0:
+        p(class = "knowledge-meta"):
+          text $corrections.withheld & (if corrections.withheld == 1: " correction was" else: " corrections were") &
+            " left out because it contains a possible secret or personal identifier."
+
 proc renderLearningPanel*(state: AppState): VNode =
   let catalog = state.learningCatalog
   result = buildHtml(section(class = "conversation")):
@@ -191,4 +232,5 @@ proc renderLearningPanel*(state: AppState): VNode =
                 text (if state.learningChecking: "Checking…" else: "Check readiness")
           if state.learningPreflight.sha256.len > 0:
             renderReceipt(state)
+      renderCorrections(state)
       renderRuns(state)

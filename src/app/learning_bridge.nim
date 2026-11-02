@@ -288,8 +288,46 @@ proc reconcileLearningStart*(state: AppState) {.async.} =
     if matchesLearningMutationRequest(state, request): state.learningReconciling = false
     redraw(kxi)
 
+proc refreshLearningCorrections*(state: AppState) {.async.} =
+  ## Reads the preview only; saving is the explicit button below.
+  if not state.auth.authenticated or state.learningCorrectionsSaving: return
+  let request = beginLearningCorrectionsRequest(state)
+  try:
+    let corrections = parseLearningCorrections(await learningApi.fetchLearningCorrections(), saved = false)
+    if not matchesLearningCorrectionsRequest(state, request): return
+    state.learningCorrections = corrections
+    state.learningCorrectionsLoaded = true
+    state.learningCorrectionsError = ""
+  except CatchableError as exc:
+    if matchesLearningCorrectionsRequest(state, request): state.learningCorrectionsError = exc.msg
+  finally:
+    if matchesAccount(state, request.account): redraw(kxi)
+
+proc saveLearningCorrections*(state: AppState) {.async.} =
+  ## Saves the owner's accepted corrections as the next training dataset
+  ## version, then reloads the catalog so the version can be checked. A save
+  ## never starts a run; a refusal is stated and nothing is retried.
+  if not state.auth.authenticated or state.learningCorrectionsSaving or
+      state.learningCorrections.status != "ready": return
+  let request = beginLearningCorrectionsRequest(state)
+  state.learningCorrectionsSaving = true
+  state.learningCorrectionsError = ""
+  redraw(kxi)
+  try:
+    let saved = parseLearningCorrections(await learningApi.saveLearningCorrections(state.auth.csrfToken), saved = true)
+    if not matchesLearningCorrectionsRequest(state, request): return
+    state.learningCorrections = saved
+  except CatchableError as exc:
+    if matchesLearningCorrectionsRequest(state, request): state.learningCorrectionsError = exc.msg
+    return
+  finally:
+    if matchesLearningCorrectionsRequest(state, request): state.learningCorrectionsSaving = false
+    redraw(kxi)
+  await refreshLearning(state)
+
 proc openLearning*(state: AppState) =
   setActiveView(state, viewLearning)
   discard readLearningRecovery(state)
   discard refreshLearning(state)
   discard refreshLearningRuns(state)
+  discard refreshLearningCorrections(state)
