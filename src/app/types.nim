@@ -102,6 +102,9 @@ type
     decisionError*: string
     observationMode*: string
     progressStage*: string
+    # Answer text streamed while the current attempt writes it (FR-080): a
+    # preview only, replaced by the saved result and never kept.
+    answerPreview*: string
     presentations*: seq[ResultCard]
     workflowContract*: JsonNode
     workflowContractHash*: string

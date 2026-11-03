@@ -5,7 +5,7 @@ const {create} = require("../public/js/job_socket.js");
 
 function fixture(options = {}) {
   let now = 0, sequence = 0, current = true;
-  const timers = new Map(), requests = [], sockets = [], modes = [], progress = [];
+  const timers = new Map(), requests = [], sockets = [], modes = [], progress = [], answers = [];
   const env = {
     setTimeout(fn, delay) { const id = ++sequence; timers.set(id, {at: now + delay, fn}); return id; },
     clearTimeout(id) { timers.delete(id); },
@@ -25,7 +25,8 @@ function fixture(options = {}) {
   };
   if (options.unsupported) delete env.WebSocket;
   const observer = create("https://example.test", "job-123", "csrf-secret", 1000,
-    () => current, value => modes.push(value), value => progress.push(value), env);
+    () => current, value => modes.push(value), value => progress.push(value), env,
+    (sequence, text) => answers.push([sequence, text]));
   async function settle() { for (let count = 0; count < 8; count++) await Promise.resolve(); }
   async function tick(duration) {
     const end = now + duration;
@@ -51,7 +52,7 @@ function fixture(options = {}) {
     await settle();
     return {socket, joinRef};
   }
-  return {observer, requests, sockets, modes, progress, settle, tick, join,
+  return {observer, requests, sockets, modes, progress, answers, settle, tick, join,
     invalidate() { current = false; }, timerCount() { return timers.size; }};
 }
 
@@ -168,6 +169,28 @@ test("only bounded stages for the current persisted attempt are shown", async ()
   socket.receive([joinRef, null, "job:job-123", "job_progress", {job_id: "job-123", attempt: 1, stage: "executing"}]);
   assert.deepEqual(f.progress, ["routing", "waiting_provider"]);
   f.observer.close();
+});
+
+test("streamed answer text for the current attempt is passed on in order, once", async () => {
+  const f = fixture();
+  const {socket, joinRef} = await f.join();
+  const frame = (attempt, sequence, text, jobId = "job-123") =>
+    socket.receive([joinRef, null, "job:job-123", "job_answer_text", {job_id: jobId, attempt, sequence, text}]);
+  frame(1, 1, "The VPN ");
+  frame(1, 1, "The VPN ");      // a repeated part is ignored
+  frame(0, 2, "stale attempt");
+  frame(1, 2, "other job", "job-999");
+  frame(1, 2, 42);
+  frame(1, 0, "no sequence");
+  frame(1, 3, "is up.");        // a gap keeps the order; nothing is reordered
+  assert.deepEqual(f.answers, [[1, "The VPN "], [3, "is up."]]);
+  socket.receive([joinRef, null, "job:job-123", "job_updated", {job_id: "job-123", attempts: 2}]);
+  frame(1, 4, "old attempt");
+  frame(2, 1, "Retry ");        // a new attempt starts its own sequence
+  assert.deepEqual(f.answers, [[1, "The VPN "], [3, "is up."], [1, "Retry "]]);
+  f.observer.close();
+  frame(2, 2, "after close");
+  assert.equal(f.answers.length, 3);
 });
 
 test("the live channel still performs periodic reads to recover missed notifications", async () => {

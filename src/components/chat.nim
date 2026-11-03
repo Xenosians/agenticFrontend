@@ -33,14 +33,20 @@ proc progressLabel(state: AppState): string =
 
 
 proc renderJobProgress(state: AppState): VNode =
+  # While the answer is written it is shown here as plain text, marked as a
+  # preview; the saved answer replaces it as a normal message (FR-080).
+  let writing = state.run.answerPreview.len > 0
   result = buildHtml(tdiv(class = "job-progress", role = "status", `aria-live` = "polite")):
     span(class = "job-progress-dot"):
       text ""
     tdiv(class = "job-progress-copy"):
       strong:
-        text progressLabel(state)
+        text(if writing: "Writing the answer" else: progressLabel(state))
       span:
-        text observationLabel(state.run.observationMode)
+        text(if writing: "Preview. The saved answer replaces it." else: observationLabel(state.run.observationMode))
+      if writing:
+        p(class = "answer-preview"):
+          text state.run.answerPreview
     if state.run.observationMode == "interrupted":
       button(class = "approval-recovery-button"):
         text "Check saved task"

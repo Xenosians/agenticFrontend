@@ -3,7 +3,7 @@
 (function (root) {
   "use strict";
 
-  function create(baseUrl, jobId, csrfToken, pollIntervalMs, isCurrent, onMode, onProgress, dependencies) {
+  function create(baseUrl, jobId, csrfToken, pollIntervalMs, isCurrent, onMode, onProgress, dependencies, onAnswerText) {
     const env = dependencies || root;
     const schedule = env.setTimeout.bind(env);
     const cancel = env.clearTimeout.bind(env);
@@ -20,6 +20,9 @@
     let heartbeatRef = "";
     let controller = null;
     let attempt = null;
+    // The last streamed answer part shown for the current attempt. A part is a
+    // preview only; the durable result read over HTTP replaces it.
+    let answerSequence = 0;
     const stages = new Set(["routing", "planning", "executing", "synthesizing", "waiting_provider"]);
 
     function current() {
@@ -33,6 +36,12 @@
 
     function mode(value) {
       if (current()) onMode(value);
+    }
+
+    // A new attempt restarts its answer numbering.
+    function setAttempt(value) {
+      if (value !== attempt) answerSequence = 0;
+      attempt = value;
     }
 
     function close() {
@@ -137,18 +146,24 @@
               return reconnect(connection);
             }
             cancel(joinTimer);
-            attempt = payload.response.attempts;
+            setAttempt(payload.response.attempts);
             live = true;
             retryDelay = 1000;
             mode("live");
             signal(); // Join is a new snapshot: always catch up through GET.
             heartbeatTimer = schedule(() => heartbeat(connection), 25000);
           } else if (eventName === "job_updated" && live && payload && payload.job_id === jobId) {
-            attempt = payload.attempts;
+            setAttempt(payload.attempts);
             signal();
           } else if (eventName === "job_progress" && live && payload && payload.job_id === jobId &&
                      Number.isInteger(attempt) && payload.attempt === attempt && stages.has(payload.stage)) {
             onProgress(payload.stage);
+          } else if (eventName === "job_answer_text" && live && payload && payload.job_id === jobId &&
+                     Number.isInteger(attempt) && payload.attempt === attempt &&
+                     Number.isInteger(payload.sequence) && payload.sequence > answerSequence &&
+                     typeof payload.text === "string" && payload.text) {
+            answerSequence = payload.sequence;
+            if (typeof onAnswerText === "function") onAnswerText(payload.sequence, payload.text);
           } else if (eventName === "phx_error" || eventName === "phx_close") {
             reconnect(connection);
           }

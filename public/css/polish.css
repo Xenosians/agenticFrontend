@@ -1872,6 +1872,10 @@ body {
 .job-progress-copy strong { font-size: 12px; font-weight: 500; color: var(--text-bright); }
 .job-progress-copy > span { font-size: 10px; color: var(--muted); }
 .job-progress .approval-recovery-button { margin: 0 0 0 auto; }
+.job-progress:has(.answer-preview) { align-items: flex-start; }
+.job-progress:has(.answer-preview) .job-progress-dot { margin-top: 5px; }
+.job-progress-copy:has(.answer-preview) { min-width: 0; max-width: min(100%, 700px); }
+.answer-preview { margin: 4px 0 0; color: var(--text); font-size: 13px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
 .result-card-status.success { border-color: var(--success-line); color: var(--success); }
 .result-card-status.error { border-color: var(--danger-line); color: var(--danger); }
 .result-card-status.warning { border-color: var(--warning-line); color: var(--warning); }

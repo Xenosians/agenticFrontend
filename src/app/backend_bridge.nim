@@ -217,9 +217,16 @@ proc pollBackendJob*(
       state.run.progressStage = $stage
       redraw(kxi)
 
+  # Streamed answer text is a preview of the current attempt only; the
+  # saved result read below replaces it (FR-080).
+  proc updateAnswer(sequence: int, part: cstring) =
+    if isCurrent() and state.run.status in ["pending", "processing"]:
+      state.run.answerPreview.add($part)
+      redraw(kxi)
+
   let observer = observeJob(cstring(frontendConfig.backendBaseUrl), cstring(jobId),
     cstring(state.auth.csrfToken), frontendConfig.pollIntervalMs,
-    isCurrent, updateMode, updateProgress)
+    isCurrent, updateMode, updateProgress, updateAnswer)
 
   # A durable job outlives one failed read (a brief backend or storage
   # outage). Retry at the observer's pace; give up only after repeated
@@ -262,6 +269,7 @@ proc pollBackendJob*(
 
       if job.status != previousStatus:
         state.run.progressStage = ""
+        state.run.answerPreview = ""
         addRunEvent(
           state,
           "status",
@@ -613,6 +621,7 @@ proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
   inc state.jobObservationEpoch
   state.run.observationMode = ""
   state.run.progressStage = ""
+  state.run.answerPreview = ""
   let eventKind = if decision == jdApprove: "approval" else: "rejection"
   state.run.status = decisionStatus(decision)
   state.run.decisionError = ""
