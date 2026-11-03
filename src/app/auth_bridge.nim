@@ -264,14 +264,7 @@ proc loadChats*(
   state.chats.setLen(0)
 
   for remote in remoteChats:
-    state.chats.add(
-      ChatItem(
-        chatId: remote.chatId,
-        title: remote.title,
-        updatedAt: remote.updatedAt,
-        createdAt: remote.createdAt, pinned: remote.pinned
-      )
-    )
+    state.chats.add(remote)
 
   if state.currentChatId.len == 0:
     if state.chats.len > 0:
@@ -590,28 +583,8 @@ proc createNewChat*(
     redraw(kxi)
     return
 
-  # A single foreground durable job is still the current
-  # frontend contract. Don't detach its UI from its chat.
-  if (
-    state.run.active and
-    state.run.status in [
-      "submitting",
-      "restoring",
-      "pending",
-      "processing",
-      "waiting_approval",
-      "approving",
-      "rejecting"
-    ]
-  ):
-    showToast(
-      state,
-      "Finish the current job before creating another chat."
-    )
-
-    redraw(kxi)
-    return
-
+  # A running job belongs to its chat and keeps running while another chat
+  # is open; reopening that chat resumes its saved state.
   if state.chatActionId.len > 0:
     showToast(state, "Wait for the current chat change to finish.")
     redraw(kxi)
@@ -787,25 +760,6 @@ proc selectChat*(
     discard beginNavigation(state)
     state.auth.loading = false
     state.activeView = viewChat
-    redraw(kxi)
-    return
-
-  if (
-    state.run.active and
-    state.run.status in [
-      "submitting",
-      "restoring",
-      "pending",
-      "processing",
-      "waiting_approval",
-      "approving",
-      "rejecting"
-    ]
-  ):
-    showToast(
-      state,
-      "Finish the current job before switching chats."
-    )
     redraw(kxi)
     return
 

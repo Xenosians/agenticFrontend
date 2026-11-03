@@ -7,6 +7,11 @@ suite "saved chat metadata":
     for node in [%*{"chat_id": "a", "title": "First", "pinned": "false"},
                  %*{"chat_id": "", "title": "First"}, %*{"chat_id": "a", "title": 3}]:
       expect ValueError: discard parseChat(node)
+  test "a chat is working only when the backend says so":
+    check parseChat(%*{"chat_id": "a", "title": "First", "working": true}).working
+    check not parseChat(%*{"chat_id": "a", "title": "First", "working": false}).working
+    check not parseChat(%*{"chat_id": "a", "title": "First"}).working
+    expect ValueError: discard parseChat(%*{"chat_id": "a", "title": "First", "working": "yes"})
   test "malformed lists and duplicate identities do not become an empty list":
     for node in [%*{}, %*{"chats": nil},
                  %*{"chats": [{"chat_id": "a", "title": "First"}, {"chat_id": "a", "title": "Second"}]}]:

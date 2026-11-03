@@ -367,6 +367,10 @@ proc pollBackendJob*(
     observer.closeObservation()
     if isCurrent() and state.run.observationMode != "interrupted":
       state.run.observationMode = ""
+    # The sidebar marks chats that are still working; this job's chat may
+    # have just finished, or the user may have moved to another chat.
+    if state.auth.authenticated and state.auth.sessionId == sessionId:
+      discard refreshChatMetadata(state)
 
 
 proc resumeBackendJob*(
@@ -521,12 +525,13 @@ proc submitBackendJob*(
     await confirmServerSubmission(submissionOwner, submissionChat, submission.identity, state.auth.csrfToken)
     if not submissionIsCurrent(): return
     clearWorkflowDraft(state)
-    # The saved request may have named this chat on the backend.
-    discard refreshChatMetadata(state)
     state.run.workflowContractHash = response.workflowContractHash
 
     state.run.jobId = response.jobId
     state.run.status = response.status
+    # The saved request may have named this chat, and its job now marks the
+    # chat as working in the sidebar.
+    discard refreshChatMetadata(state)
 
     addRunEvent(
       state,

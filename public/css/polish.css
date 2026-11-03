@@ -455,6 +455,21 @@ a:focus-visible,
   white-space: nowrap;
 }
 
+/* A chat whose request is still running: a quiet pulsing dot after its title. */
+.chat-working-dot {
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: var(--text-bright, currentColor);
+  animation: status-pulse 1.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-working-dot { animation: none; }
+}
+
 .chat-delete {
   flex: 0 0 28px;
   width: 28px;

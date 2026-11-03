@@ -6,6 +6,8 @@ type
   ChatItem* = object
     chatId*, title*, createdAt*, updatedAt*: string
     pinned*: bool
+    ## A request in this chat is still queued, running or awaiting approval.
+    working*: bool
   ChatGroup* = object
     title*: string
     chats*: seq[ChatItem]
@@ -30,6 +32,10 @@ proc parseChat*(node: JsonNode): ChatItem =
     if node["pinned"].kind != JBool:
       raise newException(ValueError, "Backend chat response is invalid.")
     result.pinned = node["pinned"].getBool()
+  if node.hasKey("working"):
+    if node["working"].kind != JBool:
+      raise newException(ValueError, "Backend chat response is invalid.")
+    result.working = node["working"].getBool()
 
 proc parseChatList*(data: JsonNode): seq[ChatItem] =
   if data.kind != JObject or not data.hasKey("chats") or data["chats"].kind != JArray:

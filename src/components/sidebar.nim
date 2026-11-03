@@ -33,14 +33,18 @@ proc renderViewButton(state: AppState, icon, label: string, target: AppView,
 proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
   # Each invocation captures one immutable identity, including all row actions.
   let disabled = state.chatActionId.len > 0 or state.chatsRefreshing or state.chatsNeedRefresh
-  result = buildHtml(tdiv(class = "chat-nav-row")):
+  # A chat with a request still running in it shows a small marker, so the
+  # user can open other chats while it works.
+  result = buildHtml(tdiv(class = (if chat.working: cstring"chat-nav-row working" else: cstring"chat-nav-row"))):
     let isOpen = chat.chatId == state.currentChatId
     button(class = (if isOpen and state.activeView == viewChat: cstring"chat-nav-main active"
       elif isOpen: cstring"chat-nav-main active background" else: cstring"chat-nav-main"),
-      title = cstring(chat.title),
+      title = cstring(chat.title & (if chat.working: " · Working" else: "")),
       `aria-current` = (if isOpen and state.activeView == viewChat: cstring"page"
         elif isOpen: cstring"true" else: cstring"false")):
       span(class = "chat-nav-title"): text chat.title
+      if chat.working:
+        span(class = "chat-working-dot", `aria-label` = "Working", role = "img")
       proc onclick(event: Event, node: VNode) =
         state.commandPaletteOpen = false
         discard selectChat(state, chat.chatId)

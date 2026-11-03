@@ -626,6 +626,68 @@ class ChatNavigationTests(unittest.TestCase):
         self.check_saved_submission(first)
         self.assertEqual(self.errors, [])
 
+    def test_a_running_job_keeps_working_while_another_chat_is_open(self):
+        """Each job belongs to its chat: leaving the chat neither blocks nor stops it."""
+        state = {"status": "processing"}
+
+        def submit(route):
+            payload = route.request.post_data_json
+            self.submissions.append(payload)
+            route.fulfill(json={"job_id": "fixture-running", "status": "pending",
+                                "submission_id": payload["submission_id"]})
+
+        def job(route):
+            body = {"contract_version": 2, "job_id": "fixture-running", "status": state["status"]}
+            if state["status"] == "completed":
+                body["result"] = {"answer": "Finished while you were away"}
+            route.fulfill(json=body)
+
+        def first_history(route):
+            messages = [{"role": "user", "content": "First chat history"}]
+            if self.submissions:
+                messages.append({"role": "user", "content": "Check the router", "job_id": "fixture-running",
+                                 "status": state["status"]})
+                if state["status"] == "completed":
+                    messages.append({"role": "assistant", "content": "Finished while you were away",
+                                     "job_id": "fixture-running", "status": "completed"})
+            route.fulfill(json={"messages": messages})
+
+        def chats(route):
+            # Phoenix marks a chat working while its own job is unfinished.
+            working = bool(self.submissions) and state["status"] != "completed"
+            route.fulfill(json={"chats": [
+                {"chat_id": "fixture-first", "title": "First fixture chat", "working": working},
+                {"chat_id": "fixture-second", "title": "Second fixture chat", "working": False},
+            ]})
+
+        self.page.route("**/api/v1/jobs", submit)
+        self.page.route("**/api/v2/jobs/fixture-running**", job)
+        self.page.route("**/api/v2/chats/fixture-first/history**", first_history)
+        self.page.route("**/api/v1/chats", chats)
+        self.open_first_chat()
+        first_row = self.page.locator(".chat-nav-row", has_text="First fixture chat")
+        composer = self.page.locator("#messageInput")
+        composer.fill("Check the router")
+        composer.press("Enter")
+        expect(first_row).to_have_class(re.compile(r"\bworking\b"))
+
+        # Opening another chat is allowed while the job runs.
+        self.begin_second_chat()
+        self.release_second_chat()
+        expect(self.page.get_by_text("Finish the current job", exact=False)).to_have_count(0)
+        expect(self.page.get_by_role("button", name="Send message", exact=True)).to_be_disabled()
+        composer.fill("A question for the second chat")
+        expect(self.page.get_by_role("button", name="Send message", exact=True)).to_be_enabled()
+
+        # The first chat finished meanwhile; returning shows its saved answer.
+        state["status"] = "completed"
+        self.page.locator(".chat-nav-title", has_text="First fixture chat").click()
+        expect(self.page.get_by_text("Finished while you were away", exact=True)).to_be_visible()
+        expect(first_row).not_to_have_class(re.compile(r"\bworking\b"))
+        self.assertEqual(len(self.submissions), 1)
+        self.assertEqual(self.submissions[0]["chat_id"], "fixture-first")
+        self.assertEqual(self.errors, [])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
