@@ -49,7 +49,7 @@ Rename and pin changes are shown as saved only after the server confirms the exa
 
 ## Stack
 
-Nim `>= 2.2.10`, Karax `1.5.0`, and static HTML/CSS/JavaScript. Nim compiles [src/agenticFrontend.nim](src/agenticFrontend.nim) to `public/js/app.js`.
+Nim `>= 2.2.10`, Karax `1.5.0` with the upstream event-handler release fix (pinned to commit `fa5fdef` in [agenticFrontend.nimble](agenticFrontend.nimble)), and static HTML/CSS/JavaScript. Nim compiles [src/agenticFrontend.nim](src/agenticFrontend.nim) to `public/js/app.js`.
 
 ## Build and run
 

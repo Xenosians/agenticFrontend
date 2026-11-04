@@ -126,6 +126,23 @@ class StatusbarTests(navigation.ChatNavigationTests):
                 expect(bar.locator(".statusbar-health")).to_have_text(label)
         self.assertEqual(self.errors, [])
 
+    def test_redraws_do_not_keep_old_render_trees_alive(self):
+        # Every redraw re-attaches the handlers of each button it keeps. The
+        # handlers it detaches must be released too: each one holds its whole
+        # render tree, so a long-lived tab grew by about 10 MB a minute while
+        # idle (health is re-read every 30 s) and a 25-minute run reached GBs.
+        self.health_interval_ms = 40
+        self.page.goto(self.base + "/")
+        expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
+        before = self.health_requests
+        while self.health_requests < before + 20:
+            self.page.wait_for_timeout(50)
+        # karaxEvents is Karax's record of the handlers it attached to a DOM node.
+        attached = self.page.evaluate("""() => [...document.querySelectorAll('button')]
+            .map((node) => (node.karaxEvents || []).length)""")
+        self.assertTrue(attached and max(attached) <= 2, f"handlers kept per button: {max(attached or [0])}")
+        self.assertEqual(self.errors, [])
+
     def test_without_a_configured_cadence_health_is_read_once(self):
         self.open_first_chat()
         expect(self.bar()).to_contain_text("Services ready")
