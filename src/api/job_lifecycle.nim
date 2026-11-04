@@ -1,6 +1,7 @@
 import std/json
 
-const publicJobStates* = ["pending", "processing", "waiting_approval", "completed", "failed", "denied", "outcome_unknown"]
+const publicJobStates* = ["pending", "processing", "waiting_approval", "completed", "failed", "denied",
+  "outcome_unknown", "cancelled"]
 
 proc validateJobV2*(data: JsonNode) =
   if data.kind != JObject or not data.hasKey("contract_version") or

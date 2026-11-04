@@ -17,7 +17,7 @@ const observableJobStates* = [
 
 const restorableJobStates* = [
   "pending", "processing", "waiting_approval", "approving", "rejecting",
-  "outcome_unknown", "reconciliation_required", "completed", "failed", "denied"
+  "outcome_unknown", "reconciliation_required", "completed", "failed", "denied", "cancelled"
 ]
 
 proc outstandingHistoryJob*(history: openArray[ChatHistoryMessage]): ChatHistoryMessage =

@@ -688,6 +688,67 @@ class ChatNavigationTests(unittest.TestCase):
         self.assertEqual(self.submissions[0]["chat_id"], "fixture-first")
         self.assertEqual(self.errors, [])
 
+    def test_stop_cancels_the_running_request_and_frees_the_composer(self):
+        state = {"status": "processing"}
+        cancels = []
+
+        def submit(route):
+            payload = route.request.post_data_json
+            self.submissions.append(payload)
+            route.fulfill(json={"job_id": "fixture-stop", "status": "pending",
+                                "submission_id": payload["submission_id"]})
+
+        def job(route):
+            if route.request.method == "POST" and route.request.url.endswith("/cancel"):
+                cancels.append(route.request.headers.get("x-csrf-token"))
+                state["status"] = "cancelled"
+            body = {"contract_version": 2, "job_id": "fixture-stop", "status": state["status"]}
+            if state["status"] == "cancelled":
+                body["error"] = "Cancelled while it was running. Nothing it had not finished will run."
+            route.fulfill(json=body)
+
+        self.open_first_chat()
+        self.page.route("**/api/v1/jobs", submit)
+        self.page.route("**/api/v2/jobs/fixture-stop**", job)
+        composer = self.page.locator("#messageInput")
+        composer.fill("Check the router")
+        composer.press("Enter")
+        stop = self.page.get_by_role("button", name="Stop this request", exact=True)
+        expect(stop).to_be_visible()
+        stop.click()
+        expect(self.page.get_by_text(
+            "Cancelled while it was running. Nothing it had not finished will run.", exact=True)).to_be_visible()
+        expect(stop).to_have_count(0)
+        self.assertEqual(len(cancels), 1)
+        self.assertTrue(cancels[0])
+        composer.fill("The next question")
+        expect(self.page.get_by_role("button", name="Send message", exact=True)).to_be_enabled()
+        self.assertEqual(self.errors, [])
+
+    def test_a_request_waiting_for_approval_offers_no_stop(self):
+        proposal = {"tool": "fixture_identity_create", "approval_id": "fixture-approval",
+                    "arguments": {"login": "fixture.user"}}
+
+        def submit(route):
+            payload = route.request.post_data_json
+            self.submissions.append(payload)
+            route.fulfill(json={"job_id": "fixture-wait", "status": "waiting_approval",
+                                "submission_id": payload["submission_id"]})
+
+        def job(route):
+            route.fulfill(json={"contract_version": 2, "job_id": "fixture-wait", "status": "waiting_approval",
+                                "proposed_tool": proposal, "result": {"answer": "Approval required"}})
+
+        self.open_first_chat()
+        self.page.route("**/api/v1/jobs", submit)
+        self.page.route("**/api/v2/jobs/fixture-wait**", job)
+        composer = self.page.locator("#messageInput")
+        composer.fill("Create the fixture identity")
+        composer.press("Enter")
+        expect(self.page.get_by_role("button", name="Reject action", exact=True)).to_be_visible()
+        expect(self.page.get_by_role("button", name="Stop this request", exact=True)).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

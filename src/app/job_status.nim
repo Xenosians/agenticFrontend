@@ -10,6 +10,7 @@ proc statusTitle*(status: string): string =
   of "completed": "Completed"
   of "failed": "Failed"
   of "denied": "Denied"
+  of "cancelled": "Cancelled"
   of "waiting_approval": "Waiting approval"
   of "outcome_unknown", "reconciliation_required": "Outcome unresolved"
   else: "Idle"
@@ -26,6 +27,7 @@ proc statusDescription*(status: string): string =
   of "completed": "Run completed successfully"
   of "failed": "Run failed"
   of "denied": "The action did not proceed. See the saved response for the reason."
+  of "cancelled": "You stopped this request."
   of "waiting_approval": "User approval is required"
   of "outcome_unknown", "reconciliation_required":
     "Execution outcome unresolved; trusted reconciliation is required. Automatic retry is disabled."
@@ -36,7 +38,7 @@ proc indicatorClass*(status: string): cstring =
   of "submitting", "restoring", "processing", "approving", "rejecting":
     cstring"status-indicator processing"
   of "completed": cstring"status-indicator completed"
-  of "failed", "denied": cstring"status-indicator failed"
+  of "failed", "denied", "cancelled": cstring"status-indicator failed"
   of "waiting_approval": cstring"status-indicator waiting-approval"
   of "outcome_unknown", "reconciliation_required", "submission_unknown": cstring"status-indicator unresolved"
   else: cstring"status-indicator pending"

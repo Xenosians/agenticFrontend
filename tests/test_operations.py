@@ -31,7 +31,7 @@ def snapshot():
     return {"schema": "operations-snapshot.v1", "observed_at": "2026-10-26T09:00:00Z",
             "counts": {"pending": 13, "processing": 3, "waiting_approval": 7,
                        "reconciliation_required": 0, "denied": 0, "outcome_unknown": 1,
-                       "completed": 28, "failed": 2},
+                       "completed": 28, "failed": 2, "cancelled": 0},
             "jobs": [job("a", "first", "processing", [metric()]), job("b", "second", "completed", [])]}
 
 

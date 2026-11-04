@@ -17,6 +17,18 @@ proc decisionPath*(jobId: string, decision: JobDecision): string =
 proc decisionStatus*(decision: JobDecision): string =
   if decision == jdApprove: "approving" else: "rejecting"
 
+proc cancelPath*(jobId: string): string =
+  if jobId.len == 0:
+    raise newException(ValueError, "A saved job is required.")
+  "/api/v2/jobs/" & encodeUrl(jobId, usePlus = false) & "/cancel"
+
+proc canCancelJob*(state: AppState): bool =
+  ## Only a queued or running request can be stopped; one waiting for
+  ## approval is decided by approve or reject instead.
+  state.auth.authenticated and state.auth.csrfToken.len > 0 and
+    state.run.active and state.run.jobId.len > 0 and
+    state.run.status in ["pending", "processing"]
+
 proc decisionPayload*(approvalId: string): JsonNode =
   if approvalId.len == 0:
     raise newException(ValueError, "The displayed saved proposal is required.")

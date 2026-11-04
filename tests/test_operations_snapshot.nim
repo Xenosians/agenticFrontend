@@ -14,7 +14,8 @@ proc event(): JsonNode =
 proc snapshot(): JsonNode =
   %*{"schema": "operations-snapshot.v1", "observed_at": "2026-10-26T09:00:00Z",
     "counts": {"pending": 9, "processing": 1, "waiting_approval": 2,
-      "reconciliation_required": 0, "denied": 0, "outcome_unknown": 1, "completed": 20, "failed": 3},
+      "reconciliation_required": 0, "denied": 0, "outcome_unknown": 1, "completed": 20, "failed": 3,
+      "cancelled": 4},
     "jobs": [{"job_id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "chat_id": "fixture-chat",
       "status": "processing", "attempt": 1, "selected_agent": "fixture-specialist",
       "created_at": "2026-10-26T08:00:00Z", "claimed_at": "2026-10-26T08:00:01Z", "completed_at": nil,
@@ -26,6 +27,7 @@ suite "owner operations snapshots":
     check observed.jobs.len == 1
     check observed.operationCount("pending") == 9
     check observed.operationCount("completed") == 20
+    check observed.operationCount("cancelled") == 4
     check observed.jobs[0].metrics[0].queueMs == some(0.0)
     check observed.jobs[0].metrics[0].generatedTokens.isNone
     var uploaded = snapshot()

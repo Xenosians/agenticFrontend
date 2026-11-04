@@ -59,3 +59,19 @@ suite "governed action decisions":
     app.run.jobId = context.jobId
     app.run.proposal.approvalId = "other-approval"
     check not matchesDecisionContext(app, context)
+  test "only a queued or running request can be stopped, on the versioned endpoint":
+    check cancelPath("job") == "/api/v2/jobs/job/cancel"
+    check cancelPath("job/other") == "/api/v2/jobs/job%2Fother/cancel"
+    expect ValueError:
+      discard cancelPath("")
+    let app = awaitingDecision()
+    for status in ["pending", "processing"]:
+      app.run.status = status
+      check canCancelJob(app)
+    for status in ["waiting_approval", "approving", "rejecting", "completed", "failed", "denied",
+                   "cancelled", "outcome_unknown", "submitting", "restoring"]:
+      app.run.status = status
+      check not canCancelJob(app)
+    app.run.status = "processing"
+    app.auth.csrfToken = ""
+    check not canCancelJob(app)

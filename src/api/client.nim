@@ -1067,6 +1067,24 @@ proc decideJob*(
     )
 
 
+proc cancelJob*(jobId, csrfToken: string): Future[JobResponse] {.async.} =
+  ## Stops a queued or running request (Phoenix records it first).
+  let headers = newHeaders()
+  headers["Content-Type"] = "application/json"
+  headers["X-CSRF-Token"] = csrfToken
+  let options = newFetchOptions(
+    metod = HttpPost,
+    body = cstring("{}"),
+    mode = fmCors,
+    credentials = fcInclude,
+    headers = headers
+  )
+  let response = await sendRequest(frontendConfig.backendBaseUrl & cancelPath(jobId), options)
+  if not response.ok:
+    raise publicApiError($response.status, response.body)
+  result = parseJobResponse(decodeJson(response.body))
+
+
 proc sendJobFeedback*(
   jobId, identity, note, correction, csrfToken: string
 ) {.async.} =

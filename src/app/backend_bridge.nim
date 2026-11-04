@@ -113,6 +113,18 @@ proc finishFailedJob(
   )
 
 
+proc finishCancelledJob(state: AppState, job: JobResponse, restoreHistory: bool = false) =
+  let message =
+    if job.error.len > 0: job.error
+    else: "The request was cancelled."
+  if restoreHistory:
+    restoreAssistantJobMessage(state, job.jobId, message, job.presentations)
+  else:
+    addAssistantMessage(state, message, job.presentations, job.jobId)
+  addRunEvent(state, "cancelled", "Phoenix recorded that you stopped this request.")
+  showToast(state, "Request stopped.")
+
+
 proc finishDeniedJob(state: AppState, job: JobResponse, restoreHistory: bool = false) =
   let message =
     if job.error.len > 0: job.error
@@ -296,6 +308,11 @@ proc pollBackendJob*(
 
       of "denied":
         finishDeniedJob(state, job, restoreHistory or waitingPresented)
+        redraw(kxi)
+        return
+
+      of "cancelled":
+        finishCancelledJob(state, job, restoreHistory or waitingPresented)
         redraw(kxi)
         return
 
@@ -672,6 +689,44 @@ proc approvePendingJob*(state: AppState) {.async.} =
 
 proc rejectPendingJob*(state: AppState) {.async.} =
   await decidePendingJob(state, jdReject)
+
+
+proc cancelRunningJob*(state: AppState) {.async.} =
+  ## Stops the current chat's queued or running request. Phoenix records the
+  ## cancel; the running observation then sees the saved state and ends.
+  if not canCancelJob(state):
+    return
+  let jobId = state.run.jobId
+  # The running observation must not also finish this job; the cancel
+  # response, or a later authorized read, settles it once.
+  inc state.jobObservationEpoch
+  state.run.observationMode = ""
+  state.run.progressStage = ""
+  state.run.answerPreview = ""
+  addRunEvent(state, "cancel", "Asking Phoenix to stop this request.")
+  redraw(kxi)
+  try:
+    let job = await cancelJob(jobId, state.auth.csrfToken)
+    if state.run.jobId != jobId:
+      return
+    applyJobState(state, job)
+    if job.status == "cancelled":
+      finishCancelledJob(state, job, restoreHistory = true)
+    else:
+      # It finished or moved on first; observe its saved state.
+      await pollBackendJob(state, jobId, false, restoreHistory = true)
+  except CatchableError as error:
+    if state.run.jobId != jobId:
+      return
+    # Nothing was cancelled, or the reply was lost: resume observing the job.
+    discard pollBackendJob(state, jobId, false, restoreHistory = true)
+    if "job_waiting_approval" in error.msg:
+      showToast(state, "This request is waiting for your approval. Approve or reject it instead.")
+    elif "job_already_finished" in error.msg:
+      showToast(state, "This request had already finished.")
+    else:
+      showToast(state, "The request could not be stopped. Check its status before trying again.")
+  redraw(kxi)
 
 
 

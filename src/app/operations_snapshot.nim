@@ -3,7 +3,7 @@ import std/[json, math, options, strutils]
 
 const
   operationStatuses* = ["pending", "processing", "waiting_approval", "reconciliation_required",
-    "denied", "outcome_unknown", "completed", "failed"]
+    "denied", "outcome_unknown", "completed", "failed", "cancelled"]
   operationStages* = ["CONTROL_ROUTING", "CANDIDATE_NARROWING", "SEMANTIC_ROUTING",
     "SEMANTIC_ROUTING_BROAD", "SPECIALIST_REASONING", "PRIMARY_RESPONSE", "SYNTHESIS",
     "REPAIR", "NETWORKING", "NETWORKING_SELECTED", "INVALID"]
@@ -138,6 +138,7 @@ proc operationStatusLabel*(status: string): string =
   of "outcome_unknown": "Outcome unknown"
   of "completed": "Completed"
   of "failed": "Failed"
+  of "cancelled": "Cancelled"
   else: "Unknown"
 
 proc operationStageLabel*(stage: string): string =

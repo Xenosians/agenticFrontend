@@ -594,6 +594,7 @@ proc runStatusLabel(status: string): string =
   of "rejecting": "Rejecting"
   of "completed": "Completed"
   of "denied": "Stopped"
+  of "cancelled": "Cancelled"
   of "outcome_unknown", "reconciliation_required": "Needs review"
   of "failed": "Failed"
   else:
@@ -608,7 +609,7 @@ proc runStatusClass(status: string): cstring =
   of "completed": cstring"run-status-chip success"
   of "outcome_unknown", "reconciliation_required", "submission_unknown": cstring"run-status-chip warning"
   of "failed": cstring"run-status-chip error"
-  of "denied": cstring"run-status-chip neutral"
+  of "denied", "cancelled": cstring"run-status-chip neutral"
   else: cstring"run-status-chip"
 
 

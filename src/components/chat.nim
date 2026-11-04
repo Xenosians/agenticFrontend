@@ -52,6 +52,11 @@ proc renderJobProgress(state: AppState): VNode =
         text "Check saved task"
         proc onclick(event: Event, node: VNode) =
           discard resumeBackendJob(state)
+    elif canCancelJob(state):
+      button(class = "approval-recovery-button", `aria-label` = "Stop this request"):
+        text "Stop"
+        proc onclick(event: Event, node: VNode) =
+          discard cancelRunningJob(state)
 
 
 proc renderMessage(

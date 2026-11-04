@@ -76,6 +76,9 @@ proc composerStatusText(
   of "denied":
     "The action did not proceed."
 
+  of "cancelled":
+    "Request stopped."
+
   of "failed":
     "Request could not be completed."
 

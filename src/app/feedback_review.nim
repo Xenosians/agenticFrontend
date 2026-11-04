@@ -62,7 +62,8 @@ proc parseReviewQueue*(data: JsonNode): seq[ReviewItem] =
       invalidReview()
     let request = requiredText(subject, "request")
     let taskStatus = requiredText(subject, "status")
-    if taskStatus notin ["waiting_approval", "completed", "failed", "denied", "outcome_unknown", "reconciliation_required"]:
+    if taskStatus notin ["waiting_approval", "completed", "failed", "denied", "outcome_unknown",
+                         "reconciliation_required", "cancelled"]:
       invalidReview()
     var decision, reason: string
     if status != "pending_review":

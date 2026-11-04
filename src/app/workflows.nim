@@ -63,7 +63,8 @@ proc checkedName(node: JsonNode): string =
     raise newException(ValueError, "The workflow response has an invalid name.")
 
 proc knownRunStatus(status: string): bool =
-  status in ["pending", "processing", "waiting_approval", "completed", "failed", "denied", "outcome_unknown"]
+  status in ["pending", "processing", "waiting_approval", "completed", "failed", "denied", "outcome_unknown",
+    "cancelled"]
 
 proc requireRunStatus(node: JsonNode): string =
   result = requireText(node, "status")
@@ -270,6 +271,7 @@ proc runStatusLabel*(status: string): string =
   of "failed": "Failed"
   of "denied": "Denied"
   of "outcome_unknown": "Outcome unknown"
+  of "cancelled": "Cancelled"
   else: "Status unknown"
 
 proc parseWorkflowRun*(data: JsonNode, draft: WorkflowDraft, submissionId: string): WorkflowRun =

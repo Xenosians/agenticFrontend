@@ -8,7 +8,7 @@ proc resultStatusClass(status: string): cstring =
   of "completed", "success", "succeeded": cstring"result-card-status success"
   of "failed", "error": cstring"result-card-status error"
   of "outcome_unknown", "unresolved", "reconciliation_required": cstring"result-card-status warning"
-  of "denied", "rejected": cstring"result-card-status neutral"
+  of "denied", "rejected", "cancelled": cstring"result-card-status neutral"
   else: cstring"result-card-status"
 
 
