@@ -54,3 +54,11 @@ suite "knowledge crawl":
       "skipped": {"sensitive": 2, "robots": 1}}}
     check crawlSummary(row) ==
       "Read 1 page from https://docs.example.org/ · 2 pages withheld for possible credentials or personal data"
+
+  test "a site Janus read on its own says so":
+    let row = %*{"kind": "dataset", "crawl": {"schema": "knowledge-crawl.v1", "truncated": false,
+      "automatic": true, "site": "https://docs.example.org",
+      "pages": [{"url": "https://docs.example.org/", "title": "Docs", "sha256": "a"},
+                {"url": "https://docs.example.org/vpn", "title": "VPN", "sha256": "b"}],
+      "skipped": {}}}
+    check crawlSummary(row) == "Read automatically: 2 pages from https://docs.example.org/"

@@ -55,7 +55,9 @@ proc crawlSummary*(row: JsonNode): string =
     return
   let pages = crawl["pages"]
   let start = if pages[0].kind == JObject and pages[0].hasKey("url"): pages[0]["url"].getStr else: ""
-  result = "Read " & $pages.len & (if pages.len == 1: " page" else: " pages") & " from " & start
+  let automatic = crawl.hasKey("automatic") and crawl["automatic"].kind == JBool and crawl["automatic"].getBool
+  result = (if automatic: "Read automatically: " & $pages.len else: "Read " & $pages.len) &
+    (if pages.len == 1: " page" else: " pages") & " from " & start
   if crawl.hasKey("truncated") and crawl["truncated"].kind == JBool and crawl["truncated"].getBool:
     result.add " · stopped at the crawl limit"
   if crawl.hasKey("skipped") and crawl["skipped"].kind == JObject and crawl["skipped"].hasKey("sensitive") and

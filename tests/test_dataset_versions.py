@@ -77,6 +77,24 @@ class DatasetVersionTests(navigation.ChatNavigationTests):
         self.assertGreaterEqual(contrast, 4.5)
         self.assertEqual(self.errors, [])
 
+    def test_removing_a_resource_asks_first_and_keep_cancels(self):
+        self.open_tab("Personal")
+        row = self.page.locator(".personal-resource-row").filter(has_text="Fixture examples")
+        row.get_by_role("button", name="Remove", exact=True).click()
+        # Nothing is removed by the first click: it asks, naming what goes.
+        self.assertEqual(self.mutations, [])
+        confirm = row.get_by_role("button", name="Remove Fixture examples", exact=True)
+        expect(confirm).to_be_visible()
+        row.get_by_role("button", name="Keep", exact=True).click()
+        expect(confirm).to_have_count(0)
+        self.assertEqual(self.mutations, [])
+        row.get_by_role("button", name="Remove", exact=True).click()
+        with self.page.expect_response(lambda response: urlparse(response.url).path == "/api/v1/extensions"
+                                       and response.request.method == "POST"):
+            row.get_by_role("button", name="Remove Fixture examples", exact=True).click()
+        self.assertEqual(self.mutations, [{"action": "delete", "payload": {"id": "c" * 32}}])
+        self.assertEqual(self.errors, [])
+
     def test_an_upload_can_replace_the_latest_version_of_a_dataset(self):
         self.open_tab("Data & automation")
         self.page.get_by_role("combobox", name="Purpose", exact=True).select_option("rag")

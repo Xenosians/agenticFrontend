@@ -868,6 +868,10 @@ proc renderPublicProviders(state: AppState): VNode =
             renderProviderPreset(state, preset)
 
 
+# The personal resource whose removal is being confirmed (one at a time), as in Skills.
+var confirmRemove = ""
+
+
 proc renderResourceActions(
   state: AppState,
   item: JsonNode
@@ -1006,29 +1010,33 @@ proc renderResourceActions(
             }
           )
 
-    button(
-      class = "plugin-action-button danger",
-      disabled = state.extensionBusy
-    ):
+    let id = nodeText(item, "id")
+    if confirmRemove == id:
+      let name = nodeText(item, "name")
+      button(class = "plugin-action-button danger", disabled = state.extensionBusy,
+             `aria-label` = cstring("Remove " & name)):
+        text "Remove " & name
+        proc onclick(event: Event, node: VNode) =
+          confirmRemove = ""
+          discard changeExtension(state, "delete", %*{"id": id})
+      button(class = "plugin-action-button", disabled = state.extensionBusy):
+        text "Keep"
+        proc onclick(event: Event, node: VNode) = confirmRemove = ""
+    else:
+      button(
+        class = "plugin-action-button danger",
+        disabled = state.extensionBusy
+      ):
 
-      text "Remove"
+        text "Remove"
 
-      proc onclick(
-        event: Event,
-        node: VNode
-      ) =
+        # Removal is permanent, so the first click only asks, naming what goes.
+        proc onclick(
+          event: Event,
+          node: VNode
+        ) =
 
-        discard changeExtension(
-          state,
-          "delete",
-          %*{
-            "id":
-              nodeText(
-                item,
-                "id"
-              )
-          }
-        )
+          confirmRemove = id
 
 
 proc renderPersonal(
@@ -2099,7 +2107,8 @@ proc renderDatasetCrawl(state: AppState): VNode =
     if state.datasetCrawlOpen:
       tdiv(class = "dataset-api-body"):
         p(class = "dataset-transform-note"):
-          text "Saves up to 25 pages beneath the start page as reference knowledge."
+          text "Saves up to 25 pages beneath the start page as reference knowledge. " &
+            "Janus also reads your sites on its own, at most once a day, when it has no passage for a question."
         if sites.len > 0:
           renderCrawlSiteList(state, sites)
         if siteRegistrationOpen(state.extensionCatalog):
