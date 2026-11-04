@@ -744,9 +744,14 @@ proc deleteChatApplication*(
       "Chat deleted."
     )
 
-  except CatchableError:
+  except CatchableError as error:
     if matchesAccount(state, context):
-      showToast(state, "Could not delete this chat right now.")
+      # Phoenix keeps a chat whose turn is queued, running or waiting for
+      # approval, so the row stays and the reason is shown.
+      if "chat_has_running_job" in error.msg:
+        showToast(state, "This chat still has a request in progress. Delete it once that finishes.")
+      else:
+        showToast(state, "Could not delete this chat right now.")
 
   redraw(kxi)
 

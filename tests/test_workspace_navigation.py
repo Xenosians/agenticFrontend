@@ -11,6 +11,7 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.opened = []
         self.deleted = []
+        self.busy = set()
         self.revoked = []
         self.created = []
         self.chat_keys = ["first", "second", "third"]
@@ -37,6 +38,9 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
                 return
             if path.startswith("/api/v1/chats/") and request.method == "DELETE":
                 key = path.rsplit("/", 1)[1].removeprefix("fixture-")
+                if key in self.busy:
+                    route.fulfill(status=409, json={"error": "chat_has_running_job"})
+                    return
                 self.deleted.append(key)
                 self.chat_keys.remove(key)
                 route.fulfill(json={"status": "deleted"})
@@ -90,6 +94,22 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
                 row.locator(".chat-delete-confirm-yes").click()
                 expect(self.sidebar_row(key)).to_have_count(0)
                 self.assertEqual(self.deleted[-1], key)
+        self.assert_no_side_effects()
+
+    def test_a_chat_with_an_unfinished_turn_says_why_it_stays(self):
+        # Phoenix refuses to delete a chat whose turn is queued, running or
+        # waiting for approval; the row stays and the reason is shown.
+        self.busy.add("second")
+        self.open_first_chat()
+        row = self.sidebar_row("second")
+        row.hover()
+        row.locator(".chat-delete").click()
+        row.locator(".chat-delete-confirm-yes").click()
+        expect(self.page.get_by_text(
+            "This chat still has a request in progress. Delete it once that finishes.",
+            exact=True)).to_be_visible()
+        expect(self.sidebar_row("second")).to_have_count(1)
+        self.assertEqual(self.deleted, [])
         self.assert_no_side_effects()
 
     def test_sidebar_actions_are_reachable_by_keyboard_without_hover(self):
