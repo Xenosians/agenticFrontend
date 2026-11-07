@@ -84,7 +84,7 @@ class AnswerStreamingTests(navigation.ChatNavigationTests):
         self.open_first_chat()
         self.page.locator("#messageInput").fill(text)
         self.page.locator("#messageInput").press("Enter")
-        self.page.wait_for_function("() => window.answerFixture.joined()")
+        self.wait_for_predicate("window.answerFixture.joined()")
 
     def push_text(self, sequence, text, attempt=1):
         self.page.evaluate("([payload]) => window.answerFixture.push('job_answer_text', payload)",

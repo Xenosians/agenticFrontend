@@ -1,4 +1,4 @@
-## The Skills page (FR-090): the owner's reusable guidance for the answers Janus writes.
+## The Skill Store (FR-090): the owner's reusable guidance for the answers Janus writes.
 ##
 ## A skill is a SKILL.md file. The page lists the owner's skills with their
 ## current version and when each applies, writes a new one from a template or
@@ -155,7 +155,7 @@ proc renderSkillsView*(state: AppState): VNode =
     tdiv(class = "developer-view skills-view"):
       tdiv(class = "developer-view-header"):
         tdiv:
-          h2: text "Skills"
+          h2: text "Skill Store"
           p(class = "skills-note"):
             text "Your written guidance for answers, as SKILL.md files. A skill shapes how an answer " &
                  "is written, never which operation runs or what needs approval."

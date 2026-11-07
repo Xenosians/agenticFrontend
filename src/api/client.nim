@@ -842,6 +842,26 @@ proc getIntegrationStatus*():
   )
 
 
+proc getProxmoxOverview*(): Future[JsonNode] {.async.} =
+  let options = newFetchOptions(metod = HttpGet, mode = fmCors, credentials = fcInclude)
+  let response = await sendRequest(
+    frontendConfig.backendBaseUrl & "/api/v1/proxmox/overview",
+    options
+  )
+  if not response.ok:
+    var code = ""
+    try:
+      let body = decodeJson(response.body)
+      if body.kind == JObject and body.hasKey("error") and body["error"].kind == JString:
+        code = body["error"].getStr
+    except CatchableError:
+      discard
+    if code in ["proxmox_not_configured", "proxmox_configuration_invalid", "proxmox_read_failed"]:
+      raise newException(ValueError, code)
+    raise newException(ValueError, "Proxmox dashboard returned HTTP " & $response.status & ".")
+  result = decodeJson(response.body)
+
+
 proc createJob*(
   chatId: string,
   message: string,

@@ -281,27 +281,32 @@ proc renderPcb(state: AppState): VNode =
 proc renderEngineeringPanel*(state: AppState): VNode =
   let tab = if state.engineeringTab == "pcb": "pcb" else: "infrastructure"
   result = buildHtml(section(class = "conversation")):
-    tdiv(class = "developer-view workflow-panel"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2: text "PCB / Infrastructure Simulator"
-          p: text "Desired designs, observed state and simulated comparisons, kept separate."
-      p(class = "operation-note"):
-        text "Read-only: checks observe allow-listed sources and compare. Live changes stay with governed tools and approval."
-      if state.engineeringError.len > 0:
-        p(class = "operation-error", role = "alert"): text state.engineeringError
-      if state.engineeringNotice.len > 0:
-        p(class = "operation-note", role = "status"): text state.engineeringNotice
-      tdiv(class = "simulation-toolbar", role = "tablist"):
-        for (id, title) in [("infrastructure", "Infrastructure"), ("pcb", "PCB")]:
-          button(class = (if tab == id: cstring"simulation-tab active" else: cstring"simulation-tab"),
-              role = "tab", `aria-selected` = (if tab == id: cstring"true" else: cstring"false")):
-            text title
-            let target = id
-            proc onclick(event: Event, n: VNode) = state.engineeringTab = target
-      if tab == "pcb":
-        renderPcb(state)
-      elif state.engineeringBusy and not state.engineeringLoaded:
-        p(class = "operation-note", role = "status"): text "Loading your topologies…"
-      else:
-        renderInfrastructure(state)
+    details(class = "workspace-disclosure topology-disclosure"):
+      summary(class = "workspace-disclosure-summary"):
+        tdiv(class = "workspace-disclosure-copy"):
+          strong: text "Infrastructure topology and PCB"
+          small: text "Desired designs, observed state and read-only comparisons"
+      tdiv(class = "developer-view workflow-panel"):
+        tdiv(class = "developer-view-header"):
+          tdiv:
+            h2: text "PCB / Infrastructure Simulator"
+            p: text "Desired designs, observed state and simulated comparisons, kept separate."
+        p(class = "operation-note"):
+          text "Read-only: checks observe allow-listed sources and compare. Live changes stay with governed tools and approval."
+        if state.engineeringError.len > 0:
+          p(class = "operation-error", role = "alert"): text state.engineeringError
+        if state.engineeringNotice.len > 0:
+          p(class = "operation-note", role = "status"): text state.engineeringNotice
+        tdiv(class = "simulation-toolbar", role = "tablist"):
+          for (id, title) in [("infrastructure", "Infrastructure"), ("pcb", "PCB")]:
+            button(class = (if tab == id: cstring"simulation-tab active" else: cstring"simulation-tab"),
+                role = "tab", `aria-selected` = (if tab == id: cstring"true" else: cstring"false")):
+              text title
+              let target = id
+              proc onclick(event: Event, n: VNode) = state.engineeringTab = target
+        if tab == "pcb":
+          renderPcb(state)
+        elif state.engineeringBusy and not state.engineeringLoaded:
+          p(class = "operation-note", role = "status"): text "Loading your topologies…"
+        else:
+          renderInfrastructure(state)

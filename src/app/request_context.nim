@@ -1,4 +1,5 @@
 import types
+import proxmox_snapshot
 import operations_snapshot
 import feedback_review
 import learning
@@ -46,6 +47,13 @@ proc beginOperationsRequest*(state: AppState): OperationsRequestContext =
 proc matchesOperationsRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.operationsEpoch == request.epoch
 
+proc beginProxmoxRequest*(state: AppState): OperationsRequestContext =
+  inc state.proxmoxEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.proxmoxEpoch)
+
+proc matchesProxmoxRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.proxmoxEpoch == request.epoch
+
 proc clearOperations*(state: AppState) =
   inc state.operationsEpoch
   state.operations = OperationsSnapshot()
@@ -53,6 +61,11 @@ proc clearOperations*(state: AppState) =
   state.operationsBusy = false
   state.operationsError = ""
   state.operationsExpandedJob = ""
+  inc state.proxmoxEpoch
+  state.proxmox = ProxmoxSnapshot()
+  state.proxmoxLoaded = false
+  state.proxmoxBusy = false
+  state.proxmoxError = ""
   # The review queue belongs to the signed-in reviewer as well.
   inc state.reviewEpoch
   state.reviewItems = @[]

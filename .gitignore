@@ -27,3 +27,6 @@ Thumbs.db
 /tests/test_commands.js
 /tests/test_job_lifecycle
 /tests/test_job_lifecycle.js
+nimble.develop
+nimble.paths
+nimbledeps

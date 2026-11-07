@@ -13,6 +13,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - The optional acceptance-only Required operations editor pins capabilities, exact targets and supported success dependencies to a saved request. It is hidden in the normal composer; tool selection and approvals still work normally.
 - Explicit approve/reject decisions bound to the displayed saved action, separate approval for each mutating workflow step, and structured result cards.
 - Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
+- Four store views: Model Store for connections and datasets, Skill Store for versioned answer guidance, MCP Tool Store for registered capability metadata, and Lua Plugin Store for resolved runtime adapters.
 - Shared UI typography for native controls, Connections and Capabilities, with readable semantic text sizes and intentional monospace for technical content.
 - Display of completed, failed, denied, and unknown-outcome jobs.
 - Feedback on any answer from a saved task: what was wrong and, optionally, the correct result, saved for review. A note that was not confirmed is kept and resent under the same identity.
@@ -158,6 +159,7 @@ chrome zoom or live provider acceptance.
 - Reference retrieval has no embedding/vector-provider connector yet, and user datasets do not replace the application database.
 - An unknown execution outcome requires server-side reconciliation; the UI does not automatically retry the mutation.
 - Live provider availability depends on the configured backend and AI services. Deployment still requires correct origin, cookie, and service configuration across all three repositories.
+- Tool registration does not show provider readiness. Lua adapter resolution does not mean user plugins can be installed; owner-authored plugin review and lifecycle controls remain to be built.
 
 ## Source references
 

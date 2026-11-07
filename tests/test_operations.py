@@ -35,6 +35,29 @@ def snapshot():
             "jobs": [job("a", "first", "processing", [metric()]), job("b", "second", "completed", [])]}
 
 
+def proxmox_snapshot():
+    return {"ok": True, "status": "success", "provider": "proxmox", "observed_at": "2026-11-06T09:00:00Z",
+            "data": {"schema": "proxmox-overview.v1",
+                     "cluster": {"count": 1, "truncated": False,
+                                 "members": [{"id": "cluster", "type": "cluster", "name": "lab", "online": None}]},
+                     "nodes": {"count": 2, "truncated": False,
+                               "nodes": [{"node": "pve-a", "status": "online", "cpu_fraction": 0.25,
+                                          "cpu_count": 8, "memory_bytes": 536870912, "memory_total_bytes": 1073741824,
+                                          "disk_bytes": 1073741824, "disk_total_bytes": 2147483648, "uptime_seconds": 7200},
+                                         {"node": "pve-b", "status": "offline", "cpu_fraction": None,
+                                          "cpu_count": 8, "memory_bytes": None, "memory_total_bytes": 1073741824,
+                                          "disk_bytes": None, "disk_total_bytes": 2147483648, "uptime_seconds": None}]},
+                     "guests": {"count": 2, "truncated": False,
+                                "guests": [{"vmid": 101, "node": "pve-a", "type": "qemu", "name": "router-lab",
+                                            "status": "running", "cpu_fraction": 0.1, "memory_bytes": 268435456,
+                                            "memory_total_bytes": 536870912, "disk_bytes": None,
+                                            "disk_total_bytes": None, "uptime_seconds": None},
+                                           {"vmid": 102, "node": "pve-b", "type": "lxc", "name": None,
+                                            "status": "stopped", "cpu_fraction": None, "memory_bytes": 0,
+                                            "memory_total_bytes": 0, "disk_bytes": None,
+                                            "disk_total_bytes": None, "uptime_seconds": 0}]}}}
+
+
 class OperationsTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.snapshot = snapshot()
@@ -42,6 +65,8 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.operations_requests = []
         self.operations_pending = []
         self.hold_operations = False
+        self.proxmox_status = 200
+        self.proxmox_requests = []
         self.owner = "fixture-owner"
         self.history_reads = []
         super().setUp()
@@ -81,6 +106,13 @@ class OperationsTests(navigation.ChatNavigationTests):
                 else:
                     route.fulfill(json=self.snapshot)
                 return
+            if path == "/api/v1/proxmox/overview":
+                self.proxmox_requests.append(request.method)
+                if self.proxmox_status == 200:
+                    route.fulfill(json=proxmox_snapshot())
+                else:
+                    route.fulfill(status=self.proxmox_status, json={"error": getattr(self, "proxmox_error", "proxmox_not_configured")})
+                return
             if path.startswith("/api/v2/chats/") and path.endswith("/history"):
                 key = path.split("/")[-2]
                 self.history_reads.append(key)
@@ -97,6 +129,7 @@ class OperationsTests(navigation.ChatNavigationTests):
     def assert_safe(self):
         self.assertTrue(self.operations_requests)
         self.assertTrue(all(method == "GET" for method in self.operations_requests))
+        self.assertTrue(all(method == "GET" for method in self.proxmox_requests))
         self.assertEqual(self.submissions, [])
         self.assertEqual(self.errors, [])
 
@@ -114,6 +147,56 @@ class OperationsTests(navigation.ChatNavigationTests):
         historical = self.page.locator('.operation-job[data-job-id="' + "b" * 32 + '"]')
         expect(historical).to_contain_text("Inference timings: Not recorded")
         expect(historical.get_by_role("button", name="Show recorded calls", exact=True)).to_have_count(0)
+        self.assert_safe()
+
+    def test_proxmox_dashboard_renders_only_observed_inventory(self):
+        self.open_operations()
+        dashboard = self.page.locator(".proxmox-dashboard")
+        self.page.locator(".proxmox-dashboard .proxmox-live-status, .proxmox-dashboard .proxmox-unavailable").wait_for()
+        unavailable = dashboard.locator(".proxmox-unavailable")
+        if unavailable.count():
+            self.fail("Proxmox request failed: " + str(unavailable.get_attribute("data-error-code")))
+        expect(dashboard.get_by_text("Connected", exact=True)).to_be_visible()
+        expect(dashboard.locator(".proxmox-summary-card").nth(0)).to_contain_text("1")
+        expect(dashboard.locator(".proxmox-summary-card").nth(1)).to_contain_text("1 / 2")
+        expect(dashboard.locator(".proxmox-summary-card").nth(2)).to_contain_text("1")
+        expect(dashboard.locator(".proxmox-summary-card").nth(3)).to_contain_text("1")
+        expect(dashboard.locator(".proxmox-table").first).to_contain_text("pve-a")
+        expect(dashboard.locator(".proxmox-table").last).to_contain_text("router-lab")
+        expect(dashboard.locator(".proxmox-table").last).to_contain_text("Unnamed")
+        self.assertEqual(self.proxmox_requests, ["GET"])
+        self.assert_safe()
+
+    def test_unconfigured_proxmox_is_not_presented_as_an_empty_cluster(self):
+        self.proxmox_status = 503
+        self.proxmox_error = "proxmox_not_configured"
+        self.open_operations()
+        dashboard = self.page.locator(".proxmox-dashboard")
+        expect(dashboard.get_by_text("Connection not configured", exact=True)).to_be_visible()
+        expect(dashboard.locator(".proxmox-summary-card")).to_have_count(0)
+        self.assertEqual(self.proxmox_requests, ["GET"])
+        self.assert_safe()
+
+    def test_invalid_proxmox_configuration_is_named_distinctly(self):
+        self.proxmox_status = 503
+        self.proxmox_error = "proxmox_configuration_invalid"
+        self.open_operations()
+        dashboard = self.page.locator(".proxmox-dashboard")
+        expect(dashboard.get_by_text("Configuration invalid", exact=True)).to_be_visible()
+        expect(dashboard.locator(".proxmox-summary-card")).to_have_count(0)
+        expect(dashboard.locator(".proxmox-unavailable")).to_have_attribute("data-error-code", "proxmox_configuration_invalid")
+        self.assertEqual(self.proxmox_requests, ["GET"])
+        self.assert_safe()
+
+    def test_failed_proxmox_reads_stay_unavailable_without_fabricating_data(self):
+        self.proxmox_status = 503
+        self.proxmox_error = "proxmox_read_failed"
+        self.open_operations()
+        dashboard = self.page.locator(".proxmox-dashboard")
+        expect(dashboard.get_by_text("Proxmox data unavailable", exact=True)).to_be_visible()
+        expect(dashboard.locator(".proxmox-summary-card")).to_have_count(0)
+        expect(dashboard.locator(".proxmox-unavailable")).to_have_attribute("data-error-code", "proxmox_read_failed")
+        self.assertEqual(self.proxmox_requests, ["GET"])
         self.assert_safe()
 
     def test_counts_status_and_secondary_text_meet_wcag_aa_contrast(self):

@@ -125,11 +125,23 @@ class WorkflowTests(navigation.ChatNavigationTests):
         self.records[identity] = row
         route.fulfill(json=self.save_override if self.save_override is not None else {"workflow": row})
 
-    def open_automation_page(self):
+    def open_automation_page(self, expand=True):
         self.page.keyboard.press("Control+k")
         self.page.locator("#commandSearch").fill("Automation")
         self.page.locator("#commandSearch").press("Enter")
+        if expand:
+            self.page.locator(".automation-disclosure > summary").click()
         expect(self.page.locator(".workflow-panel h2")).to_have_text("Automation")
+
+    def test_automation_editor_starts_collapsed_and_can_expand(self):
+        self.open_first_chat()
+        self.open_automation_page(expand=False)
+        details = self.page.locator("details.automation-disclosure")
+        expect(details).not_to_have_attribute("open", "")
+        expect(details.locator(".workflow-panel")).to_be_hidden()
+        details.locator("summary").click()
+        expect(details.locator(".workflow-panel")).to_be_visible()
+        self.assert_clean()
 
     def open_workflow(self):
         self.open_first_chat()
@@ -143,6 +155,14 @@ class WorkflowTests(navigation.ChatNavigationTests):
     def start_run(self):
         self.page.locator("#automationRunMessage").fill("Provision the reviewed identity")
         self.page.get_by_role("button", name="Run saved version", exact=True).click()
+
+    def wait_for_held_run(self):
+        import time
+        deadline = time.monotonic() + 5.0
+        while len(self.pending_runs) == 0:
+            if time.monotonic() > deadline:
+                raise AssertionError("Timed out waiting for held run fixture")
+            self.page.wait_for_timeout(50)
 
     def change_owner(self):
         self.page.keyboard.press("Control+k")
@@ -268,7 +288,7 @@ class WorkflowTests(navigation.ChatNavigationTests):
         self.open_workflow()
         self.hold_run = True
         self.start_run()
-        self.page.wait_for_function("document.querySelector('#workflowName').disabled")
+        self.wait_for_held_run()
         self.assertEqual(len(self.pending_runs), 1)
         route, receipt = self.pending_runs.pop()
         receipt["workflow_contract_hash"] = "9" * 64
@@ -312,7 +332,7 @@ class WorkflowTests(navigation.ChatNavigationTests):
         self.open_workflow()
         self.hold_run = True
         self.start_run()
-        self.page.wait_for_function("document.querySelector('#workflowName').disabled")
+        self.wait_for_held_run()
         self.assertEqual(len(self.pending_runs), 1)
         self.change_owner()
         route, receipt = self.pending_runs.pop()

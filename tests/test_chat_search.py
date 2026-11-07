@@ -74,7 +74,7 @@ class ChatSearchTests(navigation.ChatNavigationTests):
         self.assertEqual(self.queries, ["VPN"])
         result.click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Chat")
-        self.page.wait_for_function("globalThis.navigationFixturePending === true")
+        self.wait_for_pending_history()
         self.release_second_chat()
         expect(self.page.get_by_text("Second chat history", exact=True)).to_be_visible()
         self.assertEqual(self.errors, [])

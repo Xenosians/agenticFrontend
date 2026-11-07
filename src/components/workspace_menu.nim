@@ -10,7 +10,7 @@ proc menuActions(menu: string): seq[MenuAction] =
   of "File":
     @[MenuAction(action: "new_chat", label: "New chat", keys: @["Mod", "Alt", "N"]),
       MenuAction(action: "chats", label: "Recent chats"),
-      MenuAction(action: "connections", label: "Models and datasets")]
+      MenuAction(action: "connections", label: "Model Store: models and datasets")]
   of "Edit":
     @[MenuAction(action: "compose", label: "Focus message"),
       MenuAction(action: "search", label: "Search chats", keys: @["Mod", "Shift", "F"])]
@@ -19,7 +19,9 @@ proc menuActions(menu: string): seq[MenuAction] =
       MenuAction(action: "palette", label: "Commands", keys: @paletteKeys),
       MenuAction(action: "knowledge", label: "Knowledge"),
       MenuAction(action: "operations", label: "Operations"),
-      MenuAction(action: "skills", label: "Skills"),
+      MenuAction(action: "tools", label: "MCP Tool Store"),
+      MenuAction(action: "plugins", label: "Lua Plugin Store"),
+      MenuAction(action: "skills", label: "Skill Store"),
       MenuAction(action: "inspector", label: "Run inspector", keys: @["Mod", "Alt", "I"]),
       MenuAction(action: "settings", label: "Settings")]
   of "Help":

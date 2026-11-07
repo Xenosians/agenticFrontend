@@ -9,6 +9,7 @@ import functools
 import copy
 import hashlib
 import json
+import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 import re
@@ -186,7 +187,6 @@ class ChatNavigationTests(unittest.TestCase):
             data = {"messages": [{"role": "user", "content": "First chat history"}]}
         elif path == "/api/v2/chats/fixture-second/history":
             self.pending_history.append(route)
-            self.page.evaluate("globalThis.navigationFixturePending = true")
             return  # Explicitly delayed until the test releases navigation.
         elif path == "/api/v1/jobs" and request.method == "POST":
             payload = request.post_data_json
@@ -271,10 +271,40 @@ class ChatNavigationTests(unittest.TestCase):
         self.page.goto(self.base + "/", wait_until="networkidle")
         expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
 
+    def wait_for_predicate(self, expression, timeout_ms=5000):
+        """Poll an evaluate-able boolean expression without eval().
+        wait_for_function wraps its argument in a predicate via eval(),
+        which the production CSP (script-src 'self', no unsafe-eval)
+        blocks in current Chromium. evaluate() itself bypasses CSP,
+        so poll it directly and treat a throw as not-yet-true."""
+        deadline = time.monotonic() + timeout_ms / 1000.0
+        while True:
+            try:
+                if self.page.evaluate(expression):
+                    return
+            except Exception:
+                pass
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise AssertionError("Timed out waiting for predicate: " + expression)
+            self.page.wait_for_timeout(min(50, int(remaining * 1000)))
+
+    def wait_for_pending_history(self, timeout_ms=5000):
+        """Wait for the delayed second-chat fixture to have been captured.
+        This avoids a page.evaluate() inside the route handler racing with
+        the wait (the old navigationFixturePending flag), which could
+        deadlock under sync Playwright."""
+        deadline = time.monotonic() + timeout_ms / 1000.0
+        while len(self.pending_history) == 0:
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise AssertionError("Timed out waiting for pending history fixture")
+            self.page.wait_for_timeout(min(50, int(remaining * 1000)))
+
     def begin_second_chat(self):
         self.page.locator(".chat-nav-title", has_text="Second fixture chat").click()
         # The navigation request is captured by the local fixture handler.
-        self.page.wait_for_function("globalThis.navigationFixturePending === true")
+        self.wait_for_pending_history()
         self.assertEqual(len(self.pending_history), 1)
 
     def release_second_chat(self):
@@ -527,7 +557,7 @@ class ChatNavigationTests(unittest.TestCase):
         expect(recover).to_be_visible()
         composer.fill("My independently typed next request")
         recover.click()
-        self.page.wait_for_function("document.querySelector('.composer-hint').textContent.includes('Submitting request')")
+        self.wait_for_predicate("document.querySelector('.composer-hint').textContent.includes('Submitting request')")
         expect(composer).to_have_value("My independently typed next request")
         self.assertEqual(len(held), 1)
         composer.fill("A newer draft while recovery is pending")

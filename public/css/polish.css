@@ -822,6 +822,77 @@ body {
   line-height: var(--line-height-ui);
 }
 
+/* MCP and Lua catalogs use the shared component scale without changing workspace layout. */
+.store-view { max-width: 1040px; }
+.store-guidance,
+.store-state {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text-soft);
+  font-size: var(--font-size-control);
+  line-height: var(--line-height-ui);
+}
+.store-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin: 0 0 16px;
+  color: var(--text-soft);
+  font-size: var(--font-size-control);
+}
+.store-summary strong { color: var(--text); font-size: var(--font-size-title); }
+.store-search-label { display: block; margin: 0 0 6px; color: var(--text-soft); font-size: var(--font-size-control); }
+.store-search {
+  box-sizing: border-box;
+  width: min(100%, 520px);
+  min-height: 42px;
+  margin: 0 0 18px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  font: inherit;
+}
+.store-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+.store-card {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.store-card-heading { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.store-card-heading h3 { min-width: 0; margin: 0; color: var(--text); font-size: var(--font-size-control); overflow-wrap: anywhere; }
+.store-card-badges { display: flex; flex-wrap: wrap; gap: 5px; }
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 1px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: var(--font-size-caption);
+  line-height: 1.35;
+}
+.store-badge.mutation,
+.store-badge.approval,
+.store-badge.unavailable { border-color: var(--warning-border, var(--border)); color: var(--warning-text, var(--text)); }
+.store-badge.resolved { border-color: var(--success-border, var(--border)); color: var(--success-text, var(--text)); }
+.store-card-description { margin: 10px 0 12px; color: var(--text-soft); font-size: var(--font-size-control); line-height: var(--line-height-ui); }
+.store-card-details { display: grid; grid-template-columns: minmax(74px, 0.35fr) minmax(0, 1fr); gap: 5px 10px; margin: 0; font-size: var(--font-size-caption); }
+.store-card-details dt { color: var(--text-soft); }
+.store-card-details dd { min-width: 0; margin: 0; color: var(--text); overflow-wrap: anywhere; }
+@media (max-width: 560px) {
+  .store-card { padding: 12px; }
+  .store-card-heading { display: block; }
+  .store-card-badges { margin-top: 7px; }
+}
+
 .developer-card,
 .detail-card,
 .empty-card,
@@ -2203,9 +2274,37 @@ body {
 .operation-call { padding: 12px 0; border-top: 1px solid var(--border); }
 .operation-call-heading strong { font-size: 13px; }
 .operation-call-limits summary { color: var(--text-soft); font-size: var(--header-control-size); cursor: pointer; }
+.proxmox-dashboard { margin: 18px 0 26px; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--panel); }
+.proxmox-dashboard-heading, .proxmox-live-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.proxmox-dashboard-heading h3, .proxmox-table-section h4 { margin: 0; font-size: 15px; }
+.proxmox-dashboard-heading .operation-note { margin-top: 4px; }
+.proxmox-live-status { justify-content: flex-start; flex-wrap: wrap; margin: 14px 0 10px; }
+.proxmox-live-status .operation-note { margin: 0 0 0 auto; }
+.proxmox-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #29966a; box-shadow: 0 0 0 3px color-mix(in srgb, #29966a 16%, transparent); }
+.proxmox-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 22px; }
+.proxmox-summary-card { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.proxmox-summary-card .run-label { color: var(--text-soft); }
+.proxmox-summary-card strong { font-size: 21px; }
+.proxmox-table-section { min-width: 0; margin-top: 20px; }
+.proxmox-table-section .section-heading-row { margin-bottom: 8px; }
+.proxmox-table-section .section-heading-row span { color: var(--text-soft); }
+.proxmox-table { width: 100%; border-collapse: collapse; font-size: 12px; text-align: left; }
+.proxmox-table th, .proxmox-table td { padding: 10px 9px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.proxmox-table thead th { color: var(--text-soft); font-size: 11px; font-weight: 600; }
+.proxmox-table tbody th { font-weight: 600; }
+.proxmox-state { display: inline-flex; align-items: center; border: 1px solid var(--border); border-radius: 999px; padding: 3px 8px; color: var(--text-soft); text-transform: capitalize; }
+.proxmox-state.online { border-color: color-mix(in srgb, #29966a 42%, var(--border)); color: var(--text); }
+.proxmox-unavailable { margin-top: 14px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg); }
+.proxmox-unavailable strong { font-size: 13px; }
+.proxmox-unavailable p { max-width: 72ch; }
 @media (max-width: 650px) {
   .operation-counts, .operation-measurements { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .operation-job-heading { flex-wrap: wrap; }
+  .proxmox-dashboard { padding: 13px; }
+  .proxmox-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .proxmox-table-section { overflow-x: auto; }
+  .proxmox-table { min-width: 690px; }
+  .proxmox-live-status .operation-note { margin-left: 0; width: 100%; }
 }
 
 /* Reviewer queue for critiques and corrections; same scale as Operations. */
@@ -2375,6 +2474,29 @@ body {
 .workflow-panel .simulation-toolbar { margin: 20px 0 0; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--panel); }
 .workflow-panel .simulation-tab { color: var(--text-soft); font-size: 13px; }
 .workflow-panel .simulation-tab.active { color: var(--text); background: var(--panel-active); }
+.workspace-disclosure { width: 100%; }
+.workspace-disclosure-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 58px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+}
+.workspace-disclosure-summary::-webkit-details-marker { display: none; }
+.workspace-disclosure-summary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
+.workspace-disclosure-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.workspace-disclosure-copy strong { font-size: 14px; font-weight: 600; }
+.workspace-disclosure-copy small { color: var(--text-soft); font-size: var(--header-control-size); }
+.workspace-disclosure-summary::after { content: "+"; color: var(--text-soft); font-size: 20px; line-height: 1; }
+.workspace-disclosure[open] > .workspace-disclosure-summary::after { content: "−"; }
+.workspace-disclosure > .workflow-panel { padding-top: 16px; }
 .netlist-picker { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 20px 0 0; }
 .netlist-file { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .netlist-choose { display: inline-flex; align-items: center; cursor: pointer; }

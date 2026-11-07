@@ -177,82 +177,87 @@ proc renderRuns(state: AppState): VNode =
 proc renderWorkflowPanel*(state: AppState): VNode =
   let draft = state.automationDraft
   result = buildHtml(section(class = "conversation")):
-    tdiv(class = "developer-view workflow-panel"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2: text "Automation"
-          p: text "Draw a workflow from registered capabilities, save it, then run it as a governed job."
-      p(class = "operation-note"):
-        text "Saving never runs anything. A run uses the saved version and asks for approval before any change. Retries keep the same run identity."
-      if workflowUnconfirmed(state):
-        p(class = "operation-note", role = "status"):
-          text (if state.automationRunConfirmed: "Confirmed run is still being cleared. " else: "Unconfirmed run. ") &
-            "Saved version " & $draft.version & " and its exact request stay locked. Refresh does not send it again."
-      if state.automationRecoveryError.len > 0:
-        p(class = "operation-error", role = "alert"): text state.automationRecoveryError
-      if state.automationError.len > 0 and state.automationError != state.automationRecoveryError:
-        p(class = "operation-error", role = "alert"): text state.automationError
-      if state.automationNotice.len > 0:
-        p(class = "operation-note", role = "status"): text state.automationNotice
-      tdiv(class = "workflow-toolbar"):
-        label(class = "review-label", `for` = "workflowOpen"): text "Workflow"
-        select(id = "workflowOpen", class = "learning-select", disabled = workflowEditingBlocked(state)):
-          option(value = "", selected = draft.id.len == 0): text "New workflow"
-          for row in state.automationWorkflows:
-            option(value = cstring(row.id), selected = row.id == draft.id):
-              text row.name & " · v" & $row.version
-          proc onchange(event: Event, n: VNode) =
-            let id = $n.value
-            if id.len == 0: newWorkflowDraft(state)
-            else: discard openWorkflow(state, id)
-        label(class = "review-label", `for` = "workflowName"): text "Name"
-        input(id = "workflowName", class = "workflow-name", value = cstring(draft.name),
-            maxlength = $workflowNameLimit, disabled = workflowEditingBlocked(state)):
-          proc oninput(event: Event, n: VNode) =
-            let value = $n.value
-            editWorkflow(state, proc(current: WorkflowDraft): WorkflowDraft =
-              result = current
-              result.name = value)
-        button(class = "secondary-action", disabled = workflowEditingBlocked(state) or draft.nodes.len == 0):
-          text (if state.automationSaving: "Saving…" elif draft.version == 0: "Save" else: "Save version")
-          proc onclick(event: Event, n: VNode) = discard saveWorkflowDraft(state)
-        if draft.id.len > 0:
-          button(class = "secondary-action", disabled = workflowEditingBlocked(state)):
-            text "Archive"
-            proc onclick(event: Event, n: VNode) = discard archiveWorkflowDraft(state)
-        button(class = "secondary-action", disabled = workflowBusy(state)):
-          text "Refresh workflows"
-          proc onclick(event: Event, n: VNode) = discard refreshWorkflows(state)
-      if state.automationBusy and not state.automationLoaded:
-        p(class = "operation-note", role = "status"): text "Loading your workflows…"
-      elif state.extensionCatalog == nil:
-        p(class = "operation-note"): text "Capabilities are still loading."
-      else:
-        tdiv(class = "workflow-editor"):
-          renderPalette(state)
-          tdiv(class = "workflow-canvas", role = "group", `aria-label` = "Workflow canvas"):
-            renderEdges(state)
-            for node in draft.nodes:
-              renderNode(state, node)
-            if draft.nodes.len == 0:
-              p(class = "workflow-empty"): text "Add a step to start."
-          renderInspector(state)
-        tdiv(class = "workflow-run-form"):
-          label(class = "review-label", `for` = "automationRunMessage"): text "Run request"
-          textarea(id = "automationRunMessage", class = "workflow-target", rows = "2",
-              value = cstring(state.automationRunMessage), maxlength = $workflowRunMessageLimit,
-              placeholder = "Describe this run, for example who to onboard",
-              disabled = workflowEditingBlocked(state) or draft.version == 0):
+    details(class = "workspace-disclosure automation-disclosure"):
+      summary(class = "workspace-disclosure-summary"):
+        tdiv(class = "workspace-disclosure-copy"):
+          strong: text "Automation workflows"
+          small: text "Owner-managed governed workflows · n8n runtime is not connected"
+      tdiv(class = "developer-view workflow-panel"):
+        tdiv(class = "developer-view-header"):
+          tdiv:
+            h2: text "Automation"
+            p: text "Draw a workflow from registered capabilities, save it, then run it as a governed job."
+        p(class = "operation-note"):
+          text "Saving never runs anything. A run uses the saved version and asks for approval before any change. Retries keep the same run identity."
+        if workflowUnconfirmed(state):
+          p(class = "operation-note", role = "status"):
+            text (if state.automationRunConfirmed: "Confirmed run is still being cleared. " else: "Unconfirmed run. ") &
+              "Saved version " & $draft.version & " and its exact request stay locked. Refresh does not send it again."
+        if state.automationRecoveryError.len > 0:
+          p(class = "operation-error", role = "alert"): text state.automationRecoveryError
+        if state.automationError.len > 0 and state.automationError != state.automationRecoveryError:
+          p(class = "operation-error", role = "alert"): text state.automationError
+        if state.automationNotice.len > 0:
+          p(class = "operation-note", role = "status"): text state.automationNotice
+        tdiv(class = "workflow-toolbar"):
+          label(class = "review-label", `for` = "workflowOpen"): text "Workflow"
+          select(id = "workflowOpen", class = "learning-select", disabled = workflowEditingBlocked(state)):
+            option(value = "", selected = draft.id.len == 0): text "New workflow"
+            for row in state.automationWorkflows:
+              option(value = cstring(row.id), selected = row.id == draft.id):
+                text row.name & " · v" & $row.version
+            proc onchange(event: Event, n: VNode) =
+              let id = $n.value
+              if id.len == 0: newWorkflowDraft(state)
+              else: discard openWorkflow(state, id)
+          label(class = "review-label", `for` = "workflowName"): text "Name"
+          input(id = "workflowName", class = "workflow-name", value = cstring(draft.name),
+              maxlength = $workflowNameLimit, disabled = workflowEditingBlocked(state)):
             proc oninput(event: Event, n: VNode) =
-              setWorkflowRunMessage(state, $n.value)
-          button(class = "secondary-action",
-              disabled = workflowBusy(state) or state.automationRecoveryError.len > 0 or
-                draft.version == 0 or (state.automationDirty and not workflowUnconfirmed(state))):
-            text (if state.automationRunning: "Starting…" elif workflowUnconfirmed(state): "Retry same run" else: "Run saved version")
-            proc onclick(event: Event, n: VNode) = discard runWorkflowDraft(state)
-          if draft.version == 0:
-            p(class = "operation-note"): text "Save the workflow to run it."
-          elif state.automationDirty:
-            p(class = "operation-note"): text "Unsaved changes. Save a new version to run them."
-        if draft.id.len > 0:
-          renderRuns(state)
+              let value = $n.value
+              editWorkflow(state, proc(current: WorkflowDraft): WorkflowDraft =
+                result = current
+                result.name = value)
+          button(class = "secondary-action", disabled = workflowEditingBlocked(state) or draft.nodes.len == 0):
+            text (if state.automationSaving: "Saving…" elif draft.version == 0: "Save" else: "Save version")
+            proc onclick(event: Event, n: VNode) = discard saveWorkflowDraft(state)
+          if draft.id.len > 0:
+            button(class = "secondary-action", disabled = workflowEditingBlocked(state)):
+              text "Archive"
+              proc onclick(event: Event, n: VNode) = discard archiveWorkflowDraft(state)
+          button(class = "secondary-action", disabled = workflowBusy(state)):
+            text "Refresh workflows"
+            proc onclick(event: Event, n: VNode) = discard refreshWorkflows(state)
+        if state.automationBusy and not state.automationLoaded:
+          p(class = "operation-note", role = "status"): text "Loading your workflows…"
+        elif state.extensionCatalog == nil:
+          p(class = "operation-note"): text "Capabilities are still loading."
+        else:
+          tdiv(class = "workflow-editor"):
+            renderPalette(state)
+            tdiv(class = "workflow-canvas", role = "group", `aria-label` = "Workflow canvas"):
+              renderEdges(state)
+              for node in draft.nodes:
+                renderNode(state, node)
+              if draft.nodes.len == 0:
+                p(class = "workflow-empty"): text "Add a step to start."
+            renderInspector(state)
+          tdiv(class = "workflow-run-form"):
+            label(class = "review-label", `for` = "automationRunMessage"): text "Run request"
+            textarea(id = "automationRunMessage", class = "workflow-target", rows = "2",
+                value = cstring(state.automationRunMessage), maxlength = $workflowRunMessageLimit,
+                placeholder = "Describe this run, for example who to onboard",
+                disabled = workflowEditingBlocked(state) or draft.version == 0):
+              proc oninput(event: Event, n: VNode) =
+                setWorkflowRunMessage(state, $n.value)
+            button(class = "secondary-action",
+                disabled = workflowBusy(state) or state.automationRecoveryError.len > 0 or
+                  draft.version == 0 or (state.automationDirty and not workflowUnconfirmed(state))):
+              text (if state.automationRunning: "Starting…" elif workflowUnconfirmed(state): "Retry same run" else: "Run saved version")
+              proc onclick(event: Event, n: VNode) = discard runWorkflowDraft(state)
+            if draft.version == 0:
+              p(class = "operation-note"): text "Save the workflow to run it."
+            elif state.automationDirty:
+              p(class = "operation-note"): text "Unsaved changes. Save a new version to run them."
+          if draft.id.len > 0:
+            renderRuns(state)

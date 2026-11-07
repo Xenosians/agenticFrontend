@@ -136,10 +136,12 @@ class EngineeringTests(navigation.ChatNavigationTests):
         self.records[identity] = row
         route.fulfill(json={"topology": row})
 
-    def open_engineering(self, command="Infrastructure topology"):
+    def open_engineering(self, command="Infrastructure topology", expand=True):
         self.page.keyboard.press("Control+k")
         self.page.locator("#commandSearch").fill(command)
         self.page.locator("#commandSearch").press("Enter")
+        if expand:
+            self.page.locator(".topology-disclosure > summary").click()
         expect(self.page.locator(".workflow-panel h2")).to_have_text("PCB / Infrastructure Simulator")
 
     def open_topology(self):
@@ -158,6 +160,10 @@ class EngineeringTests(navigation.ChatNavigationTests):
         rail = self.page.get_by_role("button", name="PCB / Infra Simulator", exact=True)
         expect(rail).to_be_visible()
         rail.click()
+        details = self.page.locator("details.topology-disclosure")
+        expect(details).not_to_have_attribute("open", "")
+        expect(details.locator(".workflow-panel")).to_be_hidden()
+        details.locator("summary").click()
         expect(self.page.locator(".workflow-panel h2")).to_have_text("PCB / Infrastructure Simulator")
         expect(self.page.locator("#topologyOpen option")).to_have_count(3)
         self.assert_clean()
@@ -245,7 +251,7 @@ class EngineeringTests(navigation.ChatNavigationTests):
         self.open_topology()
         self.hold_check = True
         self.page.get_by_role("button", name="Check drift", exact=True).click()
-        self.page.wait_for_function("document.querySelector('#topologyName').disabled")
+        self.wait_for_predicate("document.querySelector('#topologyName') && document.querySelector('#topologyName').disabled")
         route = self.pending_checks.pop()
         self.page.keyboard.press("Control+k")
         self.page.locator("#commandSearch").fill("Settings")

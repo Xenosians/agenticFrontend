@@ -20,7 +20,8 @@ from test_workspace_context import CATALOG
 # Implementation names and internal vocabulary that mean nothing to a person using the product.
 INTERNAL = re.compile(r"\b(Phoenix|Karax|SemanticGuard|ToolGateway|durable|harness(es)?|owner-scoped|"
                       r"frontend-visible|backend mailer|governed|orchestration|[a-z]+(-[a-z]+)*\.v\d)\b")
-VIEWS = ("Chat", "Search", "Skills", "Knowledge", "Operations", "Settings")
+VIEWS = ("Chat", "Search", "Model Store", "MCP Tool Store", "Lua Plugin Store", "Skill Store",
+         "Knowledge", "Operations", "Settings")
 
 
 class PlainLanguageTests(navigation.ChatNavigationTests):

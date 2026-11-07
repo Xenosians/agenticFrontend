@@ -1,4 +1,4 @@
-"""The Skills page (FR-090): the owner's reusable guidance for answers, in the rail where Capabilities was.
+"""The Skill Store (FR-090): the owner's reusable guidance for answers.
 
 A skill is a SKILL.md file; the page lists the owner's skills with their version
 and when they apply, writes a new one from a template or uploads a file, turns
@@ -91,17 +91,18 @@ class SkillsPageTests(navigation.ChatNavigationTests):
 
     def open_skills(self):
         self.open_first_chat()
-        self.page.locator(".sidebar").get_by_role("button", name="Skills", exact=True).click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Skills")
+        self.page.locator(".sidebar").get_by_role("button", name="Skill Store", exact=True).click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Skill Store")
 
     def skill(self, name):
         return self.page.locator(".skill-row").filter(has=self.page.locator(".skill-name", has_text=name))
 
-    def test_the_rail_offers_skills_where_capabilities_was(self):
+    def test_the_rail_offers_the_four_store_surfaces(self):
         self.open_first_chat()
         rail = self.page.locator(".rail-navigation")
         labels = rail.locator(".nav-item").evaluate_all("nodes => nodes.map((node) => node.getAttribute('aria-label'))")
-        self.assertEqual(labels[:5], ["Chat", "Search", "Connections", "Skills", "Knowledge"])
+        self.assertEqual(labels[:7], ["Chat", "Search", "Model Store", "MCP Tool Store", "Lua Plugin Store",
+                                      "Skill Store", "Knowledge"])
         self.assertNotIn("Capabilities", labels)
         self.assertEqual(self.errors, [])
 
@@ -197,15 +198,15 @@ class SkillsPageTests(navigation.ChatNavigationTests):
         self.page.set_viewport_size({"width": 390, "height": 760})
         self.open_first_chat()
         self.page.keyboard.press("Control+k")
-        self.page.locator("#commandSearch").fill("Skills")
+        self.page.locator("#commandSearch").fill("Skill Store")
         self.page.keyboard.press("Enter")
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Skills")
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Skill Store")
         overflow = self.page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth")
         self.assertFalse(overflow)
         self.page.set_viewport_size({"width": 1280, "height": 800})
         self.page.get_by_role("menubar", name="Application menu").get_by_role("menuitem", name="View", exact=True).click()
-        self.page.get_by_role("menu", name="View", exact=True).get_by_role("menuitem", name="Skills", exact=True).click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Skills")
+        self.page.get_by_role("menu", name="View", exact=True).get_by_role("menuitem", name="Skill Store", exact=True).click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Skill Store")
         self.assertEqual(self.errors, [])
 
     def test_an_answer_names_the_skill_versions_that_guided_it(self):

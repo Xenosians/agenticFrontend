@@ -21,9 +21,11 @@ proc renderViewButton(state: AppState, icon, label: string, target: AppView,
     span(class = "rail-label"): text label
     proc onclick(event: Event, node: VNode) =
       setActiveView(state, target)
-      if target in [viewPlugin, viewTool, viewSkills, viewKnowledge]:
+      if target in [viewPlugin, viewTool, viewPluginStore, viewSkills, viewKnowledge]:
         discard refreshExtensions(state)
-      elif target == viewJobs: discard refreshOperations(state)
+      elif target == viewJobs:
+        discard refreshOperations(state)
+        discard refreshProxmoxOverview(state)
       elif target == viewReview: discard refreshReview(state)
       elif target == viewSimulator and not state.engineeringLoaded: discard refreshTopologies(state)
       elif target == viewSettings:
@@ -112,8 +114,10 @@ proc renderSidebar*(state: AppState): VNode =
       nav(class = "rail-navigation", `aria-label` = "Workspace"):
         renderViewButton(state, "◈", "Chat", viewChat)
         renderViewButton(state, "⌕", "Search", viewSearch)
-        renderViewButton(state, "◇", "Connections", viewPlugin)
-        renderViewButton(state, "✎", "Skills", viewSkills)
+        renderViewButton(state, "◇", "Model Store", viewPlugin)
+        renderViewButton(state, "⬡", "MCP Tool Store", viewTool)
+        renderViewButton(state, "⌘", "Lua Plugin Store", viewPluginStore)
+        renderViewButton(state, "✎", "Skill Store", viewSkills)
         renderViewButton(state, "❏", "Knowledge", viewKnowledge)
         renderViewButton(state, "◌", "Operations", viewJobs)
         if isReviewer(state): renderViewButton(state, "✓", "Review", viewReview)

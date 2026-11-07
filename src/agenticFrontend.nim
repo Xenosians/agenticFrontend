@@ -20,6 +20,7 @@ import app/request_context
 
 import components/connections
 import components/skills
+import components/stores
 import app/extension_bridge
 import components/auth
 import components/settings
@@ -126,14 +127,18 @@ proc activeViewTitle(): string =
     "Operations"
   of viewSettings:
     "Settings"
-  of viewPlugin, viewTool:
-    "Connections"
+  of viewPlugin:
+    "Model Store"
+  of viewTool:
+    "MCP Tool Store"
+  of viewPluginStore:
+    "Lua Plugin Store"
   of viewNodeBuilder:
     "AI Node Builder"
   of viewSimulator:
     "PCB / Infrastructure Simulator"
   of viewSkills:
-    "Skills"
+    "Skill Store"
   of viewReview:
     "Review"
   of viewKnowledge:
@@ -392,6 +397,10 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         text "⌕"
       of "connections":
         text "◇"
+      of "tools":
+        text "⬡"
+      of "plugins":
+        text "⌘"
       of "skills":
         text "✎"
       of "knowledge":
@@ -418,9 +427,13 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         of "search":
           text "Search every saved chat"
         of "connections":
-          text "Models, datasets and connected services"
+          text "Model Store: models, harnesses and datasets"
+        of "tools":
+          text "Registered MCP capabilities and their policy metadata"
+        of "plugins":
+          text "Lua runtime adapters and their resolved source identities"
         of "skills":
-          text "Your written guidance for answers"
+          text "Your versioned written guidance for answers"
         of "review":
           text "Decide on critiques and corrections"
         of "knowledge":
@@ -564,8 +577,12 @@ proc renderWorkspaceBody(): VNode =
     renderActivityView()
   of viewSettings:
     renderSettingsView(appState)
-  of viewPlugin, viewTool:
+  of viewPlugin:
     renderConnections(appState)
+  of viewTool:
+    renderToolStore(appState)
+  of viewPluginStore:
+    renderPluginStore(appState)
   of viewNodeBuilder:
     renderWorkflowPanel(appState)
   of viewSimulator:
@@ -824,6 +841,12 @@ proc runWorkspaceCommand(action: string) =
     queueWorkspaceFocus("chatSearch")
   of "connections":
     setActiveView(appState, viewPlugin)
+    discard refreshExtensions(appState)
+  of "tools":
+    setActiveView(appState, viewTool)
+    discard refreshExtensions(appState)
+  of "plugins":
+    setActiveView(appState, viewPluginStore)
     discard refreshExtensions(appState)
   of "settings":
     setActiveView(appState, viewSettings)

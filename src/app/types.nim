@@ -1,6 +1,7 @@
 import std/json
 import workflow_request
 import operations_snapshot
+import proxmox_snapshot
 import feedback_review
 import knowledge
 import learning
@@ -25,6 +26,7 @@ type
     viewSettings,
     viewTool,
     viewPlugin,
+    viewPluginStore,
     viewNodeBuilder,
     viewSimulator,
     viewSkills,
@@ -169,6 +171,10 @@ type
     operationsBusy*, operationsLoaded*: bool
     operationsError*, operationsExpandedJob*: string
     operationsEpoch*: int
+    proxmox*: ProxmoxSnapshot
+    proxmoxBusy*, proxmoxLoaded*: bool
+    proxmoxError*: string
+    proxmoxEpoch*: int
     reviewItems*: seq[ReviewItem]
     reviewBusy*, reviewLoaded*, reviewShowDecided*: bool
     reviewError*, reviewDeciding*: string
@@ -227,6 +233,7 @@ type
     commandQuery*: string
     pluginSection*: string
     pluginSearchDraft*: string
+    toolStoreSearch*, pluginStoreSearch*: string
     extensionBusy*: bool
     extensionError*: string
     connectionName*: string

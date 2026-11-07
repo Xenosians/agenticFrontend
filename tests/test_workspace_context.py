@@ -23,6 +23,8 @@ CATALOG = {
     "selected": {"model_id": "fixture-model", "dataset_id": "fixture-dataset"},
     "role_assignments": {}, "local_profiles": [], "specialist_roles": [], "provider_presets": [],
     "connection_presets": [], "harnesses": [], "connections": [], "capabilities": [],
+    "capabilities_schema": "mcp-tool-catalog.v1",
+    "plugin_catalog": {"schema": "lua-plugin-catalog.v1", "scope": "runtime", "plugins": []},
     "inference_option_support": [],
 }
 
