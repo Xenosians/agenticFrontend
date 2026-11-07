@@ -1,9 +1,11 @@
-## Read-only MCP and Lua runtime catalogs; lifecycle actions remain host-owned.
+## MCP tools with the owner's on/off switch, and the read-only Lua runtime catalog.
+## A switch is saved by the AI service and read back; adapter lifecycle stays host-owned.
 
 include karax/prelude
-import std/[json, strutils]
+import std/[asyncjs, json, strutils]
 import ../app/types
 import ../app/store_catalog
+import ../app/extension_bridge
 
 
 proc containsQuery(value, query: string): bool =
@@ -15,16 +17,24 @@ proc matches(item: ToolStoreEntry, query: string): bool =
     item.permission & " " & item.effect & " " & item.risk & " " & item.agentNames.join(" "), query)
 
 
-proc renderToolCard(item: ToolStoreEntry): VNode =
-  result = buildHtml(article(class = "store-card tool-store-card")):
-    tdiv(class = "store-card-heading"):
+proc renderToolCard(state: AppState, item: ToolStoreEntry): VNode =
+  let cardClass = if item.enabled: cstring"store-card tool-store-card" else: cstring"store-card tool-store-card is-off"
+  result = buildHtml(article(class = cardClass)):
+    tdiv(class = "store-card-heading tool-card-heading"):
       h3: text item.id
-      tdiv(class = "store-card-badges"):
-        span(class = (if item.effect == "mutation": cstring"store-badge mutation" else: cstring"store-badge")):
-          text item.effect
-        span(class = "store-badge"): text item.risk
-        span(class = (if item.requiresApproval: cstring"store-badge approval" else: cstring"store-badge")):
-          text (if item.requiresApproval: "Approval required" else: "Approval not required")
+      label(class = "tool-switch"):
+        input(`type` = "checkbox", checked = item.enabled, disabled = state.extensionBusy,
+              `aria-label` = cstring("Use " & item.id)):
+          proc onchange(event: Event, node: VNode) =
+            discard changeExtension(state, "tool_enable", %*{"id": item.id, "enabled": not item.enabled})
+        span: text toolSwitchLabel(item)
+    tdiv(class = "store-card-badges"):
+      if item.effect == "mutation":
+        span(class = "store-badge mutation"): text "Changes data"
+      span(class = (if item.risk == "high": cstring"store-badge risk-high" else: cstring"store-badge")):
+        text toolRiskLabel(item)
+      span(class = (if item.requiresApproval: cstring"store-badge approval" else: cstring"store-badge")):
+        text (if item.requiresApproval: "Approval required" else: "Approval not required")
     p(class = "store-card-description"): text item.description
     dl(class = "store-card-details"):
       dt: text "Provider"
@@ -44,7 +54,7 @@ proc renderToolStore*(state: AppState): VNode =
     tdiv(class = "developer-view store-view"):
       tdiv(class = "developer-view-header"):
         h2: text "MCP Tool Store"
-        p: text "The registered MCP capability catalog. Provider readiness is shown separately; mutations still use Janus’s approval and verification path."
+        p: text "The registered MCP capability catalog. Turn a tool off to keep Janus from using it for your requests. Provider readiness is shown separately; mutations still use Janus’s approval and verification path."
       if state.extensionError.len > 0:
         p(class = "operation-error", role = "alert"): text state.extensionError
       if state.extensionBusy and not valid:
@@ -68,7 +78,7 @@ proc renderToolStore*(state: AppState): VNode =
             for item in rows:
               if matches(item, query):
                 inc visible
-                renderToolCard(item)
+                renderToolCard(state, item)
           if visible == 0:
             p(class = "store-state"): text "No registered tools match this search."
 

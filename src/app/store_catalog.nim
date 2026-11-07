@@ -7,6 +7,7 @@ type
   ToolStoreEntry* = object
     id*, description*, effect*, risk*, permission*, provider*: string
     requiresApproval*: bool
+    enabled*: bool  ## The owner's switch; only an explicit false from the service is off.
     agentNames*: seq[string]
 
   LuaPluginEntry* = object
@@ -52,7 +53,17 @@ proc catalogTools*(catalog: JsonNode): seq[ToolStoreEntry] =
       continue
     result.add ToolStoreEntry(id: id, description: description, effect: effect, risk: risk,
       permission: permission, provider: text(node, "provider"),
-      requiresApproval: node["requires_approval"].getBool, agentNames: strings(node, "agent_names"))
+      requiresApproval: node["requires_approval"].getBool, agentNames: strings(node, "agent_names"),
+      enabled: not (node.hasKey("enabled") and node["enabled"].kind == JBool and not node["enabled"].getBool))
+
+
+proc toolSwitchLabel*(item: ToolStoreEntry): string =
+  if item.enabled: "On" else: "Off"
+
+
+proc toolRiskLabel*(item: ToolStoreEntry): string =
+  ## A read tool's risk is the registry's "read" class; say it once, plainly.
+  if item.risk == "read": "Read only" else: "Risk: " & item.risk
 
 
 proc validLuaPluginCatalog*(catalog: JsonNode): bool =

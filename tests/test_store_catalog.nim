@@ -31,6 +31,22 @@ suite "MCP tool store catalog":
     let rows = catalogTools(%*{"capabilities_schema": "mcp-tool-catalog.v1", "capabilities": [tool, malformed]})
     check rows.len == 1 and rows[0].id == "ticket_create"
 
+  test "reads the owner's on/off state; only an explicit false is off":
+    var off = parseJson($readTool)
+    off["enabled"] = %false
+    var odd = parseJson($tool)
+    odd["enabled"] = %"no"
+    let rows = catalogTools(%*{"capabilities_schema": "mcp-tool-catalog.v1", "capabilities": [off, odd]})
+    check rows.len == 2
+    check not rows[0].enabled and rows[1].enabled
+    check catalogTools(%*{"capabilities_schema": "mcp-tool-catalog.v1", "capabilities": [readTool]})[0].enabled
+    check toolSwitchLabel(rows[0]) == "Off" and toolSwitchLabel(rows[1]) == "On"
+
+  test "risk is named once: read tools say read only, others name their risk":
+    let rows = catalogTools(%*{"capabilities_schema": "mcp-tool-catalog.v1", "capabilities": [readTool, tool]})
+    check toolRiskLabel(rows[0]) == "Read only"
+    check toolRiskLabel(rows[1]) == "Risk: high"
+
 suite "Lua runtime plugin catalog":
   test "reports exact resolved source state and unavailable state":
     let catalog = %*{"schema": "lua-plugin-catalog.v1", "scope": "runtime", "plugins": [

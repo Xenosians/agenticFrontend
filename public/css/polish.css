@@ -887,9 +887,46 @@ body {
 .store-card-details { display: grid; grid-template-columns: minmax(74px, 0.35fr) minmax(0, 1fr); gap: 5px 10px; margin: 0; font-size: var(--font-size-caption); }
 .store-card-details dt { color: var(--text-soft); }
 .store-card-details dd { min-width: 0; margin: 0; color: var(--text); overflow-wrap: anywhere; }
+/* MCP tool cards: the name and the owner's switch share one row on every card;
+   the badges follow on their own row, so every card lines up the same way. */
+.tool-card-heading { flex-wrap: nowrap; align-items: center; }
+.tool-card-heading h3 { flex: 1 1 auto; }
+.tool-store-card > .store-card-badges { margin-top: 8px; }
+.tool-switch {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 2px 10px 2px 8px;
+  border: 1px solid var(--text-soft);
+  border-radius: 999px;
+  color: var(--text);
+  font-size: var(--font-size-caption);
+  font-weight: 600;
+  cursor: pointer;
+}
+.tool-switch input { width: 16px; height: 16px; margin: 0; accent-color: var(--text); cursor: pointer; }
+.tool-switch input:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.tool-switch:has(input:checked) { border-color: var(--text); background: var(--text); color: var(--panel); }
+.tool-switch:has(input:checked) input { accent-color: var(--panel); }
+.tool-switch:has(input:disabled) { cursor: progress; }
+.store-badge.risk-high { border-color: var(--text); color: var(--text); font-weight: 600; }
+/* A turned-off tool reads as set aside: dashed, dimmed, still legible (contrast is tested). */
+.tool-store-card.is-off { border-style: dashed; border-color: var(--text-soft); }
+.tool-store-card.is-off .tool-card-heading h3,
+.tool-store-card.is-off .store-card-badges,
+.tool-store-card.is-off .store-card-description,
+.tool-store-card.is-off .store-card-details { opacity: 0.72; }
+.tool-store-card.is-off h3,
+.tool-store-card.is-off .store-badge,
+.tool-store-card.is-off .store-card-description,
+.tool-store-card.is-off .store-card-details dd,
+.tool-store-card.is-off .tool-switch { color: var(--text-soft); }
 @media (max-width: 560px) {
   .store-card { padding: 12px; }
   .store-card-heading { display: block; }
+  .store-card-heading.tool-card-heading { display: flex; }
   .store-card-badges { margin-top: 7px; }
 }
 

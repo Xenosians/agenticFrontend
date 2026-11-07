@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from playwright.sync_api import expect
 
 import test_chat_navigation as navigation
+from test_statusbar import CONTRAST
 
 
 CATALOG = {
@@ -37,6 +38,8 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.catalog = copy.deepcopy(CATALOG)
         self.methods = []
+        self.commands = []
+        self.reject = None
         super().setUp()
         self.page.set_default_timeout(5000)
 
@@ -46,6 +49,15 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
             self.methods.append(request.method)
             if request.method == "GET":
                 route.fulfill(json=self.catalog)
+                return
+            body = request.post_data_json
+            self.commands.append(body)
+            if self.reject:
+                route.fulfill(status=422, json={"error": "extension_request_rejected", "detail": self.reject})
+            elif body["action"] == "tool_enable":
+                row = next(row for row in self.catalog["capabilities"] if row.get("id") == body["payload"]["id"])
+                row["enabled"] = body["payload"]["enabled"]
+                route.fulfill(json={"id": row["id"], "enabled": row["enabled"]})
             else:
                 route.fulfill(status=405, json={"error": "read_only_catalog"})
             return
@@ -61,15 +73,49 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
         cards = self.page.locator(".tool-store-card")
         expect(cards).to_have_count(2)
         ticket = cards.filter(has=self.page.get_by_role("heading", name="ticket_create", exact=True))
-        expect(ticket).to_contain_text("mutation")
+        expect(ticket).to_contain_text("Changes data")
+        expect(ticket).to_contain_text("Risk: high")
         expect(ticket).to_contain_text("Approval required")
         expect(ticket).to_contain_text("jira-specialist")
+        account = cards.filter(has=self.page.get_by_role("heading", name="account_status", exact=True))
+        expect(account.locator(".store-badge")).to_have_text(["Read only", "Approval not required"])
         expect(self.page.locator(".store-view")).to_contain_text("Provider readiness is shown separately")
         self.page.get_by_role("searchbox", name="Search MCP tools", exact=True).fill("directory")
         expect(cards).to_have_count(1)
         expect(cards.first).to_contain_text("account_status")
         self.assertTrue(self.methods)
         self.assertEqual(set(self.methods), {"GET"})
+        self.assertEqual(self.errors, [])
+
+    def test_an_owner_turns_a_tool_off_and_the_store_shows_the_saved_state(self):
+        self.open_store("MCP Tool Store", "MCP Tool Store")
+        card = self.page.locator(".tool-store-card").filter(
+            has=self.page.get_by_role("heading", name="account_status", exact=True))
+        switch = card.get_by_role("checkbox", name="Use account_status", exact=True)
+        expect(switch).to_be_checked()
+        switch.click()
+        expect(card).to_contain_text("Off")
+        expect(switch).not_to_be_checked()
+        expect(card).to_have_class("store-card tool-store-card is-off")
+        # Dimmed, but every text on a turned-off card stays readable (WCAG AA).
+        for selector in (".tool-store-card.is-off h3", ".tool-store-card.is-off .store-card-description",
+                         ".tool-store-card.is-off .store-badge", ".tool-store-card.is-off .tool-switch span"):
+            with self.subTest(selector=selector):
+                self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
+        self.assertEqual(self.commands, [{"action": "tool_enable",
+                                          "payload": {"id": "account_status", "enabled": False}}])
+        # The page shows what the service saved: the catalog is read again after the change.
+        self.assertIn("GET", self.methods[self.methods.index("POST") + 1:])
+        self.assertEqual(self.errors, [])
+
+    def test_a_refused_switch_keeps_the_previous_state_and_says_why(self):
+        self.reject = {"code": "tool_not_found", "message": "Tool not found."}
+        self.open_store("MCP Tool Store", "MCP Tool Store")
+        card = self.page.locator(".tool-store-card").filter(
+            has=self.page.get_by_role("heading", name="account_status", exact=True))
+        card.get_by_role("checkbox", name="Use account_status", exact=True).click()
+        expect(self.page.locator(".store-view .operation-error")).to_contain_text("Tool not found.")
+        expect(card.get_by_role("checkbox", name="Use account_status", exact=True)).to_be_checked()
         self.assertEqual(self.errors, [])
 
     def test_lua_store_reports_resolution_and_does_not_offer_unreviewed_install(self):
