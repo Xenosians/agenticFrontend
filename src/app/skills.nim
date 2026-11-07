@@ -30,7 +30,7 @@ type
   SavedSkill* = object
     name*, description*, body*, text*, id*, sha256*: string
     triggers*: seq[string]
-    always*, enabled*: bool
+    always*, enabled*, builtin*: bool
     version*: int
     versions*: seq[SkillVersion]
 
@@ -100,7 +100,8 @@ proc catalogSkills*(catalog: JsonNode): seq[SavedSkill] =
       continue
     var row = SavedSkill(name: identity.name, id: identity.id, sha256: identity.sha256,
       version: identity.version, description: text(node, "description"), body: body,
-      text: text(node, "text"), always: flag(node, "always"), enabled: flag(node, "enabled"))
+      text: text(node, "text"), always: flag(node, "always"), enabled: flag(node, "enabled"),
+      builtin: flag(node, "builtin"))
     if node.hasKey("triggers") and node["triggers"].kind == JArray:
       for trigger in node["triggers"]:
         if trigger.kind == JString: row.triggers.add trigger.getStr
@@ -118,6 +119,11 @@ proc skillUse*(row: SavedSkill): string =
   if row.always: "Used for every answer"
   elif row.triggers.len > 0: "Used when a request mentions: " & row.triggers.join(", ")
   else: "Used when a request names " & row.name
+
+
+proc skillOrigin*(row: SavedSkill): string =
+  ## "Built in" for a skill every owner starts with (still the owner's to edit, turn off or delete).
+  if row.builtin: "Built in" else: ""
 
 
 proc skillFileProblem*(content: string): string =

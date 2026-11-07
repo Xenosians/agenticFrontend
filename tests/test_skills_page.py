@@ -122,6 +122,19 @@ class SkillsPageTests(navigation.ChatNavigationTests):
         self.assertEqual(self.commands, [])
         self.assertEqual(self.errors, [])
 
+    def test_a_built_in_skill_is_marked_and_stays_the_owners_to_turn_off(self):
+        built_in = saved("senior-engineer", 1)
+        built_in["builtin"] = True
+        self.catalog["skills"].append(built_in)
+        self.open_skills()
+        expect(self.skill("senior-engineer")).to_contain_text("Version 1 · Built in")
+        expect(self.skill("password-reset")).not_to_contain_text("Built in")
+        self.skill("senior-engineer").get_by_role("checkbox", name="Use senior-engineer", exact=True).click()
+        expect(self.skill("senior-engineer")).to_contain_text("Version 1 · Off · Built in")
+        self.assertEqual(self.commands, [{"action": "skill_enable",
+                                          "payload": {"name": "senior-engineer", "enabled": False}}])
+        self.assertEqual(self.errors, [])
+
     def test_a_new_skill_is_written_from_a_template_and_saved(self):
         self.open_skills()
         self.page.get_by_role("button", name="New skill", exact=True).click()

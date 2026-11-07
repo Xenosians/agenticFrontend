@@ -47,6 +47,16 @@ suite "the skill library":
     check skillUse(rows[0]) == "Used when a request mentions: password reset"
     check skillUse(rows[1]) == "Used for every answer"
 
+  test "a built-in skill is marked; a missing or malformed flag means the owner's own":
+    var builtin = saved("senior-engineer")
+    builtin["builtin"] = %true
+    var malformed = saved("odd-flag")
+    malformed["builtin"] = %"yes"
+    let rows = catalogSkills(%*{"skills": [builtin, saved("password-reset"), malformed]})
+    check rows.len == 3
+    check rows[0].builtin and not rows[1].builtin and not rows[2].builtin
+    check skillOrigin(rows[0]) == "Built in" and skillOrigin(rows[1]) == ""
+
   test "a catalog without skills or with malformed rows gives no skills":
     check catalogSkills(newJNull()).len == 0
     check catalogSkills(%*{"skills": "x"}).len == 0

@@ -117,7 +117,8 @@ proc renderSkill(state: AppState, row: SavedSkill): VNode =
     tdiv(class = "skill-heading"):
       strong(class = "skill-name"): text row.name
       span(class = "skill-meta"):
-        text "Version " & $row.version & (if row.enabled: "" else: " · Off")
+        text "Version " & $row.version & (if row.enabled: "" else: " · Off") &
+          (if row.builtin: " · " & skillOrigin(row) else: "")
       label(class = "skill-toggle"):
         input(`type` = "checkbox", checked = row.enabled, disabled = editor.busy,
               `aria-label` = cstring("Use " & row.name)):
