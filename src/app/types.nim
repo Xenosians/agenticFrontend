@@ -82,6 +82,9 @@ type
     cards*: seq[ResultCard]
     references*: seq[AnswerReference]
     skills*: seq[AnswerSkill]
+    ## A temporary password this answer's approved action saved, revealable
+    ## once by its requester (identity only; the backend decides).
+    handoverCredentialId*: string
 
   RunEvent* = object
     id*: int

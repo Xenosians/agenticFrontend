@@ -12,6 +12,7 @@ import answer_references
 import ../app/skills
 import message_body
 import message_feedback
+import credential_reveal
 import answer_actions
 import brand
 import statusbar
@@ -113,6 +114,11 @@ proc renderMessage(
               renderResultCard(
                 card
               )
+
+        # The approved action saved a temporary password its requester can
+        # reveal once; the message's own saved task identifies it.
+        if message.handoverCredentialId.len > 0 and message.jobId.len > 0:
+          renderCredentialHandover(state, message.jobId, message.handoverCredentialId)
 
         if message.references.len > 0:
           renderAnswerReferences(state, message.references)

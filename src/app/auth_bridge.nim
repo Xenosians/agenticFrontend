@@ -184,7 +184,8 @@ proc applyHistory(
         content: item.content,
         cards: @[],
         references: parseAnswerReferences(item.references),
-        skills: parseAnswerSkills(item.skills)
+        skills: parseAnswerSkills(item.skills),
+        handoverCredentialId: item.handoverCredentialId
       )
     )
 

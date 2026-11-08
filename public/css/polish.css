@@ -2268,6 +2268,69 @@ body {
 .message-feedback-status,
 .message-feedback-error { margin: 0; color: var(--text-soft); font-size: var(--header-control-size); }
 
+/* One-time hand-over of an approved request's temporary password. */
+.credential-handover { margin: 8px 0 0 14px; }
+.credential-handover-toggle {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: var(--header-control-size);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.credential-handover-form,
+.credential-handover-secret {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.credential-handover-form p,
+.credential-handover-secret p { margin: 0; color: var(--text); font-size: 13px; }
+.credential-handover-field { display: flex; flex-direction: column; gap: 5px; }
+.credential-handover-field span { color: var(--text-soft); font-size: var(--header-control-size); }
+.credential-handover-field input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 13px;
+}
+.credential-handover-value {
+  padding: 9px 11px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  letter-spacing: .04em;
+  user-select: all;
+  /* A wrapped secret is ambiguous at its hyphens: keep one line, scroll if needed. */
+  white-space: nowrap;
+  overflow-x: auto;
+}
+.credential-handover-actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.credential-handover-actions button {
+  padding: 6px 13px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--text);
+  color: var(--bg);
+  font-size: 13px;
+  cursor: pointer;
+}
+.credential-handover-actions .credential-handover-close { background: transparent; color: var(--text); }
+.credential-handover-actions button:disabled { opacity: .55; cursor: default; }
+.credential-handover-hint { color: var(--text-soft) !important; }
+.credential-handover-error,
+.credential-handover-notice { margin: 0; color: var(--text); font-size: var(--header-control-size); }
+
 /* Provider setup on the Capabilities page (FR-081): configuration only. */
 .integration-setup {
   margin-bottom: 14px;

@@ -641,7 +641,10 @@ proc getChatHistory*(
           jobId: jsonText(node, "job_id"),
           status: jsonText(node, "status"),
           references: (if node.kind == JObject and node.hasKey("references"): node["references"] else: nil),
-          skills: (if node.kind == JObject and node.hasKey("skills"): node["skills"] else: nil)
+          skills: (if node.kind == JObject and node.hasKey("skills"): node["skills"] else: nil),
+          handoverCredentialId:
+            (if node.kind == JObject and node{"credential_handover"} != nil:
+              jsonText(node["credential_handover"], "credential_id") else: "")
         )
       )
 

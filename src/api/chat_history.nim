@@ -9,6 +9,9 @@ type ChatHistoryMessage* = object
   references*: JsonNode
   ## The owner's skill versions that guided this answer (identities only).
   skills*: JsonNode
+  ## A temporary password the approved action saved, revealable once by its
+  ## requester (the credential's identity only, never the password).
+  handoverCredentialId*: string
 
 const observableJobStates* = [
   "pending", "processing", "waiting_approval", "approving",

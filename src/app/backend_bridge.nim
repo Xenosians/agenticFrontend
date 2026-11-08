@@ -62,9 +62,9 @@ proc finishCompletedJob(
   let references = parseAnswerReferences(job.references)
   let skills = parseAnswerSkills(job.skills)
   if restoreHistory:
-    restoreAssistantJobMessage(state, job.jobId, answer, job.presentations, references, skills)
+    restoreAssistantJobMessage(state, job.jobId, answer, job.presentations, references, skills, handoverCredentialId = job.handoverCredentialId)
   else:
-    addAssistantMessage(state, answer, job.presentations, job.jobId, references, skills)
+    addAssistantMessage(state, answer, job.presentations, job.jobId, references, skills, handoverCredentialId = job.handoverCredentialId)
 
   if job.presentations.len > 0:
     addRunEvent(
@@ -97,9 +97,9 @@ proc finishFailedJob(
     )
 
   if restoreHistory:
-    restoreAssistantJobMessage(state, job.jobId, failureMessage, job.presentations)
+    restoreAssistantJobMessage(state, job.jobId, failureMessage, job.presentations, handoverCredentialId = job.handoverCredentialId)
   else:
-    addAssistantMessage(state, failureMessage, job.presentations, job.jobId)
+    addAssistantMessage(state, failureMessage, job.presentations, job.jobId, handoverCredentialId = job.handoverCredentialId)
 
   addRunEvent(
     state,
@@ -118,9 +118,9 @@ proc finishCancelledJob(state: AppState, job: JobResponse, restoreHistory: bool 
     if job.error.len > 0: job.error
     else: "The request was cancelled."
   if restoreHistory:
-    restoreAssistantJobMessage(state, job.jobId, message, job.presentations)
+    restoreAssistantJobMessage(state, job.jobId, message, job.presentations, handoverCredentialId = job.handoverCredentialId)
   else:
-    addAssistantMessage(state, message, job.presentations, job.jobId)
+    addAssistantMessage(state, message, job.presentations, job.jobId, handoverCredentialId = job.handoverCredentialId)
   addRunEvent(state, "cancelled", "Phoenix recorded that you stopped this request.")
   showToast(state, "Request stopped.")
 
@@ -131,9 +131,9 @@ proc finishDeniedJob(state: AppState, job: JobResponse, restoreHistory: bool = f
     elif job.answer.len > 0: job.answer
     else: "The requested action did not proceed."
   if restoreHistory:
-    restoreAssistantJobMessage(state, job.jobId, message, job.presentations)
+    restoreAssistantJobMessage(state, job.jobId, message, job.presentations, handoverCredentialId = job.handoverCredentialId)
   else:
-    addAssistantMessage(state, message, job.presentations, job.jobId)
+    addAssistantMessage(state, message, job.presentations, job.jobId, handoverCredentialId = job.handoverCredentialId)
   addRunEvent(state, "denied", "Phoenix reported that the action did not proceed. The saved response contains the reason.")
   showToast(state, "Action did not proceed.")
 
@@ -151,9 +151,9 @@ proc finishReconciliationRequired(
       "The approved action has an unresolved execution outcome. Automatic retry is disabled; trusted reconciliation is required."
 
   if restoreHistory:
-    restoreAssistantJobMessage(state, job.jobId, message, job.presentations)
+    restoreAssistantJobMessage(state, job.jobId, message, job.presentations, handoverCredentialId = job.handoverCredentialId)
   else:
-    addAssistantMessage(state, message, job.presentations, job.jobId)
+    addAssistantMessage(state, message, job.presentations, job.jobId, handoverCredentialId = job.handoverCredentialId)
 
   addRunEvent(
     state,
@@ -182,9 +182,9 @@ proc finishWaitingApproval(
         "This action requires your approval before it can continue."
 
     if restoreHistory:
-      restoreAssistantJobMessage(state, job.jobId, approvalMessage, job.presentations)
+      restoreAssistantJobMessage(state, job.jobId, approvalMessage, job.presentations, handoverCredentialId = job.handoverCredentialId)
     else:
-      addAssistantMessage(state, approvalMessage, job.presentations, job.jobId)
+      addAssistantMessage(state, approvalMessage, job.presentations, job.jobId, handoverCredentialId = job.handoverCredentialId)
 
   addRunEvent(
     state,

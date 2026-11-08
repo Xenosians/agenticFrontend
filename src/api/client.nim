@@ -12,6 +12,7 @@ from std/httpcore import
 import ../app/types
 import ../app/job_decision
 import ../app/job_feedback
+import ../app/credential_handover
 import tool_proposal
 import approval_result
 import http_call
@@ -45,6 +46,8 @@ type
     references*: JsonNode
     ## The owner's skill versions that guided the answer (identities only).
     skills*: JsonNode
+    ## A temporary password the approved action saved for one-time hand-over.
+    handoverCredentialId*: string
 
     presentations*: seq[
       ResultCard
@@ -674,6 +677,8 @@ proc parseJobResponse(
         (if data.kind == JObject and data.hasKey("result") and data["result"].kind == JObject and
             data["result"].hasKey("skills"): data["result"]["skills"] else: nil),
 
+      handoverCredentialId: handoverCredential(data),
+
       presentations:
         extractPresentations(
           data
@@ -1122,3 +1127,24 @@ proc sendJobFeedback*(
   let response = await sendRequest(frontendConfig.backendBaseUrl & feedbackPath(jobId), options)
   if not response.ok:
     raise publicApiError($response.status, response.body)
+
+
+proc revealTemporaryCredential*(
+  jobId, credentialId, password, csrfToken: string
+): Future[RevealedCredential] {.async.} =
+  ## Asks the backend to reveal an approved request's temporary password once,
+  ## after confirming the signed-in user's own password. Nothing is stored here.
+  let headers = newHeaders()
+  headers["Content-Type"] = "application/json"
+  headers["X-CSRF-Token"] = csrfToken
+  let options = newFetchOptions(
+    metod = HttpPost,
+    body = cstring($revealPayload(password)),
+    mode = fmCors,
+    credentials = fcInclude,
+    headers = headers
+  )
+  let response = await sendRequest(frontendConfig.backendBaseUrl & revealPath(jobId, credentialId), options)
+  if not response.ok:
+    raise publicApiError($response.status, response.body)
+  result = parseRevealed(decodeJson(response.body))

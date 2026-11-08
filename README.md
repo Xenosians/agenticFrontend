@@ -12,6 +12,7 @@ Nim/Karax browser app for the Agentic Developer Hub and ITSM platform. It provid
 - Durable submission identities prevent duplicate jobs when an acknowledgement is lost; the same request can be recovered after reopening its chat.
 - The optional acceptance-only Required operations editor pins capabilities, exact targets and supported success dependencies to a saved request. It is hidden in the normal composer; tool selection and approvals still work normally.
 - Explicit approve/reject decisions bound to the displayed saved action, separate approval for each mutating workflow step, and structured result cards.
+- Temporary password hand-over: under an approved account, password reset or mailbox answer, **Reveal temporary password** asks for your own Janus password and shows the password once, with **Copy password**. Nothing is kept in the browser; the backend allows one reveal.
 - Safe formatting for headings, lists and code, responsive navigation, keyboard shortcuts, and drafting while a task runs.
 - Four store views: Model Store for connections and datasets, Skill Store for versioned answer guidance, MCP Tool Store for registered capability metadata, and Lua Plugin Store for resolved runtime adapters.
 - Shared UI typography for native controls, Connections and Capabilities, with readable semantic text sizes and intentional monospace for technical content.
@@ -40,6 +41,8 @@ agenticFrontend (this browser app)
 ```
 
 The browser calls Phoenix only. Phoenix owns sessions, chats, jobs, and resource ownership; the AI runtime owns inference and guarded execution. Approval requests refer to a durable job, while the server retains the exact action and arguments.
+
+[How one request travels through all three repositories (animation) and the roadmap](https://github.com/Xenosians/agenticAI#how-the-repositories-fit-together).
 The approval card displays that saved action before offering **Approve action** or **Reject action**. Both decisions go through Phoenix and remain disabled while their outcome is pending. An interrupted response requires reading the saved job again; the browser does not retry a mutation or assume a rejection succeeded. Completed decisions restore the saved tool result or rejection reason on reload.
 
 Before creating a job, the browser reserves an owner-scoped request identity with Phoenix. Phoenix stores the exact request and operation binding; the browser uses neither local nor session storage for recovery. If a reply is interrupted, **Check saved submission** reads the saved server state. An explicit retry uses that same identity and exact request; reopening a chat never automatically dispatches it. Phoenix atomically creates one job for the owner and identity and rejects a changed chat or message. Recovery does not replay tools or reset the existing job state, and sign-out clears only the browser's in-memory view of the server-held request.
@@ -132,6 +135,7 @@ python tests/test_lua_transforms.py
 python tests/test_workspace_navigation.py
 python tests/test_connection_actions.py
 python tests/test_typography.py
+python tests/test_credential_handover.py
 ```
 
 It delays chat-history responses to verify that clicking Send or pressing Enter
