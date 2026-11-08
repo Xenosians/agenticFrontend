@@ -1,5 +1,4 @@
-## The Engineering surface (FR-093) inside the existing PCB / Infrastructure
-## Simulator view. Infrastructure: draw the desired topology, save versions and
+## The Topology & PCB dashboard (FR-093). Infrastructure: draw the desired topology, save versions and
 ## compare a saved version with what the read adapters observe. PCB: inspect a
 ## KiCad netlist. Observed, desired and simulated state stay labelled, and
 ## nothing here can change a device.
@@ -289,7 +288,7 @@ proc renderEngineeringPanel*(state: AppState): VNode =
       tdiv(class = "developer-view workflow-panel"):
         tdiv(class = "developer-view-header"):
           tdiv:
-            h2: text "PCB / Infrastructure Simulator"
+            h2: text "Topology & PCB"
             p: text "Desired designs, observed state and simulated comparisons, kept separate."
         p(class = "operation-note"):
           text "Read-only: checks observe allow-listed sources and compare. Live changes stay with governed tools and approval."

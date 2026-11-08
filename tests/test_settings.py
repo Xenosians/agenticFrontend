@@ -13,7 +13,7 @@ from playwright.sync_api import expect
 import test_chat_navigation as navigation
 from test_statusbar import CONTRAST
 
-DEFAULTS = {"task_completed": True, "theme": "dark", "accent": "mono"}
+DEFAULTS = {"task_completed": True, "theme": "dark", "accent": "mono", "pinned_views": ["knowledge", "operations"]}
 
 
 def sessions():

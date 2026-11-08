@@ -6,6 +6,18 @@ type NotificationPreferences* = object
   taskCompleted*: bool
   theme*: ThemeMode
   accent*: Accent
+  pinnedViews*: seq[Dashboard]
+  pinsKnown*: bool  ## False when the saved pins are not a list of known dashboards.
+
+proc parsePins(node: JsonNode): (seq[Dashboard], bool) =
+  ## The saved pins in order, or not known: an unknown or repeated value is never guessed.
+  if node.kind != JArray: return (@[], false)
+  var pins: seq[Dashboard]
+  for item in node:
+    let dashboard = if item.kind == JString: parseDashboard(item.getStr) else: none(Dashboard)
+    if dashboard.isNone or dashboard.get in pins: return (@[], false)
+    pins.add dashboard.get
+  (pins, true)
 
 proc parseNotificationPreferences*(node: JsonNode): NotificationPreferences =
   if node.kind != JObject or not node.hasKey("preferences") or node["preferences"].kind != JObject:
@@ -19,8 +31,10 @@ proc parseNotificationPreferences*(node: JsonNode): NotificationPreferences =
   let accent = parseAccent(saved["accent"].getStr())
   if theme.isNone or accent.isNone:
     raise newException(ValueError, "The settings response was invalid.")
+  # A server from before pinning keeps the dashboards the rail always had.
+  let (pins, known) = if saved.hasKey("pinned_views"): parsePins(saved["pinned_views"]) else: (defaultPins, true)
   NotificationPreferences(taskCompleted: saved["task_completed"].getBool(),
-    theme: theme.get, accent: accent.get)
+    theme: theme.get, accent: accent.get, pinnedViews: pins, pinsKnown: known)
 
 proc parseOtherSessionRevocation*(node: JsonNode): int =
   if node.kind != JObject or not node.hasKey("status") or

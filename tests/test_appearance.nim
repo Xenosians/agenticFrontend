@@ -40,3 +40,15 @@ suite "saved settings receipts":
                         %*{"task_completed": true, "accent": "mono"},
                         %*{"task_completed": true, "theme": "dark"}]:
       expect ValueError: discard parseNotificationPreferences(%*{"preferences": preferences})
+
+suite "workspace dashboards":
+  test "every dashboard has a label and round-trips through its saved value":
+    for dashboard in Dashboard:
+      check dashboardLabel(dashboard).len > 0
+      check parseDashboard(dashboardValue(dashboard)) == some(dashboard)
+    for value in ["", "Knowledge", "settings", "chat", "store"]:
+      check parseDashboard(value).isNone
+  test "pinning adds at the end and unpinning removes, once each":
+    check togglePin(@[dashKnowledge, dashOperations], dashTopology) == @[dashKnowledge, dashOperations, dashTopology]
+    check togglePin(@[dashKnowledge, dashOperations], dashKnowledge) == @[dashOperations]
+    check togglePin(@[], dashLearning) == @[dashLearning]

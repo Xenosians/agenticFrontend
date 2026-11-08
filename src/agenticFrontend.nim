@@ -19,7 +19,6 @@ import app/engineering_bridge
 import app/request_context
 
 import components/connections
-import components/skills
 import components/stores
 import app/extension_bridge
 import components/auth
@@ -95,6 +94,8 @@ proc focusWorkspaceAfterRender() =
   if pendingMenuFocus.len > 0 and appState.auth.authenticated:
     focusElement(cstring(pendingMenuFocus))
   pendingMenuFocus = ""
+  afterSidebarRender(appState)
+  afterStoreRender()
   syncDatasetFilePicker(appState)
 
 proc activateFirstSearchResult() =
@@ -129,16 +130,12 @@ proc activeViewTitle(): string =
     "Settings"
   of viewPlugin:
     "Model Store"
-  of viewTool:
-    "MCP Tool Store"
-  of viewPluginStore:
-    "Lua Plugin Store"
+  of viewStore:
+    "Store"
   of viewNodeBuilder:
-    "AI Node Builder"
+    dashboardLabel(dashAutomation)
   of viewSimulator:
-    "PCB / Infrastructure Simulator"
-  of viewSkills:
-    "Skill Store"
+    dashboardLabel(dashTopology)
   of viewReview:
     "Review"
   of viewKnowledge:
@@ -579,16 +576,12 @@ proc renderWorkspaceBody(): VNode =
     renderSettingsView(appState)
   of viewPlugin:
     renderConnections(appState)
-  of viewTool:
-    renderToolStore(appState)
-  of viewPluginStore:
-    renderPluginStore(appState)
+  of viewStore:
+    renderStore(appState)
   of viewNodeBuilder:
     renderWorkflowPanel(appState)
   of viewSimulator:
     renderEngineeringPanel(appState)
-  of viewSkills:
-    renderSkillsView(appState)
   of viewReview:
     renderReviewPanel(appState)
   of viewKnowledge:
@@ -823,7 +816,10 @@ proc runWorkspaceCommand(action: string) =
   of "dismiss":
     appState.headerMenuOpen = false
     appState.composerPanel = cpNone
-    if wasPalette and focusContextMatches(paletteOrigin):
+    if appState.dashboardsOpen:
+      appState.dashboardsOpen = false
+      queueWorkspaceFocus("dashboardAdd")
+    elif wasPalette and focusContextMatches(paletteOrigin):
       queueWorkspaceFocus(paletteOrigin.target)
     elif wasWorkspaceMenu.len > 0:
       pendingMenuFocus = "menu" & wasWorkspaceMenu
@@ -842,19 +838,18 @@ proc runWorkspaceCommand(action: string) =
   of "connections":
     setActiveView(appState, viewPlugin)
     discard refreshExtensions(appState)
-  of "tools":
-    setActiveView(appState, viewTool)
-    discard refreshExtensions(appState)
-  of "plugins":
-    setActiveView(appState, viewPluginStore)
+  of "tools", "skills", "plugins":
+    # One Store page; each command opens its section.
+    appState.storeSection = case action
+      of "skills": storeSkills
+      of "plugins": storePlugins
+      else: storeTools
+    setActiveView(appState, viewStore)
     discard refreshExtensions(appState)
   of "settings":
     setActiveView(appState, viewSettings)
     discard loadAuthSessions(appState)
     discard refreshSystemStatus(appState)
-  of "skills":
-    setActiveView(appState, viewSkills)
-    discard refreshExtensions(appState)
   of "operations": openOperations(appState)
   of "review": openReview(appState)
   of "knowledge": openKnowledge(appState)
@@ -963,6 +958,8 @@ if frontendConfig.healthIntervalMs > 0:
         discard refreshLearningRuns(appState),
     frontendConfig.healthIntervalMs
   )
+
+installDashboardMenu(appState)
 
 installMenuInteractions(proc(focusId: cstring) =
   if openWorkspaceMenu.len > 0:

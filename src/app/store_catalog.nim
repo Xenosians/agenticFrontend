@@ -1,5 +1,6 @@
 ## Read-only store projections of the authenticated extension catalog.
-## Tool metadata is the MCP capability registry; Lua inventory is runtime-scoped.
+## Tool metadata is the MCP capability registry, grouped into one package per
+## service; Lua inventory is runtime-scoped.
 
 import std/[json, strutils]
 
@@ -12,6 +13,12 @@ type
 
   LuaPluginEntry* = object
     id*, protocol*, state*, source*, sha256*, reasonCode*: string
+
+  ToolPackage* = object
+    ## The tools of one service (Jira, the directory, OpenWrt…), as the AI service groups them.
+    id*, name*, setup*: string
+    known*: bool  ## False for tools whose package the service did not list.
+    tools*: seq[ToolStoreEntry]
 
 
 proc text(node: JsonNode, key: string): string =
@@ -64,6 +71,72 @@ proc toolSwitchLabel*(item: ToolStoreEntry): string =
 proc toolRiskLabel*(item: ToolStoreEntry): string =
   ## A read tool's risk is the registry's "read" class; say it once, plainly.
   if item.risk == "read": "Read only" else: "Risk: " & item.risk
+
+
+proc toolPackages*(catalog: JsonNode): seq[ToolPackage] =
+  ## Packages in the service's order, each with its registered tools; a package
+  ## without tools is left out. Tools whose package is not listed are kept
+  ## together under "Other tools", never dropped.
+  let tools = catalogTools(catalog)
+  var placed: seq[string]
+  if catalog != nil and catalog.kind == JObject and catalog.hasKey("tool_packages") and
+      catalog["tool_packages"].kind == JArray:
+    for node in catalog["tool_packages"]:
+      let id = text(node, "id")
+      let name = text(node, "name")
+      if id.len == 0 or name.len == 0 or id in placed:
+        continue
+      var package = ToolPackage(id: id, name: name, setup: text(node, "state"), known: true)
+      for tool in tools:
+        if tool.provider == id: package.tools.add tool
+      placed.add id
+      if package.tools.len > 0: result.add package
+  var other = ToolPackage(name: "Other tools")
+  for tool in tools:
+    if tool.provider notin placed: other.tools.add tool
+  if other.tools.len > 0: result.add other
+
+
+proc enabledCount*(package: ToolPackage): int =
+  for tool in package.tools:
+    if tool.enabled: inc result
+
+
+proc allOn*(package: ToolPackage): bool = package.enabledCount == package.tools.len
+proc allOff*(package: ToolPackage): bool = package.enabledCount == 0
+
+
+proc switchLabel*(package: ToolPackage): string =
+  if package.allOn: "On"
+  elif package.allOff: "Off"
+  else: $package.enabledCount & " of " & $package.tools.len & " on"
+
+
+proc counts*(package: ToolPackage): string =
+  var changes = 0
+  for tool in package.tools:
+    if tool.effect == "mutation": inc changes
+  result = $package.tools.len & (if package.tools.len == 1: " tool" else: " tools")
+  if changes > 0: result.add " · " & $changes & " can change data"
+
+
+proc matches*(item: ToolStoreEntry, query: string): bool =
+  query.len == 0 or query in (item.id & " " & item.description & " " & item.permission & " " &
+    item.agentNames.join(" ")).toLowerAscii
+
+
+proc searchPackages*(packages: seq[ToolPackage], query: string): seq[ToolPackage] =
+  ## A package whose name matches keeps all its tools; otherwise only its matching tools.
+  let query = query.strip.toLowerAscii
+  for package in packages:
+    if query.len == 0 or query in package.name.toLowerAscii:
+      result.add package
+      continue
+    var found = package
+    found.tools = @[]
+    for tool in package.tools:
+      if tool.matches(query): found.tools.add tool
+    if found.tools.len > 0: result.add found
 
 
 proc validLuaPluginCatalog*(catalog: JsonNode): bool =

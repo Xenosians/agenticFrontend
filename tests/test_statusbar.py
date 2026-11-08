@@ -159,7 +159,7 @@ class StatusbarTests(navigation.ChatNavigationTests):
         job = self.bar().locator(".statusbar-job")
         # The fixture has no WebSocket, so the job is observed by polling.
         expect(job).to_contain_text("Checking for updates")
-        self.page.locator(".sidebar").get_by_role("button", name="Skill Store", exact=True).click()
+        self.page.locator(".sidebar").get_by_role("button", name="Store", exact=True).click()
         expect(job).to_be_visible()
         job.click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Operations")

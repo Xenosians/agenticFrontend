@@ -3,8 +3,28 @@ import ../src/app/[account_settings, types, state, request_context]
 
 suite "authoritative account settings receipts":
   test "notification choices are explicit server booleans":
-    check parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark", "accent": "mono"}}).taskCompleted
-    check not parseNotificationPreferences(%*{"preferences": {"task_completed": false, "theme": "dark", "accent": "mono"}}).taskCompleted
+    check parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark", "accent": "mono",
+                                                          "pinned_views": []}}).taskCompleted
+    check not parseNotificationPreferences(%*{"preferences": {"task_completed": false, "theme": "dark", "accent": "mono",
+                                                              "pinned_views": []}}).taskCompleted
+  test "pinned dashboards are read in the saved order":
+    let saved = parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark",
+      "accent": "mono", "pinned_views": ["topology", "knowledge"]}})
+    check saved.pinnedViews == @[dashTopology, dashKnowledge]
+    check saved.pinsKnown
+  test "unknown, repeated or malformed pins are not guessed":
+    for pins in [%*["knowledge", "nowhere"], %*["knowledge", "knowledge"], %*"knowledge", %*[1], newJNull()]:
+      let saved = parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark",
+        "accent": "mono", "pinned_views": pins}})
+      check not saved.pinsKnown
+      check saved.pinnedViews.len == 0
+    # The other settings still load: one unknown value does not hide the rest.
+    let saved = parseNotificationPreferences(%*{"preferences": {"task_completed": false, "theme": "light",
+      "accent": "teal", "pinned_views": ["nowhere"]}})
+    check not saved.taskCompleted and saved.theme == themeLight and saved.accent == accentTeal
+  test "a server from before pins keeps today's dashboards":
+    let saved = parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark", "accent": "mono"}})
+    check saved.pinsKnown and saved.pinnedViews == @[dashKnowledge, dashOperations]
   test "missing or malformed choices never become a default":
     for node in [%*{}, %*{"preferences": {}}, %*{"preferences": {"task_completed": "false", "theme": "dark", "accent": "mono"}},
                  %*{"preferences": {"task_completed": nil, "theme": "dark", "accent": "mono"}}]:

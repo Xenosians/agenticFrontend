@@ -160,7 +160,7 @@ class LearningTests(navigation.ChatNavigationTests):
             route.fulfill(json={"status": "logged_out"})
             return
         if path == "/api/v1/auth/preferences":
-            route.fulfill(json={"preferences": {"task_completed": False, "theme": "dark", "accent": "mono"}})
+            route.fulfill(json={"preferences": {"task_completed": False, "theme": "dark", "accent": "mono", "pinned_views": ["knowledge", "operations"]}})
             return
         if path == "/api/v1/auth/sessions":
             route.fulfill(json={"sessions": []})

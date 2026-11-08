@@ -27,8 +27,10 @@ class WorkspaceMenuTests(ChatNavigationTests):
         self.open_first_chat()
         expect(self.page.get_by_role("button", name="Required operations", exact=True)).to_have_count(0)
         self.menu("View").click()
-        self.page.get_by_role("menu", name="View", exact=True).get_by_role("menuitem", name="Skill Store", exact=True).click()
-        expect(self.page.locator(".workspace-title h1")).to_have_text("Skill Store")
+        self.page.get_by_role("menu", name="View", exact=True).get_by_role(
+            "menuitem", name="Store: Skill Library", exact=True).click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Store")
+        expect(self.page.get_by_role("tab", name="Skill Library", exact=True)).to_have_attribute("aria-selected", "true")
         self.assertEqual(self.submissions, [])
         self.assertEqual(self.errors, [])
 

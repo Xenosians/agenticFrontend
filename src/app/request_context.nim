@@ -178,6 +178,11 @@ proc clearOperations*(state: AppState) =
   # The next owner starts from the default appearance until their own loads.
   state.themeMode = themeDark
   state.accent = accentMono
+  # Pins belong to the owner: none are shown until this owner's own load.
+  state.pinnedViews = @[]
+  state.pinsKnown = false
+  state.dashboardsOpen = false
+  state.pinError = ""
 
 proc beginReviewRequest*(state: AppState): OperationsRequestContext =
   inc state.reviewEpoch

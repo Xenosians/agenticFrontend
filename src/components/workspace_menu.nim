@@ -17,11 +17,14 @@ proc menuActions(menu: string): seq[MenuAction] =
   of "View":
     @[MenuAction(action: "compose", label: "Chat"),
       MenuAction(action: "palette", label: "Commands", keys: @paletteKeys),
+      MenuAction(action: "tools", label: "Store: Tools"),
+      MenuAction(action: "skills", label: "Store: Skill Library"),
+      MenuAction(action: "plugins", label: "Store: Plugin Store"),
+      MenuAction(action: "automation", label: "Automation"),
+      MenuAction(action: "engineering", label: "Topology & PCB"),
       MenuAction(action: "knowledge", label: "Knowledge"),
       MenuAction(action: "operations", label: "Operations"),
-      MenuAction(action: "tools", label: "MCP Tool Store"),
-      MenuAction(action: "plugins", label: "Lua Plugin Store"),
-      MenuAction(action: "skills", label: "Skill Store"),
+      MenuAction(action: "learning", label: "Learning"),
       MenuAction(action: "inspector", label: "Run inspector", keys: @["Mod", "Alt", "I"]),
       MenuAction(action: "settings", label: "Settings")]
   of "Help":

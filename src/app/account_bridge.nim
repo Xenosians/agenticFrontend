@@ -25,6 +25,8 @@ proc applySavedPreferences(state: AppState, saved: NotificationPreferences) =
   state.completionMailDraft = saved.taskCompleted
   state.themeMode = saved.theme
   state.accent = saved.accent
+  state.pinnedViews = saved.pinnedViews
+  state.pinsKnown = saved.pinsKnown
   state.preferencesLoaded = true
   applyAppearance(state)
 
@@ -121,6 +123,33 @@ proc saveCompletionMail*(state: AppState, enabled: bool) {.async.} =
   state.completionMailDraft = enabled
   await saveSetting(state, %*{"task_completed": enabled}, "Notification setting saved.",
     proc() = state.completionMailDraft = saved)
+
+proc canChangePins*(state: AppState): bool =
+  canSaveSettings(state) and state.pinsKnown
+
+proc pinsPayload(pins: seq[Dashboard]): JsonNode =
+  result = newJArray()
+  for pin in pins: result.add %dashboardValue(pin)
+
+proc togglePinnedDashboard*(state: AppState, dashboard: Dashboard) {.async.} =
+  ## Pins or unpins one dashboard. The rail changes when the server confirms the
+  ## saved list; a refused or unconfirmed save keeps the saved rail and says so.
+  if not canChangePins(state): return
+  let request = beginPreferencesRequest(state)
+  state.preferencesSaving = true
+  state.pinError = ""
+  redraw(kxi)
+  try:
+    let preferences = await writePreferences(state.auth.csrfToken,
+      %*{"pinned_views": pinsPayload(togglePin(state.pinnedViews, dashboard))})
+    if not matchesPreferencesRequest(state, request): return
+    applySavedPreferences(state, preferences)
+  except CatchableError:
+    if matchesPreferencesRequest(state, request):
+      state.pinError = "The change to your dashboards was not confirmed. Reload to see the saved list."
+  finally:
+    if matchesPreferencesRequest(state, request): state.preferencesSaving = false
+    redraw(kxi)
 
 proc revokeOtherAuthSessions*(state: AppState) {.async.} =
   if not state.auth.authenticated or state.sessionsBusy or state.sessionActionBusy or state.sessionsNeedRefresh: return

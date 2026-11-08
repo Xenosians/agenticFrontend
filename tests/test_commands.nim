@@ -1,4 +1,4 @@
-import std/unittest
+import std/[sequtils, unittest]
 import ../src/app/commands
 suite "workspace shortcuts":
   test "labels name the keys of the platform in use":
@@ -26,3 +26,9 @@ suite "workspace shortcuts":
     check shortcutAction("C", true, false, false, false, true) == "chats"
     check shortcutAction("N", true, true, false, false) == ""
     check shortcutAction(",", true, false, false, false) == "connections"
+
+  test "the store sections and the dashboards each have one command":
+    var ids: seq[string]
+    for command in workspaceCommands: ids.add command.id
+    for id in ["tools", "skills", "plugins", "automation", "engineering", "knowledge", "operations", "learning"]:
+      check ids.count(id) == 1

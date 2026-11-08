@@ -1,5 +1,5 @@
 import std/[json, unittest, strutils]
-import ../src/app/store_catalog
+import ../src/app/[store_catalog, integration_setup]
 
 let tool = %*{
   "id": "ticket_create", "description": "Create an issue in the selected project.",
@@ -67,3 +67,64 @@ suite "Lua runtime plugin catalog":
     ]}
     check catalogLuaPlugins(catalog).len == 0
     check not validLuaPluginCatalog(%*{"schema": "lua-plugin-catalog.v1", "scope": "owner", "plugins": []})
+
+suite "MCP tool packages":
+  let unlock = %*{
+    "id": "account_unlock", "description": "Unlock one account.", "effect": "mutation", "risk": "medium",
+    "permission": "directory.write", "provider": "directory", "requires_approval": true,
+    "agent_names": ["account-specialist"], "enabled": false}
+  let catalog = %*{"capabilities_schema": "mcp-tool-catalog.v1",
+    "capabilities": [tool, readTool, unlock],
+    "tool_packages": [
+      {"id": "directory", "name": "Directory (LDAP)", "kind": "provider", "state": "configured"},
+      {"id": "proxmox", "name": "Proxmox VE", "kind": "provider", "state": "not_configured"},
+      {"id": "", "name": "No identity", "kind": "provider", "state": "configured"},
+      {"id": "broken", "kind": "provider", "state": "configured"}]}
+
+  test "tools are grouped by their package in the service's order, empty packages left out":
+    let packages = toolPackages(catalog)
+    check packages.len == 2
+    check packages[0].id == "directory" and packages[0].name == "Directory (LDAP)"
+    check packages[0].tools.len == 2
+    check packages[0].tools[0].id == "account_status" and packages[0].tools[1].id == "account_unlock"
+    check packages[0].known and packages[0].setup == "configured"
+    # A tool whose package the service did not list is still shown, never dropped.
+    check packages[1].id == "" and packages[1].name == "Other tools" and not packages[1].known
+    check packages[1].tools.len == 1 and packages[1].tools[0].id == "ticket_create"
+
+  test "a package counts its tools, changes and switch state":
+    let directory = toolPackages(catalog)[0]
+    check directory.counts == "2 tools · 1 can change data"
+    check directory.enabledCount == 1
+    check directory.switchLabel == "1 of 2 on"
+    check not directory.allOn and not directory.allOff
+    var on = parseJson($catalog)
+    on["capabilities"][2]["enabled"] = %true
+    check toolPackages(on)[0].switchLabel == "On" and toolPackages(on)[0].allOn
+    var off = parseJson($catalog)
+    off["capabilities"][1]["enabled"] = %false
+    check toolPackages(off)[0].switchLabel == "Off" and toolPackages(off)[0].allOff
+    var single = parseJson($catalog)
+    single["capabilities"] = %*[readTool]
+    check toolPackages(single)[0].counts == "1 tool"
+
+  test "a package keeps the service's setup state as sent; the label is the Capabilities page's":
+    let packages = toolPackages(catalog)
+    check setupLabel(packages[0].setup) == "Configured"
+    var unknown = parseJson($catalog)
+    unknown["tool_packages"][0]["state"] = %"ready-ish"
+    check setupLabel(toolPackages(unknown)[0].setup) == "Setup unknown"
+
+  test "search keeps packages whose name or tools match, with only the matching tools":
+    let packages = toolPackages(catalog)
+    let byTool = searchPackages(packages, "unlock")
+    check byTool.len == 1 and byTool[0].tools.len == 1 and byTool[0].tools[0].id == "account_unlock"
+    let byName = searchPackages(packages, "ldap")
+    check byName.len == 1 and byName[0].tools.len == 2
+    check searchPackages(packages, "").len == 2
+    check searchPackages(packages, "nothing like this").len == 0
+
+  test "an old catalog without packages groups every tool under other tools":
+    let old = %*{"capabilities_schema": "mcp-tool-catalog.v1", "capabilities": [tool, readTool]}
+    let packages = toolPackages(old)
+    check packages.len == 1 and not packages[0].known and packages[0].tools.len == 2

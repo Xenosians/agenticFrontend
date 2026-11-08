@@ -24,16 +24,18 @@ type
     viewRuns,
     viewLogs,
     viewSettings,
-    viewTool,
+    viewStore,
     viewPlugin,
-    viewPluginStore,
     viewNodeBuilder,
     viewSimulator,
-    viewSkills,
     viewReview,
     viewKnowledge,
     viewLearning,
     viewHelp
+
+  StoreSection* = enum
+    ## The three sections of the one Store page.
+    storeTools, storeSkills, storePlugins
 
   InspectorTab* = enum
     tabRun,
@@ -237,6 +239,8 @@ type
     pluginSection*: string
     pluginSearchDraft*: string
     toolStoreSearch*, pluginStoreSearch*: string
+    storeSection*: StoreSection
+    openToolPackages*: seq[string]  ## Packages the owner opened; kept across catalog reloads.
     extensionBusy*: bool
     extensionError*: string
     connectionName*: string
@@ -319,5 +323,10 @@ type
     # Appearance as saved on the server; shown before sign-in as the default.
     themeMode*: ThemeMode
     accent*: Accent
+    # Dashboards pinned to the rail, as saved; the "+" list offers every dashboard.
+    pinnedViews*: seq[Dashboard]
+    pinsKnown*: bool
+    dashboardsOpen*: bool
+    pinError*: string
     nextMessageId*: int
     nextEventId*: int

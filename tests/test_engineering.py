@@ -87,7 +87,7 @@ class EngineeringTests(navigation.ChatNavigationTests):
                 route.fulfill(json={"status": "logged_out"})
                 return
             if path == "/api/v1/auth/preferences":
-                route.fulfill(json={"preferences": {"task_completed": False, "theme": "dark", "accent": "mono"}})
+                route.fulfill(json={"preferences": {"task_completed": False, "theme": "dark", "accent": "mono", "pinned_views": ["knowledge", "operations"]}})
                 return
             if path == "/api/v1/auth/sessions":
                 route.fulfill(json={"sessions": []})
@@ -142,7 +142,7 @@ class EngineeringTests(navigation.ChatNavigationTests):
         self.page.locator("#commandSearch").press("Enter")
         if expand:
             self.page.locator(".topology-disclosure > summary").click()
-        expect(self.page.locator(".workflow-panel h2")).to_have_text("PCB / Infrastructure Simulator")
+        expect(self.page.locator(".workflow-panel h2")).to_have_text("Topology & PCB")
 
     def open_topology(self):
         self.open_first_chat()
@@ -155,16 +155,18 @@ class EngineeringTests(navigation.ChatNavigationTests):
     def assert_clean(self):
         self.assertEqual(self.errors, [])
 
-    def test_the_rail_keeps_its_place_and_opens_the_same_view(self):
+    def test_the_dashboard_list_opens_the_same_view(self):
         self.open_first_chat()
-        rail = self.page.get_by_role("button", name="PCB / Infra Simulator", exact=True)
-        expect(rail).to_be_visible()
-        rail.click()
+        self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True).click()
+        entry = self.page.get_by_role("dialog", name="Dashboards").get_by_role("button", name="Topology & PCB", exact=True)
+        expect(entry).to_be_visible()
+        entry.click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Topology & PCB")
         details = self.page.locator("details.topology-disclosure")
         expect(details).not_to_have_attribute("open", "")
         expect(details.locator(".workflow-panel")).to_be_hidden()
         details.locator("summary").click()
-        expect(self.page.locator(".workflow-panel h2")).to_have_text("PCB / Infrastructure Simulator")
+        expect(self.page.locator(".workflow-panel h2")).to_have_text("Topology & PCB")
         expect(self.page.locator("#topologyOpen option")).to_have_count(3)
         self.assert_clean()
 

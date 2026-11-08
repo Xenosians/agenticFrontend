@@ -153,3 +153,132 @@
 .account-session-panel .secondary-action:not(:disabled) { border-color: var(--danger-line); color: var(--danger); }
 .account-session-panel .secondary-action:not(:disabled):hover { background: var(--danger-surface); }
 .settings-list-footer { display: flex; justify-content: flex-end; }
+
+/* The Store: one page, three sections (Tools · Skill Library · Plugin Store). */
+.store-tabs {
+  display: flex;
+  gap: 4px;
+  margin: 0 0 20px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.store-tab {
+  position: relative;
+  flex: none;
+  min-height: 40px;
+  padding: 0 14px;
+  white-space: nowrap;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: var(--font-size-control);
+  cursor: pointer;
+}
+.store-tab:hover { color: var(--text); }
+.store-tab.active { color: var(--text); font-weight: 600; }
+.store-tab.active::after {
+  content: "";
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 999px 999px 0 0;
+  background: var(--text);
+}
+.store-tab:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; border-radius: var(--radius-sm); }
+.store-intro { margin: 0 0 16px; color: var(--text-soft); font-size: var(--font-size-control); line-height: 1.6; }
+.skills-header { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 12px; margin: 0 0 16px; }
+.skills-header .skills-note { flex: 1 1 320px; margin: 0; }
+
+/* Tool packages: one row per service; its tools open beneath it. */
+.tool-packages { display: flex; flex-direction: column; gap: 10px; }
+.tool-package { border: 1px solid var(--border); border-radius: 12px; background: var(--panel); }
+.tool-package-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; padding: 12px 14px; }
+.tool-package-title { display: flex; flex: 1 1 240px; align-items: center; gap: 12px; min-width: 0; }
+.tool-package-controls { display: flex; flex: none; flex-wrap: wrap; align-items: center; gap: 8px; }
+.tool-package-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+.tool-package-toggle:hover { background: var(--panel-hover); }
+.tool-package-toggle:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.tool-package-summary { display: flex; flex: 1 1 auto; flex-direction: column; gap: 2px; min-width: 0; }
+.tool-package-summary h3 { margin: 0; color: var(--text); font-size: var(--font-size-control); overflow-wrap: anywhere; }
+.tool-package-counts { color: var(--text-soft); font-size: var(--font-size-caption); }
+.tool-package-tools { padding: 0 14px 14px; }
+/* A package that is all off reads as set aside: dashed, still legible (contrast is tested). */
+.tool-package.is-off { border-style: dashed; border-color: var(--text-soft); }
+.tool-package.is-off h3,
+.tool-package.is-off .tool-package-counts,
+.tool-package.is-off .tool-package-heading .tool-switch { color: var(--text-soft); }
+
+/* "+" on the rail: every dashboard, opened or pinned from one list. */
+.workspace-rail { position: relative; }
+.rail-navigation .dashboard-add .nav-icon { font-size: 22px; line-height: 1; }
+.dashboard-menu {
+  position: fixed;
+  z-index: 70;
+  /* Placed beside the "+" button after each render; these are the values before that. */
+  top: 8px;
+  left: calc(var(--rail-width) + 8px);
+  width: min(280px, calc(100vw - var(--rail-width) - 18px));
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+  padding: 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  box-shadow: var(--shadow-strong);
+}
+.dashboard-menu-title { display: block; padding: 2px 6px; color: var(--text); font-size: 13px; }
+.dashboard-menu-note { margin: 2px 6px 8px; color: var(--text-soft); font-size: 11px; line-height: 1.5; }
+.dashboard-menu-error { margin: 0 6px 8px; color: var(--text); font-size: 11px; line-height: 1.5; }
+.dashboard-list { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.dashboard-row { display: flex; align-items: center; gap: 4px; }
+.dashboard-open {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+.dashboard-open .nav-icon { width: 18px; font-size: 15px; text-align: center; color: var(--text-soft); }
+.dashboard-open:hover, .dashboard-open:focus-visible { background: var(--panel-active); }
+.dashboard-pin {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 13px;
+  cursor: pointer;
+}
+.dashboard-pin.pinned { color: var(--text); border-color: var(--border-strong); }
+.dashboard-pin:hover:not(:disabled), .dashboard-pin:focus-visible { background: var(--panel-active); color: var(--text); }
+.dashboard-pin:disabled { cursor: not-allowed; opacity: 0.6; }
+.dashboard-open:focus-visible, .dashboard-pin:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }

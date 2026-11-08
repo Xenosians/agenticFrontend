@@ -22,6 +22,10 @@ class SidebarWorkspaceTests(unittest.TestCase):
         self.patches = []
         self.held = []
         self.patch_mode = "confirmed"
+        self.preferences = {"task_completed": True, "theme": "dark", "accent": "mono",
+                            "pinned_views": ["knowledge", "operations"]}
+        self.preference_writes = []
+        self.preference_status = 200
         navigation.ChatNavigationTests.setUp(self)
         self.page.set_default_timeout(5000)
 
@@ -47,6 +51,16 @@ class SidebarWorkspaceTests(unittest.TestCase):
                     route.fulfill(json={"chat": {**chat, "chat_id": "unrelated-chat"}})
                 else:
                     route.fulfill(json={"chat": chat})
+                return
+            if path == "/api/v1/auth/preferences":
+                if request.method == "PUT":
+                    body = request.post_data_json
+                    self.preference_writes.append((body, request.headers.get("x-csrf-token")))
+                    if self.preference_status != 200:
+                        route.fulfill(status=self.preference_status, json={"error": "invalid_preferences"})
+                        return
+                    self.preferences.update(body)
+                route.fulfill(json={"preferences": self.preferences})
                 return
             if path.startswith("/api/v2/chats/") and path.endswith("/history"):
                 key = path.split("/")[-2].removeprefix("fixture-")
@@ -180,6 +194,130 @@ class SidebarWorkspaceTests(unittest.TestCase):
         self.assertTrue(self.page.evaluate("document.documentElement.scrollWidth <= innerWidth"))
         self.assertEqual(self.errors, [])
 
+
+    def rail(self):
+        return self.page.locator(".rail-navigation")
+
+    def rail_labels(self):
+        return self.rail().locator(".nav-item .rail-label").all_inner_texts()
+
+    def open_dashboards(self):
+        self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True).click()
+        menu = self.page.get_by_role("dialog", name="Dashboards", exact=True)
+        expect(menu).to_be_visible()
+        return menu
+
+    def test_the_rail_keeps_the_core_and_ends_with_plus(self):
+        self.open()
+        self.assertEqual(self.rail_labels(), ["Chat", "Search", "Model Store", "Store", "Settings",
+                                              "Knowledge", "Operations", "Dashboards"])
+        for removed in ("AI Node Builder", "PCB / Infra Simulator", "MCP Tool Store", "Lua Plugin Store",
+                        "Skill Store"):
+            expect(self.rail().get_by_role("button", name=removed, exact=True)).to_have_count(0)
+        plus = self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True)
+        expect(plus).to_have_attribute("aria-expanded", "false")
+        expect(plus.locator(".nav-icon")).to_have_text("+")
+        self.assertEqual(self.errors, [])
+
+    def test_plus_lists_every_dashboard_and_opens_one_without_pinning(self):
+        self.open()
+        menu = self.open_dashboards()
+        expect(self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True)).to_have_attribute(
+            "aria-expanded", "true")
+        rows = menu.locator(".dashboard-row")
+        expect(rows.locator(".dashboard-open .dashboard-name")).to_have_text(
+            ["Automation", "Topology & PCB", "Knowledge", "Operations", "Learning"])
+        expect(menu.get_by_role("button", name="Unpin Knowledge", exact=True)).to_have_attribute("aria-pressed", "true")
+        expect(menu.get_by_role("button", name="Pin Automation", exact=True)).to_have_attribute("aria-pressed", "false")
+        menu.get_by_role("button", name="Automation", exact=True).click()
+        expect(menu).to_have_count(0)
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Automation")
+        # Opening is not pinning.
+        expect(self.rail().get_by_role("button", name="Automation", exact=True)).to_have_count(0)
+        self.assertEqual(self.preference_writes, [])
+        self.assertEqual(self.errors, [])
+
+    def test_pinning_adds_a_dashboard_to_the_rail_and_saves_it_for_next_time(self):
+        self.open()
+        menu = self.open_dashboards()
+        menu.get_by_role("button", name="Pin Topology & PCB", exact=True).click()
+        expect(self.rail().get_by_role("button", name="Topology & PCB", exact=True)).to_be_visible()
+        expect(menu.get_by_role("button", name="Unpin Topology & PCB", exact=True)).to_have_attribute(
+            "aria-pressed", "true")
+        self.assertEqual(self.preference_writes,
+                         [({"pinned_views": ["knowledge", "operations", "topology"]}, "fixture-csrf")])
+        menu.get_by_role("button", name="Unpin Knowledge", exact=True).click()
+        expect(self.rail().get_by_role("button", name="Knowledge", exact=True)).to_have_count(0)
+        self.assertEqual(self.preference_writes[-1][0], {"pinned_views": ["operations", "topology"]})
+        # A reload shows the saved rail: the pins live on the server, not in the browser.
+        self.page.reload(wait_until="networkidle")
+        expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
+        self.assertEqual(self.rail_labels(), ["Chat", "Search", "Model Store", "Store", "Settings",
+                                              "Operations", "Topology & PCB", "Dashboards"])
+        self.rail().get_by_role("button", name="Topology & PCB", exact=True).click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Topology & PCB")
+        self.assertEqual(self.errors, [])
+
+    def test_a_refused_pin_keeps_the_saved_rail_and_says_why(self):
+        self.open()
+        self.preference_status = 422
+        menu = self.open_dashboards()
+        menu.get_by_role("button", name="Pin Learning", exact=True).click()
+        expect(menu.get_by_role("alert")).to_contain_text("not confirmed")
+        expect(self.rail().get_by_role("button", name="Learning", exact=True)).to_have_count(0)
+        expect(menu.get_by_role("button", name="Pin Learning", exact=True)).to_have_attribute("aria-pressed", "false")
+        self.assertEqual(len(self.preference_writes), 1)
+        self.assertEqual(self.errors, [])
+
+    def test_an_unknown_saved_pin_is_not_guessed(self):
+        self.preferences["pinned_views"] = ["knowledge", "nowhere"]
+        self.open()
+        # The rail keeps the core and "+"; nothing is pinned on a guess.
+        self.assertEqual(self.rail_labels(), ["Chat", "Search", "Model Store", "Store", "Settings", "Dashboards"])
+        menu = self.open_dashboards()
+        expect(menu.get_by_role("alert")).to_contain_text("could not be loaded")
+        expect(menu.locator(".dashboard-pin")).to_have_count(5)
+        for pin in menu.locator(".dashboard-pin").all():
+            expect(pin).to_be_disabled()
+        self.assertEqual(self.preference_writes, [])
+        self.assertEqual(self.errors, [])
+
+    def test_the_dashboard_list_works_from_the_keyboard(self):
+        self.open()
+        plus = self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True)
+        plus.focus()
+        self.page.keyboard.press("Enter")
+        menu = self.page.get_by_role("dialog", name="Dashboards", exact=True)
+        expect(menu.get_by_role("button", name="Automation", exact=True)).to_be_focused()
+        self.page.keyboard.press("Escape")
+        expect(menu).to_have_count(0)
+        expect(plus).to_be_focused()
+        # A click outside closes it too.
+        plus.click()
+        expect(menu).to_be_visible()
+        self.page.locator(".chats-sidebar-heading").click()
+        expect(menu).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_the_dashboard_list_stays_on_screen_at_short_and_mobile_sizes(self):
+        for size in ({"width": 1440, "height": 640}, {"width": 390, "height": 844}):
+            with self.subTest(size=size):
+                self.page.set_viewport_size(size)
+                self.open()
+                menu = self.open_dashboards()
+                box = menu.bounding_box()
+                self.assertGreaterEqual(box["x"], 0)
+                self.assertGreaterEqual(box["y"], 0)
+                self.assertLessEqual(box["x"] + box["width"], size["width"])
+                self.assertLessEqual(box["y"] + box["height"], size["height"])
+                # It opens beside the "+" button, level with it.
+                plus = self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True).bounding_box()
+                self.assertGreaterEqual(box["x"], plus["x"] + plus["width"])
+                self.assertLessEqual(box["x"], plus["x"] + plus["width"] + 24)
+                self.assertLessEqual(box["y"], plus["y"] + plus["height"])
+                self.assertGreaterEqual(box["y"] + box["height"], plus["y"])
+                self.page.keyboard.press("Escape")
+        self.assertEqual(self.errors, [])
 
     def test_date_groups_use_the_viewers_timezone_near_utc_midnight(self):
         self.context.close()

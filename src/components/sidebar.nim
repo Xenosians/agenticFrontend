@@ -1,8 +1,9 @@
 import std/[strutils, unicode]
 include karax/prelude
 import karax/kdom
-import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge,
-  operations_bridge, review_bridge, request_context, engineering_bridge, backend_bridge]
+import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge, account_bridge,
+  operations_bridge, review_bridge, request_context, engineering_bridge, backend_bridge,
+  knowledge_bridge, learning_bridge, workflow_bridge]
 import brand
 
 proc currentCalendarDay(): cstring {.importjs: "(() => {const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');})()".}
@@ -10,27 +11,143 @@ proc eventKey(event: Event): cstring {.importjs: "#.key".}
 proc composingOrRepeated(event: Event): bool {.importjs: "((event) => Boolean(event.isComposing || event.repeat || event.keyCode === 229))(#)".}
 proc focusRename() {.importjs: "requestAnimationFrame(() => document.querySelector('.chat-rename-input')?.focus())".}
 
-proc renderViewButton(state: AppState, icon, label: string, target: AppView,
-    preview = false): VNode =
+proc focusById(id: cstring) {.importjs: "document.getElementById(#)?.focus()".}
+
+proc placeDashboardMenu() {.importjs: """(() => {
+  const button = document.getElementById('dashboardAdd');
+  const menu = document.getElementById('dashboardMenu');
+  const rail = button && button.closest('.workspace-rail');
+  if (!button || !menu || !rail) return;
+  // Just past the rail, top-aligned with the "+" button, moved up only as far as needed to stay on screen.
+  const box = button.getBoundingClientRect();
+  const margin = 8;
+  menu.style.left = (rail.getBoundingClientRect().right + margin) + 'px';
+  menu.style.top = Math.max(margin, Math.min(box.top, innerHeight - menu.offsetHeight - margin)) + 'px';
+})()""".}
+
+var pendingDashboardFocus = ""
+
+proc afterSidebarRender*(state: AppState) =
+  ## Run after Karax commits the DOM, so the elements exist.
+  if state.dashboardsOpen: placeDashboardMenu()
+  if pendingDashboardFocus.len > 0:
+    focusById(cstring(pendingDashboardFocus))
+    pendingDashboardFocus = ""
+proc installDashboardDismiss(close: proc(focusPlus: bool)) {.importjs: """((close) => {
+  document.addEventListener('pointerdown', e => {
+    if (!e.target.closest('.dashboard-menu, .dashboard-add')) close(false);
+  });
+})(#)""".}
+
+proc renderViewButton(state: AppState, icon, label: string, target: AppView): VNode =
   result = buildHtml(button(
       class = (if state.activeView == target: cstring"nav-item active" else: cstring"nav-item"),
-      title = cstring(label & (if preview: " · Design preview" else: "")),
+      title = cstring(label),
       `aria-label` = cstring(label),
       `aria-current` = (if state.activeView == target: cstring"page" else: cstring"false"))):
     span(class = "nav-icon", `aria-hidden` = "true"): text icon
     span(class = "rail-label"): text label
     proc onclick(event: Event, node: VNode) =
+      state.dashboardsOpen = false
       setActiveView(state, target)
-      if target in [viewPlugin, viewTool, viewPluginStore, viewSkills, viewKnowledge]:
+      if target in [viewPlugin, viewStore]:
         discard refreshExtensions(state)
-      elif target == viewJobs:
-        discard refreshOperations(state)
-        discard refreshProxmoxOverview(state)
       elif target == viewReview: discard refreshReview(state)
-      elif target == viewSimulator and not state.engineeringLoaded: discard refreshTopologies(state)
       elif target == viewSettings:
         discard loadAuthSessions(state)
         discard refreshSystemStatus(state)
+
+proc dashboardView(dashboard: Dashboard): AppView =
+  case dashboard
+  of dashAutomation: viewNodeBuilder
+  of dashTopology: viewSimulator
+  of dashKnowledge: viewKnowledge
+  of dashOperations: viewJobs
+  of dashLearning: viewLearning
+
+proc openDashboard*(state: AppState, dashboard: Dashboard) =
+  ## Opens a dashboard with the reads it needs, whether it is pinned or not.
+  state.dashboardsOpen = false
+  case dashboard
+  of dashAutomation: openWorkflows(state)
+  of dashTopology: openEngineering(state)
+  of dashKnowledge: openKnowledge(state)
+  of dashOperations: openOperations(state)
+  of dashLearning: openLearning(state)
+
+proc dashboardActive(state: AppState, dashboard: Dashboard): bool =
+  let view = dashboardView(dashboard)
+  state.activeView == view or (view == viewJobs and state.activeView in [viewRuns, viewLogs])
+
+proc renderPinnedButton(state: AppState, dashboard: Dashboard): VNode =
+  ## A pinned dashboard on the rail; its own proc so the click keeps its dashboard.
+  let active = dashboardActive(state, dashboard)
+  result = buildHtml(button(class = (if active: cstring"nav-item active" else: cstring"nav-item"),
+      title = cstring(dashboardLabel(dashboard)), `aria-label` = cstring(dashboardLabel(dashboard)),
+      `aria-current` = (if active: cstring"page" else: cstring"false"))):
+    span(class = "nav-icon", `aria-hidden` = "true"): text dashboardIcon(dashboard)
+    span(class = "rail-label"): text dashboardLabel(dashboard)
+    proc onclick(event: Event, node: VNode) = openDashboard(state, dashboard)
+
+proc renderDashboardRow(state: AppState, dashboard: Dashboard): VNode =
+  ## One dashboard in the "+" list: open it, or pin it to the rail.
+  let pinned = dashboard in state.pinnedViews
+  let label = dashboardLabel(dashboard)
+  result = buildHtml(li(class = "dashboard-row")):
+    button(id = cstring("dashboardOpen" & dashboardValue(dashboard)), class = "dashboard-open"):
+      span(class = "nav-icon", `aria-hidden` = "true"): text dashboardIcon(dashboard)
+      span(class = "dashboard-name"): text label
+      proc onclick(event: Event, node: VNode) = openDashboard(state, dashboard)
+    button(class = (if pinned: cstring"dashboard-pin pinned" else: cstring"dashboard-pin"),
+           `aria-label` = cstring((if pinned: "Unpin " else: "Pin ") & label),
+           `aria-pressed` = (if pinned: cstring"true" else: cstring"false"),
+           title = cstring(if pinned: "Unpin from the rail" else: "Pin to the rail"),
+           disabled = not canChangePins(state)):
+      text (if pinned: "◆" else: "◇")
+      proc onclick(event: Event, node: VNode) = discard togglePinnedDashboard(state, dashboard)
+
+proc renderDashboardMenu(state: AppState): VNode =
+  result = buildHtml(tdiv(class = "dashboard-menu", role = "dialog", `aria-label` = "Dashboards",
+                          id = "dashboardMenu")):
+    strong(class = "dashboard-menu-title"): text "Dashboards"
+    p(class = "dashboard-menu-note"): text "Open one, or pin it to keep it on the rail."
+    if not state.pinsKnown and state.preferencesLoaded:
+      p(class = "dashboard-menu-error", role = "alert"):
+        text "Your pinned dashboards could not be loaded. Open any dashboard from here."
+    elif state.pinError.len > 0:
+      p(class = "dashboard-menu-error", role = "alert"): text state.pinError
+    ul(class = "dashboard-list"):
+      for dashboard in Dashboard:
+        renderDashboardRow(state, dashboard)
+    proc onkeydown(event: Event, node: VNode) =
+      if eventKey(event) == "Escape":
+        event.preventDefault()
+        state.dashboardsOpen = false
+        pendingDashboardFocus = "dashboardAdd"
+
+proc renderDashboardAdd(state: AppState): VNode =
+  result = buildHtml(button(id = "dashboardAdd", class = (if state.dashboardsOpen: cstring"nav-item dashboard-add active"
+                                                          else: cstring"nav-item dashboard-add"),
+      title = "Dashboards", `aria-label` = "Add a dashboard to the rail", `aria-haspopup` = "dialog",
+      `aria-controls` = "dashboardMenu", `aria-expanded` = (if state.dashboardsOpen: cstring"true" else: cstring"false"))):
+    span(class = "nav-icon", `aria-hidden` = "true"): text "+"
+    span(class = "rail-label"): text "Dashboards"
+    proc onclick(event: Event, node: VNode) =
+      state.dashboardsOpen = not state.dashboardsOpen
+      if state.dashboardsOpen:
+        state.pinError = ""
+        pendingDashboardFocus = "dashboardOpen" & dashboardValue(low(Dashboard))
+
+var dashboardDismissInstalled = false
+
+proc installDashboardMenu*(state: AppState) =
+  ## A click outside the dashboard list closes it, once per page.
+  if dashboardDismissInstalled: return
+  dashboardDismissInstalled = true
+  installDashboardDismiss(proc(focusPlus: bool) =
+    if state.dashboardsOpen:
+      state.dashboardsOpen = false
+      redraw(kxi))
 
 proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
   # Each invocation captures one immutable identity, including all row actions.
@@ -112,19 +229,19 @@ proc renderSidebar*(state: AppState): VNode =
       tdiv(class = "rail-brand"):
         img(class = "brand-logo", src = productMark, alt = productName)
       nav(class = "rail-navigation", `aria-label` = "Workspace"):
+        # The core views are always here; dashboards are pinned from "+".
         renderViewButton(state, "◈", "Chat", viewChat)
         renderViewButton(state, "⌕", "Search", viewSearch)
         renderViewButton(state, "◇", "Model Store", viewPlugin)
-        renderViewButton(state, "⬡", "MCP Tool Store", viewTool)
-        renderViewButton(state, "⌘", "Lua Plugin Store", viewPluginStore)
-        renderViewButton(state, "✎", "Skill Store", viewSkills)
-        renderViewButton(state, "❏", "Knowledge", viewKnowledge)
-        renderViewButton(state, "◌", "Operations", viewJobs)
+        renderViewButton(state, "⬡", "Store", viewStore)
         if isReviewer(state): renderViewButton(state, "✓", "Review", viewReview)
         renderViewButton(state, "⚙", "Settings", viewSettings)
         span(class = "rail-divider", `aria-hidden` = "true")
-        renderViewButton(state, "⌘", "AI Node Builder", viewNodeBuilder, true)
-        renderViewButton(state, "▦", "PCB / Infra Simulator", viewSimulator, true)
+        for dashboard in state.pinnedViews:
+          renderPinnedButton(state, dashboard)
+        renderDashboardAdd(state)
+      if state.dashboardsOpen:
+        renderDashboardMenu(state)
       let ownerName = if state.auth.displayName.len > 0: state.auth.displayName else: state.auth.email
       button(class = "sidebar-footer", title = cstring("Settings · " & ownerName), `aria-label` = "Account settings"):
         tdiv(class = "avatar"):

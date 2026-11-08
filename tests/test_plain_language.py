@@ -20,8 +20,8 @@ from test_workspace_context import CATALOG
 # Implementation names and internal vocabulary that mean nothing to a person using the product.
 INTERNAL = re.compile(r"\b(Phoenix|Karax|SemanticGuard|ToolGateway|durable|harness(es)?|owner-scoped|"
                       r"frontend-visible|backend mailer|governed|orchestration|[a-z]+(-[a-z]+)*\.v\d)\b")
-VIEWS = ("Chat", "Search", "Model Store", "MCP Tool Store", "Lua Plugin Store", "Skill Store",
-         "Knowledge", "Operations", "Settings")
+VIEWS = ("Chat", "Search", "Model Store", "Store", "Knowledge", "Operations", "Settings")
+STORE_SECTIONS = ("Tools", "Skill Library", "Plugin Store")
 
 
 class PlainLanguageTests(navigation.ChatNavigationTests):
@@ -61,6 +61,13 @@ class PlainLanguageTests(navigation.ChatNavigationTests):
                 self.page.wait_for_timeout(150)
                 found = sorted({match.group(0) for match in INTERNAL.finditer(self.visible_text())})
                 self.assertEqual(found, [], f"{name} shows internal names")
+        self.open_view("Store")
+        for section in STORE_SECTIONS:
+            with self.subTest(section=section):
+                self.page.get_by_role("tab", name=section, exact=True).click()
+                self.page.wait_for_timeout(150)
+                found = sorted({match.group(0) for match in INTERNAL.finditer(self.visible_text())})
+                self.assertEqual(found, [], f"{section} shows internal names")
         self.assertEqual(self.errors, [])
 
     def test_the_header_does_not_repeat_the_page_description(self):

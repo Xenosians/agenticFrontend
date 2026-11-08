@@ -1,6 +1,7 @@
-## The Skill Store (FR-090): the owner's reusable guidance for the answers Janus writes.
+## The Skill Library (FR-090): the owner's reusable guidance for the answers Janus writes.
+## It is one section of the Store page.
 ##
-## A skill is a SKILL.md file. The page lists the owner's skills with their
+## A skill is a SKILL.md file. The library lists the owner's skills with their
 ## current version and when each applies, writes a new one from a template or
 ## uploads a file, turns one off or on, restores an older version and deletes one
 ## after confirmation. The AI service checks every skill before it is saved.
@@ -150,27 +151,24 @@ proc renderSkill(state: AppState, row: SavedSkill): VNode =
           proc onclick(event: Event, node: VNode) = editor.confirmDelete = row.name
 
 
-proc renderSkillsView*(state: AppState): VNode =
+proc renderSkillLibrary*(state: AppState): VNode =
   let rows = catalogSkills(state.extensionCatalog)
-  result = buildHtml(section(class = "conversation")):
-    tdiv(class = "developer-view skills-view"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2: text "Skill Store"
-          p(class = "skills-note"):
-            text "Your written guidance for answers, as SKILL.md files. A skill shapes how an answer " &
-                 "is written, never which operation runs or what needs approval."
-        if not editor.open:
-          button(class = "plugin-primary"):
-            text "New skill"
-            proc onclick(event: Event, node: VNode) = openEditor(skillTemplate)
-      if editor.error.len > 0:
-        p(class = "operation-error", role = "alert"): text editor.error
-      if editor.open:
-        renderEditor(state)
-      if rows.len == 0:
-        p(class = "skills-empty"):
-          text "No skills yet. Write one or upload a SKILL.md file; it applies when a request " &
-               "mentions one of its triggers."
-      for row in rows:
-        renderSkill(state, row)
+  result = buildHtml(tdiv(class = "skills-view")):
+    tdiv(class = "skills-header"):
+      p(class = "skills-note"):
+        text "Your written guidance for answers, as SKILL.md files. A skill shapes how an answer " &
+             "is written, never which operation runs or what needs approval."
+      if not editor.open:
+        button(class = "plugin-primary"):
+          text "New skill"
+          proc onclick(event: Event, node: VNode) = openEditor(skillTemplate)
+    if editor.error.len > 0:
+      p(class = "operation-error", role = "alert"): text editor.error
+    if editor.open:
+      renderEditor(state)
+    if rows.len == 0:
+      p(class = "skills-empty"):
+        text "No skills yet. Write one or upload a SKILL.md file; it applies when a request " &
+             "mentions one of its triggers."
+    for row in rows:
+      renderSkill(state, row)
