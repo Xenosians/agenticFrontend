@@ -54,6 +54,18 @@ proc beginProxmoxRequest*(state: AppState): OperationsRequestContext =
 proc matchesProxmoxRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.proxmoxEpoch == request.epoch
 
+proc beginProxmoxActionRequest*(state: AppState): OperationsRequestContext =
+  ## Action proposals and decisions; overview refreshes never invalidate them.
+  inc state.proxmoxActionEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.proxmoxActionEpoch)
+
+proc matchesProxmoxActionRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.proxmoxActionEpoch == request.epoch
+
+proc proxmoxActionsAccount*(state: AppState): OperationsRequestContext =
+  ## The current owner, without starting a new action request.
+  OperationsRequestContext(account: accountContext(state), epoch: state.proxmoxActionEpoch)
+
 proc clearOperations*(state: AppState) =
   inc state.operationsEpoch
   state.operations = OperationsSnapshot()
@@ -66,6 +78,15 @@ proc clearOperations*(state: AppState) =
   state.proxmoxLoaded = false
   state.proxmoxBusy = false
   state.proxmoxError = ""
+  state.proxmoxErrorMessage = ""
+  state.proxmoxErrorReason = ""
+  # A confirmation belongs to the owner who opened it.
+  inc state.proxmoxActionEpoch
+  state.proxmoxActions = @[]
+  state.proxmoxActionBusy = false
+  state.proxmoxActionError = ""
+  state.proxmoxActionsError = ""
+  state.proxmoxConfirming = ""
   # The review queue belongs to the signed-in reviewer as well.
   inc state.reviewEpoch
   state.reviewItems = @[]

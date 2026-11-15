@@ -2,6 +2,7 @@ import std/json
 import workflow_request
 import operations_snapshot
 import proxmox_snapshot
+import proxmox_actions
 import feedback_review
 import knowledge
 import learning
@@ -179,7 +180,13 @@ type
     proxmox*: ProxmoxSnapshot
     proxmoxBusy*, proxmoxLoaded*: bool
     proxmoxError*: string
+    proxmoxErrorReason*, proxmoxErrorMessage*: string  ## why a read failed, in the service's fixed words
     proxmoxEpoch*: int
+    proxmoxActions*: seq[ProxmoxAction]
+    proxmoxActionBusy*: bool
+    proxmoxActionError*, proxmoxActionsError*: string  ## a refused action; an unread recent list
+    proxmoxConfirming*: string  ## the action id whose confirmation is open
+    proxmoxActionEpoch*: int
     reviewItems*: seq[ReviewItem]
     reviewBusy*, reviewLoaded*, reviewShowDecided*: bool
     reviewError*, reviewDeciding*: string

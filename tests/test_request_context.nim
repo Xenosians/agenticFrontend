@@ -1,5 +1,5 @@
 import std/unittest
-import ../src/app/[types, state, request_context]
+import ../src/app/[types, state, request_context, proxmox_actions]
 import ../src/app/workflows
 import std/json
 
@@ -81,3 +81,23 @@ suite "asynchronous account and chat boundaries":
     check not app.learningRecoveryChecked
     check not app.learningStarting
     check app.learningRecoveryError == ""
+
+  test "owner reset closes a Proxmox confirmation and forgets the previous owner's actions":
+    let app = signedIn()
+    let request = beginProxmoxActionRequest(app)
+    app.proxmoxActions = @[ProxmoxAction(actionId: "ffffffffffffffffffffffffffffffff", status: "waiting_approval")]
+    app.proxmoxConfirming = "ffffffffffffffffffffffffffffffff"
+    app.proxmoxActionBusy = true
+    app.proxmoxActionError = "old error"
+    app.proxmoxActionsError = "old list error"
+    app.proxmoxErrorMessage = "old cause"
+    app.proxmoxErrorReason = "provider_timeout"
+    clearOperations(app)
+    check not matchesProxmoxActionRequest(app, request)
+    check app.proxmoxActions.len == 0
+    check app.proxmoxConfirming == ""
+    check not app.proxmoxActionBusy
+    check app.proxmoxActionError == ""
+    check app.proxmoxActionsError == ""
+    check app.proxmoxErrorMessage == ""
+    check app.proxmoxErrorReason == ""

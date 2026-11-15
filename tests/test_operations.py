@@ -1,7 +1,8 @@
-"""Operations uses real snapshot data and read-only controls with isolated HTTP fixtures."""
+"""Operations uses real snapshot data, and Proxmox power actions only through a confirmed proposal."""
 import copy
 import os
 from pathlib import Path
+import time
 import unittest
 from urllib.parse import urlparse
 
@@ -58,6 +59,22 @@ def proxmox_snapshot():
                                             "disk_total_bytes": None, "uptime_seconds": 0}]}}}
 
 
+def proxmox_action(action, vmid, node):
+    # Mirrors the AI's approval wording: the frozen type and the effect of this action.
+    text = {"start": "Start", "shutdown": "Shut down", "reboot": "Reboot", "force_stop": "Force stop"}[action]
+    effect = {"start": "It boots the guest.",
+              "shutdown": "The guest's own operating system is asked to shut down cleanly (up to 60 seconds).",
+              "reboot": "The guest's own operating system is asked to restart cleanly (up to 60 seconds).",
+              "force_stop": "The guest is cut off immediately like pulling its power; unsaved data inside it is lost."}
+    kind = "qemu" if vmid == 101 else "lxc"
+    label = "VM" if kind == "qemu" else "LXC"
+    return {"action_id": "f" * 32, "action": action, "node": node, "vmid": vmid, "type": kind, "name": None,
+            "risk": "high" if action == "force_stop" else "medium", "status": "waiting_approval",
+            "approval_text": f"{text} {label} {vmid} on Proxmox node {node}. {effect[action]} "
+                             "Janus waits for the Proxmox task and reads the guest back.",
+            "created_at": "2026-11-16T03:00:00Z", "decided_at": None, "error": None}
+
+
 class OperationsTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.snapshot = snapshot()
@@ -67,6 +84,11 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.hold_operations = False
         self.proxmox_status = 200
         self.proxmox_requests = []
+        self.proxmox_body = None
+        self.action_posts = []
+        self.action_decisions = []
+        self.actions = []
+        self.action_refusal = None
         self.owner = "fixture-owner"
         self.history_reads = []
         super().setUp()
@@ -111,7 +133,32 @@ class OperationsTests(navigation.ChatNavigationTests):
                 if self.proxmox_status == 200:
                     route.fulfill(json=proxmox_snapshot())
                 else:
-                    route.fulfill(status=self.proxmox_status, json={"error": getattr(self, "proxmox_error", "proxmox_not_configured")})
+                    route.fulfill(status=self.proxmox_status, json=self.proxmox_body or
+                                  {"error": getattr(self, "proxmox_error", "proxmox_not_configured")})
+                return
+            if path == "/api/v1/proxmox/actions":
+                if request.method == "GET":
+                    route.fulfill(json={"actions": self.actions})
+                    return
+                body = request.post_data_json
+                self.action_posts.append((body, request.headers.get("x-csrf-token")))
+                if self.action_refusal:
+                    route.fulfill(status=409, json=self.action_refusal)
+                    return
+                action = proxmox_action(body["action"], body["vmid"], body["node"])
+                self.actions.insert(0, action)
+                route.fulfill(status=201, json=action)
+                return
+            if path.startswith("/api/v1/proxmox/actions/"):
+                action_id, decision = path.split("/")[-2:]
+                self.action_decisions.append((action_id, decision, request.headers.get("x-csrf-token")))
+                action = next(item for item in self.actions if item["action_id"] == action_id)
+                if decision == "approve":
+                    action.update(status="succeeded", observed_status="running", verification_ok=True,
+                                  upid="UPID:pve-b:0001:0002:0003:vzstart:102:janus@pve!dashboard:")
+                else:
+                    action.update(status="rejected")
+                route.fulfill(json=action)
                 return
             if path.startswith("/api/v2/chats/") and path.endswith("/history"):
                 key = path.split("/")[-2]
@@ -198,6 +245,165 @@ class OperationsTests(navigation.ChatNavigationTests):
         expect(dashboard.locator(".proxmox-unavailable")).to_have_attribute("data-error-code", "proxmox_read_failed")
         self.assertEqual(self.proxmox_requests, ["GET"])
         self.assert_safe()
+
+    def test_a_failed_read_shows_the_cause_the_service_named(self):
+        self.proxmox_status = 503
+        self.proxmox_body = {"error": "proxmox_read_failed", "reason": "provider_unreachable",
+                             "message": "Proxmox VE could not be reached, or it closed the connection before answering."}
+        self.open_operations()
+        dashboard = self.page.locator(".proxmox-dashboard")
+        failure = dashboard.locator(".proxmox-unavailable")
+        expect(failure).to_have_attribute("data-error-code", "proxmox_read_failed")
+        expect(failure).to_have_attribute("data-error-reason", "provider_unreachable")
+        expect(failure.get_by_text("Proxmox data unavailable", exact=True)).to_be_visible()
+        expect(failure).to_contain_text("could not be reached")
+        self.assert_safe()
+
+    def test_the_dashboard_refreshes_itself_only_while_it_is_on_screen(self):
+        self.page.clock.install()
+        self.open_operations()
+        self.page.locator(".proxmox-dashboard .proxmox-live-status").wait_for()
+        self.assertEqual(self.proxmox_requests, ["GET"])
+        # One interval at a time: a read still in flight is never doubled.
+        for expected in (2, 3):
+            self.page.clock.run_for(10_500)
+            self.wait_for_count(self.proxmox_requests, expected)
+            self.page.locator(".proxmox-dashboard .proxmox-live-status").wait_for()
+        seen = len(self.proxmox_requests)
+        self.set_visibility("hidden")
+        self.page.clock.run_for(60_000)
+        self.page.wait_for_timeout(200)
+        self.assertEqual(len(self.proxmox_requests), seen, "a hidden page kept reading Proxmox")
+        # Coming back reads at once instead of showing a stale snapshot.
+        self.set_visibility("visible")
+        self.wait_for_count(self.proxmox_requests, seen + 1)
+        seen = len(self.proxmox_requests)
+        self.page.locator('.operation-job[data-job-id="' + "a" * 32 + '"]').get_by_role(
+            "button", name="Open chat", exact=True).click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Chat")
+        self.page.clock.run_for(60_000)
+        self.page.wait_for_timeout(200)
+        self.assertEqual(len(self.proxmox_requests), seen, "another view kept reading Proxmox")
+        self.assert_safe()
+
+    def test_a_power_action_needs_the_exact_target_confirmed_before_anything_runs(self):
+        self.open_operations()
+        guest = self.page.locator('.proxmox-guest-row[data-vmid="102"]')
+        guest.get_by_role("button", name="Start 102", exact=True).click()
+        dialog = self.page.get_by_role("dialog", name="Confirm Proxmox action")
+        expect(dialog).to_contain_text("Start LXC 102 on Proxmox node pve-b.")
+        self.assertEqual(len(self.action_posts), 1)
+        body, csrf = self.action_posts[0]
+        self.assertEqual({key: body[key] for key in ("node", "vmid", "action")},
+                         {"node": "pve-b", "vmid": 102, "action": "start"})
+        self.assertEqual(csrf, "fixture-csrf")
+        self.assertEqual(self.action_decisions, [])
+        dialog.get_by_role("button", name="Start", exact=True).click()
+        expect(self.page.locator(".proxmox-actions")).to_contain_text("Succeeded")
+        expect(self.page.locator(".proxmox-actions")).to_contain_text("running")
+        self.assertEqual([decision[:2] for decision in self.action_decisions], [("f" * 32, "approve")])
+        self.assertEqual(self.action_decisions[0][2], "fixture-csrf")
+
+    def test_cancelling_the_confirmation_rejects_the_proposal_and_runs_nothing(self):
+        self.open_operations()
+        guest = self.page.locator('.proxmox-guest-row[data-vmid="101"]')
+        guest.get_by_role("button", name="Force stop 101", exact=True).click()
+        dialog = self.page.get_by_role("dialog", name="Confirm Proxmox action")
+        expect(dialog).to_contain_text("Force stop")
+        dialog.get_by_role("button", name="Cancel", exact=True).click()
+        expect(dialog).to_have_count(0)
+        self.assertEqual([decision[1] for decision in self.action_decisions], ["reject"])
+        expect(self.page.locator(".proxmox-actions")).to_contain_text("Rejected")
+
+    def test_only_actions_that_apply_to_a_guest_state_are_offered(self):
+        self.open_operations()
+        running = self.page.locator('.proxmox-guest-row[data-vmid="101"]')
+        stopped = self.page.locator('.proxmox-guest-row[data-vmid="102"]')
+        for name in ("Shut down 101", "Reboot 101", "Force stop 101"):
+            expect(running.get_by_role("button", name=name, exact=True)).to_be_visible()
+        expect(running.get_by_role("button", name="Start 101", exact=True)).to_have_count(0)
+        expect(stopped.get_by_role("button", name="Start 102", exact=True)).to_be_visible()
+        expect(stopped.get_by_role("button", name="Shut down 102", exact=True)).to_have_count(0)
+
+    def test_a_refused_action_shows_why_and_opens_no_confirmation(self):
+        self.action_refusal = {"error": "proxmox_action_refused", "message": "LXC 102 is locked (backup)."}
+        self.open_operations()
+        self.page.locator('.proxmox-guest-row[data-vmid="102"]').get_by_role("button", name="Start 102",
+                                                                              exact=True).click()
+        expect(self.page.locator(".proxmox-dashboard").get_by_role("alert")).to_contain_text("locked (backup)")
+        expect(self.page.get_by_role("dialog", name="Confirm Proxmox action")).to_have_count(0)
+        self.assertEqual(self.action_decisions, [])
+
+    def test_ask_in_chat_prefills_an_exact_request_without_sending_it(self):
+        self.open_operations()
+        self.page.locator('.proxmox-guest-row[data-vmid="101"]').get_by_role(
+            "button", name="Ask in chat about 101", exact=True).click()
+        expect(self.page.locator(".workspace-title h1")).to_have_text("Chat")
+        expect(self.page.locator("#messageInput")).to_have_value("What is the current status of VMID 101 on node pve-a?")
+        self.assertEqual(self.submissions, [])
+
+    def test_a_pending_action_left_from_earlier_can_still_be_reviewed(self):
+        self.actions = [proxmox_action("reboot", 101, "pve-a")]
+        self.open_operations()
+        row = self.page.locator(".proxmox-action").first
+        expect(row).to_contain_text("Waiting for your confirmation")
+        row.get_by_role("button", name="Review", exact=True).click()
+        dialog = self.page.get_by_role("dialog", name="Confirm Proxmox action")
+        expect(dialog).to_contain_text("Reboot VM 101 on Proxmox node pve-a.")
+        self.page.keyboard.press("Escape")
+        expect(dialog).to_have_count(0)
+        self.assertEqual([decision[1] for decision in self.action_decisions], ["reject"])
+
+    def test_action_text_and_the_confirmation_are_legible_at_both_widths(self):
+        self.actions = [proxmox_action("start", 102, "pve-b")]
+        for width, height in ((1440, 900), (390, 760)):
+            self.page.set_viewport_size({"width": width, "height": height})
+            self.open_operations()
+            guest = self.page.locator('.proxmox-guest-row[data-vmid="101"]')
+            expect(guest.get_by_role("button", name="Ask in chat about 101", exact=True)).to_have_text("Ask in chat")
+            for selector in (".proxmox-guest-actions .secondary-action", ".proxmox-action-heading .capability-badge",
+                             ".proxmox-action .operation-note"):
+                with self.subTest(width=width, selector=selector):
+                    self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
+            # A status is read at a glance, not squinted at.
+            self.assertGreaterEqual(self.font_px(".proxmox-action-heading .capability-badge"), 11)
+            # The destructive button in a row is not the most prominent control.
+            self.assertEqual(self.page.evaluate("""() => [...document.querySelectorAll(
+                '.proxmox-guest-row[data-vmid="101"] .proxmox-power')].map((n) => getComputedStyle(n).fontWeight)
+                .filter((value, index, all) => all.indexOf(value) === index).length"""), 1)
+            guest.get_by_role("button", name="Force stop 101", exact=True).click()
+            dialog = self.page.get_by_role("dialog", name="Confirm Proxmox action")
+            expect(dialog).to_be_visible()
+            for selector in (".proxmox-confirm-target dt", ".proxmox-confirm .secondary-action",
+                             ".proxmox-confirm-warning"):
+                with self.subTest(width=width, selector=selector):
+                    self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
+            # The data-loss warning reads at least as large as the general description.
+            self.assertGreaterEqual(self.font_px(".proxmox-confirm-warning"), self.font_px(".proxmox-confirm-text"))
+            box = dialog.bounding_box()
+            self.assertGreaterEqual(box["x"], 0)
+            self.assertLessEqual(box["x"] + box["width"], width)
+            self.assertLessEqual(box["y"] + box["height"], height)
+            dialog.get_by_role("button", name="Cancel", exact=True).click()
+            expect(dialog).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def font_px(self, selector):
+        return self.page.evaluate("(s) => parseFloat(getComputedStyle(document.querySelector(s)).fontSize)", selector)
+
+    def wait_for_count(self, items, count, timeout_ms=5000):
+        deadline = time.monotonic() + timeout_ms / 1000
+        while len(items) < count:
+            if time.monotonic() > deadline:
+                self.fail(f"expected {count} requests, saw {len(items)}")
+            self.page.wait_for_timeout(25)
+
+    def set_visibility(self, state):
+        self.page.evaluate("""(state) => {
+            Object.defineProperty(document, 'visibilityState', {configurable: true, get: () => state});
+            Object.defineProperty(document, 'hidden', {configurable: true, get: () => state === 'hidden'});
+            document.dispatchEvent(new Event('visibilitychange'));
+        }""", state)
 
     def test_counts_status_and_secondary_text_meet_wcag_aa_contrast(self):
         for width, height in ((1440, 900), (390, 760)):

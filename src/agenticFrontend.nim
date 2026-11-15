@@ -94,6 +94,9 @@ proc focusWorkspaceAfterRender() =
   if pendingMenuFocus.len > 0 and appState.auth.authenticated:
     focusElement(cstring(pendingMenuFocus))
   pendingMenuFocus = ""
+  let proxmoxFocus = consumeProxmoxFocus()
+  if proxmoxFocus.len > 0 and appState.auth.authenticated:
+    focusElement(cstring(proxmoxFocus))
   afterSidebarRender(appState)
   afterStoreRender()
   syncDatasetFilePicker(appState)

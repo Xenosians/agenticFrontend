@@ -847,6 +847,13 @@ proc getIntegrationStatus*():
   )
 
 
+type
+  ProxmoxReadFailed* = object of ValueError
+    ## A failed overview read: `msg` is the stable code; the service may name
+    ## the cause with a fixed reason and text (never the provider's own text).
+    ## Not `message`: on the JS backend Exception.msg is exported as `message`.
+    reason*, detail*: string
+
 proc getProxmoxOverview*(): Future[JsonNode] {.async.} =
   let options = newFetchOptions(metod = HttpGet, mode = fmCors, credentials = fcInclude)
   let response = await sendRequest(
@@ -854,15 +861,20 @@ proc getProxmoxOverview*(): Future[JsonNode] {.async.} =
     options
   )
   if not response.ok:
-    var code = ""
+    var code, reason, message = ""
     try:
       let body = decodeJson(response.body)
-      if body.kind == JObject and body.hasKey("error") and body["error"].kind == JString:
-        code = body["error"].getStr
+      code = jsonValueText(body, "error")
+      reason = jsonValueText(body, "reason")
+      message = jsonValueText(body, "message")
     except CatchableError:
       discard
     if code in ["proxmox_not_configured", "proxmox_configuration_invalid", "proxmox_read_failed"]:
-      raise newException(ValueError, code)
+      let failure = newException(ProxmoxReadFailed, code)
+      if reason.len in 1..64 and message.len in 1..300:
+        failure.reason = reason
+        failure.detail = message
+      raise failure
     raise newException(ValueError, "Proxmox dashboard returned HTTP " & $response.status & ".")
   result = decodeJson(response.body)
 
