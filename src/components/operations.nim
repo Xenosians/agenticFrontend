@@ -1,9 +1,10 @@
 include karax/prelude
-import std/[options, strutils]
+import std/[options, sequtils, strutils]
 import ../app/types
 import ../app/operations_snapshot
 import ../app/proxmox_snapshot
 import ../app/proxmox_actions
+import ../app/tailnet_snapshot
 import ../app/operations_bridge
 import ../app/auth_bridge
 
@@ -307,6 +308,113 @@ proc renderProxmoxDashboard(state: AppState): VNode =
     if state.proxmoxConfirming.len > 0 and confirmingAction(state).actionId.len > 0:
       renderProxmoxConfirm(state)
 
+proc tailnetFailureTitle(code: string): string =
+  case code
+  of "tailnet_not_configured": "Connection not configured"
+  else: "Tailscale data unavailable"
+
+proc tailnetFailureHelp(state: AppState): string =
+  case state.tailnetError
+  of "tailnet_not_configured":
+    "Add TAILSCALE_CLIENT_ID and TAILSCALE_CLIENT_SECRET (a read-only OAuth client with devices:core:read and dns:read) to the AI connections, then refresh."
+  else:
+    (if state.tailnetErrorMessage.len > 0: state.tailnetErrorMessage & " " else: "") &
+      "Check the OAuth client's scopes and the AI logs; nothing on the tailnet was changed."
+
+proc attentionLevel(device: TailnetDevice): string =
+  if device.issues.len == 0: return "none"
+  for issue in device.issues:
+    if tailnetIssueBlocking(issue): return "blocking"
+  "warning"
+
+proc renderTailnetDevice(device: TailnetDevice): VNode =
+  let online = device.online == some(true)
+  let state =
+    if online: "Online"
+    elif device.lastSeen.len >= 10: "Offline since " & device.lastSeen[0 ..< 10]
+    elif device.online == some(false): "Offline"
+    else: "State not reported"
+  let about = [device.os, (if device.clientVersion.len > 0: "Tailscale " & device.clientVersion else: "")]
+  result = buildHtml(li(class = "tailnet-device", `data-name` = cstring(device.name),
+                        `data-online` = cstring(if online: "true" else: "false"),
+                        `data-attention` = cstring(attentionLevel(device)))):
+    tdiv(class = "tailnet-device-heading"):
+      strong(class = "tailnet-device-name"): text device.name
+      span(class = "tailnet-device-state", `data-online` = cstring(if online: "true" else: "false")):
+        span(class = "tailnet-state-mark", `aria-hidden` = "true")
+        text state
+    p(class = "operation-note"):
+      text about.filterIt(it.len > 0).join(" · ")
+    dl(class = "tailnet-device-facts"):
+      tdiv:
+        dt: text "Key expiry"
+        dd(`data-fact` = "key"): text keyExpiryLabel(device)
+      # Only a connected device has a current path; an offline one's last report is history.
+      if online:
+        tdiv:
+          dt: text "Connection"
+          dd(`data-fact` = "connection"): text connectionLabel(device)
+        if relayLabel(device).len > 0:
+          tdiv:
+            dt: text "Nearest relay"
+            dd(`data-fact` = "relay"): text relayLabel(device)
+    if device.issues.len > 0:
+      ul(class = "tailnet-issues", `aria-label` = cstring("Needs attention: " & device.name)):
+        for issue in device.issues:
+          li(class = "tailnet-issue", `data-issue` = cstring(issue),
+             `data-blocking` = cstring(if tailnetIssueBlocking(issue): "true" else: "false")):
+            text tailnetIssueLabel(issue)
+
+proc renderTailnetDashboard(state: AppState): VNode =
+  let snapshot = state.tailnet
+  result = buildHtml(section(class = "tailnet-dashboard", `aria-labelledby` = "tailnetDashboardTitle")):
+    tdiv(class = "proxmox-dashboard-heading"):
+      tdiv:
+        h3(id = "tailnetDashboardTitle"): text "Tailscale network"
+        p(class = "operation-note"):
+          text "Each device's health from the Tailscale API, read-only and refreshed while this page is open."
+      button(class = "secondary-action", disabled = state.tailnetBusy,
+          `aria-label` = "Refresh Tailscale network"):
+        text (if state.tailnetBusy: "Refreshing…" else: "Refresh")
+        proc onclick(event: Event, node: VNode) = discard refreshTailnetOverview(state)
+    if state.tailnetBusy and not state.tailnetLoaded and state.tailnetError.len == 0:
+      p(class = "operation-note", role = "status"): text "Reading the tailnet…"
+    elif state.tailnetError.len > 0:
+      tdiv(class = "tailnet-unavailable", role = "status",
+           `data-error-code` = cstring(state.tailnetError), `data-error-reason` = cstring(state.tailnetErrorReason)):
+        strong: text tailnetFailureTitle(state.tailnetError)
+        p(class = "operation-note"): text tailnetFailureHelp(state)
+    elif not state.tailnetLoaded:
+      p(class = "operation-note", role = "status"): text "No tailnet snapshot has been loaded. Refresh to read it."
+    else:
+      tdiv(class = "tailnet-live-status", role = "status"):
+        if snapshot.withIssues == 0 and snapshot.offline == 0:
+          span(class = "proxmox-status-dot", `aria-hidden` = "true")
+        strong(class = "tailnet-summary"):
+          text $snapshot.online & " online · " & $snapshot.offline & " offline · " &
+            (if snapshot.withIssues == 0: "none need attention"
+             elif snapshot.withIssues == 1: "1 needs attention"
+             else: $snapshot.withIssues & " need attention")
+        span(class = "operation-note"): text "Observed " & $localTimestamp(cstring(snapshot.observedAt))
+      if snapshot.devices.len == 0:
+        tdiv(class = "empty-card"): text "The tailnet returned no devices."
+      else:
+        ul(class = "tailnet-device-list"):
+          for device in attentionOrder(snapshot.devices):
+            renderTailnetDevice(device)
+      if snapshot.truncated:
+        p(class = "operation-note", role = "status"): text "More devices exist than this dashboard displays."
+      p(class = "operation-note tailnet-dns"):
+        if snapshot.dnsLoaded:
+          text "DNS: MagicDNS " & (if snapshot.magicDns: "on" else: "off") & "; " &
+            (if snapshot.resolvers.len == 0: "devices use the local network's resolvers"
+             elif snapshot.overrideLocalDns: "tailnet resolvers " & snapshot.resolvers.join(", ")
+             else: "local resolvers first, then " & snapshot.resolvers.join(", ")) &
+            (if snapshot.splitDomains.len > 0: "; split DNS for " & snapshot.splitDomains.join(", ") else: "") & "."
+        else:
+          text "DNS settings could not be read: " &
+            (if snapshot.dnsError.len > 0: snapshot.dnsError else: "no reason was given.")
+
 proc renderOperationsPanel*(state: AppState): VNode =
   result = buildHtml(tdiv(class = "developer-view operations-panel")):
     tdiv(class = "developer-view-header"):
@@ -318,6 +426,7 @@ proc renderOperationsPanel*(state: AppState): VNode =
         proc onclick(event: Event, node: VNode) =
           discard refreshOperations(state)
     renderProxmoxDashboard(state)
+    renderTailnetDashboard(state)
     if state.operationsError.len > 0:
       p(class = "operation-error", role = "alert"): text state.operationsError
     if state.operationsBusy and not state.operationsLoaded:

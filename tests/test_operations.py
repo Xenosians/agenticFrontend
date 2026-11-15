@@ -75,6 +75,39 @@ def proxmox_action(action, vmid, node):
             "created_at": "2026-11-16T03:00:00Z", "decided_at": None, "error": None}
 
 
+def tailnet_device(name, **changes):
+    device = {"name": name, "dns_name": name + ".tail1234.ts.net", "os": "linux", "client_version": "1.104.4",
+              "update_available": False, "online": True, "last_seen": "2026-11-16T05:00:00Z",
+              "key_expires": "2027-05-01T00:00:00Z", "key_expiry_disabled": False, "key_expires_in_days": 166,
+              "authorized": True, "shared_from_another_tailnet": False, "tags": [], "blocks_incoming": False,
+              "routes_advertised": 0, "routes_waiting_for_approval": 0, "exit_node_offered": False,
+              "tailnet_lock_error": False,
+              "connectivity": {"udp": True, "hard_nat": False, "port_mapping": False, "nearest_relay": "Singapore",
+                               "relay_latency_ms": 27.2},
+              "issues": []}
+    device.update(changes)
+    return device
+
+
+def tailnet_overview():
+    devices = [tailnet_device("hummingbird"),
+               tailnet_device("kiosk-with-a-long-device-name", os="windows", update_available=True,
+                              key_expires_in_days=9,
+                              connectivity={"udp": False, "hard_nat": True, "port_mapping": None,
+                                            "nearest_relay": "Tokyo", "relay_latency_ms": 90.1},
+                              issues=["key_expiring", "udp_blocked", "update_available"]),
+               tailnet_device("phone", os="android", online=False, last_seen="2026-11-10T08:00:00Z",
+                              connectivity=None)]
+    return {"ok": True, "status": "success", "provider": "tailscale", "observed_at": "2026-11-16T05:00:00+00:00",
+            "data": {"schema": "tailnet-overview.v1",
+                     "devices": {"count": 3, "truncated": False,
+                                 "summary": {"online": 2, "offline": 1, "with_issues": 1}, "devices": devices},
+                     "dns": {"magic_dns": True, "override_local_dns": False,
+                             "nameservers": [{"address": "1.1.1.1", "encrypted": True}], "split_dns": [],
+                             "search_domains": []},
+                     "dns_error": None}}
+
+
 class OperationsTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.snapshot = snapshot()
@@ -89,6 +122,9 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.action_decisions = []
         self.actions = []
         self.action_refusal = None
+        self.tailnet_requests = []
+        self.tailnet_status = 200
+        self.tailnet_body = None
         self.owner = "fixture-owner"
         self.history_reads = []
         super().setUp()
@@ -136,6 +172,13 @@ class OperationsTests(navigation.ChatNavigationTests):
                     route.fulfill(status=self.proxmox_status, json=self.proxmox_body or
                                   {"error": getattr(self, "proxmox_error", "proxmox_not_configured")})
                 return
+            if path == "/api/v1/tailnet/overview":
+                self.tailnet_requests.append(request.method)
+                if self.tailnet_status == 200:
+                    route.fulfill(json=self.tailnet_body or tailnet_overview())
+                else:
+                    route.fulfill(status=self.tailnet_status, json=self.tailnet_body or {"error": "tailnet_unavailable"})
+                return
             if path == "/api/v1/proxmox/actions":
                 if request.method == "GET":
                     route.fulfill(json={"actions": self.actions})
@@ -177,8 +220,152 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.assertTrue(self.operations_requests)
         self.assertTrue(all(method == "GET" for method in self.operations_requests))
         self.assertTrue(all(method == "GET" for method in self.proxmox_requests))
+        self.assertTrue(all(method == "GET" for method in self.tailnet_requests))
         self.assertEqual(self.submissions, [])
         self.assertEqual(self.errors, [])
+
+    def test_the_tailnet_shows_each_devices_observed_health(self):
+        self.open_operations()
+        panel = self.page.locator(".tailnet-dashboard")
+        expect(panel.get_by_role("heading", name="Tailscale network", exact=True)).to_be_visible()
+        expect(panel.locator(".tailnet-summary")).to_contain_text("2 online · 1 offline · 1 needs attention")
+        healthy = panel.locator('.tailnet-device[data-name="hummingbird"]')
+        expect(healthy.locator(".tailnet-device-facts")).to_contain_text("Direct")
+        expect(healthy.locator(".tailnet-device-facts")).to_contain_text("Singapore 27 ms")
+        expect(healthy.locator(".tailnet-device-facts")).to_contain_text("In 166 days")
+        expect(healthy.locator(".tailnet-issue")).to_have_count(0)
+        busy = panel.locator('.tailnet-device[data-name="kiosk-with-a-long-device-name"]')
+        expect(busy.locator(".tailnet-issue")).to_have_text(["Key expires soon", "UDP blocked", "Update available"])
+        expect(busy.locator(".tailnet-device-facts")).to_contain_text("Relayed")
+        expect(busy.locator(".tailnet-device-facts")).to_contain_text("Tokyo 90 ms")
+        quiet = panel.locator('.tailnet-device[data-name="phone"]')
+        expect(quiet).to_contain_text("Offline since 2026-11-10")
+        # Offline: there is no live path, so no connection or relay is shown as current.
+        expect(quiet.locator('[data-fact="connection"], [data-fact="relay"]')).to_have_count(0)
+        expect(quiet.locator('[data-fact="key"]')).to_have_text("In 166 days")
+        expect(panel).to_contain_text("MagicDNS on")
+        expect(panel).to_contain_text("1.1.1.1 (encrypted)")
+        self.assertEqual(self.tailnet_requests, ["GET"])
+        self.assert_safe()
+
+    def test_devices_needing_attention_are_first_and_marked_at_a_glance(self):
+        body = tailnet_overview()
+        body["data"]["devices"]["devices"].append(
+            tailnet_device("old-tablet", online=False, last_seen="2026-09-01T00:00:00Z", key_expires_in_days=-12,
+                           connectivity=None, issues=["key_expired"]))
+        body["data"]["devices"].update(count=4, summary={"online": 2, "offline": 2, "with_issues": 2})
+        self.tailnet_body = body
+        self.open_operations()
+        cards = self.page.locator(".tailnet-dashboard .tailnet-device")
+        expect(cards).to_have_count(4)
+        # A device that is cut off comes first, then other issues, then healthy devices.
+        self.assertEqual(cards.evaluate_all("cards => cards.map((card) => card.dataset.name)"),
+                         ["old-tablet", "kiosk-with-a-long-device-name", "hummingbird", "phone"])
+        self.assertEqual(cards.evaluate_all("cards => cards.map((card) => card.dataset.attention)"),
+                         ["blocking", "warning", "none", "none"])
+        styles = self.page.evaluate("""() => {
+            const card = (name) => getComputedStyle(document.querySelector(`.tailnet-device[data-name="${name}"]`));
+            const pill = getComputedStyle(document.querySelector('.tailnet-device[data-name="hummingbird"] .tailnet-device-state'));
+            const issue = getComputedStyle(document.querySelector('.tailnet-issue'));
+            return {blocking: card('old-tablet').borderLeftWidth, warning: card('kiosk-with-a-long-device-name').borderLeftWidth,
+                    healthy: card('hummingbird').borderLeftWidth, pillRadius: pill.borderTopLeftRadius,
+                    issueRadius: issue.borderTopLeftRadius, pillBorder: pill.borderTopStyle};
+        }""")
+        # Needing attention is visible on the card itself, strongest for a blocking problem.
+        self.assertGreater(float(styles["blocking"][:-2]), float(styles["warning"][:-2]))
+        self.assertGreater(float(styles["warning"][:-2]), float(styles["healthy"][:-2]))
+        # The online/offline state is not drawn like an issue badge.
+        self.assertNotEqual((styles["pillRadius"], styles["pillBorder"]), (styles["issueRadius"], "solid"))
+        # A tailnet with devices needing attention does not show an all-clear dot.
+        expect(self.page.locator(".tailnet-live-status .proxmox-status-dot")).to_have_count(0)
+        self.assert_safe()
+
+    def test_an_unavailable_tailnet_says_why_and_shows_no_devices(self):
+        self.tailnet_status = 503
+        self.tailnet_body = {"error": "tailnet_read_failed", "reason": "provider_timeout",
+                             "message": "The Tailscale network did not answer in time."}
+        self.open_operations()
+        panel = self.page.locator(".tailnet-dashboard")
+        failure = panel.locator(".tailnet-unavailable")
+        expect(failure).to_have_attribute("data-error-code", "tailnet_read_failed")
+        expect(failure).to_have_attribute("data-error-reason", "provider_timeout")
+        expect(failure).to_contain_text("did not answer in time")
+        expect(panel.locator(".tailnet-device")).to_have_count(0)
+        self.tailnet_body = {"error": "tailnet_not_configured"}
+        panel.get_by_role("button", name="Refresh Tailscale network", exact=True).click()
+        expect(failure).to_have_attribute("data-error-code", "tailnet_not_configured")
+        expect(failure.get_by_text("Connection not configured", exact=True)).to_be_visible()
+        self.assert_safe()
+
+    def test_a_failed_dns_read_is_named_beside_the_devices(self):
+        body = tailnet_overview()
+        body["data"]["dns"] = None
+        body["data"]["dns_error"] = {"reason": "provider_error", "message": "Tailscale refused the read (HTTP 403)."}
+        self.tailnet_body = body
+        self.open_operations()
+        panel = self.page.locator(".tailnet-dashboard")
+        expect(panel.locator(".tailnet-device")).to_have_count(3)
+        expect(panel.locator(".tailnet-dns")).to_contain_text("DNS settings could not be read: Tailscale refused")
+        self.assert_safe()
+
+    def test_the_tailnet_refreshes_only_while_operations_is_on_screen(self):
+        self.page.clock.install()
+        self.open_operations()
+        self.page.locator(".tailnet-dashboard .tailnet-device").first.wait_for()
+        self.assertEqual(self.tailnet_requests, ["GET"])
+        self.page.clock.run_for(30_500)
+        self.wait_for_count(self.tailnet_requests, 2)
+        seen = len(self.tailnet_requests)
+        self.set_visibility("hidden")
+        self.page.clock.run_for(120_000)
+        self.page.wait_for_timeout(200)
+        self.assertEqual(len(self.tailnet_requests), seen, "a hidden page kept reading the tailnet")
+        self.set_visibility("visible")
+        self.wait_for_count(self.tailnet_requests, seen + 1)
+        self.assert_safe()
+
+    def test_the_tailnet_panel_is_legible_at_both_widths(self):
+        for width, height in ((1440, 900), (390, 760)):
+            self.page.set_viewport_size({"width": width, "height": height})
+            self.open_operations()
+            panel = self.page.locator(".tailnet-dashboard")
+            panel.locator(".tailnet-device").first.wait_for()
+            for selector in (".tailnet-device-name", ".tailnet-device .operation-note", ".tailnet-issue",
+                             ".tailnet-summary", ".tailnet-dns"):
+                with self.subTest(width=width, selector=selector):
+                    self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
+            self.assertGreaterEqual(self.font_px(".tailnet-issue"), 11)
+            self.assertTrue(self.page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"),
+                            f"Operations overflows at {width}px")
+            # A long device name wraps inside its card instead of pushing the card wider.
+            overflow = self.page.evaluate("""() => [...document.querySelectorAll('.tailnet-device')]
+                .some((card) => card.scrollWidth > card.clientWidth + 1)""")
+            self.assertFalse(overflow, f"a device card overflows at {width}px")
+            # A short name is never broken mid-word to make room for its state.
+            lines = self.page.evaluate("""() => {
+                const name = document.querySelector('.tailnet-device[data-name="phone"] .tailnet-device-name');
+                return Math.round(name.getBoundingClientRect().height / (parseFloat(getComputedStyle(name).fontSize) * 1.6));
+            }""")
+            self.assertEqual(lines, 1, f"a short device name wraps at {width}px")
+            # Facts and issues stay readable: values are not squeezed into one-word lines.
+            relay_lines = self.page.evaluate("""() => {
+                const value = document.querySelector('.tailnet-device[data-name="hummingbird"] [data-fact="relay"]');
+                return Math.round(value.getBoundingClientRect().height / (parseFloat(getComputedStyle(value).fontSize) * 1.6));
+            }""")
+            self.assertEqual(relay_lines, 1, f"the nearest relay wraps at {width}px")
+            # Every card states its facts in the same place: key expiry first, whatever else it shows.
+            first_facts = panel.locator(".tailnet-device").evaluate_all(
+                "cards => cards.map((card) => card.querySelector('.tailnet-device-facts dt').textContent)")
+            self.assertEqual(set(first_facts), {"Key expiry"})
+            if width < 650:
+                # On a phone the state always sits under the name, not beside some names and under others.
+                misplaced = self.page.evaluate("""() => [...document.querySelectorAll('.tailnet-device')].filter((card) => {
+                    const name = card.querySelector('.tailnet-device-name').getBoundingClientRect();
+                    const state = card.querySelector('.tailnet-device-state').getBoundingClientRect();
+                    return Math.abs(state.left - name.left) > 1 || state.top < name.bottom - 1;
+                }).map((card) => card.dataset.name)""")
+                self.assertEqual(misplaced, [], f"device state placement differs at {width}px")
+        self.assert_safe()
 
     def test_queue_counts_and_call_measurements_come_from_snapshot(self):
         self.open_operations()

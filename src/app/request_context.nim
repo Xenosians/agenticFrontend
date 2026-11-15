@@ -1,5 +1,6 @@
 import types
 import proxmox_snapshot
+import tailnet_snapshot
 import operations_snapshot
 import feedback_review
 import learning
@@ -66,6 +67,13 @@ proc proxmoxActionsAccount*(state: AppState): OperationsRequestContext =
   ## The current owner, without starting a new action request.
   OperationsRequestContext(account: accountContext(state), epoch: state.proxmoxActionEpoch)
 
+proc beginTailnetRequest*(state: AppState): OperationsRequestContext =
+  inc state.tailnetEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.tailnetEpoch)
+
+proc matchesTailnetRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.tailnetEpoch == request.epoch
+
 proc clearOperations*(state: AppState) =
   inc state.operationsEpoch
   state.operations = OperationsSnapshot()
@@ -87,6 +95,13 @@ proc clearOperations*(state: AppState) =
   state.proxmoxActionError = ""
   state.proxmoxActionsError = ""
   state.proxmoxConfirming = ""
+  inc state.tailnetEpoch
+  state.tailnet = TailnetSnapshot()
+  state.tailnetLoaded = false
+  state.tailnetBusy = false
+  state.tailnetError = ""
+  state.tailnetErrorReason = ""
+  state.tailnetErrorMessage = ""
   # The review queue belongs to the signed-in reviewer as well.
   inc state.reviewEpoch
   state.reviewItems = @[]

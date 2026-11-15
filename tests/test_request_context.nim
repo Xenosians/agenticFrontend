@@ -101,3 +101,20 @@ suite "asynchronous account and chat boundaries":
     check app.proxmoxActionsError == ""
     check app.proxmoxErrorMessage == ""
     check app.proxmoxErrorReason == ""
+
+  test "owner reset forgets the previous owner's tailnet view and ignores its late reads":
+    let app = signedIn()
+    let request = beginTailnetRequest(app)
+    app.tailnetLoaded = true
+    app.tailnetBusy = true
+    app.tailnetError = "tailnet_read_failed"
+    app.tailnetErrorReason = "provider_timeout"
+    app.tailnetErrorMessage = "old cause"
+    clearOperations(app)
+    check not matchesTailnetRequest(app, request)
+    check not app.tailnetLoaded
+    check not app.tailnetBusy
+    check app.tailnetError == ""
+    check app.tailnetErrorReason == ""
+    check app.tailnetErrorMessage == ""
+    check app.tailnet.devices.len == 0

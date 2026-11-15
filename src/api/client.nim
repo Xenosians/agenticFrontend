@@ -879,6 +879,34 @@ proc getProxmoxOverview*(): Future[JsonNode] {.async.} =
   result = decodeJson(response.body)
 
 
+type
+  TailnetReadFailed* = object of ValueError
+    ## A failed tailnet overview: `msg` is the stable code; `reason` and
+    ## `detail` are the service's fixed cause and words, when it named them.
+    reason*, detail*: string
+
+proc getTailnetOverview*(): Future[JsonNode] {.async.} =
+  let options = newFetchOptions(metod = HttpGet, mode = fmCors, credentials = fcInclude)
+  let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/tailnet/overview", options)
+  if not response.ok:
+    var code, reason, message = ""
+    try:
+      let body = decodeJson(response.body)
+      code = jsonValueText(body, "error")
+      reason = jsonValueText(body, "reason")
+      message = jsonValueText(body, "message")
+    except CatchableError:
+      discard
+    if code in ["tailnet_not_configured", "tailnet_read_failed", "tailnet_unavailable"]:
+      let failure = newException(TailnetReadFailed, code)
+      if reason.len in 1..64 and message.len in 1..300:
+        failure.reason = reason
+        failure.detail = message
+      raise failure
+    raise newException(ValueError, "The Tailscale overview returned HTTP " & $response.status & ".")
+  result = decodeJson(response.body)
+
+
 proc createJob*(
   chatId: string,
   message: string,

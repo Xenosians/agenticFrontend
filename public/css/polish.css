@@ -2375,6 +2375,15 @@ body {
 .operation-call-heading strong { font-size: 13px; }
 .operation-call-limits summary { color: var(--text-soft); font-size: var(--header-control-size); cursor: pointer; }
 .proxmox-dashboard { margin: 18px 0 26px; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--panel); }
+.tailnet-dashboard { margin: 0 0 26px; padding: 18px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--panel); }
+.tailnet-dashboard .proxmox-dashboard-heading h3 { margin: 0; font-size: 15px; }
+.tailnet-dashboard .proxmox-dashboard-heading .operation-note { margin-top: 4px; }
+.tailnet-live-status { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 14px 0 0; }
+.tailnet-live-status .operation-note { margin: 0 0 0 auto; }
+.tailnet-summary { font-size: 13px; }
+.tailnet-unavailable { margin-top: 14px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg); }
+.tailnet-unavailable strong { font-size: 13px; }
+.tailnet-unavailable p { max-width: 72ch; }
 .proxmox-dashboard-heading, .proxmox-live-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .proxmox-dashboard-heading h3, .proxmox-table-section h4 { margin: 0; font-size: 15px; }
 .proxmox-dashboard-heading .operation-note { margin-top: 4px; }
@@ -2421,6 +2430,25 @@ body {
 .proxmox-confirm-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .proxmox-confirm-actions .secondary-action { color: var(--text); }
 .proxmox-confirm-actions .proxmox-confirm-danger { font-weight: 700; }
+.tailnet-device-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); align-items: start; gap: 10px; margin: 14px 0 0; padding: 0; list-style: none; }
+.tailnet-device { min-width: 0; padding: 12px 12px 12px 13px; border: 1px solid var(--border); border-radius: var(--radius-md); }
+.tailnet-device[data-attention="warning"] { border-left: 3px solid var(--border-max); padding-left: 11px; }
+.tailnet-device[data-attention="blocking"] { border: 1px solid var(--border-max); border-left: 6px solid var(--text); padding-left: 8px; }
+.tailnet-device-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.tailnet-device-name { min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+.tailnet-device-state { display: inline-flex; align-items: center; gap: 6px; flex: none; color: var(--text); font-size: 12px; white-space: nowrap; }
+.tailnet-device-state[data-online="false"] { color: var(--text-soft); }
+.tailnet-state-mark { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid currentColor; }
+.tailnet-device-state[data-online="true"] .tailnet-state-mark { background: currentColor; }
+.tailnet-device .operation-note { margin: 4px 0 0; color: var(--text-soft); }
+.tailnet-device-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr)); gap: 8px 12px; margin: 10px 0 0; }
+.tailnet-device-facts dt { color: var(--text-soft); font-size: 11px; }
+.tailnet-device-facts dd { margin: 2px 0 0; font-size: 12px; overflow-wrap: anywhere; }
+.tailnet-device-facts dd[data-fact="relay"] { white-space: nowrap; }
+.tailnet-issues { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.tailnet-issue { padding: 3px 8px; border: 1px solid var(--border-max); border-radius: 4px; color: var(--text); font-size: 11px; font-weight: 600; }
+.tailnet-issue[data-blocking="true"] { border: 1px solid var(--text); background: var(--text); color: var(--bg); }
+.tailnet-dns { margin: 14px 0 0; color: var(--text-soft); overflow-wrap: anywhere; }
 @media (max-width: 650px) {
   .operation-counts, .operation-measurements { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .operation-job-heading { flex-wrap: wrap; }
@@ -2429,6 +2457,8 @@ body {
   .proxmox-table-section { overflow-x: auto; }
   .proxmox-table { min-width: 690px; }
   .proxmox-live-status .operation-note { margin-left: 0; width: 100%; }
+  .tailnet-live-status .operation-note { margin-left: 0; width: 100%; }
+  .tailnet-device-heading { flex-direction: column; align-items: flex-start; }
   .proxmox-confirm-target { grid-template-columns: 1fr; }
 }
 

@@ -3,6 +3,7 @@ import workflow_request
 import operations_snapshot
 import proxmox_snapshot
 import proxmox_actions
+import tailnet_snapshot
 import feedback_review
 import knowledge
 import learning
@@ -187,6 +188,10 @@ type
     proxmoxActionError*, proxmoxActionsError*: string  ## a refused action; an unread recent list
     proxmoxConfirming*: string  ## the action id whose confirmation is open
     proxmoxActionEpoch*: int
+    tailnet*: TailnetSnapshot
+    tailnetBusy*, tailnetLoaded*: bool
+    tailnetError*, tailnetErrorReason*, tailnetErrorMessage*: string  ## why a read failed, in the service's fixed words
+    tailnetEpoch*: int
     reviewItems*: seq[ReviewItem]
     reviewBusy*, reviewLoaded*, reviewShowDecided*: bool
     reviewError*, reviewDeciding*: string

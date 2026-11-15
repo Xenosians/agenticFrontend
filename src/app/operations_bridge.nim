@@ -5,12 +5,15 @@ import ../api/client
 import ../api/proxmox_requests
 import proxmox_snapshot
 import proxmox_actions
+import tailnet_snapshot
 import types
 import state
 import request_context
 
 const proxmoxRefreshMs = 10_000
   ## The live dashboard re-reads Proxmox this often while it is on screen.
+const tailnetRefreshMs = 30_000
+  ## Device health changes slowly; the Tailscale API is rate limited per tailnet.
 
 proc everyInterval(callback: proc(), milliseconds: int): int {.importjs: "setInterval(#, #)".}
 proc stopInterval(id: int) {.importjs: "clearInterval(#)".}
@@ -20,6 +23,7 @@ proc randomUuid(): cstring {.importjs: "globalThis.crypto.randomUUID()".}
 
 var
   proxmoxTimer = 0
+  tailnetTimer = 0
   visibilityWatched = false
   pendingProxmoxFocus = ""
 
@@ -90,6 +94,35 @@ proc refreshProxmoxActions*(state: AppState) {.async.} =
   finally:
     redraw(kxi)
 
+proc refreshTailnetOverview*(state: AppState) {.async.} =
+  if not state.auth.authenticated or state.tailnetBusy: return
+  let request = beginTailnetRequest(state)
+  state.tailnetBusy = true
+  redraw(kxi)
+  try:
+    let snapshot = parseTailnetSnapshot(await getTailnetOverview())
+    if not matchesTailnetRequest(state, request): return
+    state.tailnet = snapshot
+    state.tailnetLoaded = true
+    state.tailnetError = ""
+    state.tailnetErrorReason = ""
+    state.tailnetErrorMessage = ""
+  except TailnetReadFailed as failure:
+    if matchesTailnetRequest(state, request):
+      state.tailnetError = failure.msg
+      state.tailnetErrorReason = failure.reason
+      state.tailnetErrorMessage = failure.detail
+      state.tailnetLoaded = false
+  except CatchableError as exc:
+    if matchesTailnetRequest(state, request):
+      state.tailnetError = exc.msg
+      state.tailnetErrorReason = ""
+      state.tailnetErrorMessage = ""
+      state.tailnetLoaded = false
+  finally:
+    if matchesTailnetRequest(state, request): state.tailnetBusy = false
+    redraw(kxi)
+
 proc proxmoxDashboardOnScreen(state: AppState): bool =
   state.auth.authenticated and state.activeView in [viewJobs, viewRuns, viewLogs] and pageVisible()
 
@@ -97,25 +130,36 @@ proc stopProxmoxRefresh*() =
   if proxmoxTimer != 0:
     stopInterval(proxmoxTimer)
     proxmoxTimer = 0
+  if tailnetTimer != 0:
+    stopInterval(tailnetTimer)
+    tailnetTimer = 0
 
 proc startProxmoxRefresh*(state: AppState) =
-  ## Keep the dashboard live while it is on screen; stop as soon as it is not.
+  ## Keep the dashboards live while they are on screen; stop as soon as they are not.
   if not visibilityWatched:
     visibilityWatched = true
     onVisibilityChange(proc() =
       if proxmoxDashboardOnScreen(state):
         # Coming back shows current data at once, then keeps it live.
         discard refreshProxmoxOverview(state)
+        discard refreshTailnetOverview(state)
         startProxmoxRefresh(state)
       else:
         stopProxmoxRefresh())
-  if proxmoxTimer != 0: return
-  proxmoxTimer = everyInterval(proc() =
-    if proxmoxDashboardOnScreen(state):
-      discard refreshProxmoxOverview(state)
-    else:
-      stopProxmoxRefresh(),
-    proxmoxRefreshMs)
+  if proxmoxTimer == 0:
+    proxmoxTimer = everyInterval(proc() =
+      if proxmoxDashboardOnScreen(state):
+        discard refreshProxmoxOverview(state)
+      else:
+        stopProxmoxRefresh(),
+      proxmoxRefreshMs)
+  if tailnetTimer == 0:
+    tailnetTimer = everyInterval(proc() =
+      if proxmoxDashboardOnScreen(state):
+        discard refreshTailnetOverview(state)
+      else:
+        stopProxmoxRefresh(),
+      tailnetRefreshMs)
 
 proc confirmingAction*(state: AppState): ProxmoxAction =
   for action in state.proxmoxActions:
@@ -190,4 +234,5 @@ proc openOperations*(state: AppState) =
   discard refreshOperations(state)
   discard refreshProxmoxOverview(state)
   discard refreshProxmoxActions(state)
+  discard refreshTailnetOverview(state)
   startProxmoxRefresh(state)
