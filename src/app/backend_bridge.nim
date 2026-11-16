@@ -224,9 +224,11 @@ proc pollBackendJob*(
       state.run.observationMode = $mode
       redraw(kxi)
 
-  proc updateProgress(stage: cstring) =
+  proc updateProgress(stage: cstring, agent: cstring) =
     if isCurrent() and state.run.status in ["pending", "processing"]:
       state.run.progressStage = $stage
+      # nil when the AI named no agent for this step
+      state.run.progressAgent = if agent.isNil: "" else: $agent
       redraw(kxi)
 
   # Streamed answer text is a preview of the current attempt only; the
@@ -281,6 +283,7 @@ proc pollBackendJob*(
 
       if job.status != previousStatus:
         state.run.progressStage = ""
+        state.run.progressAgent = ""
         state.run.answerPreview = ""
         addRunEvent(
           state,
@@ -643,6 +646,7 @@ proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
   inc state.jobObservationEpoch
   state.run.observationMode = ""
   state.run.progressStage = ""
+  state.run.progressAgent = ""
   state.run.answerPreview = ""
   let eventKind = if decision == jdApprove: "approval" else: "rejection"
   state.run.status = decisionStatus(decision)
@@ -702,6 +706,7 @@ proc cancelRunningJob*(state: AppState) {.async.} =
   inc state.jobObservationEpoch
   state.run.observationMode = ""
   state.run.progressStage = ""
+  state.run.progressAgent = ""
   state.run.answerPreview = ""
   addRunEvent(state, "cancel", "Asking Phoenix to stop this request.")
   redraw(kxi)

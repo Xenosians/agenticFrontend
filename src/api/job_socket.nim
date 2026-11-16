@@ -2,7 +2,7 @@ import std/[asyncjs, jsffi]
 
 proc observeJob*(baseUrl, jobId, csrfToken: cstring, pollIntervalMs: int,
                  isCurrent: proc(): bool, onMode: proc(mode: cstring),
-                 onProgress: proc(stage: cstring),
+                 onProgress: proc(stage: cstring, agent: cstring),
                  onAnswerText: proc(sequence: int, text: cstring)): JsObject {.
   importjs: "globalThis.AgenticJobSocket.create(#, #, #, #, #, #, #, undefined, #)"
 .}

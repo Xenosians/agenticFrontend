@@ -105,6 +105,42 @@ suite "the hub speaks with the specialist he hands a request to":
     let scene = ludusScene(roster, running("processing", "routing"), ready(), @[], idleSeconds = 0)
     check gladiatorArea(scene[0], scene) == laArena
 
+suite "the live hand-off: the agent the AI names while it works":
+  let roster = @["hub", "networking-specialist", "proxmox-specialist"]
+
+  proc live(stage, agent: string, status = "processing", named = ""): RunState =
+    result = running(status, stage, named)
+    result.progressAgent = agent
+
+  test "while the specialist plans his call, the hub stands with him and both think":
+    let scene = ludusScene(roster, live("planning", "proxmox-specialist"), ready(), @[], idleSeconds = 0)
+    check scene[0].talkingTo == "proxmox-specialist"
+    check scene[0].presence == apThinking and scene[2].presence == apThinking
+    check scene[1].presence == apSleeping
+    check gladiatorArea(scene[0], scene) == gladiatorArea(scene[2], scene)
+
+  test "while the specialist's tool runs he works and the hub watches with him":
+    let scene = ludusScene(roster, live("executing", "proxmox-specialist"), ready(), @[], idleSeconds = 0)
+    check scene[2].presence == apWorking
+    check scene[0].talkingTo == "proxmox-specialist" and scene[0].presence == apThinking
+
+  test "when the hub writes the answer he works alone, even after a specialist was named":
+    for named in ["", "proxmox-specialist"]:
+      let scene = ludusScene(roster, live("synthesizing", "hub", named = named), ready(), @[], idleSeconds = 0)
+      check scene[0].presence == apWorking and scene[0].talkingTo == ""
+      check scene[2].presence == apSleeping
+
+  test "a live name outside the roster is ignored; the hub carries the step":
+    let scene = ludusScene(roster, live("planning", "made-up-specialist"), ready(), @[], idleSeconds = 0)
+    check scene[0].talkingTo == "" and scene[0].presence == apThinking
+    for gladiator in scene[1 .. ^1]:
+      check gladiator.presence == apSleeping
+
+  test "without a live name the server's named agent decides, as before":
+    let scene = ludusScene(roster, live("", "", status = "waiting_approval", named = "proxmox-specialist"), ready(),
+                           @[], idleSeconds = 0)
+    check scene[0].talkingTo == "proxmox-specialist" and scene[2].presence == apWaiting
+
 suite "zoom steps keep the pixel art crisp":
   test "whole-pixel steps from 1x to 4x; fit picks the largest step that fits":
     check zoomIn(1) == 2 and zoomIn(4) == 4

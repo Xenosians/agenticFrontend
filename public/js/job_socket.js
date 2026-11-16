@@ -24,6 +24,12 @@
     // preview only; the durable result read over HTTP replaces it.
     let answerSequence = 0;
     const stages = new Set(["routing", "planning", "executing", "synthesizing", "waiting_provider"]);
+    // The agent doing the step ("hub" or e.g. "proxmox-specialist"), display only.
+    const agentName = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+    function plainAgent(value) {
+      return typeof value === "string" && value.length <= 64 && agentName.test(value) ? value : null;
+    }
 
     function current() {
       return !stopped && isCurrent();
@@ -157,7 +163,8 @@
             signal();
           } else if (eventName === "job_progress" && live && payload && payload.job_id === jobId &&
                      Number.isInteger(attempt) && payload.attempt === attempt && stages.has(payload.stage)) {
-            onProgress(payload.stage);
+            // null when the AI named no plain agent for this step.
+            onProgress(payload.stage, plainAgent(payload.agent));
           } else if (eventName === "job_answer_text" && live && payload && payload.job_id === jobId &&
                      Number.isInteger(attempt) && payload.attempt === attempt &&
                      Number.isInteger(payload.sequence) && payload.sequence > answerSequence &&

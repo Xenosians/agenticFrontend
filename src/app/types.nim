@@ -113,6 +113,9 @@ type
     decisionError*: string
     observationMode*: string
     progressStage*: string
+    # The agent the AI names for the current step while it works ("hub" or a
+    # specialist); display only, cleared with progressStage.
+    progressAgent*: string
     # Answer text streamed while the current attempt writes it (FR-080): a
     # preview only, replaced by the saved result and never kept.
     answerPreview*: string

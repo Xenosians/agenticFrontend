@@ -25,7 +25,7 @@ function fixture(options = {}) {
   };
   if (options.unsupported) delete env.WebSocket;
   const observer = create("https://example.test", "job-123", "csrf-secret", 1000,
-    () => current, value => modes.push(value), value => progress.push(value), env,
+    () => current, value => modes.push(value), (value, agent) => progress.push(agent === null ? value : [value, agent]), env,
     (sequence, text) => answers.push([sequence, text]));
   async function settle() { for (let count = 0; count < 8; count++) await Promise.resolve(); }
   async function tick(duration) {
@@ -168,6 +168,22 @@ test("only bounded stages for the current persisted attempt are shown", async ()
   socket.receive([joinRef, null, "job:job-123", "job_updated", {job_id: "job-123", attempts: 2}]);
   socket.receive([joinRef, null, "job:job-123", "job_progress", {job_id: "job-123", attempt: 1, stage: "executing"}]);
   assert.deepEqual(f.progress, ["routing", "waiting_provider"]);
+  f.observer.close();
+});
+
+test("progress names the agent doing the step only when it is a plain agent name", async () => {
+  const f = fixture();
+  const {socket, joinRef} = await f.join();
+  const frame = payload => socket.receive([joinRef, null, "job:job-123", "job_progress",
+    {job_id: "job-123", attempt: 1, ...payload}]);
+  frame({stage: "planning", agent: "proxmox-specialist"});
+  frame({stage: "routing", agent: "hub"});
+  frame({stage: "executing"});
+  for (const agent of ["Proxmox", "a b", "-x", "x--y", "", "a".repeat(65), 7, null]) {
+    frame({stage: "planning", agent});
+  }
+  assert.deepEqual(f.progress, [["planning", "proxmox-specialist"], ["routing", "hub"], "executing",
+    "planning", "planning", "planning", "planning", "planning", "planning", "planning", "planning"]);
   f.observer.close();
 });
 

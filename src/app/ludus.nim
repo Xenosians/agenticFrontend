@@ -71,11 +71,20 @@ proc training(learningRuns: seq[LearningRun], role: string): bool =
   for learningRun in learningRuns:
     if learningRun.state in activeLearningRunStates and learningRun.role == role: return true
 
+proc stepSpecialist(run: RunState, roster: seq[string]): tuple[agent: string, live: bool] =
+  ## The specialist doing the current step. The agent the AI names live for this step wins (the hub
+  ## routing or writing the answer means no specialist); a live name outside the roster is ignored.
+  ## Without one, the agent the server's job record names decides.
+  if not run.active: return ("", false)
+  if run.progressAgent.len > 0 and run.progressAgent in roster:
+    return ((if run.progressAgent == hubAgent: "" else: run.progressAgent), true)
+  if run.agent != hubAgent and run.agent in roster: (run.agent, false) else: ("", false)
+
 proc ludusScene*(roster: seq[string], run: RunState, system: SystemState, learningRuns: seq[LearningRun],
                  idleSeconds: int): seq[Gladiator] =
   ## One gladiator per roster entry, in roster order.
   let jobPresence = presenceState(run, system, @[], idleSeconds)
-  let specialist = if run.active and run.agent != hubAgent and run.agent in roster: run.agent else: ""
+  let (specialist, live) = stepSpecialist(run, roster)
   for agent in roster:
     var gladiator = Gladiator(agent: agent, presence: apSleeping)
     if not (system.checked and system.backendConnected and system.aiReady):
@@ -92,7 +101,9 @@ proc ludusScene*(roster: seq[string], run: RunState, system: SystemState, learni
         gladiator.presence = apTraining
       else:
         gladiator.presence = jobPresence
-    elif agent == specialist and jobPresence notin {apWalking, apSleeping, apThinking}:
+    elif agent == specialist and (jobPresence notin {apWalking, apSleeping, apThinking} or
+                                  live and jobPresence == apThinking):
+      # A specialist named live also thinks while he plans his call.
       gladiator.presence = jobPresence
     elif training(learningRuns, "specialist"):
       gladiator.presence = apTraining

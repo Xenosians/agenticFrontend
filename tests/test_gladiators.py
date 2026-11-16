@@ -6,6 +6,7 @@ shows every agent's gladiator in one room that zooms in whole-pixel steps. The o
 Settings > Appearance; the choice is saved with the account. Isolated HTTP fixtures only.
 Run after rebuilding: python tests/test_gladiators.py
 """
+import json
 import os
 import unittest
 from pathlib import Path
@@ -27,6 +28,7 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.preference_writes = []
         self.job_status = None
         self.job_agent = None
+        self.job_socket = None
         super().setUp()
         self.page.set_default_timeout(5000)
 
@@ -55,6 +57,9 @@ class GladiatorTests(navigation.ChatNavigationTests):
             if path == "/api/v1/learning/runs":
                 route.fulfill(json={"runs": []})
                 return
+            if self.job_status and path == "/api/v2/jobs/socket-token":
+                route.fulfill(json={"token": "fixture-socket-token"})
+                return
             if self.job_status and path == "/api/v1/jobs" and request.method == "POST":
                 payload = request.post_data_json
                 self.submissions.append(payload)
@@ -73,6 +78,29 @@ class GladiatorTests(navigation.ChatNavigationTests):
 
     def strip(self):
         return self.page.get_by_role("img", name="Janus agents", exact=True)
+
+    def serve_job_socket(self):
+        """A stand-in for Phoenix's job channel: joins, then lets the test push progress frames."""
+        def handler(socket):
+            def on_message(message):
+                frame = json.loads(message)
+                if frame[3] == "phx_join":
+                    socket.send(json.dumps([frame[0], frame[1], frame[2], "phx_reply", {
+                        "status": "ok", "response": {"job_id": "fixture-job", "status": "processing",
+                                                     "attempts": 1}}]))
+                    self.job_socket = (socket, frame[0])
+                elif frame[2] == "phoenix":
+                    socket.send(json.dumps([None, frame[1], "phoenix", "phx_reply",
+                                                          {"status": "ok", "response": {}}]))
+            socket.on_message(on_message)
+        self.page.route_web_socket("**/socket/websocket**", handler)
+
+    def push_progress(self, stage, agent=None):
+        socket, join_ref = self.job_socket
+        payload = {"job_id": "fixture-job", "attempt": 1, "stage": stage}
+        if agent is not None:
+            payload["agent"] = agent
+        socket.send(json.dumps([join_ref, None, "job:fixture-job", "job_progress", payload]))
 
     def test_the_strip_sits_between_the_conversation_and_the_message_box(self):
         for viewport, scale in (({"width": 1440, "height": 900}, 2), ({"width": 390, "height": 760}, 1)):
@@ -111,6 +139,38 @@ class GladiatorTests(navigation.ChatNavigationTests):
         specialist = self.page.locator('.gladiator-strip .gladiator[data-agent="proxmox-specialist"]')
         expect(specialist).to_have_attribute("data-state", "waiting")
         expect(hub).to_have_attribute("data-talking-to", "proxmox-specialist")
+        self.assertEqual(self.errors, [])
+
+    def test_the_hub_hands_the_request_to_the_specialist_while_the_job_runs(self):
+        # Live progress names the agent doing each step, so the hand-off shows before any approval.
+        self.job_status = "processing"
+        self.serve_job_socket()
+        self.open_first_chat()
+        hub = self.page.locator('.gladiator-strip .gladiator[data-agent="hub"]')
+        specialist = self.page.locator('.gladiator-strip .gladiator[data-agent="proxmox-specialist"]')
+        self.page.locator("#messageInput").fill("Check node hummingbird")
+        self.page.locator("#messageInput").press("Enter")
+        expect(hub).to_have_attribute("data-state", "thinking")
+        deadline = 50
+        while self.job_socket is None and deadline:
+            self.page.wait_for_timeout(100)
+            deadline -= 1
+        self.assertIsNotNone(self.job_socket, "the job socket never joined")
+        self.push_progress("routing", "hub")
+        expect(hub).to_have_attribute("data-state", "thinking")
+        expect(specialist).to_have_count(0)
+        self.push_progress("planning", "proxmox-specialist")
+        expect(specialist).to_have_attribute("data-state", "thinking")
+        expect(hub).to_have_attribute("data-talking-to", "proxmox-specialist")
+        self.push_progress("executing", "proxmox-specialist")
+        expect(specialist).to_have_attribute("data-state", "working")
+        # The hub writes the answer alone; a name that is not a plain agent name is never shown.
+        self.push_progress("synthesizing", "hub")
+        expect(hub).to_have_attribute("data-state", "working")
+        expect(hub).to_have_attribute("data-talking-to", "")
+        expect(specialist).to_have_count(0)
+        self.push_progress("planning", "<img src=x>")
+        expect(self.page.locator('.gladiator-strip .gladiator')).to_have_count(1)
         self.assertEqual(self.errors, [])
 
     def test_the_ludus_shows_every_agent_and_zooms_in_whole_steps(self):

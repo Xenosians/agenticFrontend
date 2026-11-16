@@ -23,7 +23,8 @@ proc nowSeconds(): float {.importjs: "(Date.now() / 1000)".}
 
 proc idleSeconds(state: AppState): int =
   ## Seconds since the observed job last changed state, or since the page opened.
-  let key = state.run.jobId & "|" & state.run.status & "|" & state.run.progressStage & "|" & state.run.agent
+  let key = state.run.jobId & "|" & state.run.status & "|" & state.run.progressStage & "|" & state.run.agent &
+    "|" & state.run.progressAgent
   let now = nowSeconds()
   if idleSince == 0.0 or key != lastJobKey:
     idleSince = now
