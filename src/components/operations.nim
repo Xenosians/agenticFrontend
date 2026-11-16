@@ -201,6 +201,86 @@ proc proxmoxFailureHelp(state: AppState): string =
     (if state.proxmoxErrorMessage.len > 0: state.proxmoxErrorMessage & " " else: "") &
       "Check tailscale status, serve status, token permissions and AI logs; never disable TLS verification."
 
+proc databaseAttention(host: ProxmoxDatabaseHost): string =
+  if host.issues.len == 0: return "none"
+  for issue in host.issues:
+    if databaseIssueBlocking(issue): return "blocking"
+  "warning"
+
+proc renderDatabaseHost(host: ProxmoxDatabaseHost): VNode =
+  let name = if host.name.len > 0: host.name else: "Unnamed"
+  # A lock's reason is said once, on its chip.
+  let about = (if host.kind == "qemu": "VM " else: "LXC ") & $host.vmid & " on " & host.node & " · " & host.status
+  result = buildHtml(li(class = "database-host", `data-vmid` = cstring($host.vmid),
+                        `data-attention` = cstring(databaseAttention(host)))):
+    tdiv(class = "database-host-heading"):
+      strong(class = "database-host-name"): text name
+      if host.engine.len > 0:
+        span(class = "database-engine"): text host.engine
+    p(class = "operation-note"): text about
+    dl(class = "database-facts"):
+      tdiv:
+        dt: text "Memory"
+        dd(`data-fact` = "memory"):
+          text databaseMemoryLabel(host.memoryBytes, host.memoryTotalBytes, host.status == "running")
+      tdiv:
+        dt: text "Disk"
+        let (diskValue, diskNote) = databaseDiskParts(host.diskBytes, host.diskTotalBytes)
+        if diskNote.len > 0:
+          dd(`data-fact` = "disk", title = cstring(
+              if host.kind == "qemu": "Proxmox does not measure the disk use of a virtual machine."
+              else: "Proxmox measures a container's disk use only while it runs.")):
+            span(class = "database-fact-value"): text diskValue
+            text " "
+            span(class = "database-fact-value"): text diskNote
+        else:
+          dd(`data-fact` = "disk"):
+            span(class = "database-fact-value"): text diskValue
+      tdiv:
+        dt: text "Backup"
+        dd(`data-fact` = "backup"): text backupJobLabel(host.backupJob)
+    if host.issues.len > 0:
+      ul(class = "database-issues", `aria-label` = cstring("Needs attention: " & name)):
+        for issue in host.issues:
+          li(class = "database-issue", `data-issue` = cstring(issue),
+             `data-blocking` = cstring(if databaseIssueBlocking(issue): "true" else: "false")):
+            text databaseIssueLabel(issue, host.lock)
+
+proc renderDatabaseHosts(databases: ProxmoxDatabases): VNode =
+  result = buildHtml(tdiv(class = "proxmox-table-section proxmox-databases")):
+    tdiv(class = "section-heading-row"):
+      h4: text "Database hosts"
+      span: text $databases.hosts.len & " tagged"
+    if databases.hosts.len == 0:
+      tdiv(class = "empty-card"):
+        text "No database hosts are tagged yet. " & databases.labelHint
+    else:
+      p(class = "database-summary", role = "status"):
+        text $databases.running & " running · " & $databases.notRunning & " not running · " &
+          (if databases.withIssues == 0: "none need attention"
+           elif databases.withIssues == 1: "1 needs attention"
+           else: $databases.withIssues & " need attention")
+      if not databases.coverageKnown:
+        p(class = "operation-note database-coverage-note"):
+          text "Backup coverage unknown" &
+            (if databases.coverageNote.len > 0: ": " & databases.coverageNote else: ".")
+      # The service orders hosts by their most urgent issue, healthy hosts last.
+      ul(class = "database-host-list"):
+        for host in databases.hosts:
+          renderDatabaseHost(host)
+      if databases.truncated:
+        p(class = "operation-note", role = "status"): text "More database hosts exist than this dashboard displays."
+      if databases.storage.len > 0:
+        p(class = "operation-note database-storage"):
+          text "Guest disk storage: " & databases.storage.mapIt(
+            it.storage & (if it.kind.len > 0: " (" & it.kind & ")" else: "") & " on " & it.node &
+            (if it.usedBytes.isSome and it.totalBytes.isSome and it.totalBytes.get > 0:
+               ", " & formatProxmoxBytes(it.usedBytes) & " of " & formatProxmoxBytes(it.totalBytes) & " used (" &
+               formatProxmoxPercent(it.usedBytes, it.totalBytes) & ")"
+             else: "")).join("; ") & "."
+      p(class = "operation-note"):
+        text "Read from Proxmox tags and backup jobs. Janus holds no database credentials and runs no queries."
+
 proc renderProxmoxDashboard(state: AppState): VNode =
   let snapshot = state.proxmox
   var virtualMachines, containers: int
@@ -304,6 +384,8 @@ proc renderProxmoxDashboard(state: AppState): VNode =
                   td: renderGuestActions(state, guest)
         if snapshot.guestsTruncated:
           p(class = "operation-note", role = "status"): text "More guests exist than this dashboard displays."
+      if snapshot.databases.known:
+        renderDatabaseHosts(snapshot.databases)
     renderProxmoxActions(state)
     if state.proxmoxConfirming.len > 0 and confirmingAction(state).actionId.len > 0:
       renderProxmoxConfirm(state)

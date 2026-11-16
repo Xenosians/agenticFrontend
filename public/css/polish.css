@@ -2449,6 +2449,26 @@ body {
 .tailnet-issue { padding: 3px 8px; border: 1px solid var(--border-max); border-radius: 4px; color: var(--text); font-size: 11px; font-weight: 600; }
 .tailnet-issue[data-blocking="true"] { border: 1px solid var(--text); background: var(--text); color: var(--bg); }
 .tailnet-dns { margin: 14px 0 0; color: var(--text-soft); overflow-wrap: anywhere; }
+/* Database hosts: cards in the tailnet's style, so attention reads the same in both panels. */
+.database-summary { margin: 4px 0 0; font-size: 13px; font-weight: 600; }
+.database-coverage-note { margin: 4px 0 0; max-width: 72ch; }
+.database-host-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); align-items: start; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.database-host { min-width: 0; padding: 12px 12px 12px 13px; border: 1px solid var(--border); border-radius: var(--radius-md); }
+.database-host[data-attention="warning"] { border-left: 3px solid var(--border-max); padding-left: 11px; }
+.database-host[data-attention="blocking"] { border: 1px solid var(--border-max); border-left: 6px solid var(--text); padding-left: 8px; }
+.database-host-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 10px; }
+.database-host-name { min-width: 0; font-size: 13px; overflow-wrap: anywhere; }
+.database-engine { flex: none; padding: 1px 7px; border: 1px solid var(--border); border-radius: 999px; color: var(--text); font-size: 11px; }
+.database-host .operation-note { margin: 4px 0 0; color: var(--text-soft); }
+.database-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr)); gap: 8px 12px; margin: 10px 0 0; }
+.database-facts dt { color: var(--text-soft); font-size: 11px; }
+.database-facts dd { margin: 2px 0 0; color: var(--text); font-size: 12px; overflow-wrap: anywhere; }
+/* A value never breaks inside itself; a long disk label wraps between its value and note. */
+.database-fact-value { white-space: nowrap; }
+.database-issues { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.database-issue { padding: 3px 8px; border: 1px solid var(--border-max); border-radius: 4px; color: var(--text); font-size: 11px; font-weight: 600; }
+.database-issue[data-blocking="true"] { border: 1px solid var(--text); background: var(--text); color: var(--bg); }
+.database-storage { margin: 12px 0 0; overflow-wrap: anywhere; }
 @media (max-width: 650px) {
   .operation-counts, .operation-measurements { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .operation-job-heading { flex-wrap: wrap; }

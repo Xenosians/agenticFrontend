@@ -2,6 +2,7 @@
 import copy
 import os
 from pathlib import Path
+import re
 import time
 import unittest
 from urllib.parse import urlparse
@@ -56,7 +57,30 @@ def proxmox_snapshot():
                                            {"vmid": 102, "node": "pve-b", "type": "lxc", "name": None,
                                             "status": "stopped", "cpu_fraction": None, "memory_bytes": 0,
                                             "memory_total_bytes": 0, "disk_bytes": None,
-                                            "disk_total_bytes": None, "uptime_seconds": 0}]}}}
+                                            "disk_total_bytes": None, "uptime_seconds": 0}]},
+                     "databases": database_inventory()}}
+
+
+def database_host(vmid, name, **changes):
+    host = {"vmid": vmid, "node": "pve-a", "type": "lxc", "name": name, "engine": "postgres", "status": "running",
+            "lock": None, "memory_bytes": 536870912, "memory_total_bytes": 1073741824, "disk_bytes": 322122547,
+            "disk_total_bytes": 1073741824, "uptime_seconds": 7200, "backup_job": True, "issues": []}
+    host.update(changes)
+    return host
+
+
+def database_inventory():
+    hosts = [database_host(103, "reports-archive-with-a-long-name", engine=None, status="stopped",
+                           memory_bytes=0, disk_bytes=None, uptime_seconds=None, issues=["not_running"]),
+             database_host(102, "cache", engine="redis", disk_bytes=1020054733, backup_job=False,
+                           issues=["disk_nearly_full", "no_backup_job"]),
+             database_host(101, "orders-db", type="qemu", disk_bytes=None, disk_total_bytes=34359738368)]
+    return {"schema": "proxmox-database-inventory.v1", "count": 3, "truncated": False,
+            "summary": {"running": 2, "not_running": 1, "without_backup_job": 1, "with_issues": 2},
+            "backup_coverage_known": True, "backup_coverage_note": None, "databases": hosts,
+            "storage": [{"node": "pve-a", "storage": "local-lvm", "type": "lvmthin", "shared": False,
+                         "status": "available", "used_bytes": 85899345920, "total_bytes": 107374182400}],
+            "label_hint": None}
 
 
 def proxmox_action(action, vmid, node):
@@ -118,6 +142,7 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.proxmox_status = 200
         self.proxmox_requests = []
         self.proxmox_body = None
+        self.proxmox_overview = None
         self.action_posts = []
         self.action_decisions = []
         self.actions = []
@@ -167,7 +192,7 @@ class OperationsTests(navigation.ChatNavigationTests):
             if path == "/api/v1/proxmox/overview":
                 self.proxmox_requests.append(request.method)
                 if self.proxmox_status == 200:
-                    route.fulfill(json=proxmox_snapshot())
+                    route.fulfill(json=self.proxmox_overview or proxmox_snapshot())
                 else:
                     route.fulfill(status=self.proxmox_status, json=self.proxmox_body or
                                   {"error": getattr(self, "proxmox_error", "proxmox_not_configured")})
@@ -365,6 +390,145 @@ class OperationsTests(navigation.ChatNavigationTests):
                     return Math.abs(state.left - name.left) > 1 || state.top < name.bottom - 1;
                 }).map((card) => card.dataset.name)""")
                 self.assertEqual(misplaced, [], f"device state placement differs at {width}px")
+        self.assert_safe()
+
+    def test_database_hosts_show_their_observed_state_capacity_and_backup_coverage(self):
+        self.open_operations()
+        section = self.page.locator(".proxmox-databases")
+        expect(section.get_by_role("heading", name="Database hosts", exact=True)).to_be_visible()
+        expect(section.locator(".database-summary")).to_have_text("2 running · 1 not running · 2 need attention")
+        hosts = section.locator(".database-host")
+        expect(hosts).to_have_count(3)
+        # The server orders hosts by their most urgent issue; that order is kept.
+        self.assertEqual(hosts.evaluate_all("rows => rows.map((row) => row.dataset.vmid)"), ["103", "102", "101"])
+        self.assertEqual(hosts.evaluate_all("rows => rows.map((row) => row.dataset.attention)"),
+                         ["blocking", "warning", "none"])
+        cache = section.locator('.database-host[data-vmid="102"]')
+        expect(cache.locator(".database-engine")).to_have_text("redis")
+        expect(cache.locator('[data-fact="disk"]')).to_have_text("973 MiB of 1.0 GiB (95%)")
+        expect(cache.locator('[data-fact="backup"]')).to_have_text("No backup job")
+        expect(cache.locator(".database-issue")).to_have_text(["Disk nearly full", "No backup job"])
+        # A VM's disk use is not measured by Proxmox: its size is shown as a size, never as use.
+        orders = section.locator('.database-host[data-vmid="101"]')
+        expect(orders.locator('[data-fact="disk"]')).to_have_text("Size 32.0 GiB, use not measured")
+        expect(orders.locator('[data-fact="disk"]')).to_have_attribute("title", re.compile("does not measure"))
+        expect(orders.locator('[data-fact="backup"]')).to_have_text("Covered by a backup job")
+        expect(orders.locator(".database-issue")).to_have_count(0)
+        expect(cache.locator('[data-fact="memory"]')).to_have_text("512 MiB of 1.0 GiB")
+        stopped = section.locator('.database-host[data-vmid="103"]')
+        # A stopped host uses no memory; what it is assigned is the useful fact.
+        expect(stopped.locator('[data-fact="memory"]')).to_have_text("1.0 GiB assigned")
+        expect(stopped.locator(".database-engine")).to_have_count(0)
+        expect(stopped.locator(".database-issue")).to_have_text(["Not running"])
+        expect(stopped.locator('.database-issue[data-blocking="true"]')).to_have_count(1)
+        expect(section.locator(".database-storage")).to_have_text(
+            "Guest disk storage: local-lvm (lvmthin) on pve-a, 80.0 GiB of 100.0 GiB used (80%).")
+        # Read-only: the section offers no actions of its own.
+        expect(section.get_by_role("button")).to_have_count(0)
+        self.assert_safe()
+
+    def test_an_untagged_cluster_explains_how_to_list_a_database_host(self):
+        body = proxmox_snapshot()
+        body["data"]["databases"].update(count=0, databases=[], storage=[],
+                                         summary={"running": 0, "not_running": 0, "without_backup_job": 0,
+                                                  "with_issues": 0},
+                                         label_hint='Tag a VM or container "db" or "db-<engine>" (for example '
+                                                    '"db-postgres") in Proxmox to list it here.')
+        self.proxmox_overview = body
+        self.open_operations()
+        section = self.page.locator(".proxmox-databases")
+        expect(section.locator(".database-host")).to_have_count(0)
+        expect(section.locator(".empty-card")).to_contain_text("No database hosts are tagged yet.")
+        expect(section.locator(".empty-card")).to_contain_text('"db-postgres"')
+        self.assertGreaterEqual(self.page.evaluate(CONTRAST, ".proxmox-databases .empty-card"), 4.5)
+        self.assert_safe()
+
+    def test_a_backup_lock_is_a_mild_warning_that_names_its_reason(self):
+        body = proxmox_snapshot()
+        inventory = body["data"]["databases"]
+        inventory["databases"].insert(2, database_host(104, "billing", engine="mariadb", lock="backup",
+                                                       issues=["locked"]))
+        inventory.update(count=4, summary={"running": 3, "not_running": 1, "without_backup_job": 1,
+                                           "with_issues": 3})
+        self.proxmox_overview = body
+        self.open_operations()
+        billing = self.page.locator('.proxmox-databases .database-host[data-vmid="104"]')
+        expect(billing).to_have_attribute("data-attention", "warning")
+        expect(billing.locator(".database-issue")).to_have_text(["Locked: backup"])
+        expect(billing.locator('.database-issue[data-blocking="true"]')).to_have_count(0)
+        # The reason is said once, on the chip; the line under the name stays short.
+        expect(billing.locator(".operation-note")).to_have_text("LXC 104 on pve-a · running")
+        self.assert_safe()
+
+    def test_unknown_backup_coverage_says_why_and_marks_no_host_unprotected(self):
+        body = proxmox_snapshot()
+        inventory = body["data"]["databases"]
+        inventory.update(backup_coverage_known=False,
+                         backup_coverage_note="Proxmox refused the backup coverage read (HTTP 403); "
+                                              "the token needs Sys.Audit on / to see backup jobs.",
+                         summary={"running": 2, "not_running": 1, "without_backup_job": None, "with_issues": 1})
+        for host in inventory["databases"]:
+            host["backup_job"] = None
+            host["issues"] = [issue for issue in host["issues"] if issue != "no_backup_job"]
+        self.proxmox_overview = body
+        self.open_operations()
+        section = self.page.locator(".proxmox-databases")
+        expect(section.locator(".database-summary")).to_have_text("2 running · 1 not running · 1 needs attention")
+        expect(section.locator(".database-coverage-note")).to_contain_text("Backup coverage unknown: Proxmox refused")
+        expect(section.locator(".database-coverage-note")).to_contain_text("needs Sys.Audit")
+        expect(section.locator('[data-fact="backup"]')).to_have_text(["Backup coverage unknown"] * 3)
+        expect(section.locator('.database-issue[data-issue="no_backup_job"]')).to_have_count(0)
+        self.assert_safe()
+
+    def test_an_ai_service_without_the_database_section_shows_no_database_claims(self):
+        body = proxmox_snapshot()
+        del body["data"]["databases"]
+        self.proxmox_overview = body
+        self.open_operations()
+        expect(self.page.locator(".proxmox-guest-row")).to_have_count(2)
+        expect(self.page.locator(".proxmox-databases")).to_have_count(0)
+        self.assert_safe()
+
+    def test_the_database_hosts_are_legible_at_both_widths(self):
+        body = proxmox_snapshot()
+        body["data"]["databases"]["databases"][0]["engine"] = "postgresql-with-timescale"
+        self.proxmox_overview = body
+        for width, height in ((1440, 900), (390, 760)):
+            self.page.set_viewport_size({"width": width, "height": height})
+            self.open_operations()
+            section = self.page.locator(".proxmox-databases")
+            section.locator(".database-host").first.wait_for()
+            for selector in (".database-host-name", ".database-host .operation-note", ".database-issue",
+                             ".database-summary", ".database-storage", ".database-facts dd"):
+                with self.subTest(width=width, selector=selector):
+                    self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
+            self.assertGreaterEqual(self.font_px(".database-issue"), 11)
+            # An engine chip never covers its host's name, however long the name is.
+            covered = self.page.evaluate("""() => [...document.querySelectorAll('.database-host')].filter((row) => {
+                const chip = row.querySelector('.database-engine');
+                if (!chip) return false;
+                const a = row.querySelector('.database-host-name').getBoundingClientRect(), b = chip.getBoundingClientRect();
+                return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+            }).map((row) => row.dataset.vmid)""")
+            self.assertEqual(covered, [], f"an engine chip covers a name at {width}px")
+            self.assertTrue(self.page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"),
+                            f"Operations overflows at {width}px")
+            overflow = self.page.evaluate("""() => [...document.querySelectorAll('.database-host')]
+                .some((row) => row.scrollWidth > row.clientWidth + 1)""")
+            self.assertFalse(overflow, f"a database host overflows at {width}px")
+            # A measured disk value stays on one line; no number or unit is ever split.
+            lines = self.page.evaluate("""() => {
+                const value = document.querySelector('.database-host[data-vmid="102"] [data-fact="disk"]');
+                return Math.round(value.getBoundingClientRect().height / (parseFloat(getComputedStyle(value).fontSize) * 1.6));
+            }""")
+            self.assertEqual(lines, 1, f"a disk value wraps at {width}px")
+            split = self.page.evaluate("""() => [...document.querySelectorAll('.database-fact-value')]
+                .filter((value) => value.getClientRects().length > 1).map((value) => value.textContent)""")
+            self.assertEqual(split, [], f"a fact value breaks inside itself at {width}px")
+            # Every host states its facts in the same order.
+            orders = section.locator(".database-host").evaluate_all(
+                "rows => rows.map((row) => [...row.querySelectorAll('.database-facts dt')].map((term) => term.textContent).join('|'))")
+            self.assertEqual(set(orders), {"Memory|Disk|Backup"})
         self.assert_safe()
 
     def test_queue_counts_and_call_measurements_come_from_snapshot(self):
