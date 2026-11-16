@@ -232,6 +232,7 @@ proc clearOperations*(state: AppState) =
   # Pins belong to the owner: none are shown until this owner's own load.
   state.pinnedViews = @[]
   state.pinsKnown = false
+  state.gladiators = true
   state.dashboardsOpen = false
   state.pinError = ""
 

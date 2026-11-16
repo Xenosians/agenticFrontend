@@ -1,0 +1,235 @@
+/* =========================================================
+   GLADIATORS (F1): one pixel gladiator per Janus agent
+   =========================================================
+   Each sheet is public/assets/gladiators/<agent>.png: 8 state rows x 4 frame
+   columns of 32x40 art pixels, ink opaque and half-tone translucent. It masks
+   currentColor, so the art follows the theme, and it scales only in whole
+   steps (--gladiator-scale) with pixelated sampling, so it stays crisp. */
+
+.gladiator {
+  --gladiator-scale: 2;
+  --gladiator-row: 0;
+  --gladiator-frames: 4;
+
+  display: inline-block;
+  flex-shrink: 0;
+
+  width: calc(32px * var(--gladiator-scale));
+  height: calc(40px * var(--gladiator-scale));
+  padding: 0;
+  border: 0;
+
+  color: var(--text);
+  background-color: currentColor;
+
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: calc(128px * var(--gladiator-scale)) calc(320px * var(--gladiator-scale));
+  mask-size: calc(128px * var(--gladiator-scale)) calc(320px * var(--gladiator-scale));
+  -webkit-mask-position: 0 calc(-40px * var(--gladiator-scale) * var(--gladiator-row));
+  mask-position: 0 calc(-40px * var(--gladiator-scale) * var(--gladiator-row));
+
+  image-rendering: pixelated;
+}
+
+.gladiator[data-agent="hub"] { -webkit-mask-image: url("../assets/gladiators/hub.png"); mask-image: url("../assets/gladiators/hub.png"); }
+.gladiator[data-agent="access-specialist"] { -webkit-mask-image: url("../assets/gladiators/access-specialist.png"); mask-image: url("../assets/gladiators/access-specialist.png"); }
+.gladiator[data-agent="account-specialist"] { -webkit-mask-image: url("../assets/gladiators/account-specialist.png"); mask-image: url("../assets/gladiators/account-specialist.png"); }
+.gladiator[data-agent="asset-specialist"] { -webkit-mask-image: url("../assets/gladiators/asset-specialist.png"); mask-image: url("../assets/gladiators/asset-specialist.png"); }
+.gladiator[data-agent="atlassian-specialist"] { -webkit-mask-image: url("../assets/gladiators/atlassian-specialist.png"); mask-image: url("../assets/gladiators/atlassian-specialist.png"); }
+.gladiator[data-agent="developer-specialist"] { -webkit-mask-image: url("../assets/gladiators/developer-specialist.png"); mask-image: url("../assets/gladiators/developer-specialist.png"); }
+.gladiator[data-agent="jira-specialist"] { -webkit-mask-image: url("../assets/gladiators/jira-specialist.png"); mask-image: url("../assets/gladiators/jira-specialist.png"); }
+.gladiator[data-agent="knowledge-specialist"] { -webkit-mask-image: url("../assets/gladiators/knowledge-specialist.png"); mask-image: url("../assets/gladiators/knowledge-specialist.png"); }
+.gladiator[data-agent="networking-specialist"] { -webkit-mask-image: url("../assets/gladiators/networking-specialist.png"); mask-image: url("../assets/gladiators/networking-specialist.png"); }
+.gladiator[data-agent="operations-specialist"] { -webkit-mask-image: url("../assets/gladiators/operations-specialist.png"); mask-image: url("../assets/gladiators/operations-specialist.png"); }
+.gladiator[data-agent="proxmox-specialist"] { -webkit-mask-image: url("../assets/gladiators/proxmox-specialist.png"); mask-image: url("../assets/gladiators/proxmox-specialist.png"); }
+.gladiator[data-agent="service-desk-specialist"] { -webkit-mask-image: url("../assets/gladiators/service-desk-specialist.png"); mask-image: url("../assets/gladiators/service-desk-specialist.png"); }
+.gladiator[data-agent="ticket-specialist"] { -webkit-mask-image: url("../assets/gladiators/ticket-specialist.png"); mask-image: url("../assets/gladiators/ticket-specialist.png"); }
+
+.gladiator-sleeping { --gladiator-row: 0; animation: gladiator-frames-3 2400ms steps(3) infinite; }
+.gladiator-walking { --gladiator-row: 1; animation: gladiator-frames-4 640ms steps(4) infinite; }
+.gladiator-thinking { --gladiator-row: 2; animation: gladiator-frames-3 1500ms steps(3) infinite; }
+.gladiator-working { --gladiator-row: 3; animation: gladiator-frames-4 400ms steps(4) infinite; }
+.gladiator-training { --gladiator-row: 4; animation: gladiator-frames-3 900ms steps(3) infinite; }
+.gladiator-waiting { --gladiator-row: 5; animation: gladiator-frames-2 1000ms steps(2) infinite; }
+.gladiator-celebrating { --gladiator-row: 6; animation: gladiator-frames-4 800ms steps(4) infinite; }
+.gladiator-hurt { --gladiator-row: 7; animation: gladiator-frames-2 1000ms steps(2) infinite; }
+
+@keyframes gladiator-frames-2 {
+  from { -webkit-mask-position-x: 0; mask-position-x: 0; }
+  to { -webkit-mask-position-x: calc(-32px * var(--gladiator-scale) * 2); mask-position-x: calc(-32px * var(--gladiator-scale) * 2); }
+}
+@keyframes gladiator-frames-3 {
+  from { -webkit-mask-position-x: 0; mask-position-x: 0; }
+  to { -webkit-mask-position-x: calc(-32px * var(--gladiator-scale) * 3); mask-position-x: calc(-32px * var(--gladiator-scale) * 3); }
+}
+@keyframes gladiator-frames-4 {
+  from { -webkit-mask-position-x: 0; mask-position-x: 0; }
+  to { -webkit-mask-position-x: calc(-32px * var(--gladiator-scale) * 4); mask-position-x: calc(-32px * var(--gladiator-scale) * 4); }
+}
+
+/* The strip: its own row directly above the message box, never over the chat or the composer. */
+.gladiator-strip {
+  flex-shrink: 0;
+
+  box-sizing: border-box;
+  width: min(100%, 920px);
+  height: 84px;
+  margin: 0 auto;
+  padding: 2px 28px 0;
+
+  overflow: hidden;
+}
+
+.gladiator-track {
+  height: 100%;
+
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+
+  animation: gladiator-stroll 36s ease-in-out infinite alternate;
+}
+
+/* The hub walks along the strip only while he is walking about; any other state holds him still. */
+.gladiator-track:not(:has(.gladiator-walking)) {
+  animation-play-state: paused;
+}
+
+@keyframes gladiator-stroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(min(100vw, 920px) - 56px - 64px - 140px)); }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The Ludus: every agent in one room, zoomed in whole steps. */
+.ludus {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ludus-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ludus-zoom-button {
+  width: 28px;
+  height: 28px;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.ludus-zoom-button:disabled {
+  opacity: 0.4;
+}
+
+.ludus-zoom-level {
+  min-width: 28px;
+  text-align: center;
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.ludus-viewport {
+  max-height: 60vh;
+  overflow: auto;
+
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.ludus-room {
+  --gladiator-scale: 2;
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(max-content, 1fr));
+  gap: 1px;
+
+  width: max-content;
+  min-width: 100%;
+
+  background: var(--border);
+}
+
+.ludus-room.zoom-1 { --gladiator-scale: 1; }
+.ludus-room.zoom-2 { --gladiator-scale: 2; }
+.ludus-room.zoom-3 { --gladiator-scale: 3; }
+.ludus-room.zoom-4 { --gladiator-scale: 4; }
+
+.ludus-room .gladiator {
+  --gladiator-scale: inherit;
+  cursor: pointer;
+}
+
+.ludus-room .gladiator:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.ludus-area {
+  padding: 6px 8px 8px;
+  background: var(--surface-sunken);
+}
+
+.ludus-area-name {
+  display: block;
+  margin-bottom: 4px;
+
+  color: var(--text-soft);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ludus-area-floor {
+  min-height: calc(40px * var(--gladiator-scale, 2));
+
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 4px;
+
+  border-bottom: 1px solid var(--border-strong);
+}
+
+.ludus-focus {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.ludus-focus strong {
+  color: var(--text);
+}
+
+@media (max-width: 760px) {
+  .gladiator-strip {
+    height: 44px;
+    padding: 2px 13px 0;
+  }
+
+  .gladiator-strip .gladiator {
+    --gladiator-scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gladiator,
+  .gladiator-track {
+    animation: none;
+  }
+}

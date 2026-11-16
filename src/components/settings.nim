@@ -52,6 +52,13 @@ proc renderAppearance(state: AppState): VNode =
       span(class = "settings-field-label"): text "Accent"
       renderChoiceGroup("Accent", accents, state.accent, disabled, accentLabel, true,
         proc(accent: Accent) = discard saveAccent(state, accent))
+    label(class = "settings-toggle"):
+      input(`type` = "checkbox", checked = state.gladiators, disabled = disabled):
+        proc onchange(event: Event, node: VNode) =
+          discard saveGladiators(state, not state.gladiators)
+      span:
+        strong: text "Show the agents' gladiators"
+        small: text "Each agent is a gladiator that acts out what it is doing."
   settingsSection("Appearance", "Saved to your account, so it follows you to any browser.", body)
 
 proc renderNotifications(state: AppState): VNode =

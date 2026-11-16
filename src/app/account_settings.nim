@@ -8,6 +8,7 @@ type NotificationPreferences* = object
   accent*: Accent
   pinnedViews*: seq[Dashboard]
   pinsKnown*: bool  ## False when the saved pins are not a list of known dashboards.
+  gladiators*: bool  ## Whether the agents' gladiators are shown.
 
 proc parsePins(node: JsonNode): (seq[Dashboard], bool) =
   ## The saved pins in order, or not known: an unknown or repeated value is never guessed.
@@ -33,8 +34,12 @@ proc parseNotificationPreferences*(node: JsonNode): NotificationPreferences =
     raise newException(ValueError, "The settings response was invalid.")
   # A server from before pinning keeps the dashboards the rail always had.
   let (pins, known) = if saved.hasKey("pinned_views"): parsePins(saved["pinned_views"]) else: (defaultPins, true)
+  # A server from before the gladiators shows them, as the default does.
+  if saved.hasKey("gladiators") and saved["gladiators"].kind != JBool:
+    raise newException(ValueError, "The settings response was invalid.")
   NotificationPreferences(taskCompleted: saved["task_completed"].getBool(),
-    theme: theme.get, accent: accent.get, pinnedViews: pins, pinsKnown: known)
+    theme: theme.get, accent: accent.get, pinnedViews: pins, pinsKnown: known,
+    gladiators: not saved.hasKey("gladiators") or saved["gladiators"].getBool())
 
 proc parseOtherSessionRevocation*(node: JsonNode): int =
   if node.kind != JObject or not node.hasKey("status") or

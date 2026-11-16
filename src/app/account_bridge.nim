@@ -27,6 +27,7 @@ proc applySavedPreferences(state: AppState, saved: NotificationPreferences) =
   state.accent = saved.accent
   state.pinnedViews = saved.pinnedViews
   state.pinsKnown = saved.pinsKnown
+  state.gladiators = saved.gladiators
   state.preferencesLoaded = true
   applyAppearance(state)
 
@@ -116,6 +117,14 @@ proc saveAccent*(state: AppState, accent: Accent) {.async.} =
   applyAppearance(state)
   await saveSetting(state, %*{"accent": accentValue(accent)}, "Accent saved.",
     proc() = state.accent = saved)
+
+proc saveGladiators*(state: AppState, shown: bool) {.async.} =
+  if shown == state.gladiators or not canSaveSettings(state): return
+  let saved = state.gladiators
+  state.gladiators = shown  # Preview at once; the server's receipt confirms it.
+  await saveSetting(state, %*{"gladiators": shown},
+    (if shown: "The gladiators are shown." else: "The gladiators are hidden."),
+    proc() = state.gladiators = saved)
 
 proc saveCompletionMail*(state: AppState, enabled: bool) {.async.} =
   if enabled == state.completionMail or not canSaveSettings(state): return

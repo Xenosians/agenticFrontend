@@ -4,6 +4,7 @@ import ../app/types
 import ../app/state
 
 import result_card
+import gladiators
 
 
 import ../app/job_status
@@ -332,6 +333,28 @@ proc renderInspector*(
           )
 
 
+      if state.gladiators:
+        button(
+          class =
+            tabClass(
+              state.inspectorTab,
+              tabLudus
+            )
+        ):
+
+          text "Ludus"
+
+          proc onclick(
+            event: Event,
+            node: VNode
+          ) =
+
+            setInspectorTab(
+              state,
+              tabLudus
+            )
+
+
     section(class = "inspector-content"):
 
       case state.inspectorTab
@@ -347,6 +370,17 @@ proc renderInspector*(
         renderEventsTab(
           state
         )
+
+      of tabLudus:
+
+        if state.gladiators:
+          renderLudus(
+            state
+          )
+        else:
+          renderRunTab(
+            state
+          )
 
       of tabRaw:
 

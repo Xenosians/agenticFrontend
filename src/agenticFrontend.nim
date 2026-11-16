@@ -31,6 +31,7 @@ import components/inspector
 import components/result_card
 import components/required_operations
 import components/statusbar
+import components/gladiators
 import components/chat_search
 import components/operations
 import components/review
@@ -792,6 +793,10 @@ proc renderWorkspace(): VNode =
 
     if appState.activeView == viewChat and
        not appState.commandPaletteOpen:
+      if appState.gladiators:
+        renderGladiatorStrip(
+          appState
+        )
       renderComposer(
         appState
       )
@@ -961,6 +966,16 @@ if frontendConfig.healthIntervalMs > 0:
         discard refreshLearningRuns(appState),
     frontendConfig.healthIntervalMs
   )
+
+# The gladiators act out time as well as events (a finished job's moment, a long quiet spell): redraw
+# once a second while they are shown.
+discard setInterval(
+  proc() =
+    if appState.auth.authenticated and appState.gladiators and
+        (appState.activeView == viewChat or appState.inspectorOpen):
+      redraw(kxi),
+  1000
+)
 
 installDashboardMenu(appState)
 

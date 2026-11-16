@@ -43,7 +43,8 @@ type
   InspectorTab* = enum
     tabRun,
     tabEvents,
-    tabRaw
+    tabRaw,
+    tabLudus
 
   ComposerPanel* = enum
     cpNone,
@@ -343,6 +344,8 @@ type
     # Dashboards pinned to the rail, as saved; the "+" list offers every dashboard.
     pinnedViews*: seq[Dashboard]
     pinsKnown*: bool
+    ## Whether the agents' gladiators are shown, as saved; shown by default.
+    gladiators*: bool
     dashboardsOpen*: bool
     pinError*: string
     nextMessageId*: int

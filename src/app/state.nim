@@ -89,6 +89,10 @@ proc initAppState*():
     inspectorOpen:
       false,
 
+    # The agents' gladiators are shown until the owner's saved setting says otherwise.
+    gladiators:
+      true,
+
     headerMenuOpen:
       false,
 
