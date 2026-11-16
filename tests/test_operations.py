@@ -132,6 +132,69 @@ def tailnet_overview():
                      "dns_error": None}}
 
 
+LINES_OF = """(selector) => [...document.querySelectorAll(selector)].map((node) => {
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    return new Set([...range.getClientRects()].filter((rect) => rect.width > 0)
+        .map((rect) => Math.round(rect.top))).size;
+})"""
+
+# Each unit is one fact ("2.0 GiB"); report the units laid out over more than one line.
+SPLIT_UNITS = """(units) => [...document.querySelectorAll('[data-fact="copy"]')].flatMap((value) => {
+    const node = value.firstChild;
+    const text = node.textContent.replace(/\\u00a0/g, " ");
+    return units.filter((unit) => {
+        const at = text.indexOf(unit);
+        if (at < 0) return false;
+        const range = document.createRange();
+        range.setStart(node, at);
+        range.setEnd(node, at + unit.length);
+        return new Set([...range.getClientRects()].filter((rect) => rect.width > 0)
+            .map((rect) => Math.round(rect.top))).size !== 1;
+    });
+})"""
+
+
+def backup_guest(vmid, name, issues=(), age=None, **changes):
+    latest = None if age is None else {"storage": "pbs", "time": 1794800000, "age_days": age,
+                                       "size_bytes": 2147483648, "protected": False, "encrypted": True,
+                                       "verified": "ok"}
+    row = {"vmid": vmid, "node": "pve-a", "type": "lxc", "name": name, "backup_job": "no_backup_job" not in issues,
+           "backups": 0 if latest is None else 3, "latest": latest, "issues": list(issues)}
+    row.update(changes)
+    return row
+
+
+def proxmox_health():
+    guests = [backup_guest(990, "janus-lab", ("never_backed_up", "no_backup_job")),
+              backup_guest(102, "cache", ("backup_stale",), age=12.0),
+              backup_guest(101, "orders-db-with-a-long-name", age=0.4, type="qemu")]
+    disks = [{"device": "/dev/sda", "type": "hdd", "model": "WDC WD40EFRX", "size_bytes": 4000787030016,
+              "health": "failed", "wear_used_percent": None, "used_by": "ZFS", "issues": ["smart_failed"]},
+             {"device": "/dev/nvme0n1", "type": "nvme", "model": "INTEL SSDPEKNW512G8", "size_bytes": 512110190592,
+              "health": "passed", "wear_used_percent": 12, "used_by": "BIOS boot", "issues": []}]
+    return {"schema": "proxmox-health.v1",
+            "backups": {"ok": True, "status": "success", "provider": "proxmox",
+                        "observed_at": "2026-11-16T08:00:00Z",
+                        "data": {"schema": "proxmox-backups.v1", "jobs": {"count": 1, "enabled": 1},
+                                 "coverage_known": True, "coverage_note": None, "listing_complete": True,
+                                 "stale_after_days": 8, "unreadable_storages": [],
+                                 "summary": {"guests": 3, "with_recent_backup": 1, "stale": 1, "never": 1,
+                                             "without_backup_job": 1},
+                                 "storages": [{"node": "pve-a", "storage": "pbs", "type": "pbs", "shared": True,
+                                               "backups": 6}],
+                                 "count": 3, "truncated": False, "guests": guests}},
+            "disks": [{"node": "pve-a", "result": {"ok": True, "status": "success", "provider": "proxmox",
+                                                   "observed_at": "2026-11-16T08:00:00Z",
+                                                   "data": {"node": "pve-a", "count": 2, "truncated": False,
+                                                            "summary": {"disks": 2, "failing": 1, "worn": 0,
+                                                                        "health_unknown": 0},
+                                                            "disks": disks}}},
+                      {"node": "pve-b", "result": {"ok": False, "status": "error", "provider": "proxmox",
+                                                   "error_code": "provider_error",
+                                                   "error": "Proxmox refused the read (HTTP 403)."}}]}
+
+
 class OperationsTests(navigation.ChatNavigationTests):
     def setUp(self):
         self.snapshot = snapshot()
@@ -143,6 +206,9 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.proxmox_requests = []
         self.proxmox_body = None
         self.proxmox_overview = None
+        self.health_requests = []
+        self.health_status = 200
+        self.health_body = None
         self.action_posts = []
         self.action_decisions = []
         self.actions = []
@@ -197,6 +263,14 @@ class OperationsTests(navigation.ChatNavigationTests):
                     route.fulfill(status=self.proxmox_status, json=self.proxmox_body or
                                   {"error": getattr(self, "proxmox_error", "proxmox_not_configured")})
                 return
+            if path == "/api/v1/proxmox/health":
+                self.health_requests.append(request.method)
+                if self.health_status == 200:
+                    route.fulfill(json=self.health_body or proxmox_health())
+                else:
+                    route.fulfill(status=self.health_status, json=self.health_body or
+                                  {"error": "proxmox_dashboard_unavailable"})
+                return
             if path == "/api/v1/tailnet/overview":
                 self.tailnet_requests.append(request.method)
                 if self.tailnet_status == 200:
@@ -246,6 +320,7 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.assertTrue(all(method == "GET" for method in self.operations_requests))
         self.assertTrue(all(method == "GET" for method in self.proxmox_requests))
         self.assertTrue(all(method == "GET" for method in self.tailnet_requests))
+        self.assertTrue(all(method == "GET" for method in self.health_requests))
         self.assertEqual(self.submissions, [])
         self.assertEqual(self.errors, [])
 
@@ -529,6 +604,167 @@ class OperationsTests(navigation.ChatNavigationTests):
             orders = section.locator(".database-host").evaluate_all(
                 "rows => rows.map((row) => [...row.querySelectorAll('.database-facts dt')].map((term) => term.textContent).join('|'))")
             self.assertEqual(set(orders), {"Memory|Disk|Backup"})
+        self.assert_safe()
+
+    def test_backups_show_each_guests_newest_backup_and_what_is_overdue(self):
+        self.open_operations()
+        section = self.page.locator(".proxmox-backups")
+        expect(section.get_by_role("heading", name="Backups", exact=True)).to_be_visible()
+        expect(section.locator(".backup-summary")).to_have_text(
+            "3 guests: 1 up to date · 1 overdue · 1 never backed up · 1 backup job")
+        rows = section.locator(".backup-guest")
+        expect(rows).to_have_count(3)
+        self.assertEqual(rows.evaluate_all("rows => rows.map((row) => row.dataset.vmid)"), ["990", "102", "101"])
+        self.assertEqual(rows.evaluate_all("rows => rows.map((row) => row.dataset.attention)"),
+                         ["blocking", "warning", "none"])
+        lab = section.locator('.backup-guest[data-vmid="990"]')
+        expect(lab.locator('[data-fact="latest"]')).to_have_text("Never")
+        expect(lab.locator(".backup-issue")).to_have_text(["Never backed up", "No backup job"])
+        cache = section.locator('.backup-guest[data-vmid="102"]')
+        expect(cache.locator('[data-fact="latest"]')).to_have_text("12 days ago")
+        expect(cache.locator(".backup-issue")).to_have_text(["Overdue: older than 8 days"])
+        orders = section.locator('.backup-guest[data-vmid="101"]')
+        expect(orders.locator('[data-fact="latest"]')).to_have_text("Today")
+        expect(orders.locator('[data-fact="copy"]')).to_have_text("2.0 GiB on pbs, encrypted, verified ok")
+        # Every card keeps its facts in the same places; the long copy line comes last.
+        self.assertEqual(orders.locator("dt").all_text_contents(), ["Newest backup", "Backup job", "Newest copy"])
+        self.assertEqual(lab.locator("dt").all_text_contents(), ["Newest backup", "Backup job"])
+        expect(section.get_by_role("button")).to_have_count(0)
+        self.assertEqual(self.health_requests, ["GET"])
+        self.assert_safe()
+
+    def test_physical_disks_name_a_failing_disk_and_a_node_that_could_not_be_read(self):
+        self.open_operations()
+        section = self.page.locator(".proxmox-disks")
+        expect(section.get_by_role("heading", name="Physical disks", exact=True)).to_be_visible()
+        failing = section.locator('.physical-disk[data-device="/dev/sda"]')
+        expect(failing).to_have_attribute("data-attention", "blocking")
+        expect(failing.locator('[data-fact="health"]')).to_have_text("SMART failed")
+        expect(failing.locator(".disk-issue")).to_have_text(["Failing: replace it"])
+        expect(failing.locator('[data-fact="wear"]')).to_have_text("Not reported")
+        expect(failing.locator('[data-fact="usage"]')).to_have_text("ZFS")
+        nvme = section.locator('.physical-disk[data-device="/dev/nvme0n1"]')
+        expect(nvme.locator('[data-fact="wear"]')).to_have_text("12% of rated life used")
+        expect(nvme.locator(".disk-issue")).to_have_count(0)
+        # The failing disk first, then the node whose disks could not be read (marked, not hidden), then the rest.
+        self.assertEqual(section.locator(".physical-disk-list > li").evaluate_all(
+            "rows => rows.map((row) => row.dataset.device || row.dataset.node)"), ["/dev/sda", "pve-b", "/dev/nvme0n1"])
+        unreadable = section.locator('.disk-node-unavailable[data-node="pve-b"]')
+        expect(unreadable).to_have_attribute("data-attention", "warning")
+        expect(unreadable.locator(".physical-disk-name")).to_have_text("pve-b")
+        expect(unreadable.locator(".disk-issue")).to_have_text(["Disks unknown"])
+        expect(unreadable.locator(".operation-note")).to_have_text(
+            "Disks could not be read: Proxmox refused the read (HTTP 403).")
+        self.assert_safe()
+
+    def test_an_unreadable_backup_storage_says_backups_cannot_be_confirmed(self):
+        body = proxmox_health()
+        data = body["backups"]["data"]
+        data.update(listing_complete=False, unreadable_storages=[
+            {"node": "pve-a", "storage": "nas", "reason": "Proxmox refused the read (HTTP 403)."}],
+            summary={"guests": 3, "with_recent_backup": 1, "stale": 0, "never": 0, "without_backup_job": 1})
+        for guest in data["guests"]:
+            guest["issues"] = [issue for issue in guest["issues"] if issue == "no_backup_job"]
+        self.health_body = body
+        self.open_operations()
+        section = self.page.locator(".proxmox-backups")
+        expect(section.locator(".backup-incomplete")).to_contain_text(
+            "nas on pve-a: Proxmox refused the read (HTTP 403).")
+        expect(section.locator(".backup-incomplete")).to_contain_text("cannot be confirmed")
+        expect(section.locator('.backup-issue[data-issue="never_backed_up"]')).to_have_count(0)
+        self.assert_safe()
+
+    def test_backups_and_disks_refresh_less_often_and_only_while_on_screen(self):
+        self.page.clock.install()
+        self.open_operations()
+        self.page.locator(".proxmox-backups .backup-guest").first.wait_for()
+        self.assertEqual(self.health_requests, ["GET"])
+        self.page.clock.run_for(30_500)
+        self.page.wait_for_timeout(200)
+        self.assertEqual(self.health_requests, ["GET"], "backups and disks re-read sooner than every minute")
+        self.page.clock.run_for(30_000)
+        self.wait_for_count(self.health_requests, 2)
+        seen = len(self.health_requests)
+        self.set_visibility("hidden")
+        self.page.clock.run_for(180_000)
+        self.page.wait_for_timeout(200)
+        self.assertEqual(len(self.health_requests), seen, "a hidden page kept reading backups and disks")
+        self.assert_safe()
+
+    def test_an_unavailable_health_read_never_shows_empty_backups(self):
+        self.health_status = 503
+        self.health_body = {"error": "proxmox_read_failed", "reason": "provider_timeout",
+                            "message": "Proxmox VE did not answer in time."}
+        self.open_operations()
+        failure = self.page.locator(".proxmox-health-unavailable")
+        expect(failure).to_contain_text("Backups and disks could not be read")
+        expect(failure).to_contain_text("did not answer in time")
+        # It says how it recovers and what it does not affect.
+        expect(failure).to_contain_text("read again every minute while this page is open")
+        expect(failure).to_contain_text("The guest inventory is unaffected.")
+        expect(self.page.locator(".backup-guest, .physical-disk")).to_have_count(0)
+        self.assert_safe()
+
+    def test_a_failing_disk_on_any_node_comes_before_healthy_disks_on_every_node(self):
+        body = proxmox_health()
+        first, second = body["disks"]
+        failing, healthy = first["result"]["data"]["disks"]
+        first["result"]["data"].update(disks=[healthy], count=1)
+        second["result"] = {"ok": True, "status": "success", "provider": "proxmox",
+                            "observed_at": "2026-11-16T08:00:00Z",
+                            "data": {"node": "pve-b", "count": 1, "truncated": False,
+                                     "summary": {"disks": 1, "failing": 1, "worn": 0, "health_unknown": 0},
+                                     "disks": [failing]}}
+        self.health_body = body
+        self.open_operations()
+        rows = self.page.locator(".proxmox-disks .physical-disk-list > li")
+        self.assertEqual(rows.evaluate_all("rows => rows.map((row) => row.dataset.node + ' ' + row.dataset.device)"),
+                         ["pve-b /dev/sda", "pve-a /dev/nvme0n1"])
+        self.assert_safe()
+
+    def test_the_dashboard_refresh_also_rereads_backups_and_disks(self):
+        self.open_operations()
+        self.page.locator(".proxmox-backups .backup-guest").first.wait_for()
+        self.assertEqual(self.health_requests, ["GET"])
+        self.page.locator(".proxmox-dashboard").get_by_role("button", name="Refresh Proxmox dashboard",
+                                                            exact=True).click()
+        self.wait_for_count(self.health_requests, 2)
+        self.assert_safe()
+
+    def test_backups_and_disks_are_legible_at_both_widths(self):
+        for width, height in ((1440, 900), (390, 760)):
+            self.page.set_viewport_size({"width": width, "height": height})
+            self.open_operations()
+            self.page.locator(".proxmox-backups .backup-guest").first.wait_for()
+            for selector in (".backup-guest-name", ".backup-guest .operation-note", ".backup-issue",
+                             ".backup-summary", ".physical-disk-name", ".disk-issue", ".backup-facts dd",
+                             ".disk-facts dd", ".backup-facts dt", ".disk-facts dt",
+                             ".disk-node-unavailable .operation-note"):
+                with self.subTest(width=width, selector=selector):
+                    self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5)
+            self.assertTrue(self.page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"),
+                            f"Operations overflows at {width}px")
+            overflow = self.page.evaluate("""() => [...document.querySelectorAll('.backup-guest, .physical-disk')]
+                .filter((row) => row.scrollWidth > row.clientWidth + 1).map((row) => row.className)""")
+            self.assertEqual(overflow, [], f"a card overflows at {width}px")
+            split = self.page.evaluate("""() => [...document.querySelectorAll('.backup-facts dd, .disk-facts dd')]
+                .filter((value) => {
+                    const lines = Math.round(value.getBoundingClientRect().height / (parseFloat(getComputedStyle(value).fontSize) * 1.6));
+                    return lines > 2;
+                }).map((value) => value.textContent)""")
+            self.assertEqual(split, [], f"a fact is squeezed into many lines at {width}px")
+            # The newest copy fits one line on a desktop; on a phone it may wrap, but only at a comma,
+            # never inside a size or "verified ok".
+            lines = self.page.evaluate(LINES_OF, '[data-fact="copy"]')
+            if width >= 1024:
+                self.assertEqual(lines, [1, 1], f"a backup copy line wraps at {width}px")
+            split = self.page.evaluate(SPLIT_UNITS, ["2.0 GiB", "verified ok"])
+            self.assertEqual(split, [], f"a backup copy breaks inside a fact at {width}px")
+            # A section heading and its count each keep to one line; the count goes below when the row is narrow.
+            self.assertEqual(self.page.evaluate(LINES_OF, ".proxmox-health .section-heading-row h4"), [1, 1],
+                             f"a section heading wraps at {width}px")
+            self.assertEqual(self.page.evaluate(LINES_OF, ".proxmox-health .section-heading-row span"), [1, 1],
+                             f"a section count wraps at {width}px")
         self.assert_safe()
 
     def test_queue_counts_and_call_measurements_come_from_snapshot(self):

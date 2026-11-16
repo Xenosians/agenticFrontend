@@ -178,7 +178,8 @@ proc countOnlineNodes*(snapshot: ProxmoxSnapshot): int =
 proc formatProxmoxBytes*(value: Option[float]): string =
   if value.isNone: return "Not reported"
   let bytes = value.get
-  if bytes >= 1_073_741_824: formatFloat(bytes / 1_073_741_824, ffDecimal, 1) & " GiB"
+  if bytes >= 1_099_511_627_776.0: formatFloat(bytes / 1_099_511_627_776.0, ffDecimal, 1) & " TiB"
+  elif bytes >= 1_073_741_824: formatFloat(bytes / 1_073_741_824, ffDecimal, 1) & " GiB"
   elif bytes >= 1_048_576: formatFloat(bytes / 1_048_576, ffDecimal, 0) & " MiB"
   elif bytes >= 1024: formatFloat(bytes / 1024, ffDecimal, 0) & " KiB"
   else: formatFloat(bytes, ffDecimal, 0) & " B"

@@ -885,6 +885,30 @@ type
     ## `detail` are the service's fixed cause and words, when it named them.
     reason*, detail*: string
 
+proc getProxmoxHealth*(): Future[JsonNode] {.async.} =
+  ## Backups and each node's physical disks. A failure raises ProxmoxReadFailed
+  ## with the same stable codes as the overview.
+  let options = newFetchOptions(metod = HttpGet, mode = fmCors, credentials = fcInclude)
+  let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/proxmox/health", options)
+  if not response.ok:
+    var code, reason, message = ""
+    try:
+      let body = decodeJson(response.body)
+      code = jsonValueText(body, "error")
+      reason = jsonValueText(body, "reason")
+      message = jsonValueText(body, "message")
+    except CatchableError:
+      discard
+    if code in ["proxmox_not_configured", "proxmox_configuration_invalid", "proxmox_read_failed",
+                "proxmox_dashboard_unavailable"]:
+      let failure = newException(ProxmoxReadFailed, code)
+      if reason.len in 1..64 and message.len in 1..300:
+        failure.reason = reason
+        failure.detail = message
+      raise failure
+    raise newException(ValueError, "Proxmox backups and disks returned HTTP " & $response.status & ".")
+  result = decodeJson(response.body)
+
 proc getTailnetOverview*(): Future[JsonNode] {.async.} =
   let options = newFetchOptions(metod = HttpGet, mode = fmCors, credentials = fcInclude)
   let response = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/tailnet/overview", options)

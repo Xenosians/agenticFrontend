@@ -2469,6 +2469,30 @@ body {
 .database-issue { padding: 3px 8px; border: 1px solid var(--border-max); border-radius: 4px; color: var(--text); font-size: 11px; font-weight: 600; }
 .database-issue[data-blocking="true"] { border: 1px solid var(--text); background: var(--text); color: var(--bg); }
 .database-storage { margin: 12px 0 0; overflow-wrap: anywhere; }
+/* Backups and physical disks: the same card language as database hosts and tailnet devices. */
+.proxmox-health-unavailable { margin-top: 14px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--bg); }
+.proxmox-health-unavailable strong { font-size: 13px; }
+.proxmox-health-unavailable p { max-width: 72ch; }
+.backup-summary { margin: 4px 0 0; color: var(--text); font-size: 13px; font-weight: 600; }
+.backup-coverage-note, .backup-incomplete { margin: 4px 0 0; max-width: 72ch; overflow-wrap: anywhere; }
+.backup-guest-list, .physical-disk-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); align-items: start; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
+.backup-guest, .physical-disk, .disk-node-unavailable { min-width: 0; padding: 12px 12px 12px 13px; border: 1px solid var(--border); border-radius: var(--radius-md); }
+.backup-guest[data-attention="warning"], .physical-disk[data-attention="warning"], .disk-node-unavailable[data-attention="warning"] { border-left: 3px solid var(--border-max); padding-left: 11px; }
+.backup-guest[data-attention="blocking"], .physical-disk[data-attention="blocking"] { border: 1px solid var(--border-max); border-left: 6px solid var(--text); padding-left: 8px; }
+.backup-guest-name, .physical-disk-name { display: block; min-width: 0; color: var(--text); font-size: 13px; overflow-wrap: anywhere; }
+.backup-guest .operation-note, .physical-disk .operation-note, .disk-node-unavailable .operation-note { margin: 4px 0 0; color: var(--text-soft); overflow-wrap: anywhere; }
+.backup-facts, .disk-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(110px, 100%), 1fr)); gap: 8px 12px; margin: 10px 0 0; }
+.backup-facts dt, .disk-facts dt { color: var(--text-soft); font-size: 11px; }
+.backup-facts dd, .disk-facts dd { margin: 2px 0 0; color: var(--text); font-size: 12px; overflow-wrap: anywhere; }
+/* The newest copy's phrase spans the card instead of squeezing into one column. */
+.backup-copy { grid-column: 1 / -1; }
+.backup-issues, .disk-issues { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+.backup-issue, .disk-issue { padding: 3px 8px; border: 1px solid var(--border-max); border-radius: 4px; color: var(--text); font-size: 11px; font-weight: 600; }
+.backup-issue[data-blocking="true"], .disk-issue[data-blocking="true"] { border: 1px solid var(--text); background: var(--text); color: var(--bg); }
+.backup-storages { margin: 12px 0 0; overflow-wrap: anywhere; }
+/* A narrow row puts the count under its heading rather than splitting either into lone words. */
+.proxmox-health .section-heading-row { flex-wrap: wrap; row-gap: 2px; }
+.proxmox-health .section-heading-row h4, .proxmox-health .section-heading-row span { white-space: nowrap; }
 @media (max-width: 650px) {
   .operation-counts, .operation-measurements { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .operation-job-heading { flex-wrap: wrap; }

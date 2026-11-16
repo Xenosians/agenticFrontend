@@ -5,6 +5,7 @@ import ../api/client
 import ../api/proxmox_requests
 import proxmox_snapshot
 import proxmox_actions
+import proxmox_health
 import tailnet_snapshot
 import types
 import state
@@ -14,6 +15,9 @@ const proxmoxRefreshMs = 10_000
   ## The live dashboard re-reads Proxmox this often while it is on screen.
 const tailnetRefreshMs = 30_000
   ## Device health changes slowly; the Tailscale API is rate limited per tailnet.
+const proxmoxHealthRefreshMs = 60_000
+  ## Backups and disk health change slowly, and the read lists backup storages
+  ## and asks every node for SMART data.
 
 proc everyInterval(callback: proc(), milliseconds: int): int {.importjs: "setInterval(#, #)".}
 proc stopInterval(id: int) {.importjs: "clearInterval(#)".}
@@ -24,6 +28,7 @@ proc randomUuid(): cstring {.importjs: "globalThis.crypto.randomUUID()".}
 var
   proxmoxTimer = 0
   tailnetTimer = 0
+  proxmoxHealthTimer = 0
   visibilityWatched = false
   pendingProxmoxFocus = ""
 
@@ -123,6 +128,35 @@ proc refreshTailnetOverview*(state: AppState) {.async.} =
     if matchesTailnetRequest(state, request): state.tailnetBusy = false
     redraw(kxi)
 
+proc refreshProxmoxHealth*(state: AppState) {.async.} =
+  if not state.auth.authenticated or state.proxmoxHealthBusy: return
+  let request = beginProxmoxHealthRequest(state)
+  state.proxmoxHealthBusy = true
+  redraw(kxi)
+  try:
+    let health = parseProxmoxHealth(await getProxmoxHealth())
+    if not matchesProxmoxHealthRequest(state, request): return
+    state.proxmoxHealth = health
+    state.proxmoxHealthLoaded = true
+    state.proxmoxHealthError = ""
+    state.proxmoxHealthErrorReason = ""
+    state.proxmoxHealthErrorMessage = ""
+  except ProxmoxReadFailed as failure:
+    if matchesProxmoxHealthRequest(state, request):
+      state.proxmoxHealthError = failure.msg
+      state.proxmoxHealthErrorReason = failure.reason
+      state.proxmoxHealthErrorMessage = failure.detail
+      state.proxmoxHealthLoaded = false
+  except CatchableError as exc:
+    if matchesProxmoxHealthRequest(state, request):
+      state.proxmoxHealthError = exc.msg
+      state.proxmoxHealthErrorReason = ""
+      state.proxmoxHealthErrorMessage = ""
+      state.proxmoxHealthLoaded = false
+  finally:
+    if matchesProxmoxHealthRequest(state, request): state.proxmoxHealthBusy = false
+    redraw(kxi)
+
 proc proxmoxDashboardOnScreen(state: AppState): bool =
   state.auth.authenticated and state.activeView in [viewJobs, viewRuns, viewLogs] and pageVisible()
 
@@ -133,6 +167,9 @@ proc stopProxmoxRefresh*() =
   if tailnetTimer != 0:
     stopInterval(tailnetTimer)
     tailnetTimer = 0
+  if proxmoxHealthTimer != 0:
+    stopInterval(proxmoxHealthTimer)
+    proxmoxHealthTimer = 0
 
 proc startProxmoxRefresh*(state: AppState) =
   ## Keep the dashboards live while they are on screen; stop as soon as they are not.
@@ -143,6 +180,7 @@ proc startProxmoxRefresh*(state: AppState) =
         # Coming back shows current data at once, then keeps it live.
         discard refreshProxmoxOverview(state)
         discard refreshTailnetOverview(state)
+        discard refreshProxmoxHealth(state)
         startProxmoxRefresh(state)
       else:
         stopProxmoxRefresh())
@@ -160,6 +198,13 @@ proc startProxmoxRefresh*(state: AppState) =
       else:
         stopProxmoxRefresh(),
       tailnetRefreshMs)
+  if proxmoxHealthTimer == 0:
+    proxmoxHealthTimer = everyInterval(proc() =
+      if proxmoxDashboardOnScreen(state):
+        discard refreshProxmoxHealth(state)
+      else:
+        stopProxmoxRefresh(),
+      proxmoxHealthRefreshMs)
 
 proc confirmingAction*(state: AppState): ProxmoxAction =
   for action in state.proxmoxActions:
@@ -235,4 +280,5 @@ proc openOperations*(state: AppState) =
   discard refreshProxmoxOverview(state)
   discard refreshProxmoxActions(state)
   discard refreshTailnetOverview(state)
+  discard refreshProxmoxHealth(state)
   startProxmoxRefresh(state)

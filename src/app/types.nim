@@ -4,6 +4,7 @@ import operations_snapshot
 import proxmox_snapshot
 import proxmox_actions
 import tailnet_snapshot
+import proxmox_health
 import feedback_review
 import knowledge
 import learning
@@ -192,6 +193,10 @@ type
     tailnetBusy*, tailnetLoaded*: bool
     tailnetError*, tailnetErrorReason*, tailnetErrorMessage*: string  ## why a read failed, in the service's fixed words
     tailnetEpoch*: int
+    proxmoxHealth*: ProxmoxHealth  ## backups and physical disks, read less often than the overview
+    proxmoxHealthBusy*, proxmoxHealthLoaded*: bool
+    proxmoxHealthError*, proxmoxHealthErrorReason*, proxmoxHealthErrorMessage*: string
+    proxmoxHealthEpoch*: int
     reviewItems*: seq[ReviewItem]
     reviewBusy*, reviewLoaded*, reviewShowDecided*: bool
     reviewError*, reviewDeciding*: string

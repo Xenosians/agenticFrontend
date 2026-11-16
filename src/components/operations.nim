@@ -4,6 +4,7 @@ import ../app/types
 import ../app/operations_snapshot
 import ../app/proxmox_snapshot
 import ../app/proxmox_actions
+import ../app/proxmox_health
 import ../app/tailnet_snapshot
 import ../app/operations_bridge
 import ../app/auth_bridge
@@ -281,6 +282,154 @@ proc renderDatabaseHosts(databases: ProxmoxDatabases): VNode =
       p(class = "operation-note"):
         text "Read from Proxmox tags and backup jobs. Janus holds no database credentials and runs no queries."
 
+proc issueAttention(issues: seq[string], blocking: proc(issue: string): bool): string =
+  if issues.len == 0: return "none"
+  for issue in issues:
+    if blocking(issue): return "blocking"
+  "warning"
+
+proc renderBackupGuest(guest: GuestBackups, staleAfterDays: int): VNode =
+  let name = if guest.name.len > 0: guest.name else: "Unnamed"
+  let ageDays = if guest.latest.isSome: some(guest.latest.get.ageDays) else: none(float)
+  result = buildHtml(li(class = "backup-guest", `data-vmid` = cstring($guest.vmid),
+                        `data-attention` = cstring(issueAttention(guest.issues, backupIssueBlocking)))):
+    strong(class = "backup-guest-name"): text name
+    p(class = "operation-note"):
+      text (if guest.kind == "qemu": "VM " else: "LXC ") & $guest.vmid & " on " & guest.node
+    # Every card keeps its facts in the same places; the long copy line comes last.
+    dl(class = "backup-facts"):
+      tdiv:
+        dt: text "Newest backup"
+        dd(`data-fact` = "latest"): text backupAgeLabel(ageDays)
+      tdiv:
+        dt: text "Backup job"
+        dd(`data-fact` = "job"): text backupJobLabel(guest.backupJob)
+      if guest.latest.isSome:
+        tdiv(class = "backup-copy"):
+          dt: text "Newest copy"
+          dd(`data-fact` = "copy"): text backupCopyLabel(guest.latest.get)
+    if guest.issues.len > 0:
+      ul(class = "backup-issues", `aria-label` = cstring("Needs attention: " & name)):
+        for issue in guest.issues:
+          li(class = "backup-issue", `data-issue` = cstring(issue),
+             `data-blocking` = cstring(if backupIssueBlocking(issue): "true" else: "false")):
+            text backupIssueLabel(issue, staleAfterDays)
+
+proc renderBackups(backups: ProxmoxBackups): VNode =
+  result = buildHtml(tdiv(class = "proxmox-table-section proxmox-backups")):
+    tdiv(class = "section-heading-row"):
+      h4: text "Backups"
+      span: text $backups.guests.len & (if backups.guests.len == 1: " guest" else: " guests")
+    p(class = "backup-summary", role = "status"): text backupSummaryLabel(backups)
+    if not backups.coverageKnown and backups.coverageNote.len > 0:
+      p(class = "operation-note backup-coverage-note"): text "Backup jobs unknown: " & backups.coverageNote
+    if not backups.listingComplete:
+      p(class = "operation-note backup-incomplete"):
+        text "Not every backup storage could be read (" & backups.unreadable.mapIt(
+          it.storage & " on " & it.node & ": " & it.reason).join("; ") &
+          "), so missing or overdue backups cannot be confirmed."
+    if backups.guests.len == 0:
+      tdiv(class = "empty-card"): text "Proxmox listed no guests."
+    else:
+      # The service orders guests by their most urgent backup gap.
+      ul(class = "backup-guest-list"):
+        for guest in backups.guests:
+          renderBackupGuest(guest, backups.staleAfterDays)
+    if backups.truncated:
+      p(class = "operation-note", role = "status"): text "More guests exist than this dashboard displays."
+    if backups.storages.len > 0:
+      p(class = "operation-note backup-storages"):
+        text "Backup storage: " & backups.storages.mapIt(
+          it.storage & " on " & it.node & " (" & it.kind & (if it.shared: ", shared" else: "") & ") holds " &
+          $it.backups & (if it.backups == 1: " backup" else: " backups")).join("; ") & "."
+
+proc renderPhysicalDisk(node: string, disk: PhysicalDisk): VNode =
+  let name = disk.device & " on " & node
+  result = buildHtml(li(class = "physical-disk", `data-device` = cstring(disk.device), `data-node` = cstring(node),
+                        `data-attention` = cstring(issueAttention(disk.issues, diskIssueBlocking)))):
+    strong(class = "physical-disk-name"): text name
+    p(class = "operation-note"):
+      text @[diskKindLabel(disk.kind), disk.model, formatProxmoxBytes(disk.sizeBytes)].filterIt(
+        it.len > 0 and it != "Not reported").join(" · ")
+    dl(class = "disk-facts"):
+      tdiv:
+        dt: text "Health"
+        dd(`data-fact` = "health"): text diskHealthLabel(disk.health)
+      tdiv:
+        dt: text "Wear"
+        dd(`data-fact` = "wear"): text diskWearLabel(disk.wearUsedPercent)
+      if disk.usedBy.len > 0:
+        tdiv:
+          dt: text "Usage"
+          dd(`data-fact` = "usage"): text disk.usedBy
+    if disk.issues.len > 0:
+      ul(class = "disk-issues", `aria-label` = cstring("Needs attention: " & name)):
+        for issue in disk.issues:
+          li(class = "disk-issue", `data-issue` = cstring(issue),
+             `data-blocking` = cstring(if diskIssueBlocking(issue): "true" else: "false")):
+            text diskIssueLabel(issue)
+
+proc renderUnreadableNode(node: NodeDisks): VNode =
+  result = buildHtml(li(class = "disk-node-unavailable", `data-node` = cstring(node.node),
+                        `data-attention` = "warning")):
+    strong(class = "physical-disk-name"): text node.node
+    p(class = "operation-note"): text "Disks could not be read: " & node.error
+    ul(class = "disk-issues", `aria-label` = cstring("Needs attention: " & node.node)):
+      li(class = "disk-issue", `data-issue` = "unreadable", `data-blocking` = "false"): text "Disks unknown"
+
+proc renderPhysicalDisks(nodes: seq[NodeDisks]): VNode =
+  var count, unreadable = 0
+  for node in nodes:
+    count += node.disks.len
+    if node.error.len > 0: inc unreadable
+  # Across every node: failing disks, then nodes whose disks are unknown, then the rest.
+  let failing = proc(disk: PhysicalDisk): bool = disk.issues.anyIt(diskIssueBlocking(it))
+  result = buildHtml(tdiv(class = "proxmox-table-section proxmox-disks")):
+    tdiv(class = "section-heading-row"):
+      h4: text "Physical disks"
+      span: text $count & (if count == 1: " disk" else: " disks") &
+        (if unreadable > 0: " · " & $unreadable & (if unreadable == 1: " node" else: " nodes") & " unreadable"
+         else: "")
+    if count == 0 and unreadable == 0:
+      tdiv(class = "empty-card"): text "No physical disks were listed."
+    else:
+      ul(class = "physical-disk-list"):
+        for node in nodes:
+          for disk in node.disks:
+            if failing(disk): renderPhysicalDisk(node.node, disk)
+        for node in nodes:
+          if node.error.len > 0: renderUnreadableNode(node)
+        for node in nodes:
+          for disk in node.disks:
+            if not failing(disk): renderPhysicalDisk(node.node, disk)
+    for node in nodes:
+      if node.truncated:
+        p(class = "operation-note", role = "status"):
+          text node.node & " has more disks than this dashboard displays."
+    p(class = "operation-note"): text "SMART health and wear from Proxmox. Serial numbers are never shown."
+
+proc renderProxmoxHealth(state: AppState): VNode =
+  ## Backups and disks come from their own, slower read; its failure never hides the inventory.
+  result = buildHtml(tdiv(class = "proxmox-health")):
+    if state.proxmoxHealthError.len > 0:
+      tdiv(class = "proxmox-health-unavailable", role = "status",
+           `data-error-code` = cstring(state.proxmoxHealthError),
+           `data-error-reason` = cstring(state.proxmoxHealthErrorReason)):
+        strong: text "Backups and disks could not be read"
+        p(class = "operation-note"):
+          text (if state.proxmoxHealthErrorMessage.len > 0: state.proxmoxHealthErrorMessage
+                else: "The read did not succeed.") &
+            " They are read again every minute while this page is open. The guest inventory is unaffected."
+    elif not state.proxmoxHealthLoaded:
+      p(class = "operation-note", role = "status"): text "Reading backups and disks…"
+    else:
+      if state.proxmoxHealth.backups.known:
+        renderBackups(state.proxmoxHealth.backups)
+      else:
+        p(class = "operation-note proxmox-health-unavailable", role = "status"):
+          text "Backups could not be read: " & state.proxmoxHealth.backups.error
+      renderPhysicalDisks(state.proxmoxHealth.disks)
+
 proc renderProxmoxDashboard(state: AppState): VNode =
   let snapshot = state.proxmox
   var virtualMachines, containers: int
@@ -296,7 +445,9 @@ proc renderProxmoxDashboard(state: AppState): VNode =
       button(class = "secondary-action", disabled = state.proxmoxBusy,
           `aria-label` = "Refresh Proxmox dashboard"):
         text (if state.proxmoxBusy: "Refreshing…" else: "Refresh")
-        proc onclick(event: Event, node: VNode) = discard refreshProxmoxOverview(state)
+        proc onclick(event: Event, node: VNode) =
+          discard refreshProxmoxOverview(state)
+          discard refreshProxmoxHealth(state)
     if state.proxmoxActionError.len > 0:
       p(class = "operation-error", role = "alert"): text state.proxmoxActionError
     if state.proxmoxBusy and not state.proxmoxLoaded:
@@ -386,6 +537,7 @@ proc renderProxmoxDashboard(state: AppState): VNode =
           p(class = "operation-note", role = "status"): text "More guests exist than this dashboard displays."
       if snapshot.databases.known:
         renderDatabaseHosts(snapshot.databases)
+      renderProxmoxHealth(state)
     renderProxmoxActions(state)
     if state.proxmoxConfirming.len > 0 and confirmingAction(state).actionId.len > 0:
       renderProxmoxConfirm(state)

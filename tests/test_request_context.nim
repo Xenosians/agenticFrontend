@@ -1,5 +1,5 @@
 import std/unittest
-import ../src/app/[types, state, request_context, proxmox_actions]
+import ../src/app/[types, state, request_context, proxmox_actions, proxmox_health]
 import ../src/app/workflows
 import std/json
 
@@ -118,3 +118,17 @@ suite "asynchronous account and chat boundaries":
     check app.tailnetErrorReason == ""
     check app.tailnetErrorMessage == ""
     check app.tailnet.devices.len == 0
+
+  test "owner reset forgets the previous owner's backups and disks and ignores their late reads":
+    let app = signedIn()
+    let request = beginProxmoxHealthRequest(app)
+    app.proxmoxHealthLoaded = true
+    app.proxmoxHealthBusy = true
+    app.proxmoxHealthError = "proxmox_read_failed"
+    app.proxmoxHealth.disks.add NodeDisks(node: "pve-a")
+    clearOperations(app)
+    check not matchesProxmoxHealthRequest(app, request)
+    check not app.proxmoxHealthLoaded
+    check not app.proxmoxHealthBusy
+    check app.proxmoxHealthError == ""
+    check app.proxmoxHealth.disks.len == 0

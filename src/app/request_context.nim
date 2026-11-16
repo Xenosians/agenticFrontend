@@ -1,6 +1,7 @@
 import types
 import proxmox_snapshot
 import tailnet_snapshot
+import proxmox_health
 import operations_snapshot
 import feedback_review
 import learning
@@ -74,6 +75,13 @@ proc beginTailnetRequest*(state: AppState): OperationsRequestContext =
 proc matchesTailnetRequest*(state: AppState, request: OperationsRequestContext): bool =
   matchesAccount(state, request.account) and state.tailnetEpoch == request.epoch
 
+proc beginProxmoxHealthRequest*(state: AppState): OperationsRequestContext =
+  inc state.proxmoxHealthEpoch
+  OperationsRequestContext(account: accountContext(state), epoch: state.proxmoxHealthEpoch)
+
+proc matchesProxmoxHealthRequest*(state: AppState, request: OperationsRequestContext): bool =
+  matchesAccount(state, request.account) and state.proxmoxHealthEpoch == request.epoch
+
 proc clearOperations*(state: AppState) =
   inc state.operationsEpoch
   state.operations = OperationsSnapshot()
@@ -102,6 +110,13 @@ proc clearOperations*(state: AppState) =
   state.tailnetError = ""
   state.tailnetErrorReason = ""
   state.tailnetErrorMessage = ""
+  inc state.proxmoxHealthEpoch
+  state.proxmoxHealth = ProxmoxHealth()
+  state.proxmoxHealthLoaded = false
+  state.proxmoxHealthBusy = false
+  state.proxmoxHealthError = ""
+  state.proxmoxHealthErrorReason = ""
+  state.proxmoxHealthErrorMessage = ""
   # The review queue belongs to the signed-in reviewer as well.
   inc state.reviewEpoch
   state.reviewItems = @[]
