@@ -110,11 +110,12 @@
   white-space: nowrap;
 }
 
-/* The Ludus: every agent in one room, zoomed in whole steps. */
+/* The Ludus tab: the room's top bar, zoom and expand controls, then the room. */
 .ludus {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding: 12px;
 }
 
 .ludus-toolbar {
@@ -138,6 +139,10 @@
   opacity: 0.4;
 }
 
+.room-expand {
+  margin-left: auto;
+}
+
 .ludus-zoom-level {
   min-width: 28px;
   text-align: center;
@@ -148,63 +153,10 @@
 .ludus-viewport {
   max-height: 60vh;
   overflow: auto;
+  padding: 14px 8px;
 
   border: 1px solid var(--border);
   border-radius: 8px;
-}
-
-.ludus-room {
-  --gladiator-scale: 2;
-
-  display: grid;
-  grid-template-columns: repeat(2, minmax(max-content, 1fr));
-  gap: 1px;
-
-  width: max-content;
-  min-width: 100%;
-
-  background: var(--border);
-}
-
-.ludus-room.zoom-1 { --gladiator-scale: 1; }
-.ludus-room.zoom-2 { --gladiator-scale: 2; }
-.ludus-room.zoom-3 { --gladiator-scale: 3; }
-.ludus-room.zoom-4 { --gladiator-scale: 4; }
-
-.ludus-room .gladiator {
-  --gladiator-scale: inherit;
-  cursor: pointer;
-}
-
-.ludus-room .gladiator:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.ludus-area {
-  padding: 6px 8px 8px;
-  background: var(--surface-sunken);
-}
-
-.ludus-area-name {
-  display: block;
-  margin-bottom: 4px;
-
-  color: var(--text-soft);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.ludus-area-floor {
-  min-height: calc(40px * var(--gladiator-scale, 2));
-
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 4px;
-
-  border-bottom: 1px solid var(--border-strong);
 }
 
 .ludus-focus {
@@ -214,6 +166,381 @@
 
 .ludus-focus strong {
   color: var(--text);
+}
+
+/* =========================================================
+   THE AGENTS' ROOM (F1b): every agent at his own desk
+   =========================================================
+   Layout after a studio-sim garage (owner's reference), art all original and
+   monochrome. Sheets in public/assets/room/ (made by the Hermes art script
+   room_scene5.py): seated.png / seated-hub.png (8 pose rows x 4 frames of
+   32x40), desk.png (6 screen rows x 4 frames of 32x40), visitor-hub.png (the
+   hub standing, 9 rows), emblems.png (11x6 per agent) and the back wall in
+   two widths. Each masks currentColor, so the room follows the theme, and
+   scales only in whole steps (--room-scale). One workstation is 80 x 40 art
+   pixels: stool and agent (32 from x 8), desk (32 from x 28), the hub's visit
+   (32 from x 55, mirrored, 2 px clear of the drawers; it may reach 2 px past
+   the cell, into the floor's margin). The room is three workstations wide in the Run Inspector and four
+   when expanded (--room-columns), each width with its own wall. */
+
+.agents-room {
+  --room-scale: 1;
+  --room-columns: 3;
+  --room-ink: var(--text);
+
+  position: relative;
+  box-sizing: content-box;
+  width: calc((80px * var(--room-columns) + 8px) * var(--room-scale));
+  min-height: calc(100px * var(--room-scale));
+  margin: 0 auto;
+
+  color: var(--room-ink);
+  background: var(--surface-1);
+  border: calc(3px * var(--room-scale)) solid var(--border-max);
+  border-top-width: calc(4px * var(--room-scale));
+}
+
+.agents-room.zoom-1 { --room-scale: 1; }
+.agents-room.zoom-2 { --room-scale: 2; }
+.agents-room.zoom-3 { --room-scale: 3; }
+.agents-room.zoom-4 { --room-scale: 4; }
+
+.room-dialog .agents-room { --room-columns: 4; }
+
+/* The back wall: its props over a wall tone, the skirting line, then the floor. */
+.room-wall {
+  position: relative;
+  height: calc(52px * var(--room-scale));
+
+  /* A step darker than the floor in either theme, so the wall reads as a wall. */
+  background: var(--surface-4);
+  border-bottom: calc(2px * var(--room-scale)) solid var(--border-max);
+}
+
+.room-wall::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-color: currentColor;
+  -webkit-mask-image: url("../assets/room/wall-3.png");
+  mask-image: url("../assets/room/wall-3.png");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: calc(240px * var(--room-scale)) calc(52px * var(--room-scale));
+  mask-size: calc(240px * var(--room-scale)) calc(52px * var(--room-scale));
+  -webkit-mask-position: center bottom;
+  mask-position: center bottom;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.room-dialog .room-wall::before {
+  -webkit-mask-image: url("../assets/room/wall-4.png");
+  mask-image: url("../assets/room/wall-4.png");
+  -webkit-mask-size: calc(320px * var(--room-scale)) calc(52px * var(--room-scale));
+  mask-size: calc(320px * var(--room-scale)) calc(52px * var(--room-scale));
+}
+
+/* The floor: one plain tone the desks stand on, rows a little apart; the last row is centred. */
+.room-floor {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  row-gap: calc(6px * var(--room-scale));
+  padding: calc(8px * var(--room-scale)) calc(4px * var(--room-scale)) calc(12px * var(--room-scale));
+
+  background: var(--surface-1);
+}
+
+/* One workstation: a button, so each desk can be chosen with the keyboard. */
+.room-desk {
+  position: relative;
+  flex: 0 0 auto;
+  width: calc(80px * var(--room-scale));
+  height: calc(40px * var(--room-scale));
+  padding: 0;
+  border: 0;
+
+  color: inherit;
+  background: none;
+  cursor: pointer;
+}
+
+.room-desk:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.room-desk-furniture,
+.room-seat,
+.room-visitor,
+.room-emblem {
+  position: absolute;
+  display: block;
+
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+}
+
+.room-seat,
+.room-visitor,
+.room-desk-furniture {
+  --room-row: 0;
+
+  top: 0;
+  width: calc(32px * var(--room-scale));
+  height: calc(40px * var(--room-scale));
+
+  -webkit-mask-position: 0 calc(-40px * var(--room-scale) * var(--room-row));
+  mask-position: 0 calc(-40px * var(--room-scale) * var(--room-row));
+}
+
+.room-seat {
+  left: calc(8px * var(--room-scale));
+  -webkit-mask-image: url("../assets/room/seated.png");
+  mask-image: url("../assets/room/seated.png");
+  -webkit-mask-size: calc(128px * var(--room-scale)) calc(320px * var(--room-scale));
+  mask-size: calc(128px * var(--room-scale)) calc(320px * var(--room-scale));
+}
+
+.room-seat[data-agent="hub"] {
+  -webkit-mask-image: url("../assets/room/seated-hub.png");
+  mask-image: url("../assets/room/seated-hub.png");
+}
+
+.room-desk-furniture {
+  left: calc(28px * var(--room-scale));
+  -webkit-mask-image: url("../assets/room/desk.png");
+  mask-image: url("../assets/room/desk.png");
+  -webkit-mask-size: calc(128px * var(--room-scale)) calc(240px * var(--room-scale));
+  mask-size: calc(128px * var(--room-scale)) calc(240px * var(--room-scale));
+}
+
+/* The hub, visiting, stands beside the specialist's desk facing him (the sheet faces right: mirrored). */
+.room-visitor {
+  left: calc(55px * var(--room-scale));
+  transform: scaleX(-1);
+  -webkit-mask-image: url("../assets/room/visitor-hub.png");
+  mask-image: url("../assets/room/visitor-hub.png");
+  -webkit-mask-size: calc(128px * var(--room-scale)) calc(360px * var(--room-scale));
+  mask-size: calc(128px * var(--room-scale)) calc(360px * var(--room-scale));
+}
+
+/* Each agent's emblem on his drawer front (desk x 18-28, y 33-38). */
+.room-emblem {
+  --room-emblem-row: 0;
+
+  left: calc(46px * var(--room-scale));
+  top: calc(33px * var(--room-scale));
+  width: calc(11px * var(--room-scale));
+  height: calc(6px * var(--room-scale));
+
+  display: none;
+  -webkit-mask-image: url("../assets/room/emblems.png");
+  mask-image: url("../assets/room/emblems.png");
+  -webkit-mask-size: calc(11px * var(--room-scale)) calc(78px * var(--room-scale));
+  mask-size: calc(11px * var(--room-scale)) calc(78px * var(--room-scale));
+  -webkit-mask-position: 0 calc(-6px * var(--room-scale) * var(--room-emblem-row));
+  mask-position: 0 calc(-6px * var(--room-scale) * var(--room-emblem-row));
+}
+
+.room-emblem[data-agent="hub"] { display: block; --room-emblem-row: 0; }
+.room-emblem[data-agent="access-specialist"] { display: block; --room-emblem-row: 1; }
+.room-emblem[data-agent="account-specialist"] { display: block; --room-emblem-row: 2; }
+.room-emblem[data-agent="asset-specialist"] { display: block; --room-emblem-row: 3; }
+.room-emblem[data-agent="atlassian-specialist"] { display: block; --room-emblem-row: 4; }
+.room-emblem[data-agent="developer-specialist"] { display: block; --room-emblem-row: 5; }
+.room-emblem[data-agent="jira-specialist"] { display: block; --room-emblem-row: 6; }
+.room-emblem[data-agent="knowledge-specialist"] { display: block; --room-emblem-row: 7; }
+.room-emblem[data-agent="networking-specialist"] { display: block; --room-emblem-row: 8; }
+.room-emblem[data-agent="operations-specialist"] { display: block; --room-emblem-row: 9; }
+.room-emblem[data-agent="proxmox-specialist"] { display: block; --room-emblem-row: 10; }
+.room-emblem[data-agent="service-desk-specialist"] { display: block; --room-emblem-row: 11; }
+.room-emblem[data-agent="ticket-specialist"] { display: block; --room-emblem-row: 12; }
+
+/* Poses (rows of seated.png) and screens (rows of desk.png), each with its own frame count. */
+.room-pose-idle { --room-row: 0; animation: none; }
+.room-pose-typing { --room-row: 1; animation: room-frames-4 520ms steps(4) infinite; }
+.room-pose-pondering { --room-row: 2; animation: room-frames-3 1500ms steps(3) infinite; }
+.room-pose-dozing { --room-row: 3; animation: room-frames-3 1500ms steps(3) infinite; }
+.room-pose-waiting { --room-row: 4; animation: room-frames-2 1000ms steps(2) infinite; }
+.room-pose-away { --room-row: 5; animation: none; }
+.room-pose-cheering { --room-row: 6; animation: room-frames-2 1000ms steps(2) infinite; }
+.room-pose-slumped { --room-row: 7; animation: none; }
+.room-desk[data-screen="off"] .room-desk-furniture { --room-row: 0; animation: none; }
+.room-desk[data-screen="on"] .room-desk-furniture { --room-row: 1; animation: none; }
+.room-desk[data-screen="working"] .room-desk-furniture { --room-row: 2; animation: room-frames-4 2400ms steps(4) infinite; }
+.room-desk[data-screen="training"] .room-desk-furniture { --room-row: 3; animation: room-frames-2 1600ms steps(2) infinite; }
+.room-desk[data-screen="done"] .room-desk-furniture { --room-row: 4; animation: none; }
+.room-desk[data-screen="error"] .room-desk-furniture { --room-row: 5; animation: none; }
+.room-visitor-sleeping { --room-row: 0; animation: room-frames-3 1500ms steps(3) infinite; }
+.room-visitor-walking { --room-row: 1; animation: room-frames-4 520ms steps(4) infinite; }
+.room-visitor-thinking { --room-row: 2; animation: room-frames-3 1500ms steps(3) infinite; }
+.room-visitor-working { --room-row: 3; animation: room-frames-4 520ms steps(4) infinite; }
+.room-visitor-training { --room-row: 4; animation: room-frames-3 1500ms steps(3) infinite; }
+.room-visitor-waiting { --room-row: 5; animation: room-frames-2 1000ms steps(2) infinite; }
+.room-visitor-celebrating { --room-row: 6; animation: room-frames-4 520ms steps(4) infinite; }
+.room-visitor-hurt { --room-row: 7; animation: room-frames-2 1000ms steps(2) infinite; }
+.room-visitor-visiting { --room-row: 8; animation: room-frames-3 1500ms steps(3) infinite; }
+.room-visitor-thinking { --room-row: 8; }
+
+@keyframes room-frames-2 {
+  from { -webkit-mask-position-x: 0; mask-position-x: 0; }
+  to { -webkit-mask-position-x: calc(-32px * var(--room-scale) * 2); mask-position-x: calc(-32px * var(--room-scale) * 2); }
+}
+@keyframes room-frames-3 {
+  from { -webkit-mask-position-x: 0; mask-position-x: 0; }
+  to { -webkit-mask-position-x: calc(-32px * var(--room-scale) * 3); mask-position-x: calc(-32px * var(--room-scale) * 3); }
+}
+@keyframes room-frames-4 {
+  from { -webkit-mask-position-x: 0; mask-position-x: 0; }
+  to { -webkit-mask-position-x: calc(-32px * var(--room-scale) * 4); mask-position-x: calc(-32px * var(--room-scale) * 4); }
+}
+
+/* The top bar: the request, its step and four counters, like a studio game's header. */
+.room-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 14px;
+  padding: 8px 10px;
+
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.room-request {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+}
+
+.room-title {
+  max-width: 28ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: var(--text);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.room-step {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.room-step-cell {
+  width: 18px;
+  height: 8px;
+
+  border: 1px solid var(--border-max);
+  background: transparent;
+}
+
+.room-step-cell.done {
+  background: var(--text);
+}
+
+.room-step-name {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+/* Four counters: one row when there is room (expanded), two by two in the inspector. */
+.room-counters {
+  display: grid;
+  grid-template-columns: repeat(4, auto);
+  gap: 6px;
+}
+
+.ludus > .room-topbar .room-counters {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+}
+
+.room-counter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  padding: 2px 8px;
+  white-space: nowrap;
+
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+
+  color: var(--text-bright);
+  font-size: 12px;
+}
+
+/* An agent waiting for the owner's approval or a failure is the thing to notice. */
+.room-counter[data-counter="waiting"]:not([data-count="0"]),
+.room-counter[data-counter="failed"]:not([data-count="0"]) {
+  border-color: var(--text);
+  border-width: 2px;
+}
+
+.room-counter-value {
+  color: var(--text);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A counter above zero stands out; zeros stay quiet but readable. */
+.room-counter[data-count="0"] .room-counter-value {
+  color: var(--text-soft);
+}
+
+/* Expanded: the same room, large, over the conversation. */
+.room-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+
+  display: grid;
+  place-items: center;
+  padding: 16px;
+
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+.room-dialog {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+
+  border: 1px solid var(--border-max);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.room-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.room-dialog-body {
+  overflow: auto;
 }
 
 @media (max-width: 760px) {
@@ -229,7 +556,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .gladiator,
-  .gladiator-track {
+  .gladiator-track,
+  .room-seat,
+  .room-visitor,
+  .room-desk-furniture {
     animation: none;
   }
 }

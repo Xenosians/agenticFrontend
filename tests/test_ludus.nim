@@ -34,7 +34,7 @@ suite "the ludus roster: one gladiator per real agent":
 suite "who does what in the ludus":
   let roster = @["hub", "networking-specialist", "proxmox-specialist"]
 
-  test "with nothing running the hub walks and the specialists rest in the barracks":
+  test "with nothing running the hub walks and the specialists rest":
     let scene = ludusScene(roster, RunState(), ready(), @[], idleSeconds = 30)
     check scene[0].presence == apWalking
     check scene[1].presence == apSleeping and scene[2].presence == apSleeping
@@ -66,7 +66,7 @@ suite "who does what in the ludus":
     check scene.len == roster.len
     check scene[0].presence == apWorking and scene[0].talkingTo == ""
 
-  test "a hub learning run trains the hub; a specialist run trains the specialists' barracks":
+  test "a hub learning run trains the hub; a specialist run trains the specialists":
     let hubRun = LearningRun(id: "r1", state: "running", role: "hub")
     check ludusScene(roster, RunState(), ready(), @[hubRun], idleSeconds = 0)[0].presence == apTraining
     let specialistRun = LearningRun(id: "r2", state: "running", role: "specialist")
@@ -79,31 +79,18 @@ suite "who does what in the ludus":
                                 SystemState(checked: true), @[], idleSeconds = 0):
       check gladiator.presence == apSleeping
 
-suite "the ludus places each gladiator in the area his state belongs to":
-  test "barracks for sleep, training yard, arena floor for work, the gate for approval":
-    check ludusArea(apSleeping) == laBarracks
-    check ludusArea(apTraining) == laYard
-    check ludusArea(apWorking) == laArena
-    check ludusArea(apThinking) == laArena
-    check ludusArea(apWaiting) == laGate
-    check ludusArea(apWalking) == laArena
-    check ludusArea(apCelebrating) == laArena
-    check ludusArea(apHurt) == laArena
-
 suite "the hub speaks with the specialist he hands a request to":
-  test "while handing over, the hub stands in the specialist's area; the others keep their own":
+  test "while handing over, the hub is with the specialist; the others keep to themselves":
     let roster = @["hub", "networking-specialist", "proxmox-specialist"]
     let scene = ludusScene(roster, running("waiting_approval", agent = "proxmox-specialist"), ready(), @[],
                            idleSeconds = 0)
     check scene[0].talkingTo == "proxmox-specialist"
-    check gladiatorArea(scene[0], scene) == laGate
-    check gladiatorArea(scene[2], scene) == laGate
-    check gladiatorArea(scene[1], scene) == laBarracks
+    check scene[1].talkingTo == "" and scene[2].talkingTo == ""
 
-  test "with no hand-off the hub stands where his own state belongs":
+  test "with no hand-off the hub keeps to his own desk":
     let roster = @["hub", "proxmox-specialist"]
     let scene = ludusScene(roster, running("processing", "routing"), ready(), @[], idleSeconds = 0)
-    check gladiatorArea(scene[0], scene) == laArena
+    check scene[0].talkingTo == ""
 
 suite "the live hand-off: the agent the AI names while it works":
   let roster = @["hub", "networking-specialist", "proxmox-specialist"]
@@ -117,7 +104,6 @@ suite "the live hand-off: the agent the AI names while it works":
     check scene[0].talkingTo == "proxmox-specialist"
     check scene[0].presence == apThinking and scene[2].presence == apThinking
     check scene[1].presence == apSleeping
-    check gladiatorArea(scene[0], scene) == gladiatorArea(scene[2], scene)
 
   test "while the specialist's tool runs he works and the hub watches with him":
     let scene = ludusScene(roster, live("executing", "proxmox-specialist"), ready(), @[], idleSeconds = 0)
@@ -148,3 +134,117 @@ suite "zoom steps keep the pixel art crisp":
     check fitZoom(roomWidth = 320, roomHeight = 180, viewWidth = 700, viewHeight = 400) == 2
     check fitZoom(roomWidth = 320, roomHeight = 180, viewWidth = 300, viewHeight = 400) == 1
     check fitZoom(roomWidth = 320, roomHeight = 180, viewWidth = 5000, viewHeight = 5000) == 4
+
+
+suite "the agents' room: every agent at his own desk, like a small studio":
+  let roster = @["hub", "networking-specialist", "proxmox-specialist"]
+
+  proc live(stage, agent: string, status = "processing", named = ""): RunState =
+    result = running(status, stage, named)
+    result.progressAgent = agent
+
+  proc seatOf(room: seq[RoomSeat], agent: string): RoomSeat =
+    for seat in room:
+      if seat.agent == agent: return seat
+
+  test "each agent has one desk in roster order, the hub's first; idle desks are dark":
+    let room = roomSeats(ludusScene(roster, RunState(), ready(), @[], idleSeconds = 30))
+    check room.len == 3
+    check room[0].agent == "hub" and room[1].agent == "networking-specialist"
+    # The hub is ready at his desk; the specialists doze with their screens off.
+    check room[0].pose == rpIdle and room[0].screen == rsOn
+    check room[1].pose == rpDozing and room[1].screen == rsOff
+    check room[2].pose == rpDozing and room[2].screen == rsOff
+    check room[0].visiting == ""
+
+  test "while the hub routes he thinks at his own desk; nobody else stirs":
+    let room = roomSeats(ludusScene(roster, live("routing", "hub"), ready(), @[], idleSeconds = 0))
+    check room[0].pose == rpPondering and room[0].screen == rsOn
+    check room[0].visiting == ""
+    check seatOf(room, "proxmox-specialist").pose == rpDozing
+
+  test "the hub walks to the specialist's desk and stands with him while he plans, then types":
+    var room = roomSeats(ludusScene(roster, live("planning", "proxmox-specialist"), ready(), @[],
+                                    idleSeconds = 0))
+    # The hub's seat is empty: he is at the proxmox specialist's desk.
+    check room[0].pose == rpAway and room[0].visiting == "proxmox-specialist"
+    check seatOf(room, "proxmox-specialist").pose == rpPondering
+    room = roomSeats(ludusScene(roster, live("executing", "proxmox-specialist"), ready(), @[], idleSeconds = 0))
+    check seatOf(room, "proxmox-specialist").pose == rpTyping
+    check seatOf(room, "proxmox-specialist").screen == rsWorking
+    check room[0].visiting == "proxmox-specialist"
+    check seatOf(room, "networking-specialist").pose == rpDozing
+
+  test "approval and the finish: the specialist waits; the hub celebrates with him, then goes back":
+    let waiting = roomSeats(ludusScene(roster, running("waiting_approval", agent = "proxmox-specialist"),
+                                       ready(), @[], idleSeconds = 0))
+    check seatOf(waiting, "proxmox-specialist").pose == rpWaiting
+    check waiting[0].visiting == "proxmox-specialist"
+    let done = roomSeats(ludusScene(roster, running("completed", agent = "proxmox-specialist"), ready(), @[],
+                                    idleSeconds = 1))
+    check done[0].visiting == "proxmox-specialist" and done[0].presence == apCelebrating
+    # Once the moment has passed the hub is back at his own desk.
+    let later = roomSeats(ludusScene(roster, running("completed", agent = "proxmox-specialist"), ready(), @[],
+                                     idleSeconds = momentSeconds))
+    check later[0].visiting == "" and later[0].pose == rpIdle
+    let writing = roomSeats(ludusScene(roster, live("synthesizing", "hub", named = "proxmox-specialist"),
+                                       ready(), @[], idleSeconds = 0))
+    check writing[0].pose == rpTyping and writing[0].screen == rsWorking and writing[0].visiting == ""
+
+  test "the finish shows on the desk: a cheer and a check mark, or a slump and a cross":
+    let done = roomSeats(ludusScene(roster, running("completed", agent = "proxmox-specialist"), ready(), @[],
+                                    idleSeconds = 1))
+    check seatOf(done, "proxmox-specialist").pose == rpCheering
+    check seatOf(done, "proxmox-specialist").screen == rsDone
+    let failed = roomSeats(ludusScene(roster, running("failed", agent = "proxmox-specialist"), ready(), @[],
+                                      idleSeconds = 1))
+    check seatOf(failed, "proxmox-specialist").pose == rpSlumped
+    check seatOf(failed, "proxmox-specialist").screen == rsError
+
+  test "training, services down: training agents work on a learning curve, an outage darkens every desk":
+    let training = roomSeats(ludusScene(roster, RunState(), ready(),
+                                        @[LearningRun(id: "r", state: "running", role: "specialist")],
+                                        idleSeconds = 0))
+    check training[1].pose == rpTyping and training[2].pose == rpTyping
+    check training[1].screen == rsTraining
+    for seat in roomSeats(ludusScene(roster, live("executing", "proxmox-specialist"), SystemState(checked: true),
+                                     @[], idleSeconds = 0)):
+      check seat.pose == rpDozing and seat.screen == rsOff and seat.visiting == ""
+
+suite "the room's top bar: the request, its step and four counters":
+  let roster = @["hub", "networking-specialist", "proxmox-specialist"]
+
+  test "with nothing running there is no step and every counter is zero, the dozing ones excepted":
+    let bar = roomTopBar(ludusScene(roster, RunState(), ready(), @[], idleSeconds = 30), RunState())
+    check bar.step == 0 and bar.steps == 4
+    check bar.busy == 0 and bar.waiting == 0 and bar.training == 0 and bar.failed == 0
+
+  test "the step follows the job: routing 1, planning 2, running 3, writing 4 of 4":
+    for (stage, step) in [("routing", 1), ("planning", 2), ("executing", 3), ("synthesizing", 4)]:
+      let run = running("processing", stage, "proxmox-specialist")
+      check roomTopBar(ludusScene(roster, run, ready(), @[], idleSeconds = 0), run).step == step
+    let queued = running("pending")
+    check roomTopBar(ludusScene(roster, queued, ready(), @[], idleSeconds = 0), queued).step == 0
+    # Waiting on the provider keeps the step it was on: nothing more is claimed.
+    let provider = running("processing", "waiting_provider")
+    check roomTopBar(ludusScene(roster, provider, ready(), @[], idleSeconds = 0), provider).step == 0
+
+  test "approval holds the step at running; the finish fills the bar; a failure empties it":
+    let waiting = running("waiting_approval", agent = "proxmox-specialist")
+    var bar = roomTopBar(ludusScene(roster, waiting, ready(), @[], idleSeconds = 0), waiting)
+    check bar.step == 3 and bar.waiting == 1
+    let done = running("completed", agent = "proxmox-specialist")
+    check roomTopBar(ludusScene(roster, done, ready(), @[], idleSeconds = 1), done).step == 4
+    # A failure hurts the specialist and the hub with him: the counter counts what the room shows.
+    let failed = running("failed", agent = "proxmox-specialist")
+    bar = roomTopBar(ludusScene(roster, failed, ready(), @[], idleSeconds = 1), failed)
+    check bar.failed == 2 and bar.step == 0
+
+  test "busy counts agents thinking or working; training counts those in a learning run":
+    let run = running("processing", "executing", "proxmox-specialist")
+    let bar = roomTopBar(ludusScene(roster, run, ready(), @[], idleSeconds = 0), run)
+    check bar.busy == 2  # the specialist works; the hub thinks with him
+    let training = roomTopBar(ludusScene(roster, RunState(), ready(),
+                                         @[LearningRun(id: "r", state: "running", role: "specialist")],
+                                         idleSeconds = 0), RunState())
+    check training.training == 2 and training.busy == 0

@@ -10,16 +10,25 @@ import std/strutils
 import ../app/[types, agent_presence, ludus]
 
 const
-  roomWidth* = 320  ## the Ludus room in art pixels (zoom 1)
-  roomHeight* = 120
+  roomWidth = 334   ## the expanded room in art pixels (zoom 1): four workstations of 80, margins, walls
+  roomHeight = 70   ## the back wall and the floor's margins; each row of desks adds rowHeight
+  rowHeight = 46
+  roomColumns = 4
+  stepNames: array[1 .. roomSteps, string] = ["Routing", "Planning", "Running", "Writing"]
 
 var
   idleSince = 0.0           ## when the observed job (or the page) last changed
   lastJobKey = ""
   ludusZoomLevel = 0        ## 0 until the room is first measured, then 1..4
   ludusFocus = ""           ## the agent whose details are shown in the room
+  roomExpanded = false      ## the room is open large over the conversation
 
 proc nowSeconds(): float {.importjs: "(Date.now() / 1000)".}
+## After karax's own redraw (also a frame callback, queued after the click handler): two frames.
+proc focusSoon(selector: cstring) {.importjs:
+  "((s) => requestAnimationFrame(() => requestAnimationFrame(() => document.querySelector(s)?.focus())))(#)".}
+proc viewportWidth(): int {.importjs: "(window.innerWidth)".}
+proc viewportHeight(): int {.importjs: "(window.innerHeight)".}
 
 proc idleSeconds(state: AppState): int =
   ## Seconds since the observed job last changed state, or since the page opened.
@@ -42,21 +51,11 @@ proc stateName(presence: AgentPresence): string =
                                                "waiting", "celebrating", "hurt"]
   names[presence]
 
-proc renderGladiator(gladiator: Gladiator, interactive = false): VNode =
-  ## One gladiator per call, so a room gladiator's handler keeps its own agent (a loop variable
-  ## captured by several handlers would be shared in JavaScript).
+proc renderGladiator(gladiator: Gladiator): VNode =
   let title = gladiatorTitle(gladiator.agent) & ": " & stateName(gladiator.presence)
-  if interactive:
-    result = buildHtml(button(class = cstring("gladiator gladiator-" & stateName(gladiator.presence)),
-        `data-agent` = cstring(gladiator.agent), `data-state` = cstring(stateName(gladiator.presence)),
-        `data-talking-to` = cstring(gladiator.talkingTo), title = cstring(title),
-        `aria-label` = cstring(gladiatorTitle(gladiator.agent) & ", " & presenceWord(gladiator.presence)))):
-      proc onclick(event: Event, node: VNode) =
-        ludusFocus = gladiator.agent
-  else:
-    result = buildHtml(span(class = cstring("gladiator gladiator-" & stateName(gladiator.presence)),
-        `data-agent` = cstring(gladiator.agent), `data-state` = cstring(stateName(gladiator.presence)),
-        `data-talking-to` = cstring(gladiator.talkingTo), title = cstring(title)))
+  result = buildHtml(span(class = cstring("gladiator gladiator-" & stateName(gladiator.presence)),
+      `data-agent` = cstring(gladiator.agent), `data-state` = cstring(stateName(gladiator.presence)),
+      `data-talking-to` = cstring(gladiator.talkingTo), title = cstring(title)))
 
 proc currentScene(state: AppState): seq[Gladiator] =
   ludusScene(ludusRoster(state.extensionCatalog), state.run, state.system, state.learningRuns,
@@ -81,15 +80,107 @@ proc renderGladiatorStrip*(state: AppState): VNode =
     span(class = "visually-hidden", `aria-live` = "polite"):
       text caption
 
+proc poseName(pose: RoomPose): string =
+  const names: array[RoomPose, string] = ["idle", "typing", "pondering", "dozing", "waiting", "away", "cheering",
+                                          "slumped"]
+  names[pose]
+
+proc screenName(screen: RoomScreen): string =
+  const names: array[RoomScreen, string] = ["off", "on", "working", "training", "done", "error"]
+  names[screen]
+
+proc renderDesk(seat: RoomSeat, visitor: RoomSeat, hasVisitor: bool): VNode =
+  ## One workstation: the agent on his stool (or the empty stool), his desk and screen, his emblem on
+  ## the drawer, and the hub standing beside it when he has come to hand over a request. Choosing a
+  ## desk shows who works there and what he is doing. One desk per call, so each handler keeps its
+  ## own agent (a loop variable captured by several handlers would be shared in JavaScript).
+  let label = gladiatorTitle(seat.agent) & ", " &
+    (if seat.pose == rpAway: "at the " & gladiatorTitle(seat.visiting).toLowerAscii & "'s desk"
+     else: presenceWord(seat.presence))
+  result = buildHtml(button(class = "room-desk", `data-agent` = cstring(seat.agent),
+                            `data-pose` = cstring(poseName(seat.pose)), `data-screen` = cstring(screenName(seat.screen)),
+                            `aria-label` = cstring(label), title = cstring(label))):
+    span(class = "room-desk-furniture")
+    span(class = "room-emblem", `data-agent` = cstring(seat.agent))
+    span(class = cstring("room-seat room-pose-" & poseName(seat.pose)), `data-agent` = cstring(seat.agent))
+    if hasVisitor:
+      span(class = cstring("room-visitor room-visitor-" & stateName(visitor.presence)),
+           `data-agent` = cstring(visitor.agent))
+    proc onclick(event: Event, node: VNode) =
+      ludusFocus = seat.agent
+
+proc renderRoom(state: AppState, scene: seq[Gladiator], zoom: int, labelled: bool): VNode =
+  ## The agents' room: the back wall, then every agent's desk in roster order, four to a row.
+  let seats = roomSeats(scene)
+  result = buildHtml(tdiv(class = cstring("agents-room zoom-" & $zoom), role = "group",
+                          `aria-label` = (if labelled: cstring"Agents' room" else: cstring"Agents"))):
+    tdiv(class = "room-wall", `aria-hidden` = "true")
+    tdiv(class = "room-floor"):
+      for seat in seats:
+        var visitor: RoomSeat
+        var hasVisitor = false
+        for other in seats:
+          if other.visiting.len > 0 and other.visiting == seat.agent:
+            visitor = other
+            hasVisitor = true
+        renderDesk(seat, visitor, hasVisitor)
+
+proc requestTitle(state: AppState): string =
+  ## The current request is named by its chat, as in the conversation header.
+  for chat in state.chats:
+    if chat.chatId == state.currentChatId: return chat.title
+
+proc renderTopBar(state: AppState, scene: seq[Gladiator]): VNode =
+  ## Like a studio game's header: the request (its chat), its step, and four counters.
+  let bar = roomTopBar(scene, state.run)
+  let title = requestTitle(state)
+  let stepText = if bar.step == 0: "No request in progress" else: "Step " & $bar.step & " of " & $bar.steps &
+    ": " & stepNames[bar.step]
+  result = buildHtml(tdiv(class = "room-topbar")):
+    tdiv(class = "room-request"):
+      span(class = "room-title"): text(if state.run.active and title.len > 0: title elif state.run.active:
+                                       "Current request" else: "No request")
+      tdiv(class = "room-step", role = "progressbar", `aria-label` = "Request progress",
+           `aria-valuemin` = "0", `aria-valuemax` = cstring($bar.steps), `aria-valuenow` = cstring($bar.step),
+           `aria-valuetext` = cstring(stepText), `data-step` = cstring($bar.step)):
+        for step in 1 .. bar.steps:
+          span(class = (if step <= bar.step: cstring"room-step-cell done" else: cstring"room-step-cell"),
+               title = cstring(stepNames[step]))
+      span(class = "room-step-name"): text stepText
+    tdiv(class = "room-counters"):
+      for (key, label, count) in [("busy", "Busy", bar.busy), ("waiting", "Waiting for you", bar.waiting),
+                                  ("training", "Training", bar.training), ("failed", "Failed", bar.failed)]:
+        span(class = "room-counter", `data-counter` = cstring(key), `data-count` = cstring($count),
+             title = cstring(label)):
+          span(class = "room-counter-value"): text $count
+          span(class = "room-counter-label"): text label
+
+proc closeRoom() =
+  roomExpanded = false
+  redraw(kxi)
+  focusSoon(".ludus .room-expand")
+
+proc listenForEscape(onEscape: proc(): bool) {.importjs:
+  "document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !e.defaultPrevented && #()) e.preventDefault(); }, true)".}
+
+proc roomEscape(): bool =
+  ## Escape closes the open room wherever focus is (it may still be on the expand button): the capture
+  ## listener runs before the workspace's own Escape, which then leaves the event alone.
+  if not roomExpanded: return false
+  closeRoom()
+  true
+
+var escapeInstalled = false
+
 proc renderLudus*(state: AppState): VNode =
-  ## Every agent's gladiator in one room, by area: barracks, training yard, arena floor, the gate.
+  ## Every agent at his own desk in one room (F1b), with the request's progress above it.
+  if not escapeInstalled:
+    escapeInstalled = true
+    listenForEscape(roomEscape)
   let scene = currentScene(state)
-  if ludusZoomLevel == 0: ludusZoomLevel = 2
-  var areas: array[LudusArea, seq[Gladiator]]
-  for gladiator in scene:
-    areas[gladiatorArea(gladiator, scene)].add gladiator
-  const areaNames: array[LudusArea, string] = ["Barracks", "Training yard", "Arena", "Gate"]
+  if ludusZoomLevel == 0: ludusZoomLevel = 1
   result = buildHtml(section(class = "ludus", `aria-label` = "Ludus")):
+    renderTopBar(state, scene)
     tdiv(class = "ludus-toolbar"):
       button(class = "ludus-zoom-button", `aria-label` = "Zoom out", title = "Zoom out",
              disabled = ludusZoomLevel <= minZoom):
@@ -101,15 +192,28 @@ proc renderLudus*(state: AppState): VNode =
              disabled = ludusZoomLevel >= maxZoom):
         text "+"
         proc onclick(event: Event, node: VNode) = ludusZoomLevel = zoomIn(ludusZoomLevel)
+      button(class = "ludus-zoom-button room-expand", `aria-label` = "Expand the agents' room",
+             title = "Expand the agents' room"):
+        text "⤢"
+        proc onclick(event: Event, node: VNode) =
+          roomExpanded = true
+          focusSoon(".room-overlay .room-close")
     tdiv(class = "ludus-viewport"):
-      tdiv(class = cstring("ludus-room zoom-" & $ludusZoomLevel)):
-        for area in LudusArea:
-          tdiv(class = cstring("ludus-area ludus-area-" & ($area)[2 .. ^1].toLowerAscii),
-               `data-area` = cstring(areaNames[area])):
-            span(class = "ludus-area-name"): text areaNames[area]
-            tdiv(class = "ludus-area-floor"):
-              for gladiator in areas[area]:
-                renderGladiator(gladiator, interactive = true)
+      renderRoom(state, scene, ludusZoomLevel, labelled = not roomExpanded)
+    if roomExpanded:
+      tdiv(class = "room-overlay"):
+        tdiv(class = "room-dialog", role = "dialog", `aria-modal` = "true", `aria-label` = "Agents' room"):
+          tdiv(class = "room-dialog-header"):
+            strong: text "Agents' room"
+            button(class = "ludus-zoom-button room-close", `aria-label` = "Close the agents' room",
+                   title = "Close (Esc)"):
+              text "×"
+              proc onclick(event: Event, node: VNode) = closeRoom()
+          renderTopBar(state, scene)
+          tdiv(class = "room-dialog-body"):
+            renderRoom(state, scene, fitZoom(roomWidth, roomHeight + rowHeight * ((scene.len + roomColumns - 1) div
+                                                                                  roomColumns),
+                                             viewportWidth() - 64, viewportHeight() - 190), labelled = true)
     if ludusFocus.len > 0:
       for gladiator in scene:
         if gladiator.agent == ludusFocus:

@@ -2,7 +2,7 @@
 
 A strip directly above the message box shows the hub (and the specialist he hands a request to) at 2x on
 desktop and 1x on phones, never over the conversation or the composer. The Run Inspector's Ludus tab
-shows every agent's gladiator in one room that zooms in whole-pixel steps. The owner can hide them in
+seats every agent at his own desk in one room (F1b) that zooms in whole-pixel steps and opens large. The owner can hide them in
 Settings > Appearance; the choice is saved with the account. Isolated HTTP fixtures only.
 Run after rebuilding: python tests/test_gladiators.py
 """
@@ -182,29 +182,119 @@ class GladiatorTests(navigation.ChatNavigationTests):
         expect(tabs).to_have_text(["Run", "Events", "Raw", "Ludus"])
         self.page.locator(".inspector-tabs").get_by_role("button", name="Ludus", exact=True).click()
         room = self.page.get_by_role("region", name="Ludus", exact=True)
-        agents = room.locator(".gladiator")
-        expect(agents).to_have_count(3)  # the hub and the two specialists the catalog names
-        # Each stands in the area of his state: idle specialists in the barracks, the hub in the arena.
-        self.assertEqual(room.locator('[data-area="Barracks"] .gladiator').evaluate_all(
-            "nodes => nodes.map(n => n.dataset.agent)"), ["networking-specialist", "proxmox-specialist"])
-        self.assertEqual(room.locator('[data-area="Arena"] .gladiator').evaluate_all(
-            "nodes => nodes.map(n => n.dataset.agent)"), ["hub"])
+        desks = room.locator(".agents-room .room-desk")
+        expect(desks).to_have_count(3)  # the hub and the two specialists the catalog names
         zoom = room.locator(".ludus-zoom-level")
         start = int(zoom.get_attribute("data-zoom"))
         room.get_by_role("button", name="Zoom in", exact=True).click()
         expect(zoom).to_have_attribute("data-zoom", str(min(start + 1, 4)))
-        hub = room.locator('.gladiator[data-agent="hub"]').bounding_box()
-        self.assertEqual(round(hub["width"]), 32 * min(start + 1, 4))
+        hub = room.locator('.room-desk[data-agent="hub"]').bounding_box()
+        self.assertEqual(round(hub["width"]), 80 * min(start + 1, 4))
         zoom_out = room.get_by_role("button", name="Zoom out", exact=True)
         for _ in range(min(start + 1, 4) - 1):
             zoom_out.click()
         expect(zoom).to_have_attribute("data-zoom", "1")
         # At the smallest step the control says so instead of doing nothing.
         expect(zoom_out).to_be_disabled()
-        # Choosing a gladiator says who he is and what his agent is doing.
-        room.locator('.gladiator[data-agent="proxmox-specialist"]').click()
+        # Choosing a desk says who works there and what his agent is doing.
+        room.locator('.room-desk[data-agent="proxmox-specialist"]').click()
         expect(room.locator(".ludus-focus")).to_contain_text("Proxmox specialist")
         expect(room.locator(".ludus-focus")).to_contain_text("asleep")
+        self.assertEqual(self.errors, [])
+
+    def open_ludus(self):
+        self.page.set_viewport_size({"width": 1440, "height": 900})
+        self.open_first_chat()
+        self.page.get_by_role("contentinfo", name="Status", exact=True).get_by_role(
+            "button", name="Run inspector", exact=True).click()
+        self.page.locator(".inspector-tabs").get_by_role("button", name="Ludus", exact=True).click()
+        return self.page.get_by_role("region", name="Ludus", exact=True)
+
+    def test_the_agents_room_seats_every_agent_at_his_own_desk_and_opens_large(self):
+        room = self.open_ludus()
+        office = room.get_by_role("group", name="Agents' room", exact=True)
+        desks = office.locator(".room-desk")
+        # One desk per agent the catalog names, the hub's first; nothing is invented.
+        self.assertEqual(desks.evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
+                         ["hub", "networking-specialist", "proxmox-specialist"])
+        hub = office.locator('.room-desk[data-agent="hub"]')
+        expect(hub).to_have_attribute("data-pose", "idle")
+        expect(office.locator('.room-desk[data-agent="proxmox-specialist"]')).to_have_attribute("data-pose", "dozing")
+        expect(office.locator('.room-desk[data-agent="proxmox-specialist"]')).to_have_attribute("data-screen", "off")
+        # Each desk says whose it is and what he is doing, for people who cannot see the art.
+        expect(office.locator('.room-desk[data-agent="proxmox-specialist"]')).to_have_attribute(
+            "aria-label", "Proxmox specialist, asleep")
+        # The top bar: no request yet, nothing counted but those asleep.
+        bar = room.locator(".room-topbar")
+        expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "0")
+        expect(bar.locator(".room-counter[data-counter=\"busy\"]")).to_contain_text("0")
+        # Every desk at whole-pixel scale: a workstation is 80 x 40 art pixels at zoom 1.
+        zoom = int(room.locator(".ludus-zoom-level").get_attribute("data-zoom"))
+        box = hub.bounding_box()
+        self.assertEqual((round(box["width"]), round(box["height"])), (80 * zoom, 40 * zoom))
+        # The room fits the inspector: nothing scrolls sideways at the first step.
+        self.assertFalse(room.locator(".ludus-viewport").evaluate("node => node.scrollWidth > node.clientWidth"))
+        # Expand opens the same room large over the conversation; Escape closes it and focus returns.
+        room.get_by_role("button", name="Expand the agents' room", exact=True).click()
+        dialog = self.page.get_by_role("dialog", name="Agents' room", exact=True)
+        expect(dialog).to_be_visible()
+        large = dialog.locator('.room-desk[data-agent="hub"]').bounding_box()
+        self.assertGreater(large["width"], box["width"])
+        self.assertEqual(round(large["width"]) % 80, 0)
+        # Expanded, the whole room fits the window without scrolling.
+        self.assertFalse(dialog.locator(".room-dialog-body").evaluate(
+            "node => node.scrollWidth > node.clientWidth || node.scrollHeight > node.clientHeight"))
+        self.assertFalse(self.page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth"))
+        self.page.keyboard.press("Escape")
+        expect(dialog).to_have_count(0)
+        expand = room.get_by_role("button", name="Expand the agents' room", exact=True)
+        expect(expand).to_be_focused()
+        # Escape closes it even when pressed at once, while focus is still on the Expand button.
+        expand.click()
+        expect(dialog).to_be_visible()
+        expand.focus()
+        self.page.keyboard.press("Escape")
+        expect(dialog).to_have_count(0)
+        # The close button works too.
+        expand.click()
+        dialog.get_by_role("button", name="Close the agents' room", exact=True).click()
+        expect(dialog).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_in_the_room_the_hub_walks_to_the_specialists_desk_and_the_bar_follows_the_job(self):
+        self.job_status = "processing"
+        self.serve_job_socket()
+        room = self.open_ludus()
+        self.page.locator("#messageInput").fill("Check node hummingbird")
+        self.page.locator("#messageInput").press("Enter")
+        deadline = 50
+        while self.job_socket is None and deadline:
+            self.page.wait_for_timeout(100)
+            deadline -= 1
+        self.assertIsNotNone(self.job_socket, "the job socket never joined")
+        # Sending a request keeps the room open: the owner is watching it and it follows the job live.
+        office = room.get_by_role("group", name="Agents' room", exact=True)
+        expect(office).to_be_visible()
+        hub = office.locator('.room-desk[data-agent="hub"]')
+        specialist = office.locator('.room-desk[data-agent="proxmox-specialist"]')
+        bar = room.locator(".room-topbar")
+        self.push_progress("routing", "hub")
+        expect(hub).to_have_attribute("data-pose", "pondering")
+        expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "1")
+        self.push_progress("executing", "proxmox-specialist")
+        # The hub's seat is empty and he stands at the proxmox specialist's desk, who types.
+        expect(hub).to_have_attribute("data-pose", "away")
+        expect(specialist).to_have_attribute("data-pose", "typing")
+        expect(specialist).to_have_attribute("data-screen", "working")
+        expect(specialist.locator('.room-visitor[data-agent="hub"]')).to_have_count(1)
+        expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "3")
+        expect(bar.locator(".room-counter[data-counter=\"busy\"]")).to_contain_text("2")
+        # The bar names the request by its chat.
+        expect(bar.locator(".room-title")).to_have_text("First fixture chat")
+        self.push_progress("synthesizing", "hub")
+        expect(hub).to_have_attribute("data-pose", "typing")
+        expect(specialist.locator(".room-visitor")).to_have_count(0)
+        expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "4")
         self.assertEqual(self.errors, [])
 
     def test_the_owner_can_hide_the_gladiators_and_the_choice_is_saved(self):

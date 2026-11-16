@@ -1,4 +1,5 @@
-## The ludus: one gladiator per real agent, each acting out what his agent is doing.
+## The ludus: one gladiator per real agent, each acting out what his agent is doing, at his own desk
+## in the agents' room (F1b).
 ##
 ## The roster is the hub plus every specialist the server's capability catalog
 ## names; nothing is invented. Who works is decided only by state the app
@@ -12,13 +13,32 @@ import learning
 import agent_presence
 
 type
-  LudusArea* = enum
-    laBarracks, laYard, laArena, laGate
-
   Gladiator* = object
     agent*: string        ## the agent's identifier ("hub" or a specialist name)
     presence*: AgentPresence
     talkingTo*: string    ## the specialist the hub is handing the request to, if any
+
+  ## The agents' room (F1b): every agent at his own desk. A pose is what the seated agent does; his
+  ## screen is dark while he dozes; the hub, visiting a specialist, leaves his own seat empty.
+  RoomPose* = enum
+    rpIdle, rpTyping, rpPondering, rpDozing, rpWaiting, rpAway, rpCheering, rpSlumped
+
+  RoomScreen* = enum
+    rsOff, rsOn, rsWorking, rsTraining, rsDone, rsError
+
+  RoomSeat* = object
+    agent*: string
+    presence*: AgentPresence  ## the gladiator's state, for the words that name it
+    pose*: RoomPose
+    screen*: RoomScreen
+    visiting*: string         ## the hub only: the specialist at whose desk he stands
+
+  ## The room's top bar: the request's step (0 when none: queued, waiting on the provider, failed) of
+  ## four (routing, planning, running, writing) and how many agents are busy, waiting for the owner's
+  ## approval, training or hurt.
+  RoomTopBar* = object
+    step*, steps*: int
+    busy*, waiting*, training*, failed*: int
 
 const
   hubAgent* = "hub"
@@ -51,21 +71,6 @@ proc gladiatorTitle*(agent: string): string =
   if agent == hubAgent: return "Janus (hub)"
   result = agent.replace("-", " ")
   if result.len > 0: result[0] = result[0].toUpperAscii
-
-proc ludusArea*(presence: AgentPresence): LudusArea =
-  case presence
-  of apSleeping: laBarracks
-  of apTraining: laYard
-  of apWaiting: laGate
-  of apWalking, apThinking, apWorking, apCelebrating, apHurt: laArena
-
-proc gladiatorArea*(gladiator: Gladiator, scene: seq[Gladiator]): LudusArea =
-  ## Where he stands: the area of his own state, except that the hub, while handing a request over,
-  ## stands with that specialist so the two are seen talking.
-  if gladiator.talkingTo.len > 0:
-    for other in scene:
-      if other.agent == gladiator.talkingTo: return ludusArea(other.presence)
-  ludusArea(gladiator.presence)
 
 proc training(learningRuns: seq[LearningRun], role: string): bool =
   for learningRun in learningRuns:
@@ -109,11 +114,68 @@ proc ludusScene*(roster: seq[string], run: RunState, system: SystemState, learni
       gladiator.presence = apTraining
     result.add gladiator
 
+proc roomPose(presence: AgentPresence): RoomPose =
+  case presence
+  of apSleeping: rpDozing
+  of apWalking: rpIdle
+  of apThinking: rpPondering
+  of apWorking, apTraining: rpTyping
+  of apWaiting: rpWaiting
+  of apCelebrating: rpCheering
+  of apHurt: rpSlumped
+
+proc roomScreen(presence: AgentPresence): RoomScreen =
+  case presence
+  of apSleeping: rsOff
+  of apWorking: rsWorking
+  of apTraining: rsTraining
+  of apCelebrating: rsDone
+  of apHurt: rsError
+  of apWalking, apThinking, apWaiting: rsOn
+
+proc roomSeats*(scene: seq[Gladiator]): seq[RoomSeat] =
+  ## One desk per gladiator, in scene (roster) order. Only the scene decides; nothing is added.
+  for gladiator in scene:
+    var seat = RoomSeat(agent: gladiator.agent, presence: gladiator.presence, pose: roomPose(gladiator.presence),
+                        screen: roomScreen(gladiator.presence))
+    if gladiator.talkingTo.len > 0:
+      seat.pose = rpAway
+      seat.screen = rsOn
+      seat.visiting = gladiator.talkingTo
+    result.add seat
+
+const roomSteps* = 4
+
+proc roomStep(run: RunState): int =
+  ## Which of the four steps the request is on; 0 when it is on none (or failed). Waiting for the
+  ## owner's approval holds it at running; a finished request fills the bar.
+  if not run.active: return 0
+  case run.status
+  of "completed": return roomSteps
+  of "waiting_approval", "approving", "rejecting": return 3
+  else: discard
+  case run.progressStage
+  of "routing": 1
+  of "planning": 2
+  of "executing": 3
+  of "synthesizing": 4
+  else: 0
+
+proc roomTopBar*(scene: seq[Gladiator], run: RunState): RoomTopBar =
+  result = RoomTopBar(step: roomStep(run), steps: roomSteps)
+  for gladiator in scene:
+    case gladiator.presence
+    of apThinking, apWorking: inc result.busy
+    of apWaiting: inc result.waiting
+    of apTraining: inc result.training
+    of apHurt: inc result.failed
+    else: discard
+
 proc zoomIn*(zoom: int): int = min(zoom + 1, maxZoom)
 proc zoomOut*(zoom: int): int = max(zoom - 1, minZoom)
 
 proc fitZoom*(roomWidth, roomHeight, viewWidth, viewHeight: int): int =
-  ## The largest whole-pixel step at which the whole room fits the view.
+  ## The largest whole-pixel step at which the whole room fits the view (the expanded room).
   result = minZoom
   for zoom in minZoom .. maxZoom:
     if roomWidth * zoom <= viewWidth and roomHeight * zoom <= viewHeight:
