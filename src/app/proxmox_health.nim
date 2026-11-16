@@ -27,7 +27,7 @@ type
     error*, coverageNote*: string
     staleAfterDays*: int  ## the service's threshold for an overdue backup
     jobs*, enabledJobs*: Option[int]
-    withRecentBackup*, stale*, never*: int
+    withRecentBackup*, stale*, missedRun*, never*: int
     withoutBackupJob*: Option[int]
     guests*: seq[GuestBackups]
     storages*: seq[BackupStorage]
@@ -45,7 +45,7 @@ type
     backups*: ProxmoxBackups
     disks*: seq[NodeDisks]
 
-const backupIssues* = ["no_backup_job", "never_backed_up", "backup_stale"]
+const backupIssues* = ["no_backup_job", "never_backed_up", "missed_run", "backup_stale"]
 const diskIssues* = ["smart_failed", "worn_out"]
 const diskHealths* = ["passed", "failed", "smart_disabled", "unknown"]
 
@@ -127,6 +127,8 @@ proc parseBackups(node: JsonNode): ProxmoxBackups =
   let summary = member(data, "summary")
   result.withRecentBackup = count(summary, "with_recent_backup")
   result.stale = count(summary, "stale")
+  # Added with judging by each guest's own backup job; an older AI answer has no count.
+  result.missedRun = if summary.hasKey("missed_run"): count(summary, "missed_run") else: 0
   result.never = count(summary, "never")
   result.withoutBackupJob = optionalCount(summary, "without_backup_job")
   for row in rows(data, "guests", 200):
@@ -190,6 +192,7 @@ proc backupIssueLabel*(issue: string, staleAfterDays: int): string =
   of "no_backup_job": "No backup job"
   of "never_backed_up": "Never backed up"
   of "backup_stale": "Overdue: older than " & $staleAfterDays & " days"
+  of "missed_run": "Missed its last scheduled run"
   else: issue
 
 proc diskHealthLabel*(health: string): string =
@@ -238,18 +241,27 @@ proc backupCopyLabel*(copy: BackupCopy): string =
   elif copy.verified.len > 0: parts.add "verification" & unbreakable & copy.verified
   parts.join(", ")
 
-proc backupSummaryLabel*(backups: ProxmoxBackups): string =
+proc backupSummaryParts*(backups: ProxmoxBackups): seq[string] =
+  ## The summary's phrases, which a narrow screen wraps between but never inside.
   ## Guests first, then the jobs that protect them: two different counts, never one list.
-  let guests = $backups.guests.len & (if backups.guests.len == 1: " guest: " else: " guests: ")
-  let jobs =
-    if backups.jobs.isNone: "backup jobs unknown"
-    else:
-      let count = backups.jobs.get
-      let disabled = count - backups.enabledJobs.get(count)
-      $count & (if count == 1: " backup job" else: " backup jobs") &
-        (if disabled > 0: " (" & $disabled & " disabled)" else: "")
+  result = @[$backups.guests.len & (if backups.guests.len == 1: " guest:" else: " guests:"),
+             $backups.withRecentBackup & " up to date"]
   # Overdue and missing backups are judged only from a complete listing.
-  let gaps =
-    if not backups.listingComplete: "overdue and missing backups unknown"
-    else: $backups.stale & " overdue · " & $backups.never & " never backed up"
-  guests & $backups.withRecentBackup & " up to date · " & gaps & " · " & jobs
+  if not backups.listingComplete:
+    result.add "overdue and missing backups unknown"
+  else:
+    if backups.missedRun > 0:
+      result.add $backups.missedRun & " missed a scheduled run"
+    result.add $backups.stale & " overdue"
+    result.add $backups.never & " never backed up"
+  if backups.jobs.isNone:
+    result.add "backup jobs unknown"
+  else:
+    let count = backups.jobs.get
+    let disabled = count - backups.enabledJobs.get(count)
+    result.add $count & (if count == 1: " backup job" else: " backup jobs") &
+      (if disabled > 0: " (" & $disabled & " disabled)" else: "")
+
+proc backupSummaryLabel*(backups: ProxmoxBackups): string =
+  let parts = backupSummaryParts(backups)
+  parts[0] & " " & parts[1 .. ^1].join(" · ")

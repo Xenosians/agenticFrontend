@@ -20,6 +20,22 @@ proc measurement(label, value: string): VNode =
     span: text label
     strong: text value
 
+proc summaryPhrases(parts: openArray[string]): VNode =
+  ## A summary line whose phrases ("1 never backed up") wrap between, never inside.
+  ## A first phrase ending in a colon introduces the rest without a separator.
+  result = buildHtml(span(class = "summary-phrases")):
+    for index, part in parts:
+      if index > 0 and not parts[index - 1].endsWith(":"):
+        text " · "
+      elif index > 0:
+        text " "
+      span(class = "summary-part"): text part
+
+proc attentionPhrase(count: int): string =
+  if count == 0: "none need attention"
+  elif count == 1: "1 needs attention"
+  else: $count & " need attention"
+
 proc renderMetric(metric: OperationMetric): VNode =
   result = buildHtml(tdiv(class = "operation-call")):
     tdiv(class = "operation-call-heading"):
@@ -257,10 +273,8 @@ proc renderDatabaseHosts(databases: ProxmoxDatabases): VNode =
         text "No database hosts are tagged yet. " & databases.labelHint
     else:
       p(class = "database-summary", role = "status"):
-        text $databases.running & " running · " & $databases.notRunning & " not running · " &
-          (if databases.withIssues == 0: "none need attention"
-           elif databases.withIssues == 1: "1 needs attention"
-           else: $databases.withIssues & " need attention")
+        summaryPhrases([$databases.running & " running", $databases.notRunning & " not running",
+                        attentionPhrase(databases.withIssues)])
       if not databases.coverageKnown:
         p(class = "operation-note database-coverage-note"):
           text "Backup coverage unknown" &
@@ -320,7 +334,7 @@ proc renderBackups(backups: ProxmoxBackups): VNode =
     tdiv(class = "section-heading-row"):
       h4: text "Backups"
       span: text $backups.guests.len & (if backups.guests.len == 1: " guest" else: " guests")
-    p(class = "backup-summary", role = "status"): text backupSummaryLabel(backups)
+    p(class = "backup-summary", role = "status"): summaryPhrases(backupSummaryParts(backups))
     if not backups.coverageKnown and backups.coverageNote.len > 0:
       p(class = "operation-note backup-coverage-note"): text "Backup jobs unknown: " & backups.coverageNote
     if not backups.listingComplete:
@@ -625,10 +639,8 @@ proc renderTailnetDashboard(state: AppState): VNode =
         if snapshot.withIssues == 0 and snapshot.offline == 0:
           span(class = "proxmox-status-dot", `aria-hidden` = "true")
         strong(class = "tailnet-summary"):
-          text $snapshot.online & " online · " & $snapshot.offline & " offline · " &
-            (if snapshot.withIssues == 0: "none need attention"
-             elif snapshot.withIssues == 1: "1 needs attention"
-             else: $snapshot.withIssues & " need attention")
+          summaryPhrases([$snapshot.online & " online", $snapshot.offline & " offline",
+                          attentionPhrase(snapshot.withIssues)])
         span(class = "operation-note"): text "Observed " & $localTimestamp(cstring(snapshot.observedAt))
       if snapshot.devices.len == 0:
         tdiv(class = "empty-card"): text "The tailnet returned no devices."

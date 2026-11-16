@@ -154,6 +154,11 @@ SPLIT_UNITS = """(units) => [...document.querySelectorAll('[data-fact="copy"]')]
     });
 })"""
 
+# Count phrases of a summary line ("1 never backed up") that the browser broke across lines.
+SPLIT_PHRASES = """(selector) => [...document.querySelectorAll(selector + ' .summary-part')].filter((part) =>
+    new Set([...part.getClientRects()].filter((rect) => rect.width > 0).map((rect) => Math.round(rect.top))).size > 1
+).map((part) => part.textContent)"""
+
 
 def backup_guest(vmid, name, issues=(), age=None, **changes):
     latest = None if age is None else {"storage": "pbs", "time": 1794800000, "age_days": age,
@@ -430,6 +435,10 @@ class OperationsTests(navigation.ChatNavigationTests):
             self.open_operations()
             panel = self.page.locator(".tailnet-dashboard")
             panel.locator(".tailnet-device").first.wait_for()
+            self.assertEqual(self.page.evaluate(SPLIT_PHRASES, ".tailnet-summary"), [],
+                             f"a tailnet summary phrase breaks at {width}px")
+            expect(panel.locator(".tailnet-summary .summary-part")).to_have_text(
+                ["2 online", "1 offline", "1 needs attention"])
             for selector in (".tailnet-device-name", ".tailnet-device .operation-note", ".tailnet-issue",
                              ".tailnet-summary", ".tailnet-dns"):
                 with self.subTest(width=width, selector=selector):
@@ -573,6 +582,10 @@ class OperationsTests(navigation.ChatNavigationTests):
             self.open_operations()
             section = self.page.locator(".proxmox-databases")
             section.locator(".database-host").first.wait_for()
+            self.assertEqual(self.page.evaluate(SPLIT_PHRASES, ".database-summary"), [],
+                             f"a database summary phrase breaks at {width}px")
+            expect(section.locator(".database-summary .summary-part")).to_have_text(
+                ["2 running", "1 not running", "2 need attention"])
             for selector in (".database-host-name", ".database-host .operation-note", ".database-issue",
                              ".database-summary", ".database-storage", ".database-facts dd"):
                 with self.subTest(width=width, selector=selector):
@@ -655,6 +668,29 @@ class OperationsTests(navigation.ChatNavigationTests):
         expect(unreadable.locator(".disk-issue")).to_have_text(["Disks unknown"])
         expect(unreadable.locator(".operation-note")).to_have_text(
             "Disks could not be read: Proxmox refused the read (HTTP 403).")
+        self.assert_safe()
+
+    def test_a_guest_that_missed_its_scheduled_run_is_a_warning_with_its_rule(self):
+        body = proxmox_health()
+        data = body["backups"]["data"]
+        data["guests"][1] = backup_guest(102, "cache", ("missed_run",), age=2.0, last_scheduled_run=1794810000)
+        data["summary"] = {"guests": 3, "with_recent_backup": 1, "stale": 0, "missed_run": 1, "never": 1,
+                           "without_backup_job": 1}
+        data["missed_run_grace_hours"] = 12
+        self.health_body = body
+        self.open_operations()
+        section = self.page.locator(".proxmox-backups")
+        expect(section.locator(".backup-summary")).to_have_text(
+            "3 guests: 1 up to date · 1 missed a scheduled run · 0 overdue · 1 never backed up · 1 backup job")
+        cache = section.locator('.backup-guest[data-vmid="102"]')
+        expect(cache.locator(".backup-issue")).to_have_text(["Missed its last scheduled run"])
+        self.assertEqual(cache.get_attribute("data-attention"), "warning")
+        expect(cache.locator('.backup-issue[data-issue="missed_run"]')).to_have_attribute("data-blocking", "false")
+        # On a phone the summary wraps between phrases, never inside one ("1" / "never backed up").
+        self.page.set_viewport_size({"width": 390, "height": 844})
+        expect(section.locator(".backup-summary .summary-part")).to_have_text(
+            ["3 guests:", "1 up to date", "1 missed a scheduled run", "0 overdue", "1 never backed up", "1 backup job"])
+        self.assertEqual(self.page.evaluate(SPLIT_PHRASES, ".backup-summary"), [])
         self.assert_safe()
 
     def test_an_unreadable_backup_storage_says_backups_cannot_be_confirmed(self):

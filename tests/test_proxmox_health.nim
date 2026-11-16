@@ -76,6 +76,8 @@ suite "Proxmox backups and physical disks":
     check backupIssueLabel("never_backed_up", 8) == "Never backed up"
     # Overdue names the threshold it was judged by.
     check backupIssueLabel("backup_stale", 8) == "Overdue: older than 8 days"
+    # A guest in a scheduled job is judged by that job: its last due run left no copy.
+    check backupIssueLabel("missed_run", 8) == "Missed its last scheduled run"
     check diskHealthLabel("passed") == "SMART passed"
     check diskHealthLabel("failed") == "SMART failed"
     check diskHealthLabel("unknown") == "Health unknown"
@@ -89,6 +91,7 @@ suite "Proxmox backups and physical disks":
     # No backup at all is the one backup state that blocks; a missing job or an old copy warns.
     check backupIssueBlocking("never_backed_up")
     check not backupIssueBlocking("no_backup_job") and not backupIssueBlocking("backup_stale")
+    check not backupIssueBlocking("missed_run")
     check diskKindLabel("nvme") == "NVMe" and diskKindLabel("hdd") == "HDD" and diskKindLabel("ssd") == "SSD"
     check formatProxmoxBytes(some(4000787030016.0)) == "3.6 TiB"
     check formatProxmoxBytes(some(2147483648.0)) == "2.0 GiB"
@@ -97,6 +100,18 @@ suite "Proxmox backups and physical disks":
                                      verified: "ok")) == "2.0\u00A0GiB on pbs, encrypted, verified\u00A0ok"
     check backupCopyLabel(BackupCopy(storage: "local", protected: true, verified: "failed")) ==
       "On local, protected, verification\u00A0failed"
+
+  test "a missed scheduled run is parsed and counted beside overdue copies":
+    var body = backups(@[guest(104, issues = @["missed_run"], latest = latest(2.0))])
+    body["data"]["summary"]["missed_run"] = %1
+    body["data"]["missed_run_grace_hours"] = %12
+    let parsed = parseProxmoxHealth(health(body, @[])).backups
+    check parsed.guests[0].issues == @["missed_run"] and parsed.missedRun == 1
+    check backupSummaryLabel(parsed) ==
+      "1 guest: 1 up to date · 1 missed a scheduled run · 0 overdue · 0 never backed up · 1 backup job"
+    # The phrases a summary line wraps between; the label is exactly these, joined.
+    check backupSummaryParts(parsed) ==
+      @["1 guest:", "1 up to date", "1 missed a scheduled run", "0 overdue", "0 never backed up", "1 backup job"]
 
   test "the backup summary counts jobs and never judges overdue backups from a partial listing":
     var parsed = parseProxmoxHealth(health(backups(@[guest(102, latest = latest(0.5))]), @[])).backups

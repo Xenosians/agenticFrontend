@@ -2474,6 +2474,8 @@ body {
 .proxmox-health-unavailable strong { font-size: 13px; }
 .proxmox-health-unavailable p { max-width: 72ch; }
 .backup-summary { margin: 4px 0 0; color: var(--text); font-size: 13px; font-weight: 600; }
+/* A summary line wraps between its phrases, never inside one ("1" / "never backed up"). */
+.summary-part { white-space: nowrap; }
 .backup-coverage-note, .backup-incomplete { margin: 4px 0 0; max-width: 72ch; overflow-wrap: anywhere; }
 .backup-guest-list, .physical-disk-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr)); align-items: start; gap: 10px; margin: 12px 0 0; padding: 0; list-style: none; }
 .backup-guest, .physical-disk, .disk-node-unavailable { min-width: 0; padding: 12px 12px 12px 13px; border: 1px solid var(--border); border-radius: var(--radius-md); }
