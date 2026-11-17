@@ -300,6 +300,11 @@ type
     datasetCrawlOpen*: bool
     datasetCrawlUrl*: string
     datasetCrawlNewSite*: string
+    # The account's own Proxmox and Tailscale link drafts (Plugins > Servers);
+    # secrets are typed here only and cleared once saved.
+    proxmoxLinkUrl*, proxmoxLinkTokenId*, proxmoxLinkSecret*, proxmoxLinkServerName*: string
+    proxmoxLinkVerifyTls*: bool
+    tailscaleLinkClientId*, tailscaleLinkSecret*: string
     activeView*: AppView
     inspectorTab*: InspectorTab
     composerPanel*: ComposerPanel

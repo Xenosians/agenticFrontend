@@ -77,6 +77,10 @@ proc initAppState*():
     pluginSection:
       "public",
 
+    # Certificates are verified unless the account turns it off for its own link.
+    proxmoxLinkVerifyTls:
+      true,
+
     pluginSearchDraft:
       "",
 

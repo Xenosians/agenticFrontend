@@ -8,6 +8,7 @@ Run after rebuilding: python tests/test_gladiators.py
 """
 import json
 import os
+import re
 import unittest
 from pathlib import Path
 from urllib.parse import urlparse
@@ -259,6 +260,46 @@ class GladiatorTests(navigation.ChatNavigationTests):
         expand.click()
         dialog.get_by_role("button", name="Close the agents' room", exact=True).click()
         expect(dialog).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_the_expanded_room_is_drawn_in_3d_from_the_same_seats_and_keeps_its_desks(self):
+        """2.5D isometric voxel room (owner decision, 17 November): three.js draws the expanded room."""
+        room = self.open_ludus()
+        room.get_by_role("button", name="Expand the agents' room", exact=True).click()
+        dialog = self.page.get_by_role("dialog", name="Agents' room", exact=True)
+        canvas = dialog.locator("canvas.room3d-canvas")
+        expect(canvas).to_have_count(1)
+        # The canvas names the room for screen readers; the desks stay as the accessible layer.
+        expect(canvas).to_have_attribute("role", "img")
+        expect(canvas).to_have_attribute("aria-label", "Agents' room: Janus (hub), walking about; "
+                                                       "Networking specialist, asleep; Proxmox specialist, asleep")
+        self.assertEqual(dialog.locator(".room-desk").evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
+                         ["hub", "networking-specialist", "proxmox-specialist"])
+        # The seats the 3D room draws are exactly the app's own: same agents, order and states.
+        seats = self.page.evaluate("() => globalThis.__room3dSeats")
+        self.assertEqual([(seat["agent"], seat["state"], seat["screen"]) for seat in seats],
+                         [("hub", "walking", "on"), ("networking-specialist", "sleeping", "off"),
+                          ("proxmox-specialist", "sleeping", "off")])
+        # Something was really drawn: the canvas is not blank (WebGL renders in headless Chromium).
+        painted = canvas.evaluate("""c => { const g = c.getContext('webgl2') || c.getContext('webgl');
+            const px = new Uint8Array(4 * 64 * 64); g.readPixels((c.width >> 1) - 32, (c.height >> 1) - 32, 64, 64,
+            g.RGBA, g.UNSIGNED_BYTE, px); let lit = 0; for (let i = 3; i < px.length; i += 4) if (px[i]) lit++;
+            return lit; }""")
+        self.assertGreater(painted, 200)
+        # Closing the room removes the renderer; nothing keeps drawing in the background.
+        self.page.keyboard.press("Escape")
+        expect(dialog).to_have_count(0)
+        expect(self.page.locator("canvas.room3d-canvas")).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_without_webgl_the_expanded_room_stays_2d(self):
+        self.page.add_init_script("""HTMLCanvasElement.prototype.getContext = function () { return null; };""")
+        room = self.open_ludus()
+        room.get_by_role("button", name="Expand the agents' room", exact=True).click()
+        dialog = self.page.get_by_role("dialog", name="Agents' room", exact=True)
+        expect(dialog.locator(".room-desk")).to_have_count(3)
+        expect(dialog.locator("canvas.room3d-canvas")).to_have_count(0)
+        expect(dialog.locator(".agents-room")).not_to_have_class(re.compile("room3d-active"))
         self.assertEqual(self.errors, [])
 
     def test_in_the_room_the_hub_walks_to_the_specialists_desk_and_the_bar_follows_the_job(self):

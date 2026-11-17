@@ -10,6 +10,7 @@ import ../app/lua_transforms
 import ../app/knowledge_crawl
 import ../api/connection_options
 import brand
+import server_links_view
 
 
 proc updateDatasetFilePicker(accepted, sameAccepted: cstring) {.importjs: """
@@ -2421,6 +2422,9 @@ proc renderMainContent(
     of "limits":
       renderUsageSettings(state)
 
+    of "servers":
+      renderServerLinks(state)
+
     else:
 
       renderPublicProviders(
@@ -2577,6 +2581,11 @@ proc renderConnections*(
               state,
               "data"
             )
+
+        button(class = tabClass(state, "servers")):
+          text "Servers"
+          proc onclick(event: Event, node: VNode) =
+            setPluginSection(state, "servers")
 
       if state.extensionError.len > 0:
 

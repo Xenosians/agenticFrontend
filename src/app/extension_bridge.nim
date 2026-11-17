@@ -5,6 +5,7 @@ import dataset_versions
 import dataset_file_types
 import lua_transforms
 import knowledge_crawl
+import server_links
 import connection_draft
 import ../api/extensions
 import ../api/connection_options
@@ -182,6 +183,29 @@ proc addCrawlSite*(state: AppState) {.async.} =
   if state.extensionError.len == 0:
     state.datasetCrawlNewSite = ""
     state.datasetCrawlUrl = origin & "/"
+
+proc saveProxmoxLink*(state: AppState) {.async.} =
+  ## Saves this account's own Proxmox link; the AI service keeps the secret encrypted.
+  let existing = linkOf(serverLinks(state.extensionCatalog), "proxmox").kind.len > 0
+  if not proxmoxLinkReady(state.proxmoxLinkUrl, state.proxmoxLinkTokenId, state.proxmoxLinkSecret, existing):
+    return
+  await changeExtension(state, "link_save", proxmoxLinkPayload(state.proxmoxLinkUrl, state.proxmoxLinkTokenId,
+    state.proxmoxLinkSecret, state.proxmoxLinkVerifyTls, state.proxmoxLinkServerName))
+  # The typed secret never outlives the request, saved or refused.
+  state.proxmoxLinkSecret = ""
+
+proc saveTailscaleLink*(state: AppState) {.async.} =
+  ## Saves this account's own Tailscale OAuth client; the AI service keeps the secret encrypted.
+  let existing = linkOf(serverLinks(state.extensionCatalog), "tailscale").kind.len > 0
+  if not tailscaleLinkReady(state.tailscaleLinkClientId, state.tailscaleLinkSecret, existing):
+    return
+  await changeExtension(state, "link_save", tailscaleLinkPayload(state.tailscaleLinkClientId,
+    state.tailscaleLinkSecret))
+  state.tailscaleLinkSecret = ""
+
+proc removeServerLink*(state: AppState, kind: string) {.async.} =
+  ## Removes this account's link; the account returns to the machine's default, if any.
+  await changeExtension(state, "link_remove", %*{"kind": kind})
 
 proc removeCrawlSite*(state: AppState, origin: string) {.async.} =
   await changeExtension(state, "crawl_site_remove", %*{"origin": origin})

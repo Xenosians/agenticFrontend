@@ -7,7 +7,7 @@
 
 include karax/prelude
 import std/strutils
-import ../app/[types, agent_presence, ludus]
+import ../app/[types, agent_presence, ludus, room3d]
 
 const
   roomWidth = 334   ## the expanded room in art pixels (zoom 1): four workstations of 80, margins, walls
@@ -157,6 +157,7 @@ proc renderTopBar(state: AppState, scene: seq[Gladiator]): VNode =
 
 proc closeRoom() =
   roomExpanded = false
+  hideRoom3d()
   redraw(kxi)
   focusSoon(".ludus .room-expand")
 
@@ -169,6 +170,16 @@ proc roomEscape(): bool =
   if not roomExpanded: return false
   closeRoom()
   true
+
+proc drawRoom3d(scene: seq[Gladiator]) =
+  ## The expanded room in 2.5D: the same seats as the 2D room, and a label naming every agent's state.
+  let seats = roomSeats(scene)
+  var names: seq[string]
+  for seat in seats:
+    names.add gladiatorTitle(seat.agent) & ", " &
+      (if seat.pose == rpAway: "at the " & gladiatorTitle(seat.visiting).toLowerAscii & "'s desk"
+       else: presenceWord(seat.presence))
+  showRoom3d(".room-overlay .room3d-host", room3dSeats(seats), room3dLabel(names), roomColumns)
 
 var escapeInstalled = false
 
@@ -210,7 +221,12 @@ proc renderLudus*(state: AppState): VNode =
               text "×"
               proc onclick(event: Event, node: VNode) = closeRoom()
           renderTopBar(state, scene)
-          tdiv(class = "room-dialog-body"):
+          # With WebGL the room is drawn in 2.5D behind the desks, which stay as the accessible,
+          # clickable layer; without it (or with no 3D script) the 2D room shows as before.
+          let drawn3d = room3dSupported()
+          tdiv(class = (if drawn3d: cstring"room-dialog-body room3d-on" else: cstring"room-dialog-body")):
+            if drawn3d:
+              tdiv(class = "room3d-host", `aria-hidden` = "false")
             renderRoom(state, scene, fitZoom(roomWidth, roomHeight + rowHeight * ((scene.len + roomColumns - 1) div
                                                                                   roomColumns),
                                              viewportWidth() - 64, viewportHeight() - 190), labelled = true)
@@ -224,3 +240,5 @@ proc renderLudus*(state: AppState): VNode =
               if gladiator.talkingTo.len > 0:
                 text ", handing the request to the " & gladiatorTitle(gladiator.talkingTo).toLowerAscii
               text "."
+  if roomExpanded and room3dSupported():
+    drawRoom3d(scene)

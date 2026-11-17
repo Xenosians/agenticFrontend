@@ -543,6 +543,58 @@
   overflow: auto;
 }
 
+/* The 2.5D room (three.js): the canvas fills the dialog body behind the room. The 2D art turns
+ * invisible but the desk buttons keep their place, labels and focus ring, so choosing a desk and
+ * keyboard use work exactly as in the 2D room. */
+.room-dialog-body.room3d-on {
+  position: relative;
+  min-height: 360px;
+}
+
+.room3d-host {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.room3d-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.room3d-on .agents-room {
+  position: relative;
+  z-index: 1;
+  /* The 3D canvas behind it is the room now: no 2D backdrop, frame or wall art over it. */
+  background: none;
+  border-color: transparent;
+}
+
+.room3d-on .room-wall,
+.room3d-on .room-floor {
+  background: none;
+  border-color: transparent;
+}
+
+.room3d-on .room-wall::before {
+  visibility: hidden;
+}
+
+.room3d-on .room-desk > span {
+  visibility: hidden;
+}
+
+.room3d-on .room-desk {
+  background: none;
+}
+
+.room3d-on .room-desk:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
 @media (max-width: 760px) {
   .gladiator-strip {
     height: 44px;

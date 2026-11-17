@@ -69,6 +69,14 @@ proc clearExtensionDrafts*(state: AppState) =
   state.datasetApiKey = ""
   state.datasetReviewed = false
   state.datasetReplaces = ""
+  # Another account never sees this one's server link drafts or a typed secret.
+  state.proxmoxLinkUrl = ""
+  state.proxmoxLinkTokenId = ""
+  state.proxmoxLinkSecret = ""
+  state.proxmoxLinkServerName = ""
+  state.proxmoxLinkVerifyTls = true
+  state.tailscaleLinkClientId = ""
+  state.tailscaleLinkSecret = ""
   # Another account never sees this one's script or a preview of its rows.
   inc state.datasetTransformEpoch
   state.datasetScript = ""
