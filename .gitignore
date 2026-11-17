@@ -20,6 +20,9 @@ Thumbs.db
 # Logs
 *.log
 
+# Python test bytecode
+__pycache__/
+
 .runtime/
 
 # Legacy Nim test output; compile source tests into .runtime instead.

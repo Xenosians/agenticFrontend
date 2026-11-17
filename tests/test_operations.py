@@ -754,6 +754,7 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.health_body = body
         self.open_operations()
         rows = self.page.locator(".proxmox-disks .physical-disk-list > li")
+        rows.first.wait_for()
         self.assertEqual(rows.evaluate_all("rows => rows.map((row) => row.dataset.node + ' ' + row.dataset.device)"),
                          ["pve-b /dev/sda", "pve-a /dev/nvme0n1"])
         self.assert_safe()
