@@ -20,7 +20,7 @@
   border-radius: 4px;
   background: transparent;
   color: var(--text-soft);
-  font-size: 12px;
+  font-size: var(--text-xs);
   cursor: pointer;
 }
 .workspace-menu-trigger:hover, .workspace-menu-trigger[aria-expanded="true"] {
@@ -49,19 +49,19 @@
   border-radius: 4px;
   background: transparent;
   color: var(--text);
-  font-size: 12px;
+  font-size: var(--text-xs);
   white-space: nowrap;
   text-align: left;
   cursor: pointer;
 }
 .workspace-menu-item:hover, .workspace-menu-item:focus-visible { background: var(--panel-active); }
-.workspace-menu-item kbd { color: var(--text-soft); font: inherit; font-size: 10px; }
+.workspace-menu-item kbd { color: var(--text-soft); font: inherit; font-size: var(--text-xs); }
 .app-shell > .sidebar, .app-shell > .workspace, .app-shell > .inspector { grid-row: 2; }
 .app-shell > .statusbar { grid-row: 3; }
 .workspace-help { max-width: 760px; width: 100%; margin: 0 auto; padding: 32px; }
 .workspace-help p { color: var(--text-soft); line-height: 1.65; }
 .workspace-help dl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; }
-.workspace-help dt, .workspace-help dd { margin: 0; color: var(--text); font-size: 13px; }
+.workspace-help dt, .workspace-help dd { margin: 0; color: var(--text); font-size: var(--text-sm); }
 .workspace-help kbd { color: var(--text-soft); }
 @media (max-width: 760px) {
   .workspace-menu-popup { position: fixed; top: 32px; left: 8px; right: 8px; min-width: 0; }

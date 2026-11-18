@@ -172,7 +172,7 @@ class SettingsTests(navigation.ChatNavigationTests):
 
     def test_saved_preference_and_revocation_receipt_are_used(self):
         self.open_settings()
-        choice = self.page.get_by_role("checkbox", name="Task completion emails For tasks that finish from now on.")
+        choice = self.page.get_by_role("switch", name="Task completion emails", exact=True)
         expect(choice).to_be_checked()
         choice.uncheck()
         expect(self.page.get_by_text("Notification setting saved.", exact=True)).to_be_visible()
@@ -190,7 +190,7 @@ class SettingsTests(navigation.ChatNavigationTests):
         self.preferences = {"preferences": {"task_completed": "false", "theme": "dark", "accent": "mono"}}
         self.open_settings()
         expect(self.page.locator(".settings-banner .settings-error")).to_contain_text("could not be loaded")
-        expect(self.page.get_by_role("checkbox", name="Task completion emails For tasks that finish from now on.")).to_have_count(0)
+        expect(self.page.get_by_role("switch", name="Task completion emails", exact=True)).to_have_count(0)
         expect(self.radio("Theme", "Dark")).to_be_disabled()
         self.assertEqual(self.writes, [])
         self.assert_safe()

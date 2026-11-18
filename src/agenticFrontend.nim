@@ -38,6 +38,7 @@ import components/review
 import components/knowledge
 import components/learning
 import components/workflows
+import components/icons
 import components/engineering
 import components/workspace_menu
 import components/answer_actions
@@ -174,16 +175,15 @@ proc renderSearchView(): VNode =
     section(class = "conversation")
   ):
     tdiv(class = "developer-view"):
-      tdiv(class = "developer-view-header"):
+      tdiv(class = "page-header developer-view-header"):
         tdiv:
-          h2:
+          h2(class = "page-title"):
             text "Search"
-          p:
+          p(class = "page-description"):
             text "Search every saved chat, and the messages in the open one."
 
       tdiv(class = "search-box"):
-        span:
-          text "⌕"
+        icon("search", 16)
 
         input(
           id = "chatSearch",
@@ -204,8 +204,8 @@ proc renderSearchView(): VNode =
             redraw(kxi)
 
         if appState.searchDraft.len > 0:
-          button(title = "Clear search", `aria-label` = "Clear search"):
-            text "×"
+          button(class = "header-action", title = "Clear search", `aria-label` = "Clear search"):
+            icon("close", 16)
 
             proc onclick(
               event: Event,
@@ -258,25 +258,11 @@ proc renderActivityView(): VNode =
     section(class = "conversation")
   ):
     renderOperationsPanel(appState)
-    tdiv(class = "developer-view"):
-      tdiv(class = "developer-view-header"):
-        tdiv:
-          h2:
-            text "Current task"
-          p:
-            text "The task running in this browser."
-
-        button(class = "secondary-action"):
-          text "Back to chat"
-
-          proc onclick(
-            event: Event,
-            node: VNode
-          ) =
-            setActiveView(
-              appState,
-              viewChat
-            )
+    # One page, one header: the task running in this browser is a section of Operations, not a second page.
+    tdiv(class = "developer-view current-task"):
+      tdiv(class = "section-heading-row"):
+        h3: text "Current task"
+        span: text "The task running in this browser."
 
       if not appState.run.active:
         tdiv(class = "empty-card"):
@@ -344,7 +330,7 @@ proc renderSavedChat(savedChat: ChatItem): VNode =
       else:
         cstring"command-center-row saved-chat-row")):
     span(class = "command-center-icon", `aria-hidden` = "true"):
-      text "◇"
+      icon("chat", 16)
     tdiv(class = "command-center-copy"):
       strong:
         text savedChat.title
@@ -389,31 +375,20 @@ proc renderChatsView(): VNode =
 proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
   result = buildHtml(button(class = "command-center-row")):
     span(class = "command-center-icon", `aria-hidden` = "true"):
-      case command.id
-      of "new_chat":
-        text "+"
-      of "chats":
-        text "◇"
-      of "search":
-        text "⌕"
-      of "connections":
-        text "◇"
-      of "tools":
-        text "⬡"
-      of "plugins":
-        text "⌘"
-      of "skills":
-        text "✎"
-      of "knowledge":
-        text "❏"
-      of "inspector":
-        text "I"
-      of "refresh":
-        text "↻"
-      of "compose":
-        text "✎"
-      else:
-        text "·"
+      icon(case command.id
+           of "new_chat": "plus"
+           of "chats": "chat"
+           of "search": "search"
+           of "connections": "model-store"
+           of "tools": "tools"
+           of "plugins": "plugins"
+           of "skills": "skills"
+           of "review": "review"
+           of "knowledge": "knowledge"
+           of "inspector": "panel"
+           of "refresh": "refresh"
+           of "compose": "rename"
+           else: "command", 16)
 
     tdiv(class = "command-center-copy"):
       strong:
@@ -453,7 +428,7 @@ proc renderWorkspaceCommand(command: WorkspaceCommand): VNode =
         text shortcutText(command.keys)
     else:
       span(class = "command-enter", `aria-hidden` = "true"):
-        text "↵"
+        icon("enter", 14)
 
     proc onclick(
       event: Event,
@@ -492,8 +467,7 @@ proc renderCommandCenter(): VNode =
             )
 
       tdiv(class = "command-center-search"):
-        span:
-          text "⌕"
+        icon("search", 16)
 
         input(
           id = "commandSearch",
@@ -776,7 +750,7 @@ proc renderWorkspace(): VNode =
           `aria-label` = "More",
           `aria-expanded` = cstring($appState.headerMenuOpen)
         ):
-          text "⋯"
+          icon("more", 16)
 
           proc onclick(
             event: Event,

@@ -408,7 +408,7 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.open_first_chat()
         expect(self.preview()).to_be_visible()
         self.page.locator(".rail-navigation").get_by_role("button", name="Settings", exact=True).click()
-        switch = self.page.get_by_role("checkbox", name="Show the agents' gladiators")
+        switch = self.page.get_by_role("switch", name="Show the agents' gladiators", exact=True)
         expect(switch).to_be_checked()
         switch.click()
         expect(switch).not_to_be_checked()

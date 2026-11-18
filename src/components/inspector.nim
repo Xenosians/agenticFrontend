@@ -7,6 +7,7 @@ import result_card
 
 
 import ../app/job_status
+import icons
 
 proc tabClass(
   current: InspectorTab,
@@ -43,7 +44,7 @@ proc renderRunTab(
       tdiv(class = "run-empty"):
 
         tdiv(class = "run-empty-icon"):
-          text "◌"
+          icon("loading", 20)
 
         h3:
           text "No active run"
@@ -156,7 +157,7 @@ proc renderEventsTab(
       tdiv(class = "run-empty"):
 
         tdiv(class = "run-empty-icon"):
-          text "≡"
+          icon("list", 20)
 
         h3:
           text "No events"
@@ -255,7 +256,7 @@ proc renderInspector*(
         `aria-label` = "Hide inspector"
       ):
 
-        text "×"
+        icon("close", 16)
 
         proc onclick(
           event: Event,

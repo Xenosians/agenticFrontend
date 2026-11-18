@@ -57,10 +57,10 @@ proc renderKnowledgePanel*(state: AppState): VNode =
   let sources = knowledgeSourceList(state)
   result = buildHtml(section(class = "conversation")):
     tdiv(class = "developer-view knowledge-panel"):
-      tdiv(class = "developer-view-header"):
+      tdiv(class = "page-header developer-view-header"):
         tdiv:
-          h2: text "Knowledge"
-          p: text "Search your reference data. Answers cite what they use."
+          h2(class = "page-title"): text "Knowledge"
+          p(class = "page-description"): text "Search your reference data. Answers cite what they use."
       p(class = "operation-note"):
         text "Results are reference only: they never approve or permit an action."
       if state.extensionError.len > 0:

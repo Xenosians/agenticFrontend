@@ -11,6 +11,7 @@ import ../app/knowledge_crawl
 import ../api/connection_options
 import brand
 import server_links_view
+import icons
 
 
 proc updateDatasetFilePicker(accepted, sameAccepted: cstring) {.importjs: """
@@ -814,7 +815,7 @@ proc renderProviderPreset(state: AppState, preset: JsonNode): VNode =
         `aria-label` = "Configure provider"
       ):
 
-        text "+"
+        icon("plus", 16)
 
         proc onclick(
           event: Event,
@@ -1433,7 +1434,7 @@ proc renderConnectionForm(
         `aria-label` = "Back to providers"
       ):
 
-        text "←"
+        icon("back", 16)
 
         proc onclick(
           event: Event,
@@ -2445,22 +2446,21 @@ proc renderConnections*(
 
     tdiv(class = "plugin-library-page"):
 
-      tdiv(class = "plugin-library-header"):
+      tdiv(class = "page-header plugin-library-header"):
 
         tdiv:
 
-          h2:
+          h2(class = "page-title"):
             text "Plugins"
 
-          p:
+          p(class = "page-description"):
             text "Models, data and services " & productName & " can use."
 
         tdiv(class = "plugin-header-actions"):
 
           tdiv(class = "plugin-search"):
 
-            span:
-              text "⌕"
+            icon("search", 16)
 
             input(
               `type` = "search",
@@ -2488,7 +2488,7 @@ proc renderConnections*(
             `aria-label` = "Refresh connections"
           ):
 
-            text "↻"
+            icon("refresh", 16)
 
             proc onclick(
               event: Event,
@@ -2504,8 +2504,7 @@ proc renderConnections*(
             disabled = state.extensionBusy
           ):
 
-            span:
-              text "+"
+            icon("plus", 16)
 
             text "Add"
 
@@ -2601,8 +2600,7 @@ proc renderConnections*(
 
         tdiv(class = "plugin-notice"):
 
-          span:
-            text "✓"
+          icon("success", 16)
 
           p:
             text state.toastMessage

@@ -8,6 +8,7 @@ import ../app/types
 import ../app/state
 import ../app/backend_bridge
 import brand
+import icons
 import required_operations
 import ../config/runtime_config
 
@@ -222,7 +223,7 @@ proc renderComposer*(
           `aria-label` = "Send message",
           title = "Send message"
         ):
-          text "↑"
+          icon("send", 16)
 
           proc onclick(
             event: Event,

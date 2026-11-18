@@ -62,10 +62,10 @@ proc renderReviewItem(state: AppState, item: ReviewItem): VNode =
 proc renderReviewPanel*(state: AppState): VNode =
   result = buildHtml(section(class = "conversation")):
     tdiv(class = "developer-view review-panel"):
-      tdiv(class = "developer-view-header"):
+      tdiv(class = "page-header developer-view-header"):
         tdiv:
-          h2: text "Review"
-          p: text "Critiques and corrections people saved on task results."
+          h2(class = "page-title"): text "Review"
+          p(class = "page-description"): text "Critiques and corrections people saved on task results."
         tdiv(class = "review-actions"):
           button(class = "secondary-action", disabled = state.reviewBusy or state.reviewDeciding.len > 0, `aria-pressed` =
               (if state.reviewShowDecided: cstring"true" else: cstring"false")):

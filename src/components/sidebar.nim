@@ -5,6 +5,7 @@ import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge, account
   operations_bridge, review_bridge, request_context, engineering_bridge, backend_bridge,
   knowledge_bridge, learning_bridge, workflow_bridge]
 import brand
+import icons
 import gladiators
 
 proc currentCalendarDay(): cstring {.importjs: "(() => {const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');})()".}
@@ -40,13 +41,13 @@ proc installDashboardDismiss(close: proc(focusPlus: bool)) {.importjs: """((clos
   });
 })(#)""".}
 
-proc renderViewButton(state: AppState, icon, label: string, target: AppView): VNode =
+proc renderViewButton(state: AppState, iconName, label: string, target: AppView): VNode =
   result = buildHtml(button(
       class = (if state.activeView == target: cstring"nav-item active" else: cstring"nav-item"),
       title = cstring(label),
       `aria-label` = cstring(label),
       `aria-current` = (if state.activeView == target: cstring"page" else: cstring"false"))):
-    span(class = "nav-icon", `aria-hidden` = "true"): text icon
+    span(class = "nav-icon", `aria-hidden` = "true"): icon(iconName, 20)
     span(class = "rail-label"): text label
     proc onclick(event: Event, node: VNode) =
       state.dashboardsOpen = false
@@ -86,7 +87,7 @@ proc renderPinnedButton(state: AppState, dashboard: Dashboard): VNode =
   result = buildHtml(button(class = (if active: cstring"nav-item active" else: cstring"nav-item"),
       title = cstring(dashboardLabel(dashboard)), `aria-label` = cstring(dashboardLabel(dashboard)),
       `aria-current` = (if active: cstring"page" else: cstring"false"))):
-    span(class = "nav-icon", `aria-hidden` = "true"): text dashboardIcon(dashboard)
+    span(class = "nav-icon", `aria-hidden` = "true"): icon(dashboardIcon(dashboard), 20)
     span(class = "rail-label"): text dashboardLabel(dashboard)
     proc onclick(event: Event, node: VNode) = openDashboard(state, dashboard)
 
@@ -96,7 +97,7 @@ proc renderDashboardRow(state: AppState, dashboard: Dashboard): VNode =
   let label = dashboardLabel(dashboard)
   result = buildHtml(li(class = "dashboard-row")):
     button(id = cstring("dashboardOpen" & dashboardValue(dashboard)), class = "dashboard-open"):
-      span(class = "nav-icon", `aria-hidden` = "true"): text dashboardIcon(dashboard)
+      span(class = "nav-icon", `aria-hidden` = "true"): icon(dashboardIcon(dashboard), 18)
       span(class = "dashboard-name"): text label
       proc onclick(event: Event, node: VNode) = openDashboard(state, dashboard)
     button(class = (if pinned: cstring"dashboard-pin pinned" else: cstring"dashboard-pin"),
@@ -104,7 +105,7 @@ proc renderDashboardRow(state: AppState, dashboard: Dashboard): VNode =
            `aria-pressed` = (if pinned: cstring"true" else: cstring"false"),
            title = cstring(if pinned: "Unpin from the rail" else: "Pin to the rail"),
            disabled = not canChangePins(state)):
-      text (if pinned: "◆" else: "◇")
+      icon(if pinned: "unpin" else: "pin", 14)
       proc onclick(event: Event, node: VNode) = discard togglePinnedDashboard(state, dashboard)
 
 proc renderDashboardMenu(state: AppState): VNode =
@@ -131,7 +132,7 @@ proc renderDashboardAdd(state: AppState): VNode =
                                                           else: cstring"nav-item dashboard-add"),
       title = "Dashboards", `aria-label` = "Add a dashboard to the rail", `aria-haspopup` = "dialog",
       `aria-controls` = "dashboardMenu", `aria-expanded` = (if state.dashboardsOpen: cstring"true" else: cstring"false"))):
-    span(class = "nav-icon", `aria-hidden` = "true"): text "+"
+    span(class = "nav-icon", `aria-hidden` = "true"): icon("plus", 20)
     span(class = "rail-label"): text "Dashboards"
     proc onclick(event: Event, node: VNode) =
       state.dashboardsOpen = not state.dashboardsOpen
@@ -206,11 +207,11 @@ proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
         button(class = "chat-pin", title = (if chat.pinned: cstring"Unpin chat" else: cstring"Pin chat"),
           `aria-label` = cstring((if chat.pinned: "Unpin chat " else: "Pin chat ") & chat.title),
           disabled = disabled):
-          text (if chat.pinned: "◆" else: "◇")
+          icon(if chat.pinned: "unpin" else: "pin", 14)
           proc onclick(event: Event, node: VNode) = discard pinChatApplication(state, chat)
         button(class = "chat-rename-open", title = "Rename chat", `aria-label` = cstring("Rename chat " & chat.title),
           disabled = disabled):
-          text "✎"
+          icon("rename", 14)
           proc onclick(event: Event, node: VNode) =
             state.chatRenameId = chat.chatId
             state.chatRenameDraft = chat.title
@@ -218,7 +219,7 @@ proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
             redraw(kxi)
             focusRename()
         button(class = "chat-delete", title = "Delete chat", `aria-label` = cstring("Delete chat " & chat.title)):
-          text "×"
+          icon("close", 14)
           proc onclick(event: Event, node: VNode) =
             state.pendingDeleteChatId = chat.chatId
             state.chatRenameId = ""
@@ -231,12 +232,12 @@ proc renderSidebar*(state: AppState): VNode =
         img(class = "brand-logo", src = productMark, alt = productName)
       nav(class = "rail-navigation", `aria-label` = "Workspace"):
         # The core views are always here; dashboards are pinned from "+".
-        renderViewButton(state, "◈", "Chat", viewChat)
-        renderViewButton(state, "⌕", "Search", viewSearch)
-        renderViewButton(state, "◇", "Model Store", viewPlugin)
-        renderViewButton(state, "⬡", "Store", viewStore)
-        if isReviewer(state): renderViewButton(state, "✓", "Review", viewReview)
-        renderViewButton(state, "⚙", "Settings", viewSettings)
+        renderViewButton(state, "chat", "Chat", viewChat)
+        renderViewButton(state, "search", "Search", viewSearch)
+        renderViewButton(state, "model-store", "Model Store", viewPlugin)
+        renderViewButton(state, "store", "Store", viewStore)
+        if isReviewer(state): renderViewButton(state, "review", "Review", viewReview)
+        renderViewButton(state, "settings", "Settings", viewSettings)
         span(class = "rail-divider", `aria-hidden` = "true")
         for dashboard in state.pinnedViews:
           renderPinnedButton(state, dashboard)
@@ -257,10 +258,10 @@ proc renderSidebar*(state: AppState): VNode =
         strong: text productName
         button(class = "chat-refresh", title = "Refresh chats", `aria-label` = "Refresh chats",
           disabled = state.chatsRefreshing or state.chatActionId.len > 0):
-          text (if state.chatsRefreshing: "…" else: "↻")
+          icon("refresh", 16, (if state.chatsRefreshing: "spinning" else: ""))
           proc onclick(event: Event, node: VNode) = discard refreshChatMetadata(state)
       button(class = "new-session"):
-        span(`aria-hidden` = "true"): text "+"
+        icon("plus", 16)
         text "New chat"
         proc onclick(event: Event, node: VNode) =
           state.commandPaletteOpen = false

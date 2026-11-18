@@ -286,10 +286,10 @@ proc renderEngineeringPanel*(state: AppState): VNode =
           strong: text "Infrastructure topology and PCB"
           small: text "Desired designs, observed state and read-only comparisons"
       tdiv(class = "developer-view workflow-panel"):
-        tdiv(class = "developer-view-header"):
+        tdiv(class = "page-header developer-view-header"):
           tdiv:
-            h2: text "Topology & PCB"
-            p: text "Desired designs, observed state and simulated comparisons, kept separate."
+            h2(class = "page-title"): text "Topology & PCB"
+            p(class = "page-description"): text "Desired designs, observed state and simulated comparisons, kept separate."
         p(class = "operation-note"):
           text "Read-only: checks observe allow-listed sources and compare. Live changes stay with governed tools and approval."
         if state.engineeringError.len > 0:

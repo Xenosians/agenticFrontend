@@ -183,10 +183,10 @@ proc renderWorkflowPanel*(state: AppState): VNode =
           strong: text "Automation workflows"
           small: text "Owner-managed governed workflows · n8n runtime is not connected"
       tdiv(class = "developer-view workflow-panel"):
-        tdiv(class = "developer-view-header"):
+        tdiv(class = "page-header developer-view-header"):
           tdiv:
-            h2: text "Automation"
-            p: text "Draw a workflow from registered capabilities, save it, then run it as a governed job."
+            h2(class = "page-title"): text "Automation"
+            p(class = "page-description"): text "Draw a workflow from registered capabilities, save it, then run it as a governed job."
         p(class = "operation-note"):
           text "Saving never runs anything. A run uses the saved version and asks for approval before any change. Retries keep the same run identity."
         if workflowUnconfirmed(state):

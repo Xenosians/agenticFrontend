@@ -130,7 +130,7 @@ class SkillsPageTests(navigation.ChatNavigationTests):
         self.open_skills()
         expect(self.skill("senior-engineer")).to_contain_text("Version 1 · Built in")
         expect(self.skill("password-reset")).not_to_contain_text("Built in")
-        self.skill("senior-engineer").get_by_role("checkbox", name="Use senior-engineer", exact=True).click()
+        self.skill("senior-engineer").get_by_role("switch", name="Use senior-engineer", exact=True).click()
         expect(self.skill("senior-engineer")).to_contain_text("Version 1 · Off · Built in")
         self.assertEqual(self.commands, [{"action": "skill_enable",
                                           "payload": {"name": "senior-engineer", "enabled": False}}])
@@ -174,7 +174,7 @@ class SkillsPageTests(navigation.ChatNavigationTests):
     def test_a_skill_can_be_turned_off_and_deleted_after_confirmation(self):
         self.open_skills()
         reset = self.skill("password-reset")
-        toggle = reset.get_by_role("checkbox", name="Use password-reset", exact=True)
+        toggle = reset.get_by_role("switch", name="Use password-reset", exact=True)
         expect(toggle).to_be_checked()
         toggle.uncheck()
         expect(toggle).not_to_be_checked()

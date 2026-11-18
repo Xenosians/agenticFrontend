@@ -173,7 +173,7 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
     def test_a_package_switch_turns_all_its_tools_off_and_the_page_shows_the_saved_state(self):
         self.open_store("Tools")
         directory = self.package("Directory (LDAP)")
-        switch = directory.get_by_role("checkbox", name="Use all Directory (LDAP) tools", exact=True)
+        switch = directory.get_by_role("switch", name="Use all Directory (LDAP) tools", exact=True)
         expect(switch).to_be_checked()
         switch.click()
         expect(switch).not_to_be_checked()
@@ -198,7 +198,7 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
         directory = self.package("Directory (LDAP)")
         expect(directory.locator(".tool-package-heading .tool-switch span")).to_have_text("1 of 2 on")
         expect(directory).to_have_class("tool-package")
-        switch = directory.get_by_role("checkbox", name="Use all Directory (LDAP) tools", exact=True)
+        switch = directory.get_by_role("switch", name="Use all Directory (LDAP) tools", exact=True)
         # Partly on is the browser's mixed state, not "off".
         expect(switch).to_have_js_property("indeterminate", True)
         switch.click()
@@ -214,7 +214,7 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
         directory = self.open_package("Directory (LDAP)")
         card = directory.locator(".tool-store-card").filter(
             has=self.page.get_by_role("heading", name="account_status", exact=True))
-        switch = card.get_by_role("checkbox", name="Use account_status", exact=True)
+        switch = card.get_by_role("switch", name="Use account_status", exact=True)
         expect(switch).to_be_checked()
         switch.click()
         expect(card.locator(".tool-switch span")).to_have_text("Off")
@@ -235,9 +235,9 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
         self.reject = {"code": "tool_package_not_found", "message": "Tool package not found."}
         self.open_store("Tools")
         directory = self.package("Directory (LDAP)")
-        directory.get_by_role("checkbox", name="Use all Directory (LDAP) tools", exact=True).click()
+        directory.get_by_role("switch", name="Use all Directory (LDAP) tools", exact=True).click()
         expect(self.page.locator(".store-view .operation-error")).to_contain_text("Tool package not found.")
-        expect(directory.get_by_role("checkbox", name="Use all Directory (LDAP) tools", exact=True)).to_be_checked()
+        expect(directory.get_by_role("switch", name="Use all Directory (LDAP) tools", exact=True)).to_be_checked()
         self.assertEqual(self.errors, [])
 
     def test_plugin_store_reports_resolution_and_does_not_offer_unreviewed_install(self):
@@ -270,10 +270,10 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
         other = self.package("Other tools")
         expect(other).to_have_count(1)
         # Without a known package there is nothing to switch as a whole; each tool keeps its own switch.
-        expect(other.locator(".tool-package-heading").get_by_role("checkbox")).to_have_count(0)
+        expect(other.locator(".tool-package-heading").get_by_role("switch")).to_have_count(0)
         other.locator(".tool-package-toggle").click()
         expect(other.locator(".tool-store-card h3")).to_have_text(["ticket_create"])
-        expect(other.get_by_role("checkbox", name="Use ticket_create", exact=True)).to_be_checked()
+        expect(other.get_by_role("switch", name="Use ticket_create", exact=True)).to_be_checked()
         self.assertEqual(self.errors, [])
 
     def test_old_store_commands_open_the_matching_section(self):

@@ -4,6 +4,7 @@
 ## Every saved choice comes from the server; nothing is kept in the browser.
 include karax/prelude
 import ../app/[types, auth_bridge, account_bridge, backend_bridge]
+import brand
 
 proc settingsSection(title, summary: string, body: VNode, action: VNode = nil): VNode =
   ## Every section: a title, one line saying what it is for, an optional
@@ -52,26 +53,29 @@ proc renderAppearance(state: AppState): VNode =
       span(class = "settings-field-label"): text "Accent"
       renderChoiceGroup("Accent", accents, state.accent, disabled, accentLabel, true,
         proc(accent: Accent) = discard saveAccent(state, accent))
+    # A switch applies at once (Linear, Vercel): the label and its description on the left, the control on the right.
     label(class = "settings-toggle"):
-      input(`type` = "checkbox", checked = state.gladiators, disabled = disabled):
+      span:
+        strong(id = "gladiatorsLabel"): text "Show the agents' gladiators"
+        small(id = "gladiatorsHelp"): text "Each agent is a gladiator that acts out what it is doing, below your chats."
+      input(`type` = "checkbox", role = "switch", checked = state.gladiators, disabled = disabled,
+            `aria-labelledby` = "gladiatorsLabel", `aria-describedby` = "gladiatorsHelp"):
         proc onchange(event: Event, node: VNode) =
           discard saveGladiators(state, not state.gladiators)
-      span:
-        strong: text "Show the agents' gladiators"
-        small: text "Each agent is a gladiator that acts out what it is doing, below your chats."
   settingsSection("Appearance", "Saved to your account, so it follows you to any browser.", body)
 
 proc renderNotifications(state: AppState): VNode =
   let body = buildHtml(tdiv(class = "settings-body")):
     if state.preferencesLoaded:
       label(class = "settings-toggle"):
-        input(`type` = "checkbox", checked = state.completionMailDraft,
-          disabled = state.preferencesBusy or state.preferencesSaving):
+        span:
+          strong(id = "completionMailLabel"): text "Task completion emails"
+          small(id = "completionMailHelp"): text "For tasks that finish from now on."
+        input(`type` = "checkbox", role = "switch", checked = state.completionMailDraft,
+          disabled = state.preferencesBusy or state.preferencesSaving,
+          `aria-labelledby` = "completionMailLabel", `aria-describedby` = "completionMailHelp"):
           proc onchange(event: Event, node: VNode) =
             discard saveCompletionMail(state, not state.completionMailDraft)
-        span:
-          strong: text "Task completion emails"
-          small: text "For tasks that finish from now on."
   settingsSection("Notifications", "Sign-in and approval emails are always sent.", body)
 
 proc localDate(value: cstring): cstring {.
@@ -168,6 +172,10 @@ proc renderProfile(state: AppState): VNode =
 proc renderSettingsView*(state: AppState): VNode =
   result = buildHtml(section(class = "conversation")):
     tdiv(class = "settings-view account-view"):
+      tdiv(class = "page-header"):
+        tdiv:
+          h2(class = "page-title"): text "Settings"
+          p(class = "page-description"): text "Your profile, how " & productName & " looks, its emails and your signed-in devices."
       if state.auth.error.len > 0:
         p(class = "settings-error", role = "alert"): text state.auth.error
       if state.preferencesError.len > 0:

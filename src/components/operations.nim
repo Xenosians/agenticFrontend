@@ -421,8 +421,9 @@ proc renderProxmoxActions(state: AppState): VNode =
       h4(id = "proxmoxActionsTitle", tabindex = "-1"): text "Recent actions"
       span: text $state.proxmoxActions.len & " shown"
     if state.proxmoxActionsError.len > 0:
+      # The list could not be read: say so, and never claim it is empty as well.
       p(class = "operation-note", role = "status"): text state.proxmoxActionsError
-    if state.proxmoxActions.len == 0:
+    elif state.proxmoxActions.len == 0:
       tdiv(class = "empty-card"): text "No guest actions yet. Each one asks for your confirmation first."
     else:
       ul(class = "proxmox-action-list"):
@@ -892,10 +893,10 @@ proc renderTailnetDashboard(state: AppState): VNode =
 
 proc renderOperationsPanel*(state: AppState): VNode =
   result = buildHtml(tdiv(class = "developer-view operations-panel")):
-    tdiv(class = "developer-view-header"):
+    tdiv(class = "page-header developer-view-header"):
       tdiv:
-        h2: text "Operations"
-        p: text "Your recent tasks and how long each step took."
+        h2(class = "page-title"): text "Operations"
+        p(class = "page-description"): text "Your recent tasks and how long each step took."
       button(class = "secondary-action", disabled = state.operationsBusy, `aria-label` = "Refresh operations"):
         text (if state.operationsBusy: "Refreshing…" else: "Refresh")
         proc onclick(event: Event, node: VNode) =

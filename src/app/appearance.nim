@@ -24,7 +24,8 @@ const
   accentLabels: array[Accent, string] = ["Monochrome", "Blue", "Teal", "Green", "Amber", "Rose", "Violet"]
   dashboardValues: array[Dashboard, string] = ["automation", "topology", "knowledge", "operations", "learning"]
   dashboardLabels: array[Dashboard, string] = ["Automation", "Topology & PCB", "Knowledge", "Operations", "Learning"]
-  dashboardIcons: array[Dashboard, string] = ["⌘", "▦", "❏", "◌", "◎"]
+  dashboardIcons: array[Dashboard, string] = ["automation", "topology", "knowledge", "operations", "learning"]
+  ## Lucide icon names (src/components/icons.nim), not glyphs: owner decision of 18 November.
   ## Dashboards pinned until the owner chooses: the rail as it was before pinning.
   defaultPins* = @[dashKnowledge, dashOperations]
 

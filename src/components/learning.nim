@@ -199,10 +199,10 @@ proc renderLearningPanel*(state: AppState): VNode =
   let catalog = state.learningCatalog
   result = buildHtml(section(class = "conversation")):
     tdiv(class = "developer-view learning-panel"):
-      tdiv(class = "developer-view-header"):
+      tdiv(class = "page-header developer-view-header"):
         tdiv:
-          h2: text "Learning"
-          p: text "Choose a model and a training dataset version, check readiness, then start a candidate run."
+          h2(class = "page-title"): text "Learning"
+          p(class = "page-description"): text "Choose a model and a training dataset version, check readiness, then start a candidate run."
       p(class = "operation-note"):
         text "A candidate run trains an adapter on this host and never changes what serves your requests. Evaluation and promotion are separate steps."
       if state.learningError.len > 0:

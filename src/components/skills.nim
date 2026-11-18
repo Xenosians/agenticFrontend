@@ -121,7 +121,7 @@ proc renderSkill(state: AppState, row: SavedSkill): VNode =
         text "Version " & $row.version & (if row.enabled: "" else: " · Off") &
           (if row.builtin: " · " & skillOrigin(row) else: "")
       label(class = "skill-toggle"):
-        input(`type` = "checkbox", checked = row.enabled, disabled = editor.busy,
+        input(`type` = "checkbox", role = "switch", checked = row.enabled, disabled = editor.busy,
               `aria-label` = cstring("Use " & row.name)):
           proc onchange(event: Event, node: VNode) =
             discard sendSkill(state, "skill_enable", %*{"name": row.name, "enabled": not row.enabled})

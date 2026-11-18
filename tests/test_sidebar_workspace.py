@@ -216,7 +216,9 @@ class SidebarWorkspaceTests(unittest.TestCase):
             expect(self.rail().get_by_role("button", name=removed, exact=True)).to_have_count(0)
         plus = self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True)
         expect(plus).to_have_attribute("aria-expanded", "false")
-        expect(plus.locator(".nav-icon")).to_have_text("+")
+        # A Lucide "plus" line icon (owner decision of 18 November), not a typed "+".
+        expect(plus.locator(".nav-icon svg.icon-plus")).to_have_count(1)
+        expect(plus.locator(".nav-icon")).to_have_text("")
         self.assertEqual(self.errors, [])
 
     def test_plus_lists_every_dashboard_and_opens_one_without_pinning(self):

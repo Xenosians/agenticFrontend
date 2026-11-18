@@ -13,6 +13,7 @@ import ../app/store_catalog
 import ../app/integration_setup
 import ../app/extension_bridge
 import skills
+import icons
 
 
 const storeSections = [(storeTools, "Tools", "storeTabTools", "storePanelTools"),
@@ -39,7 +40,7 @@ proc renderToolCard(state: AppState, item: ToolStoreEntry): VNode =
     tdiv(class = "store-card-heading tool-card-heading"):
       h3: text item.id
       label(class = "tool-switch"):
-        input(`type` = "checkbox", checked = item.enabled, disabled = state.extensionBusy,
+        input(`type` = "checkbox", role = "switch", checked = item.enabled, disabled = state.extensionBusy,
               `aria-label` = cstring("Use " & item.id)):
           proc onchange(event: Event, node: VNode) =
             discard changeExtension(state, "tool_enable", %*{"id": item.id, "enabled": not item.enabled})
@@ -75,7 +76,7 @@ proc renderPackage(state: AppState, package: ToolPackage, searching: bool): VNod
       tdiv(class = "tool-package-title"):
         button(class = "tool-package-toggle", `aria-expanded` = (if expanded: cstring"true" else: cstring"false"),
                `aria-label` = cstring((if expanded: "Hide " else: "Show ") & package.name & " tools")):
-          span(class = "tool-package-chevron", `aria-hidden` = "true"): text (if expanded: "▾" else: "▸")
+          span(class = "tool-package-chevron", `aria-hidden` = "true"): icon(if expanded: "chevron-down" else: "chevron-right", 16)
           proc onclick(event: Event, node: VNode) =
             if key in state.openToolPackages:
               var kept: seq[string]
@@ -91,7 +92,7 @@ proc renderPackage(state: AppState, package: ToolPackage, searching: bool): VNod
         tdiv(class = "tool-package-controls"):
           span(class = "store-badge tool-package-setup"): text setupLabel(package.setup)
           label(class = (if package.allOn or package.allOff: cstring"tool-switch" else: cstring"tool-switch mixed")):
-            input(`type` = "checkbox", checked = package.allOn, disabled = state.extensionBusy,
+            input(`type` = "checkbox", role = "switch", checked = package.allOn, disabled = state.extensionBusy,
                   `aria-label` = cstring("Use all " & package.name & " tools")):
               proc onchange(event: Event, node: VNode) =
                 discard changeExtension(state, "tool_package_enable",
@@ -236,10 +237,10 @@ proc renderStore*(state: AppState): VNode =
   let current = storeSections[ord(state.storeSection)]
   result = buildHtml(section(class = "conversation")):
     tdiv(class = "developer-view store-view"):
-      tdiv(class = "developer-view-header"):
+      tdiv(class = "page-header developer-view-header"):
         tdiv:
-          h2: text "Store"
-          p: text "Tools Janus can use, the skills that shape its answers, and the plugins every request passes through."
+          h2(class = "page-title"): text "Store"
+          p(class = "page-description"): text "Tools Janus can use, the skills that shape its answers, and the plugins every request passes through."
       tdiv(class = "store-tabs", role = "tablist", `aria-label` = "Store sections"):
         for (section, title, tabId, panelId) in storeSections:
           renderStoreTab(state, section, title, tabId, panelId)
