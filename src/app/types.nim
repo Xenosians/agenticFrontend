@@ -101,6 +101,7 @@ type
     tool*: string
     arguments*: JsonNode
     approvalId*: string
+    confirmationText*: string  ## destructive only: the exact name the owner must type to approve
 
   RunState* = object
     active*: bool
@@ -111,6 +112,7 @@ type
     tool*: string
     proposal*: ToolProposal
     decisionError*: string
+    confirmTyped*: string  ## what the owner typed to confirm a destructive proposal
     observationMode*: string
     progressStage*: string
     # The agent the AI names for the current step while it works ("hub" or a

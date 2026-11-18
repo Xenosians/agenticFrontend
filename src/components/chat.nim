@@ -174,11 +174,29 @@ proc renderApprovalAction(
               proc onclick(event: Event, node: VNode) =
                 discard resumeBackendJob(state)
 
+          let confirmation = state.run.proposal.confirmationText
+          if confirmation.len > 0:
+            # A destructive action: the owner types the target's exact name; the server checks it.
+            label(class = "approval-confirm"):
+              span(class = "approval-confirm-text"):
+                text "This cannot be undone. Type "
+                strong: text confirmation
+                text " to confirm."
+              input(class = "approval-confirm-input", `type` = "text", autocomplete = "off",
+                    spellcheck = "false", `aria-label` = cstring("Type " & confirmation & " to confirm"),
+                    value = cstring(state.run.confirmTyped), disabled = not canDecideJob(state)):
+                proc oninput(event: Event, node: VNode) =
+                  state.run.confirmTyped = $node.getInputText
+              span(class = "approval-confirm-status", `aria-live` = "polite",
+                   `data-match` = (if state.run.confirmTyped == confirmation: cstring"yes" else: cstring"no")):
+                text(if state.run.confirmTyped == confirmation: "The name matches."
+                     else: "Approve stays off until the name matches exactly.")
+
           tdiv(class = "approval-actions"):
             button(
               class = "approval-action-button",
               title = "Approve and run this action",
-              disabled = not canDecideJob(state)
+              disabled = not canApproveJob(state, state.run.confirmTyped)
             ):
               if state.run.status == "approving":
                 text "Approving…"

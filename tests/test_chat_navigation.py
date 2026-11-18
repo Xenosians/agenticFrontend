@@ -9,6 +9,7 @@ import functools
 import copy
 import hashlib
 import json
+import os
 import time
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -137,11 +138,16 @@ class ChatNavigationTests(unittest.TestCase):
         url = urlparse(request.url)
         path = url.path
         if request.url.startswith(self.base + "/") and not path.startswith("/api/"):
+            # A separately built bundle may stand in for the shipped one while work is in progress.
+            bundle = os.getenv("SUITE_TEST_BUNDLE")
             if path == "/config.js":
                 route.fulfill(content_type="application/javascript", headers=SECURITY_HEADERS, body=(
                     "window.AGENTIC_CONFIG = Object.freeze({backendBaseUrl:"
                     + json.dumps(self.base) + ",pollIntervalMs:10,requiredOperations:true});"
                 ))
+            elif bundle and path == "/js/app.js":
+                route.fulfill(content_type="application/javascript", headers=SECURITY_HEADERS,
+                              body=Path(bundle).read_text())
             else:
                 route.continue_()
             return
@@ -646,6 +652,61 @@ class ChatNavigationTests(unittest.TestCase):
         approve.click(timeout=5000)
         expect(self.page.get_by_text("Fixture approval executed", exact=True)).to_be_visible()
         self.assertEqual(decisions, [{"approval_id": "fixture-approval"}])
+        self.assertEqual(self.errors, [])
+
+    def test_a_destructive_action_is_approved_only_with_its_exact_name_typed(self):
+        proposal = {"tool": "proxmox_guest_delete", "approval_id": "fixture-approval",
+                    "arguments": {"node": "pve-a", "vmid": 990, "expected_name": "janus-lab"},
+                    "confirmation_text": "janus-lab"}
+        decisions = []
+
+        def submit(route):
+            payload = route.request.post_data_json
+            self.submissions.append(payload)
+            route.fulfill(json={"job_id": "fixture-job", "status": "waiting_approval",
+                                "submission_id": payload["submission_id"]})
+
+        def job(route):
+            if route.request.method == "POST" and route.request.url.endswith("/approve"):
+                decisions.append(route.request.post_data_json)
+                route.fulfill(json={"contract_version": 2, "job_id": "fixture-job", "status": "completed",
+                                    "result": {"answer": "Fixture guest deleted"}})
+            else:
+                route.fulfill(json={"contract_version": 2, "job_id": "fixture-job", "status": "waiting_approval",
+                                    "proposed_tool": proposal, "result": {"answer": "Approval required"}})
+
+        self.page.set_viewport_size({"width": 1440, "height": 900})
+        self.open_first_chat()
+        self.page.route("**/api/v1/jobs", submit)
+        self.page.route("**/api/v2/jobs/fixture-job**", job)
+        composer = self.page.locator("#messageInput")
+        composer.fill("Delete guest 990")
+        composer.press("Enter")
+        approve = self.page.get_by_role("button", name="Approve action", exact=True)
+        confirm = self.page.get_by_role("textbox", name="Type janus-lab to confirm", exact=True)
+        expect(confirm).to_be_visible()
+        # The card says exactly what to type; nothing else enables the approval.
+        expect(self.page.locator(".approval-confirm")).to_contain_text("janus-lab")
+        expect(approve).to_be_disabled()
+        confirm.fill("janus-la")
+        expect(approve).to_be_disabled()
+        confirm.fill("Janus-lab")
+        expect(approve).to_be_disabled()
+        # Rejecting never needs the name.
+        expect(self.page.get_by_role("button", name="Reject action", exact=True)).to_be_enabled()
+        status = self.page.locator(".approval-confirm-status")
+        expect(status).to_have_text("Approve stays off until the name matches exactly.")
+        # On a phone the name to type stays whole, never split at its hyphen.
+        self.page.set_viewport_size({"width": 390, "height": 800})
+        name = self.page.locator(".approval-confirm-text strong")
+        self.assertEqual(name.evaluate("node => node.getClientRects().length"), 1)
+        self.page.set_viewport_size({"width": 1440, "height": 900})
+        confirm.fill("janus-lab")
+        expect(approve).to_be_enabled()
+        expect(status).to_have_text("The name matches.")
+        approve.click()
+        expect(self.page.get_by_text("Fixture guest deleted", exact=True)).to_be_visible()
+        self.assertEqual(decisions, [{"approval_id": "fixture-approval", "confirm_name": "janus-lab"}])
         self.assertEqual(self.errors, [])
 
     def test_recovery_keeps_the_exact_saved_operations_instead_of_building_another_request(self):

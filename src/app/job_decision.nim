@@ -29,16 +29,23 @@ proc canCancelJob*(state: AppState): bool =
     state.run.active and state.run.jobId.len > 0 and
     state.run.status in ["pending", "processing"]
 
-proc decisionPayload*(approvalId: string): JsonNode =
+proc decisionPayload*(approvalId: string, confirmName = ""): JsonNode =
   if approvalId.len == 0:
     raise newException(ValueError, "The displayed saved proposal is required.")
-  %*{"approval_id": approvalId}
+  result = %*{"approval_id": approvalId}
+  # Only a destructive approval carries the typed name; the server checks it.
+  if confirmName.len > 0:
+    result["confirm_name"] = %confirmName
 
 proc canDecideJob*(state: AppState): bool =
   state.auth.authenticated and state.auth.sessionId.len > 0 and
     state.auth.csrfToken.len > 0 and state.currentChatId.len > 0 and
     state.run.active and state.run.jobId.len > 0 and
     state.run.status == "waiting_approval" and reviewableProposal(state.run.proposal)
+
+proc canApproveJob*(state: AppState, typed: string): bool =
+  ## A destructive action is approved only once its exact name is typed (rejecting needs nothing).
+  canDecideJob(state) and typed == state.run.proposal.confirmationText
 
 proc captureDecisionContext*(state: AppState): JobDecisionContext =
   JobDecisionContext(sessionId: state.auth.sessionId, chatId: state.currentChatId,

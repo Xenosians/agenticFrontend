@@ -6575,33 +6575,33 @@ function jsonValueBool__apiZclient_u52(node_p0, key_p1) {
   return result_1660944439;
 
 }
-async function getIntegrationStatus__apiZclient_u438() {
+async function getIntegrationStatus__apiZclient_u439() {
         var Temporary3;
     var Temporary6;
 
-  var result_1660944825 = null;
+  var result_1660944826 = null;
 
-    var options_1660944835 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
-    var response_1660944840 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2365587504.backendBaseUrl).concat([47,97,112,105,47,118,49,47,105,110,116,101,103,114,97,116,105,111,110,115]), options_1660944835));
-    if (!(response_1660944840.ok)) {
-    raiseException({message: ([73,110,116,101,103,114,97,116,105,111,110,32,115,116,97,116,117,115,32,114,101,116,117,114,110,101,100,32,72,84,84,80,32]).concat(HEX24__systemZdollars_u14(response_1660944840.status),[58,32],response_1660944840.body), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
+    var options_1660944836 = newfetchOptions__stdZjsfetch_u115(1, null, 0, 0, 0, 1, false, 0, "client", "", new Headers());
+    var response_1660944841 = (await sendRequest__apiZhttp95call_u56((frontendConfig_2365587504.backendBaseUrl).concat([47,97,112,105,47,118,49,47,105,110,116,101,103,114,97,116,105,111,110,115]), options_1660944836));
+    if (!(response_1660944841.ok)) {
+    raiseException({message: ([73,110,116,101,103,114,97,116,105,111,110,32,115,116,97,116,117,115,32,114,101,116,117,114,110,101,100,32,72,84,84,80,32]).concat(HEX24__systemZdollars_u14(response_1660944841.status),[58,32],response_1660944841.body), parent: null, m_type: NTI134217746, name: null, trace: [], up: null}, "ValueError");
     }
     
-    var data_1660944842 = decodeJson__apiZhttp95call_u207(response_1660944840.body);
-    var openwrtConfigured_1660944843 = false;
-    if (((data_1660944842.kind == 5) && hasKey__pureZjson_u3195(data_1660944842, [105,110,116,101,103,114,97,116,105,111,110,115]))) {
-    var integrations_1660944848 = HEX5BHEX5D__pureZjson_u3082(data_1660944842, [105,110,116,101,103,114,97,116,105,111,110,115]);
-    if ((integrations_1660944848.kind == 6)) {
+    var data_1660944843 = decodeJson__apiZhttp95call_u207(response_1660944841.body);
+    var openwrtConfigured_1660944844 = false;
+    if (((data_1660944843.kind == 5) && hasKey__pureZjson_u3195(data_1660944843, [105,110,116,101,103,114,97,116,105,111,110,115]))) {
+    var integrations_1660944849 = HEX5BHEX5D__pureZjson_u3082(data_1660944843, [105,110,116,101,103,114,97,116,105,111,110,115]);
+    if ((integrations_1660944849.kind == 6)) {
     Label1: {
-      var integration_1660944853 = null;
-      if (!((integrations_1660944848.kind == 6))) {
-      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(integrations_1660944848.kind, NTI1493172227)));
+      var integration_1660944854 = null;
+      if (!((integrations_1660944849.kind == 6))) {
+      failedAssertImpl__stdZassertions_u86((makeNimstrLit("json.nim(834, 3) `node.kind == JArray` : items() can not iterate a JsonNode of kind ")).concat(reprEnum(integrations_1660944849.kind, NTI1493172227)));
       }
       
       Label2: {
         var i_603980887 = null;
         var colontmp__603980888 = [];
-        var Temporary3 = integrations_1660944848;
+        var Temporary3 = integrations_1660944849;
         if (ConstSet43[Temporary3.kind]===undefined) { raiseFieldError2(makeNimstrLit("field \'elems\' is not accessible for type \'JsonNodeObj\' using \'kind = "), reprDiscriminant(Temporary3.kind, NTI1493172227)); }
         colontmp__603980888 = Temporary3.elems;
         var i_603980889 = 0;
@@ -6610,9 +6610,9 @@ async function getIntegrationStatus__apiZclient_u438() {
             Label5: while (true) {
             if (!(i_603980889 < L_603980890)) break Label5;
               i_603980887 = colontmp__603980888[chckIndx(i_603980889, 0, (colontmp__603980888).length - 1)];
-              integration_1660944853 = i_603980887;
-              if (((integration_1660944853.kind == 5) && eqStrings(jsonValueText__apiZclient_u43(integration_1660944853, [105,100]), [111,112,101,110,119,114,116]))) {
-              openwrtConfigured_1660944843 = jsonValueBool__apiZclient_u52(integration_1660944853, [99,111,110,102,105,103,117,114,101,100]);
+              integration_1660944854 = i_603980887;
+              if (((integration_1660944854.kind == 5) && eqStrings(jsonValueText__apiZclient_u43(integration_1660944854, [105,100]), [111,112,101,110,119,114,116]))) {
+              openwrtConfigured_1660944844 = jsonValueBool__apiZclient_u52(integration_1660944854, [99,111,110,102,105,103,117,114,101,100]);
               }
               
               i_603980889 += 1;
@@ -6628,16 +6628,16 @@ async function getIntegrationStatus__apiZclient_u438() {
     
     }
     
-    if (hasKey__pureZjson_u3195(data_1660944842, [105,110,116,101,103,114,97,116,105,111,110,115])) {
-    Temporary6 = HEX5BHEX5D__pureZjson_u3082(data_1660944842, [105,110,116,101,103,114,97,116,105,111,110,115]);
+    if (hasKey__pureZjson_u3195(data_1660944843, [105,110,116,101,103,114,97,116,105,111,110,115])) {
+    Temporary6 = HEX5BHEX5D__pureZjson_u3082(data_1660944843, [105,110,116,101,103,114,97,116,105,111,110,115]);
     }
     else {
     Temporary6 = newJArray__pureZjson_u203();
     }
     
-    result_1660944825 = {items: Temporary6, openwrtConfigured: openwrtConfigured_1660944843};
+    result_1660944826 = {items: Temporary6, openwrtConfigured: openwrtConfigured_1660944844};
 
-  return result_1660944825;
+  return result_1660944826;
 
 }
 
@@ -6824,7 +6824,7 @@ async function readSetup__docs_u35() {
     redraw__pkgZkaraxZkarax_u1562(kxi__);
 ++excHandler;
     try {
-    var response_603979823 = (await getIntegrationStatus__apiZclient_u438());
+    var response_603979823 = (await getIntegrationStatus__apiZclient_u439());
     docs_603979802[0].setup = nimCopy(null, parseIntegrationSetup__appZintegration95setup_u20(HEX25__pureZjson_u1862([nimCopy(null, {Field0: [105,110,116,101,103,114,97,116,105,111,110,115], Field1: response_603979823.items}, NTI603979798)])), NTI2483027981);
     docs_603979802[0].setupFailed = false;
 --excHandler;

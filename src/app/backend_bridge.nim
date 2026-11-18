@@ -30,6 +30,9 @@ proc applyJobState(
   state.run.status = job.status
   state.run.agent = job.selectedAgent
   state.run.tool = job.proposedTool
+  # A new or re-read proposal starts with nothing typed for it.
+  if state.run.proposal.approvalId != job.proposal.approvalId:
+    state.run.confirmTyped = ""
   state.run.proposal = job.proposal
   state.run.decisionError = ""
   state.run.presentations = job.presentations
@@ -637,7 +640,7 @@ proc recoverPendingSubmission*(state: AppState): bool =
 
 
 proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
-  if not canDecideJob(state):
+  if not canDecideJob(state) or decision == jdApprove and not canApproveJob(state, state.run.confirmTyped):
     showToast(state, "A saved action with reviewable details must be waiting for your decision.")
     redraw(kxi)
     return
@@ -657,7 +660,8 @@ proc decidePendingJob(state: AppState, decision: JobDecision) {.async.} =
   redraw(kxi)
 
   try:
-    let job = await decideJob(context.jobId, state.auth.csrfToken, decision, context.approvalId)
+    let confirmName = if decision == jdApprove: state.run.confirmTyped else: ""
+    let job = await decideJob(context.jobId, state.auth.csrfToken, decision, context.approvalId, confirmName)
     if not matchesDecisionContext(state, context):
       return
     if job.jobId != context.jobId:

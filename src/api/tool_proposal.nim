@@ -16,6 +16,9 @@ proc parseToolProposal*(data: JsonNode): ToolProposal =
   result.arguments = proposal["arguments"]
   if proposal.hasKey("approval_id") and proposal["approval_id"].kind == JString:
     result.approvalId = proposal["approval_id"].getStr()
+  # A destructive action names the exact text to type; the approval authority checks it.
+  if proposal.hasKey("confirmation_text") and proposal["confirmation_text"].kind == JString:
+    result.confirmationText = proposal["confirmation_text"].getStr()
 
 proc reviewableProposal*(proposal: ToolProposal): bool =
   proposal.tool.strip().len > 0 and proposal.approvalId.strip().len > 0 and

@@ -1433,6 +1433,50 @@ body {
   color: var(--warning);
 }
 
+/* A destructive approval: the owner types the target's exact name before Approve is enabled. */
+.approval-confirm {
+  display: grid;
+  gap: 6px;
+  margin: 4px 0 10px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.approval-confirm-input {
+  width: min(100%, 320px);
+  min-height: 34px;
+  border: 1px solid var(--border-max);
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font: inherit;
+}
+
+.approval-confirm-input:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 1px;
+}
+
+/* The name to type stays whole: it moves to the next line as one piece and breaks only when
+   it is longer than the card. */
+.approval-confirm-text strong {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono, ui-monospace, monospace);
+}
+
+.approval-confirm-status {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.approval-confirm-status[data-match="yes"] {
+  color: var(--text);
+  font-weight: 600;
+}
+
 .approval-arguments {
   overflow-wrap: anywhere;
   white-space: pre-wrap;

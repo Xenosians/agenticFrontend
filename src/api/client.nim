@@ -1099,7 +1099,8 @@ proc decideJob*(
   jobId: string,
   csrfToken: string,
   decision: JobDecision,
-  approvalId: string
+  approvalId: string,
+  confirmName = ""
 ): Future[
   JobResponse
 ] {.async.} =
@@ -1116,7 +1117,7 @@ proc decideJob*(
         HttpPost,
 
       body =
-        cstring($decisionPayload(approvalId)),
+        cstring($decisionPayload(approvalId, confirmName)),
 
       mode =
         fmCors,

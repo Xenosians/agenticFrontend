@@ -41,6 +41,20 @@ suite "governed action decisions":
     check decisionPayload(app.run.proposal.approvalId) == %*{"approval_id": "next-jira-approval"}
     expect ValueError:
       discard decisionPayload("")
+  test "a destructive approval carries the typed name and only the approval does":
+    check decisionPayload("approval", "janus-lab") == %*{"approval_id": "approval", "confirm_name": "janus-lab"}
+    check decisionPayload("approval", "") == %*{"approval_id": "approval"}
+  test "a destructive approval waits until the exact name is typed; rejecting never does":
+    let app = awaitingDecision()
+    app.run.proposal.confirmationText = "janus-lab"
+    check canDecideJob(app)
+    check not canApproveJob(app, "")
+    check not canApproveJob(app, "janus-la")
+    check not canApproveJob(app, "Janus-lab")
+    check not canApproveJob(app, " janus-lab")
+    check canApproveJob(app, "janus-lab")
+    app.run.proposal.confirmationText = ""
+    check canApproveJob(app, "")
   test "late decision responses cannot cross account chat job or proposal boundaries":
     let app = awaitingDecision()
     let context = captureDecisionContext(app)
