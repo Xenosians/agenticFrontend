@@ -14,6 +14,7 @@ import ../config/runtime_config
 import types
 import state
 import job_decision
+import ludus
 import extension_bridge
 import chat_bridge
 import answer_references
@@ -232,6 +233,7 @@ proc pollBackendJob*(
       state.run.progressStage = $stage
       # nil when the AI named no agent for this step
       state.run.progressAgent = if agent.isNil: "" else: $agent
+      noteAgentStep(state.run)
       redraw(kxi)
 
   # Streamed answer text is a preview of the current attempt only; the
@@ -283,6 +285,8 @@ proc pollBackendJob*(
         state,
         job
       )
+      # The outcome (approval asked, finished, failed) is the job agent's last step.
+      noteAgentStep(state.run)
 
       if job.status != previousStatus:
         state.run.progressStage = ""

@@ -245,6 +245,14 @@ proc renderCard(state: AppState, scene: seq[Gladiator]): VNode =
     # The bar above already says when there is no request; the card speaks only to a running one.
     if state.run.active:
       p(class = "world-card-step"): text stepFor(state, gladiator.agent)
+      # What he did in this request, step by step (world decision 3).
+      let steps = agentSteps.recent(gladiator.agent)
+      if steps.len == 0:
+        p(class = "world-card-steps-empty"): text "No steps in this request yet."
+      else:
+        ol(class = "world-card-steps", `aria-label` = "Recent steps"):
+          for words in steps:
+            li: text words
     p(class = "world-card-note"): text "Janus decides which agent handles each request."
     button(class = "secondary-action world-card-ask"):
       text "Ask Janus"

@@ -199,6 +199,68 @@ class WorldTests(gladiators.GladiatorTests):
 
 
 
+    def test_an_agents_card_lists_what_he_did_for_the_current_request(self):
+        """World decision 3 (18 November): a card shows the agent's activity and his recent steps."""
+        self.job_status = "processing"
+        self.serve_job_socket()
+        self.page.set_viewport_size({"width": 1440, "height": 900})
+        self.open_first_chat()
+        self.page.locator("#messageInput").fill("Check node hummingbird")
+        self.page.locator("#messageInput").press("Enter")
+        deadline = 50
+        while self.job_socket is None and deadline:
+            self.page.wait_for_timeout(100)
+            deadline -= 1
+        self.assertIsNotNone(self.job_socket, "the job socket never joined")
+        self.preview().click()
+        world = self.page.get_by_role("dialog", name="Agents' world", exact=True)
+        expect(world).to_be_visible()
+        self.push_progress("routing", "hub")
+        expect(world.locator('.world-desk[data-agent="hub"]')).to_have_attribute("aria-label", "Janus (hub), thinking")
+        self.push_progress("planning", "proxmox-specialist")
+        self.push_progress("executing", "proxmox-specialist")
+        world.locator('.world-desk[data-agent="proxmox-specialist"]').click()
+        card = world.get_by_role("region", name="Proxmox specialist", exact=True)
+        steps = card.get_by_role("list", name="Recent steps", exact=True)
+        expect(steps.get_by_role("listitem")).to_have_text(["Planned the action", "Ran the tool"])
+        # The hub's card lists his own step; an agent with none says so.
+        world.locator('.world-desk[data-agent="hub"]').click()
+        hub = world.get_by_role("region", name="Janus (hub)", exact=True)
+        expect(hub.get_by_role("list", name="Recent steps", exact=True).get_by_role("listitem")).to_have_text(
+            ["Chose who handles the request"])
+        world.locator('.world-desk[data-agent="networking-specialist"]').click()
+        quiet = world.get_by_role("region", name="Networking specialist", exact=True)
+        expect(quiet.get_by_role("list")).to_have_count(0)
+        expect(quiet).to_contain_text("No steps in this request yet.")
+        self.assertEqual(self.errors, [])
+
+    def test_redraws_never_open_new_webgl_contexts_or_lose_the_worlds_own(self):
+        """Screenshot review (18 November): the world went white after many redraws. Each redraw probed
+        WebGL support with a new context; past the browser's limit the oldest one, the world's, was lost."""
+        self.page.add_init_script("""(() => {
+          const original = HTMLCanvasElement.prototype.getContext;
+          window.__webglContexts = 0;
+          window.__webglLost = 0;
+          HTMLCanvasElement.prototype.getContext = function (kind, ...rest) {
+            const context = original.call(this, kind, ...rest);
+            if (context && /webgl/.test(String(kind)) && !this.__counted) {
+              this.__counted = true;
+              window.__webglContexts++;
+            }
+            return context;
+          };
+          document.addEventListener("webglcontextlost", () => { window.__webglLost++; }, true);
+        })();""")
+        world = self.open_world()
+        world.locator(".world-floor").focus()
+        for key in ["ArrowLeft", "ArrowRight"] * 15:
+            self.page.keyboard.press(key)
+        self.page.wait_for_timeout(300)
+        # One probe and the world's own renderer, however often the page redraws.
+        self.assertLessEqual(self.page.evaluate("window.__webglContexts"), 2)
+        self.assertEqual(self.page.evaluate("window.__webglLost"), 0)
+        self.assertEqual(self.errors, [])
+
 class WorldReviewTests(WorldTests):
     """Defects found by the screenshot review, kept as assertions."""
 

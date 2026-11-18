@@ -7,7 +7,7 @@
 ## and the agent the server names) and the owner's learning runs. Display only:
 ## nothing here grants or changes anything.
 
-import std/[algorithm, json, strutils]
+import std/[algorithm, json, strutils, tables]
 import types
 import learning
 import agent_presence
@@ -200,3 +200,66 @@ proc fitZoom*(roomWidth, roomHeight, viewWidth, viewHeight: int): int =
   for zoom in minZoom .. maxZoom:
     if roomWidth * zoom <= viewWidth and roomHeight * zoom <= viewHeight:
       result = zoom
+
+const maxRecentSteps* = 6   ## the steps an agent's card lists, newest last
+
+type
+  ## What each agent did, step by step, for the world's cards (owner decision of 18 November: a
+  ## card shows the agent's activity and steps). Built only from the run the app observes; display
+  ## only. A step is recorded once, when the stage or the outcome first changes.
+  StepLog* = object
+    jobId: string
+    lastKey: string
+    steps: Table[string, seq[string]]
+
+proc stageWords(stage: string): string =
+  case stage
+  of "routing": "Chose who handles the request"
+  of "planning": "Planned the action"
+  of "executing": "Ran the tool"
+  of "synthesizing": "Wrote the answer"
+  else: ""
+
+proc outcomeWords(status: string): string =
+  case status
+  of "waiting_approval": "Asked for your approval"
+  of "completed": "Finished the request"
+  of "failed": "The request failed"
+  of "cancelled": "The request was cancelled"
+  of "rejected": "Your approval was declined"
+  else: ""
+
+proc add(log: var StepLog, agent, words: string) =
+  var steps = log.steps.getOrDefault(agent)
+  steps.add words
+  if steps.len > maxRecentSteps: steps.delete(0)
+  log.steps[agent] = steps
+
+proc note*(log: var StepLog, run: RunState) =
+  ## Records the run's current stage (for the agent the AI names) or outcome (for the job's agent).
+  if not run.active or run.jobId.len == 0: return
+  if run.jobId != log.jobId:
+    # A new request: each agent's steps start over.
+    log.jobId = run.jobId
+    log.lastKey = ""
+    log.steps.clear()
+  let outcome = outcomeWords(run.status)
+  let (agent, words) =
+    if outcome.len > 0: ((if run.agent.len > 0: run.agent else: hubAgent), outcome)
+    else: (run.progressAgent, stageWords(run.progressStage))
+  if words.len == 0 or not plainAgentName(agent): return
+  let key = agent & "|" & words
+  if key == log.lastKey: return
+  log.lastKey = key
+  log.add(agent, words)
+
+proc recent*(log: StepLog, agent: string): seq[string] =
+  ## The agent's steps for the current request, oldest first.
+  log.steps.getOrDefault(agent)
+
+var agentSteps*: StepLog  ## the page's log: fed as progress arrives, read by the world's cards
+
+proc noteAgentStep*(run: RunState) =
+  ## Called where the app receives a stage or an outcome, so no step is missed while the world is
+  ## closed or between two renders.
+  agentSteps.note(run)

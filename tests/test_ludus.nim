@@ -264,3 +264,58 @@ suite "the room preview in the chat list says who is doing what":
     # With nobody asleep the line names everyone and adds nothing.
     check roomCaption(ludusScene(@["hub"], RunState(), ready(), @[], idleSeconds = 30)) ==
       "Janus (hub) is walking about."
+
+suite "each agent's recent steps (world decision 3: a card shows what he did)":
+  proc step(stage, agent: string, status = "processing"): RunState =
+    RunState(active: true, jobId: "j1", status: status, progressStage: stage, progressAgent: agent)
+
+  test "each new stage is recorded once for the agent doing it, in order, with plain words":
+    var log: StepLog
+    log.note(step("routing", "hub"))
+    log.note(step("routing", "hub"))
+    log.note(step("planning", "proxmox-specialist"))
+    log.note(step("executing", "proxmox-specialist"))
+    log.note(step("synthesizing", "hub"))
+    check log.recent("hub") == @["Chose who handles the request", "Wrote the answer"]
+    check log.recent("proxmox-specialist") == @["Planned the action", "Ran the tool"]
+    check log.recent("networking-specialist").len == 0
+
+  test "the outcome is recorded once for the agent that did the work":
+    var log: StepLog
+    log.note(step("executing", "proxmox-specialist"))
+    var waiting = step("", "", "waiting_approval")
+    waiting.agent = "proxmox-specialist"
+    log.note(waiting)
+    log.note(waiting)
+    var done = step("", "", "completed")
+    done.agent = "proxmox-specialist"
+    log.note(done)
+    check log.recent("proxmox-specialist") == @["Ran the tool", "Asked for your approval", "Finished the request"]
+    var failed = step("", "", "failed")
+    failed.jobId = "j2"
+    failed.agent = "hub"
+    log.note(failed)
+    check log.recent("hub") == @["The request failed"]
+
+  test "a new request starts the agents' steps over; only the last few are kept":
+    var log: StepLog
+    log.note(step("routing", "hub"))
+    var next = step("routing", "hub")
+    next.jobId = "j2"
+    log.note(next)
+    check log.recent("hub") == @["Chose who handles the request"]
+    # One long request (a plan with several tool calls) keeps only the newest steps.
+    for index in 0 ..< 12:
+      var job = step(if index mod 2 == 0: "planning" else: "executing", "proxmox-specialist")
+      job.jobId = "j3"
+      log.note(job)
+    check log.recent("proxmox-specialist").len == maxRecentSteps
+    check log.recent("proxmox-specialist")[^1] == "Ran the tool"
+
+  test "an agent the AI does not name, or no request at all, records nothing":
+    var log: StepLog
+    log.note(RunState())
+    log.note(step("routing", "Not A Name"))
+    log.note(step("thinking-hard", "hub"))
+    check log.recent("hub").len == 0
+    check log.recent("Not A Name").len == 0

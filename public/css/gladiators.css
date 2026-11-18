@@ -944,6 +944,29 @@
   line-height: 1.45;
 }
 
+/* The agent's steps in the current request, oldest first; the newest is the strongest. They read
+ * as their own block: a rule above them, and every step in the body colour (the newest in bold). */
+.world-card-steps {
+  margin: 4px 0 10px;
+  padding: 6px 0 0 18px;
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.world-card-steps li:last-child {
+  font-weight: 600;
+}
+
+.world-card-steps-empty {
+  margin: 4px 0 10px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
 .world-card-note {
   color: var(--text-soft);
   font-size: 12px;
@@ -1056,7 +1079,7 @@
 
   /* The card takes the space under the bar; the chat stays at the bottom, so they never overlap. */
   .world-card {
-    top: 76px;
+    top: 84px;
     left: 12px;
     right: 12px;
     width: auto;

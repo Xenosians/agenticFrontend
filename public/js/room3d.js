@@ -18,13 +18,22 @@
     light: {floor: "#c4c4c4", wall: "#9a9a9a", ambient: 0.75, key: 1.7},
   };
 
+  // Asked on every redraw. Each probe would open a WebGL context, and past the browser's limit
+  // (about sixteen) it drops the oldest: the world's own, which then goes blank. So the page asks
+  // once, and the probe's context is released right away.
+  let support = null;
   function supported() {
+    if (support !== null) return support;
     try {
       const canvas = document.createElement("canvas");
-      return Boolean(root.THREE && models && (canvas.getContext("webgl2") || canvas.getContext("webgl")));
+      const context = root.THREE && models ? (canvas.getContext("webgl2") || canvas.getContext("webgl")) : null;
+      support = Boolean(context);
+      const lose = context && context.getExtension("WEBGL_lose_context");
+      if (lose) lose.loseContext();
     } catch (error) {
-      return false;
+      support = false;
     }
+    return support;
   }
 
   function create(host, options) {
