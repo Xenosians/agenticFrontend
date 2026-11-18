@@ -1,5 +1,8 @@
 include karax/prelude
+import std/strutils
 import ../app/commands
+import icons
+import brand
 
 type MenuAction = object
   action, label: string
@@ -59,6 +62,38 @@ proc renderWorkspaceMenubar*(openMenu: string, onToggle: proc(menu: string),
   result = buildHtml(nav(class = "workspace-menubar", role = "menubar", `aria-label` = "Application menu")):
     for menu in ["File", "Edit", "View", "Help"]:
       renderMenu(menu, openMenu, onToggle, onAction)
+
+proc renderTitlebar*(openMenu: string, sidebarCollapsed, inspectorOpen: bool,
+                     onToggle: proc(menu: string), onAction: proc(action: string)): VNode =
+  ## The slim title bar (owner decision of 19 November, after the Hermes desktop): the sidebar
+  ## toggle and the application menus on the left, one centred search pill that opens the command
+  ## palette, and the panel toggle on the right.
+  let paletteLabel = shortcutText(paletteKeys)
+  result = buildHtml(header(class = "titlebar")):
+    tdiv(class = "titlebar-start"):
+      button(class = "titlebar-button", id = "sidebarToggle",
+             `aria-label` = (if sidebarCollapsed: cstring"Show sidebar" else: cstring"Hide sidebar"),
+             title = (if sidebarCollapsed: cstring"Show sidebar" else: cstring"Hide sidebar"),
+             `aria-expanded` = cstring($(not sidebarCollapsed))):
+        icon("panel-left", 16)
+        proc onclick(event: Event, node: VNode) = onAction("sidebar")
+      tdiv(class = "titlebar-brand"):
+        img(class = "brand-logo", src = productMark, alt = "")
+        strong(class = "titlebar-product"): text productName
+      renderWorkspaceMenubar(openMenu, onToggle, onAction)
+    button(class = "titlebar-search", id = "commandPaletteButton", `aria-label` = "Search and commands",
+           title = cstring("Search chats and commands (" & paletteLabel & ")"),
+           `aria-keyshortcuts` = cstring(paletteLabel.replace("Ctrl", "Control"))):
+      icon("search", 14)
+      span(class = "titlebar-search-label"): text "Search"
+      kbd(`aria-hidden` = "true"): text paletteLabel
+      proc onclick(event: Event, node: VNode) = onAction("palette")
+    tdiv(class = "titlebar-end"):
+      button(class = "titlebar-button titlebar-inspector", `aria-label` = "Run inspector",
+             `aria-pressed` = cstring($inspectorOpen),
+             title = cstring("Run inspector (" & shortcutText(["Mod", "Alt", "I"]) & ")")):
+        icon("panel", 16)
+        proc onclick(event: Event, node: VNode) = onAction("inspector")
 
 proc installMenuInteractions*(onClose: proc(focusId: cstring)) {.
   importjs: """((close) => {

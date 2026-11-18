@@ -33,6 +33,17 @@ suite "authoritative account settings receipts":
       expect ValueError:
         discard parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark",
           "accent": "mono", "pinned_views": [], "gladiators": value}})
+  test "a collapsed sidebar is an explicit server boolean, open when a server predates it":
+    let collapsed = parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark",
+      "accent": "mono", "pinned_views": [], "sidebar_collapsed": true}})
+    check collapsed.sidebarCollapsed
+    let older = parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark",
+      "accent": "mono", "pinned_views": []}})
+    check not older.sidebarCollapsed
+    for value in [%*"true", newJNull(), %*1]:
+      expect ValueError:
+        discard parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark",
+          "accent": "mono", "pinned_views": [], "sidebar_collapsed": value}})
   test "a server from before pins keeps today's dashboards":
     let saved = parseNotificationPreferences(%*{"preferences": {"task_completed": true, "theme": "dark", "accent": "mono"}})
     check saved.pinsKnown and saved.pinnedViews == @[dashKnowledge, dashOperations]
@@ -64,8 +75,9 @@ suite "authoritative account settings receipts":
     check matchesSessionsRequest(app, sessions)
     app.auth.sessionId = "replacement"
     check not matchesSessionsRequest(app, sessions)
-  test "a fresh workspace shows the gladiators":
+  test "a fresh workspace shows the gladiators and an open sidebar":
     check initAppState().gladiators
+    check not initAppState().sidebarCollapsed
 
   test "sign-out clears settings and invalidates both pending responses":
     let app = initAppState()
@@ -77,6 +89,7 @@ suite "authoritative account settings receipts":
     app.preferencesLoaded = true
     app.completionMailDraft = true
     app.gladiators = false
+    app.sidebarCollapsed = true
     app.sessionActionBusy = true
     app.sessionsError = "old owner"
     clearOperations(app)
@@ -86,5 +99,6 @@ suite "authoritative account settings receipts":
     check not app.completionMailDraft
     # The next owner sees the gladiators, the default, until their own setting loads.
     check app.gladiators
+    check not app.sidebarCollapsed
     check not app.sessionActionBusy
     check app.sessionsError == ""

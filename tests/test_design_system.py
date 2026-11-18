@@ -106,12 +106,17 @@ class DesignSystemTests(plain.PlainLanguageTests):
         self.assertEqual(self.errors, [])
 
     def test_the_application_menu_bar_uses_compact_desktop_items(self):
-        # A desktop menu bar (VS Code, Linear desktop): 28px items in body text, 6px corners, above 24px.
+        # A desktop menu bar (VS Code, Linear desktop): 28px items in body text, 6px corners, above 24px;
+        # the title bar's icon buttons share the 28px height.
         self.open_first_chat()
-        items = self.page.evaluate("""() => [...document.querySelectorAll('.workspace-menu-trigger')].map(n => {
-            const s = getComputedStyle(n); return [Math.round(n.getBoundingClientRect().height), s.fontSize, s.borderTopLeftRadius]; })""")
+        items = self.page.evaluate("""() => [...document.querySelectorAll('.workspace-menu-trigger, .titlebar-button')]
+            .filter(n => n.getBoundingClientRect().width > 0).map(n => {
+            const s = getComputedStyle(n); return [Math.round(n.getBoundingClientRect().height), s.borderTopLeftRadius]; })""")
         self.assertTrue(items)
-        self.assertEqual({tuple(item) for item in items}, {(28, "14px", "6px")})
+        self.assertEqual({tuple(item) for item in items}, {(28, "6px")})
+        sizes = self.page.evaluate("""() => [...document.querySelectorAll('.workspace-menu-trigger')]
+            .map(n => getComputedStyle(n).fontSize)""")
+        self.assertEqual(set(sizes), {"14px"})
         self.assertEqual(self.errors, [])
 
     def test_every_control_is_a_large_enough_target_and_uses_icons_not_glyphs(self):

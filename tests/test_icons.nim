@@ -7,7 +7,8 @@ suite "Lucide icons (owner decision of 18 November: real icons instead of text g
     let names = toHashSet(iconNames())
     for name in ["chat", "search", "model-store", "store", "settings", "review", "plus", "automation",
                  "topology", "knowledge", "operations", "learning", "pin", "unpin", "rename", "close",
-                 "more", "refresh", "chevron-right", "chevron-down", "send", "back", "check", "enter"]:
+                 "more", "refresh", "chevron-right", "chevron-down", "send", "back", "check", "enter",
+                 "new-chat", "panel-left", "panel"]:
       check name in names
       check icon(name).len > 0
 

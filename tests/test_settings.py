@@ -104,7 +104,7 @@ class SettingsTests(navigation.ChatNavigationTests):
 
     def open_settings(self):
         self.open_first_chat()
-        self.page.locator(".rail-navigation").get_by_role("button", name="Settings", exact=True).click()
+        self.page.locator(".sidebar-nav").get_by_role("button", name="Settings", exact=True).click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Settings")
         expect(self.page.locator(".account-session-row")).to_have_count(2)
 
@@ -159,7 +159,8 @@ class SettingsTests(navigation.ChatNavigationTests):
     def test_an_unconfirmed_theme_reverts_and_requires_a_reload(self):
         self.save_status = 503
         self.open_settings()
-        self.radio("Theme", "Light").check()
+        # click, not check(): the refused save reverts the choice, which check() would retry against.
+        self.radio("Theme", "Light").click()
         expect(self.page.locator(".settings-banner .settings-error")).to_contain_text("not confirmed")
         self.assertEqual(self.root(), ["dark", "mono"])
         expect(self.page.get_by_role("radiogroup", name="Theme", exact=True)).to_have_count(1)
@@ -210,7 +211,8 @@ class SettingsTests(navigation.ChatNavigationTests):
     def test_wrong_save_receipt_requires_readback_and_does_not_resend(self):
         self.save_receipt = {"preferences": {"task_completed": True, "theme": "dark", "accent": "mono"}}
         self.open_settings()
-        self.radio("Theme", "Light").check()
+        # click, not check(): the mismatched receipt reverts the choice.
+        self.radio("Theme", "Light").click()
         expect(self.page.locator(".settings-banner .settings-error")).to_contain_text("did not match")
         expect(self.page.get_by_text("Theme saved.", exact=True)).to_have_count(0)
         self.assertEqual(self.root(), ["dark", "mono"])
@@ -247,7 +249,7 @@ class SettingsTests(navigation.ChatNavigationTests):
         self.page.goto(self.base + "/")
         expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
         self.assertEqual(len(self.pending), 1)
-        self.page.locator(".rail-navigation").get_by_role("button", name="Settings", exact=True).click()
+        self.page.locator(".sidebar-nav").get_by_role("button", name="Settings", exact=True).click()
         self.page.get_by_role("region", name="Profile").get_by_role("button", name="Sign out", exact=True).click()
         expect(self.page.get_by_role("heading", name="Sign in", exact=True)).to_be_visible()
         self.assertEqual(self.root(), ["dark", "mono"])

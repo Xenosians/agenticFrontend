@@ -99,11 +99,11 @@ class SkillsPageTests(navigation.ChatNavigationTests):
     def skill(self, name):
         return self.page.locator(".skill-row").filter(has=self.page.locator(".skill-name", has_text=name))
 
-    def test_the_rail_offers_the_model_store_and_the_one_store(self):
+    def test_the_sidebar_offers_the_model_store_and_the_one_store(self):
         self.open_first_chat()
-        rail = self.page.locator(".rail-navigation")
+        rail = self.page.locator(".sidebar-nav")
         labels = rail.locator(".nav-item").evaluate_all("nodes => nodes.map((node) => node.getAttribute('aria-label'))")
-        self.assertEqual(labels[:4], ["Chat", "Search", "Model Store", "Store"])
+        self.assertEqual(labels[:4], ["New chat", "Search", "Model Store", "Store"])
         self.assertNotIn("Capabilities", labels)
         self.assertEqual(self.errors, [])
 

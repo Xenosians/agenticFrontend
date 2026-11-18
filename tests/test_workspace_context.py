@@ -84,7 +84,7 @@ class WorkspaceContextTests(navigation.ChatNavigationTests):
                 expect(context).to_contain_text("Fixture runbooks")
                 # One type scale: the header's text controls share a single size.
                 sizes = self.page.evaluate("""() => [
-                    '.workspace-context', '.chats-header-action', '.command-header-action',
+                    '.workspace-context', '.chats-header-action', '#workspaceMoreButton',
                 ].map((selector) => getComputedStyle(document.querySelector(selector)).fontSize)""")
                 self.assertEqual(len(set(sizes)), 1, sizes)
                 # Both names stay visible at every width; the full text is in the name.
@@ -122,8 +122,8 @@ class WorkspaceContextTests(navigation.ChatNavigationTests):
         # Phones retain navigation while the wide conversation list is hidden.
         self.page.set_viewport_size({"width": 390, "height": 760})
         self.open_first_chat()
-        expect(self.page.locator(".chats-sidebar")).to_be_hidden()
-        expect(self.page.locator(".workspace-rail")).to_be_visible()
+        expect(self.page.locator(".sidebar-chats")).to_be_hidden()
+        expect(self.page.locator(".sidebar-nav")).to_be_visible()
         header = self.page.locator(".workspace-header")
         expect(header).to_contain_text("First fixture chat")
         # Search covers only the open chat, so it names that chat too.

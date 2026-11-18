@@ -32,6 +32,10 @@
   image-rendering: pixelated;
 }
 
+/* An agent without his own drawn sheet (a new or third-party specialist) borrows the common
+   gladiator, so he is never a solid block of text colour. Each sheet below overrides this. */
+.gladiator[data-agent] { -webkit-mask-image: url("../assets/gladiators/service-desk-specialist.png"); mask-image: url("../assets/gladiators/service-desk-specialist.png"); }
+
 .gladiator[data-agent="hub"] { -webkit-mask-image: url("../assets/gladiators/hub.png"); mask-image: url("../assets/gladiators/hub.png"); }
 .gladiator[data-agent="access-specialist"] { -webkit-mask-image: url("../assets/gladiators/access-specialist.png"); mask-image: url("../assets/gladiators/access-specialist.png"); }
 .gladiator[data-agent="account-specialist"] { -webkit-mask-image: url("../assets/gladiators/account-specialist.png"); mask-image: url("../assets/gladiators/account-specialist.png"); }

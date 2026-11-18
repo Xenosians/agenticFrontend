@@ -1,8 +1,9 @@
 """The status bar (FR-077, FR-080): Hermes-style persistent service and job state.
 
 One full-width row under the panes: backend and AI runtime health from the
-public health endpoint (re-read on the configured cadence), the live-update
-state of an observed job on every page, and the run inspector toggle.
+public health endpoint (re-read on the configured cadence) and the live-update
+state of an observed job on every page. The run inspector toggle is in the title
+bar (owner decision of 19 November).
 Isolated HTTP fixtures only; no deployment service, credential, provider or model.
 Run after rebuilding: python tests/test_statusbar.py
 """
@@ -97,8 +98,12 @@ class StatusbarTests(navigation.ChatNavigationTests):
                     "() => document.documentElement.scrollWidth > window.innerWidth"))
                 # Small text on and just above the bar, and the sidebar's
                 # product label, menus and section captions stay readable (WCAG AA, 4.5:1).
-                for selector in (".statusbar-health", ".composer-hint", ".chats-sidebar-heading strong",
-                                 ".workspace-menu-trigger", ".section-label", ".chat-nav-title"):
+                selectors = [".statusbar-health", ".composer-hint", ".workspace-menu-trigger"]
+                if viewport["width"] > 760:
+                    # The product name, captions and chat titles show where the sidebar is open.
+                    selectors += [".titlebar-product", ".section-label", ".chat-nav-title",
+                                  ".sidebar-section-label", ".titlebar-search"]
+                for selector in selectors:
                     self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5, selector)
                 self.assertEqual(self.errors, [])
 
@@ -170,7 +175,9 @@ class StatusbarTests(navigation.ChatNavigationTests):
     def test_the_inspector_toggle_reflects_and_changes_the_rail(self):
         self.page.set_viewport_size({"width": 1440, "height": 900})
         self.open_first_chat()
-        toggle = self.bar().get_by_role("button", name="Run inspector", exact=True)
+        # The panel toggle lives in the title bar now; the status bar only reports.
+        expect(self.bar().get_by_role("button", name="Run inspector", exact=True)).to_have_count(0)
+        toggle = self.page.locator(".titlebar").get_by_role("button", name="Run inspector", exact=True)
         expect(toggle).to_have_attribute("aria-pressed", "false")
         toggle.click()
         expect(self.page.locator(".inspector")).to_be_visible()
@@ -187,7 +194,7 @@ class StatusbarTests(navigation.ChatNavigationTests):
         # shows only what happened in this run.
         self.page.set_viewport_size({"width": 1440, "height": 900})
         self.open_first_chat()
-        self.bar().get_by_role("button", name="Run inspector", exact=True).click()
+        self.page.locator(".titlebar").get_by_role("button", name="Run inspector", exact=True).click()
         tabs = self.page.locator(".inspector-tabs button")
         expect(tabs).to_have_text(["Run", "Events", "Raw"])
         expect(self.page.locator(".tool-inspector-row")).to_have_count(0)

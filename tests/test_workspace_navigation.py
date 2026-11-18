@@ -183,8 +183,9 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
 
     def test_button_palette_escape_and_compose_restore_focus_after_render(self):
         self.open_first_chat()
-        # The test browser runs on Linux, which writes the shortcut as Ctrl+K.
-        button = self.page.get_by_title("Commands (Ctrl+K)", exact=True)
+        # The title bar's search pill opens the palette; Linux writes its shortcut as Ctrl+K.
+        button = self.page.get_by_role("button", name="Search and commands", exact=True)
+        expect(button).to_have_attribute("title", "Search chats and commands (Ctrl+K)")
         button.click()
         expect(self.page.locator("#commandSearch")).to_be_focused()
         self.page.keyboard.press("Escape")

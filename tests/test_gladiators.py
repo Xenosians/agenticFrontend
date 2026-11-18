@@ -118,6 +118,23 @@ class GladiatorTests(navigation.ChatNavigationTests):
     def preview(self):
         return self.page.get_by_role("button", name="Open the agents' world", exact=True)
 
+    def test_an_agent_without_his_own_sheet_is_still_a_gladiator_not_a_block(self):
+        # A new or third-party specialist has no drawn sheet yet; he borrows the common one instead of
+        # painting a solid block of text colour (seen in the layout review of 19 November).
+        catalog = {**CATALOG, "capabilities": CATALOG["capabilities"] + [
+            {"id": "fixture_new_tool", "agent_names": ["fixture-new-specialist"], "grounded_arguments": []}]}
+        self.page.route("**/api/v1/extensions", lambda route: route.fulfill(json=catalog))
+        self.page.set_viewport_size({"width": 1440, "height": 900})
+        self.open_first_chat()
+        newcomer = self.preview().locator('.gladiator[data-agent="fixture-new-specialist"]')
+        expect(newcomer).to_have_count(1)
+        masks = newcomer.evaluate("n => [getComputedStyle(n).webkitMaskImage, getComputedStyle(n).maskImage]")
+        self.assertTrue(any("assets/gladiators/" in mask for mask in masks), masks)
+        own = self.preview().locator('.gladiator[data-agent="proxmox-specialist"]').evaluate(
+            "n => getComputedStyle(n).webkitMaskImage")
+        self.assertIn("proxmox-specialist.png", own)
+        self.assertEqual(self.errors, [])
+
     def test_the_agents_room_sits_at_the_bottom_of_the_chat_list(self):
         """Owner decision, 18 November: the room moves to the empty bottom of the chat list."""
         for width in (1440, 1100):
@@ -127,7 +144,7 @@ class GladiatorTests(navigation.ChatNavigationTests):
                 preview = self.preview()
                 expect(preview).to_be_visible()
                 # Inside the chat list column, below the chats, never over one.
-                chats = self.page.locator(".chats-sidebar").bounding_box()
+                chats = self.page.locator(".sidebar-chats").bounding_box()
                 box = preview.bounding_box()
                 listed = self.page.locator(".chat-nav-section").bounding_box()
                 self.assertGreaterEqual(box["x"], chats["x"] - 1)
@@ -154,7 +171,7 @@ class GladiatorTests(navigation.ChatNavigationTests):
                 # One control: the agents inside are pictures, not separate tab stops.
                 self.assertEqual(preview.locator("button, a, input, [tabindex]").count(), 0)
                 # Nothing in the list scrolls sideways because of it.
-                self.assertFalse(self.page.locator(".chats-sidebar").evaluate(
+                self.assertFalse(self.page.locator(".sidebar").evaluate(
                     "node => node.scrollWidth > node.clientWidth + 1"))
                 self.assertEqual(self.errors, [])
 
@@ -268,8 +285,7 @@ class GladiatorTests(navigation.ChatNavigationTests):
         """Owner decision, 18 November: the Ludus tab left the Run Inspector."""
         self.page.set_viewport_size({"width": 1440, "height": 900})
         self.open_first_chat()
-        self.page.get_by_role("contentinfo", name="Status", exact=True).get_by_role(
-            "button", name="Run inspector", exact=True).click()
+        self.page.locator(".titlebar").get_by_role("button", name="Run inspector", exact=True).click()
         expect(self.page.locator(".inspector-tabs button")).to_have_text(["Run", "Events", "Raw"])
         # The three tabs share the bar's whole width: no empty slot where a tab used to be.
         bar = self.page.locator(".inspector-tabs").bounding_box()
@@ -407,14 +423,14 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.page.set_viewport_size({"width": 1440, "height": 900})
         self.open_first_chat()
         expect(self.preview()).to_be_visible()
-        self.page.locator(".rail-navigation").get_by_role("button", name="Settings", exact=True).click()
+        self.page.locator(".sidebar-nav").get_by_role("button", name="Settings", exact=True).click()
         switch = self.page.get_by_role("switch", name="Show the agents' gladiators", exact=True)
         expect(switch).to_be_checked()
         switch.click()
         expect(switch).not_to_be_checked()
         self.assertEqual(self.preference_writes, [{"gladiators": False}])
         self.page.reload(wait_until="networkidle")
-        self.page.locator(".rail-navigation").get_by_role("button", name="Chat", exact=True).click()
+        self.page.locator(".chat-nav-main", has_text="First fixture chat").click()
         expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
         expect(self.page.locator(".ludus-preview")).to_have_count(0)
         self.assertEqual(self.errors, [])

@@ -65,7 +65,7 @@ class DocsPageTests(navigation.ChatNavigationTests):
         expect(directory.locator(".capability-row")).to_have_count(3)
         expect(self.page.locator(".capability-summary")).to_have_text("5 operations · 2 need approval")
         # A documentation page: no workspace rail, chat list or composer.
-        for selector in (".sidebar", ".rail-navigation", "#messageInput"):
+        for selector in (".sidebar", ".sidebar-nav", ".titlebar", "#messageInput"):
             expect(self.page.locator(selector)).to_have_count(0)
         expect(self.page.get_by_role("link", name="Back to the workspace", exact=True)).to_have_attribute("href", "./")
         self.assertGreaterEqual(self.page.evaluate(CONTRAST, ".capability-group-meta"), 4.5)

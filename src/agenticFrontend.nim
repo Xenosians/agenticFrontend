@@ -720,28 +720,15 @@ proc renderWorkspace(): VNode =
             proc onclick(event: Event, node: VNode) =
               openOperations(appState)
 
-        button(
-          class = "header-action chats-header-action",
-          title = cstring("Saved chats (" & shortcutText(["Mod", "Alt", "C"]) & ")")
-        ):
-          text "Chats"
-          proc onclick(event: Event, node: VNode) =
-            runWorkspaceCommand("chats")
-
-        button(
-          id = "commandPaletteButton",
-          class = "header-action command-header-action",
-          title = cstring("Commands (" & shortcutText(paletteKeys) & ")")
-        ):
-          text shortcutText(paletteKeys)
-
-          proc onclick(
-            event: Event,
-            node: VNode
-          ) =
-            runWorkspaceCommand(
-              "palette"
-            )
+        # The chat list is in the sidebar; where the sidebar shows only icons, this opens it as a page.
+        if appState.sidebarCollapsed or appState.activeView != viewChats:
+          button(
+            class = "header-action chats-header-action",
+            title = cstring("Saved chats (" & shortcutText(["Mod", "Alt", "C"]) & ")")
+          ):
+            text "Chats"
+            proc onclick(event: Event, node: VNode) =
+              runWorkspaceCommand("chats")
 
         button(
           class = "header-action",
@@ -842,6 +829,10 @@ proc runWorkspaceCommand(action: string) =
     if not wasHelp: workspaceHelpPreviousView = appState.activeView
     setActiveView(appState, viewHelp)
   of "inspector": appState.inspectorOpen = not appState.inspectorOpen
+  of "sidebar":
+    appState.dashboardsOpen = false
+    discard saveSidebarCollapsed(appState, not appState.sidebarCollapsed)
+    queueWorkspaceFocus("sidebarToggle")
   of "refresh": discard refreshSystemStatus(appState)
   of "compose":
     setActiveView(appState, viewChat)
@@ -866,16 +857,13 @@ proc renderApp(): VNode =
       appState
     )
 
-  let shellClass =
-    if appState.inspectorOpen:
-      cstring"app-shell"
-    else:
-      cstring"app-shell inspector-hidden"
+  let shellClass = cstring("app-shell" & (if appState.inspectorOpen: "" else: " inspector-hidden") &
+                           (if appState.sidebarCollapsed: " sidebar-collapsed" else: ""))
 
   result = buildHtml(
     tdiv(class = shellClass)
   ):
-    renderWorkspaceMenubar(openWorkspaceMenu,
+    renderTitlebar(openWorkspaceMenu, appState.sidebarCollapsed, appState.inspectorOpen,
       proc(menu: string) =
         openWorkspaceMenu = (if openWorkspaceMenu == menu: "" else: menu)
         appState.headerMenuOpen = false
@@ -883,7 +871,8 @@ proc renderApp(): VNode =
       proc(action: string) = runWorkspaceCommand(action))
 
     renderSidebar(
-      appState
+      appState,
+      shortcutText(["Mod", "Alt", "N"])
     )
 
     renderWorkspace()
@@ -898,9 +887,7 @@ proc renderApp(): VNode =
       proc(view: AppView) =
         if view == viewJobs: openOperations(appState)
         else: setActiveView(appState, view)
-        redraw(kxi),
-      proc() =
-        runWorkspaceCommand("inspector")
+        redraw(kxi)
     )
 
     # The agents' room, large, over the workspace (opened from the agents in the chat list).

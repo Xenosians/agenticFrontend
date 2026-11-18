@@ -97,6 +97,10 @@ proc initAppState*():
     gladiators:
       true,
 
+    # The sidebar is open until the owner's saved setting says otherwise.
+    sidebarCollapsed:
+      false,
+
     headerMenuOpen:
       false,
 

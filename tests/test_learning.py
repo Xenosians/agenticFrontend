@@ -294,7 +294,7 @@ class LearningTests(navigation.ChatNavigationTests):
             "local weights unavailable on this host")
         expect(self.page.locator(".learning-panel")).to_contain_text("never changes what serves your requests")
         expect(self.page.locator(".learning-runs")).to_contain_text("No runs yet.")
-        expect(self.page.locator(".workspace-rail").get_by_role("button", name="Learning", exact=True)).to_have_count(0)
+        expect(self.page.locator(".sidebar").get_by_role("button", name="Learning", exact=True)).to_have_count(0)
         self.assertEqual((self.checks, self.starts), ([], []))
         self.assertEqual(self.errors, [])
 

@@ -4,7 +4,6 @@ import karax/kdom
 import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge, account_bridge,
   operations_bridge, review_bridge, request_context, engineering_bridge, backend_bridge,
   knowledge_bridge, learning_bridge, workflow_bridge]
-import brand
 import icons
 import gladiators
 
@@ -18,12 +17,14 @@ proc focusById(id: cstring) {.importjs: "document.getElementById(#)?.focus()".}
 proc placeDashboardMenu() {.importjs: """(() => {
   const button = document.getElementById('dashboardAdd');
   const menu = document.getElementById('dashboardMenu');
-  const rail = button && button.closest('.workspace-rail');
-  if (!button || !menu || !rail) return;
-  // Just past the rail, top-aligned with the "+" button, moved up only as far as needed to stay on screen.
+  const side = button && button.closest('.sidebar');
+  if (!button || !menu || !side) return;
+  // Just past the sidebar, top-aligned with the "+" row, moved up only as far as needed to stay on
+  // screen, and left only as far as needed on a narrow window.
   const box = button.getBoundingClientRect();
   const margin = 8;
-  menu.style.left = (rail.getBoundingClientRect().right + margin) + 'px';
+  const left = Math.min(side.getBoundingClientRect().right + margin, innerWidth - menu.offsetWidth - margin);
+  menu.style.left = Math.max(margin, left) + 'px';
   menu.style.top = Math.max(margin, Math.min(box.top, innerHeight - menu.offsetHeight - margin)) + 'px';
 })()""".}
 
@@ -42,13 +43,15 @@ proc installDashboardDismiss(close: proc(focusPlus: bool)) {.importjs: """((clos
 })(#)""".}
 
 proc renderViewButton(state: AppState, iconName, label: string, target: AppView): VNode =
+  ## A named place: its icon and its name side by side (ChatGPT, Hermes); collapsed, the icon alone,
+  ## named on hover and for assistive technology.
   result = buildHtml(button(
       class = (if state.activeView == target: cstring"nav-item active" else: cstring"nav-item"),
       title = cstring(label),
       `aria-label` = cstring(label),
       `aria-current` = (if state.activeView == target: cstring"page" else: cstring"false"))):
-    span(class = "nav-icon", `aria-hidden` = "true"): icon(iconName, 20)
-    span(class = "rail-label"): text label
+    span(class = "nav-icon", `aria-hidden` = "true"): icon(iconName, 18)
+    span(class = "nav-label"): text label
     proc onclick(event: Event, node: VNode) =
       state.dashboardsOpen = false
       setActiveView(state, target)
@@ -87,8 +90,8 @@ proc renderPinnedButton(state: AppState, dashboard: Dashboard): VNode =
   result = buildHtml(button(class = (if active: cstring"nav-item active" else: cstring"nav-item"),
       title = cstring(dashboardLabel(dashboard)), `aria-label` = cstring(dashboardLabel(dashboard)),
       `aria-current` = (if active: cstring"page" else: cstring"false"))):
-    span(class = "nav-icon", `aria-hidden` = "true"): icon(dashboardIcon(dashboard), 20)
-    span(class = "rail-label"): text dashboardLabel(dashboard)
+    span(class = "nav-icon", `aria-hidden` = "true"): icon(dashboardIcon(dashboard), 18)
+    span(class = "nav-label"): text dashboardLabel(dashboard)
     proc onclick(event: Event, node: VNode) = openDashboard(state, dashboard)
 
 proc renderDashboardRow(state: AppState, dashboard: Dashboard): VNode =
@@ -103,7 +106,7 @@ proc renderDashboardRow(state: AppState, dashboard: Dashboard): VNode =
     button(class = (if pinned: cstring"dashboard-pin pinned" else: cstring"dashboard-pin"),
            `aria-label` = cstring((if pinned: "Unpin " else: "Pin ") & label),
            `aria-pressed` = (if pinned: cstring"true" else: cstring"false"),
-           title = cstring(if pinned: "Unpin from the rail" else: "Pin to the rail"),
+           title = cstring(if pinned: "Unpin from the sidebar" else: "Pin to the sidebar"),
            disabled = not canChangePins(state)):
       icon(if pinned: "unpin" else: "pin", 14)
       proc onclick(event: Event, node: VNode) = discard togglePinnedDashboard(state, dashboard)
@@ -112,7 +115,7 @@ proc renderDashboardMenu(state: AppState): VNode =
   result = buildHtml(tdiv(class = "dashboard-menu", role = "dialog", `aria-label` = "Dashboards",
                           id = "dashboardMenu")):
     strong(class = "dashboard-menu-title"): text "Dashboards"
-    p(class = "dashboard-menu-note"): text "Open one, or pin it to keep it on the rail."
+    p(class = "dashboard-menu-note"): text "Open one, or pin it to keep it in the sidebar."
     if not state.pinsKnown and state.preferencesLoaded:
       p(class = "dashboard-menu-error", role = "alert"):
         text "Your pinned dashboards could not be loaded. Open any dashboard from here."
@@ -128,12 +131,12 @@ proc renderDashboardMenu(state: AppState): VNode =
         pendingDashboardFocus = "dashboardAdd"
 
 proc renderDashboardAdd(state: AppState): VNode =
+  ## "+" on the Dashboards heading (Hermes, ChatGPT "Projects"); collapsed, the last icon of the rail.
   result = buildHtml(button(id = "dashboardAdd", class = (if state.dashboardsOpen: cstring"nav-item dashboard-add active"
                                                           else: cstring"nav-item dashboard-add"),
-      title = "Dashboards", `aria-label` = "Add a dashboard to the rail", `aria-haspopup` = "dialog",
+      title = "Add a dashboard", `aria-label` = "Add a dashboard", `aria-haspopup` = "dialog",
       `aria-controls` = "dashboardMenu", `aria-expanded` = (if state.dashboardsOpen: cstring"true" else: cstring"false"))):
-    span(class = "nav-icon", `aria-hidden` = "true"): icon("plus", 20)
-    span(class = "rail-label"): text "Dashboards"
+    span(class = "nav-icon", `aria-hidden` = "true"): icon("plus", 16)
     proc onclick(event: Event, node: VNode) =
       state.dashboardsOpen = not state.dashboardsOpen
       if state.dashboardsOpen:
@@ -225,64 +228,73 @@ proc renderSavedChat(state: AppState, chat: ChatItem): VNode =
             state.chatRenameId = ""
             redraw(kxi)
 
-proc renderSidebar*(state: AppState): VNode =
-  result = buildHtml(aside(class = "sidebar", `aria-label` = "Workspace navigation")):
-    tdiv(class = "workspace-rail"):
-      tdiv(class = "rail-brand"):
-        img(class = "brand-logo", src = productMark, alt = productName)
-      nav(class = "rail-navigation", `aria-label` = "Workspace"):
-        # The core views are always here; dashboards are pinned from "+".
-        renderViewButton(state, "chat", "Chat", viewChat)
+proc renderSidebar*(state: AppState, newChatKeys: string): VNode =
+  ## One labelled sidebar (owner decision of 19 November, after Hermes and ChatGPT): the places with
+  ## their names, the pinned dashboards with "+", the chats by day, the agents' room, and the account
+  ## pinned at the bottom. The middle scrolls as one when the window is short; the chat list scrolls
+  ## on its own when there is room. Collapsed (the owner's saved choice) or on a phone it narrows to
+  ## the icons alone.
+  let collapsed = state.sidebarCollapsed
+  result = buildHtml(aside(class = (if collapsed: cstring"sidebar collapsed" else: cstring"sidebar"),
+                           `aria-label` = "Workspace navigation")):
+    tdiv(class = "sidebar-body"):
+      nav(class = "sidebar-nav", `aria-label` = "Workspace"):
+        button(class = "nav-item new-session", title = cstring("New chat (" & newChatKeys & ")"),
+               `aria-label` = "New chat", `aria-keyshortcuts` = cstring(newChatKeys.replace("Ctrl", "Control"))):
+          span(class = "nav-icon", `aria-hidden` = "true"): icon("new-chat", 18)
+          span(class = "nav-label"): text "New chat"
+          kbd(class = "nav-shortcut", `aria-hidden` = "true"): text newChatKeys
+          proc onclick(event: Event, node: VNode) =
+            state.commandPaletteOpen = false
+            discard createNewChat(state)
+        # The core places are always here; dashboards are pinned from "+".
         renderViewButton(state, "search", "Search", viewSearch)
         renderViewButton(state, "model-store", "Model Store", viewPlugin)
         renderViewButton(state, "store", "Store", viewStore)
         if isReviewer(state): renderViewButton(state, "review", "Review", viewReview)
         renderViewButton(state, "settings", "Settings", viewSettings)
-        span(class = "rail-divider", `aria-hidden` = "true")
+      tdiv(class = "dashboard-nav", role = "group", `aria-labelledby` = "dashboardNavLabel"):
+        tdiv(class = "dashboard-nav-header"):
+          span(id = "dashboardNavLabel", class = "sidebar-section-label"): text "Dashboards"
+          renderDashboardAdd(state)
         for dashboard in state.pinnedViews:
           renderPinnedButton(state, dashboard)
-        renderDashboardAdd(state)
       if state.dashboardsOpen:
         renderDashboardMenu(state)
-      let ownerName = if state.auth.displayName.len > 0: state.auth.displayName else: state.auth.email
-      button(class = "sidebar-footer", title = cstring("Settings · " & ownerName), `aria-label` = "Account settings"):
-        tdiv(class = "avatar"):
-          text (if state.auth.displayName.len > 0: $state.auth.displayName.runeAt(0).toUpper() else: "U")
-        span(class = "rail-label"): text ownerName
-        proc onclick(event: Event, node: VNode) =
-          setActiveView(state, viewSettings)
-          discard loadAuthSessions(state)
-          discard refreshSystemStatus(state)
-    tdiv(class = "chats-sidebar"):
-      tdiv(class = "chats-sidebar-heading"):
-        strong: text productName
-        button(class = "chat-refresh", title = "Refresh chats", `aria-label` = "Refresh chats",
-          disabled = state.chatsRefreshing or state.chatActionId.len > 0):
-          icon("refresh", 16, (if state.chatsRefreshing: "spinning" else: ""))
-          proc onclick(event: Event, node: VNode) = discard refreshChatMetadata(state)
-      button(class = "new-session"):
-        icon("plus", 16)
-        text "New chat"
-        proc onclick(event: Event, node: VNode) =
-          state.commandPaletteOpen = false
-          discard createNewChat(state)
-      tdiv(class = "chat-filter"):
-        input(`type` = "search", `aria-label` = "Filter recent chats", placeholder = "Find a chat…",
-          value = state.chatFilter):
-          proc oninput(event: Event, node: VNode) =
-            state.chatFilter = $node.getInputText
-            redraw(kxi)
-      if state.chatActionError.len > 0:
-        p(class = "chat-metadata-error", role = "alert"): text state.chatActionError
-      nav(class = "nav-section chat-nav-section", `aria-label` = "Recent chats"):
-        let groups = groupChats(state.chats, $currentCalendarDay(), state.chatFilter)
-        if groups.len == 0:
-          span(class = "sidebar-empty"):
-            text (if state.chatFilter.len > 0: "No matching chats" else: "No chats yet")
-        for group in groups:
-          tdiv(class = "chat-date-group"):
-            span(class = "section-label"): text group.title
-            for chat in group.chats: renderSavedChat(state, chat)
-      # The agents' room (owner decision, 18 November): who is doing what, below the chats.
-      if state.gladiators:
-        renderRoomPreview(state)
+      tdiv(class = "sidebar-chats"):
+        tdiv(class = "chat-filter"):
+          input(`type` = "search", `aria-label` = "Filter recent chats", placeholder = "Find a chat…",
+            value = state.chatFilter):
+            proc oninput(event: Event, node: VNode) =
+              state.chatFilter = $node.getInputText
+              redraw(kxi)
+          button(class = "chat-refresh", title = "Refresh chats", `aria-label` = "Refresh chats",
+            disabled = state.chatsRefreshing or state.chatActionId.len > 0):
+            icon("refresh", 16, (if state.chatsRefreshing: "spinning" else: ""))
+            proc onclick(event: Event, node: VNode) = discard refreshChatMetadata(state)
+        if state.chatActionError.len > 0:
+          p(class = "chat-metadata-error", role = "alert"): text state.chatActionError
+        nav(class = "nav-section chat-nav-section", `aria-label` = "Recent chats"):
+          let groups = groupChats(state.chats, $currentCalendarDay(), state.chatFilter)
+          if groups.len == 0:
+            span(class = "sidebar-empty"):
+              text (if state.chatFilter.len > 0: "No matching chats" else: "No chats yet")
+          for group in groups:
+            tdiv(class = "chat-date-group"):
+              span(class = "section-label"): text group.title
+              for chat in group.chats: renderSavedChat(state, chat)
+        # The agents' room (owner decision, 18 November): who is doing what, below the chats.
+        if state.gladiators:
+          renderRoomPreview(state)
+    let ownerName = if state.auth.displayName.len > 0: state.auth.displayName else: state.auth.email
+    button(class = "sidebar-footer", title = cstring("Settings · " & ownerName), `aria-label` = "Account settings"):
+      tdiv(class = "avatar", `aria-hidden` = "true"):
+        text (if state.auth.displayName.len > 0: $state.auth.displayName.runeAt(0).toUpper() else: "U")
+      span(class = "sidebar-account"):
+        strong(class = "nav-label"): text ownerName
+        if state.auth.displayName.len > 0 and state.auth.email.len > 0:
+          span(class = "sidebar-account-email"): text state.auth.email
+      proc onclick(event: Event, node: VNode) =
+        setActiveView(state, viewSettings)
+        discard loadAuthSessions(state)
+        discard refreshSystemStatus(state)

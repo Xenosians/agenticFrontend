@@ -1,15 +1,14 @@
 ## Status bar: the workspace's persistent service and job state.
 ##
-## Hermes keeps one quiet bar under its panes for backend health, the running
-## turn and pane toggles. Janus carries the same organisation for ITSM work
-## (FR-077, FR-080): public backend and AI runtime health, the live-update
-## state of the observed durable job on every page, and the run inspector.
+## Hermes keeps one quiet bar under its panes for backend health and the running
+## turn. Janus carries the same organisation for ITSM work (FR-077, FR-080):
+## public backend and AI runtime health and the live-update state of the
+## observed durable job on every page. The panel toggles live in the title bar.
 ## Health is the backend's public summary only; it is not provider evidence.
 
 include karax/prelude
 
 import ../app/types
-import ../app/commands
 
 proc healthLabel*(system: SystemState): string =
   ## One label for the public health summary. An unread result stays unknown.
@@ -44,8 +43,7 @@ proc observedJob*(run: RunState): bool =
   run.active and run.jobId.len > 0 and run.observationMode.len > 0
 
 
-proc renderStatusbar*(state: AppState, openView: proc(view: AppView),
-                      toggleInspector: proc()): VNode =
+proc renderStatusbar*(state: AppState, openView: proc(view: AppView)): VNode =
   result = buildHtml(footer(class = "statusbar", `aria-label` = "Status")):
     tdiv(class = "statusbar-group"):
       button(class = healthClass(state.system), title = "Open service status in Settings"):
@@ -62,13 +60,3 @@ proc renderStatusbar*(state: AppState, openView: proc(view: AppView),
           text observationLabel(state.run.observationMode)
           proc onclick(event: Event, node: VNode) =
             openView(viewJobs)
-
-    tdiv(class = "statusbar-group"):
-      button(
-        class = "statusbar-item statusbar-inspector",
-        `aria-pressed` = cstring($state.inspectorOpen),
-        title = cstring("Run inspector (" & shortcutText(["Mod", "Alt", "I"]) & ")")
-      ):
-        text "Run inspector"
-        proc onclick(event: Event, node: VNode) =
-          toggleInspector()

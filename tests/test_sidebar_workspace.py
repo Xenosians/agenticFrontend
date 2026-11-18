@@ -83,10 +83,10 @@ class SidebarWorkspaceTests(unittest.TestCase):
         expect(row.get_by_role("textbox", name="Chat title", exact=True)).to_be_focused()
         return row
 
-    def test_rail_chat_sections_filter_and_keyboard_focus(self):
+    def test_sidebar_chat_sections_filter_and_keyboard_focus(self):
         self.open()
-        expect(self.page.locator(".workspace-rail")).to_be_visible()
-        expect(self.page.locator(".chats-sidebar")).to_be_visible()
+        expect(self.page.locator(".sidebar-nav")).to_be_visible()
+        expect(self.page.locator(".sidebar-chats")).to_be_visible()
         expect(self.page.locator(".chat-date-group").first.locator(".section-label")).to_have_text("Pinned")
         expect(self.page.locator(".chat-date-group").first).to_contain_text("Third fixture chat")
         self.page.get_by_role("searchbox", name="Filter recent chats", exact=True).fill("second")
@@ -188,43 +188,47 @@ class SidebarWorkspaceTests(unittest.TestCase):
         self.page.locator(".chat-nav-main", has_text="Conversation 59").scroll_into_view_if_needed()
         expect(account).to_be_visible()
         self.page.set_viewport_size({"width": 390, "height": 844})
-        expect(self.page.locator(".workspace-rail")).to_be_visible()
-        expect(self.page.locator(".chats-sidebar")).not_to_be_visible()
+        expect(self.page.locator(".sidebar-nav")).to_be_visible()
+        expect(self.page.locator(".sidebar-chats")).not_to_be_visible()
         expect(account).to_be_visible()
         self.assertTrue(self.page.evaluate("document.documentElement.scrollWidth <= innerWidth"))
         self.assertEqual(self.errors, [])
 
 
     def rail(self):
-        return self.page.locator(".rail-navigation")
+        # The places and the pinned dashboards; not the "+" list, which opens inside the sidebar.
+        return self.page.locator(".sidebar-nav, .dashboard-nav")
 
     def rail_labels(self):
-        return self.rail().locator(".nav-item .rail-label").all_inner_texts()
+        return self.rail().locator(".nav-item .nav-label").all_inner_texts()
 
     def open_dashboards(self):
-        self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True).click()
+        self.page.get_by_role("button", name="Add a dashboard", exact=True).click()
         menu = self.page.get_by_role("dialog", name="Dashboards", exact=True)
         expect(menu).to_be_visible()
         return menu
 
-    def test_the_rail_keeps_the_core_and_ends_with_plus(self):
+    def test_the_sidebar_keeps_the_core_and_ends_with_plus(self):
         self.open()
-        self.assertEqual(self.rail_labels(), ["Chat", "Search", "Model Store", "Store", "Settings",
-                                              "Knowledge", "Operations", "Dashboards"])
+        self.assertEqual(self.rail_labels(), ["New chat", "Search", "Model Store", "Store", "Settings",
+                                              "Knowledge", "Operations"])
         for removed in ("AI Node Builder", "PCB / Infra Simulator", "MCP Tool Store", "Lua Plugin Store",
                         "Skill Store"):
             expect(self.rail().get_by_role("button", name=removed, exact=True)).to_have_count(0)
-        plus = self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True)
+        plus = self.page.get_by_role("button", name="Add a dashboard", exact=True)
         expect(plus).to_have_attribute("aria-expanded", "false")
         # A Lucide "plus" line icon (owner decision of 18 November), not a typed "+".
         expect(plus.locator(".nav-icon svg.icon-plus")).to_have_count(1)
         expect(plus.locator(".nav-icon")).to_have_text("")
+        # "+" sits on the Dashboards heading, after it.
+        expect(self.page.locator(".dashboard-nav-header")).to_contain_text("Dashboards")
+        expect(self.page.locator(".dashboard-nav-header #dashboardAdd")).to_have_count(1)
         self.assertEqual(self.errors, [])
 
     def test_plus_lists_every_dashboard_and_opens_one_without_pinning(self):
         self.open()
         menu = self.open_dashboards()
-        expect(self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True)).to_have_attribute(
+        expect(self.page.get_by_role("button", name="Add a dashboard", exact=True)).to_have_attribute(
             "aria-expanded", "true")
         rows = menu.locator(".dashboard-row")
         expect(rows.locator(".dashboard-open .dashboard-name")).to_have_text(
@@ -254,8 +258,8 @@ class SidebarWorkspaceTests(unittest.TestCase):
         # A reload shows the saved rail: the pins live on the server, not in the browser.
         self.page.reload(wait_until="networkidle")
         expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
-        self.assertEqual(self.rail_labels(), ["Chat", "Search", "Model Store", "Store", "Settings",
-                                              "Operations", "Topology & PCB", "Dashboards"])
+        self.assertEqual(self.rail_labels(), ["New chat", "Search", "Model Store", "Store", "Settings",
+                                              "Operations", "Topology & PCB"])
         self.rail().get_by_role("button", name="Topology & PCB", exact=True).click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Topology & PCB")
         self.assertEqual(self.errors, [])
@@ -275,7 +279,7 @@ class SidebarWorkspaceTests(unittest.TestCase):
         self.preferences["pinned_views"] = ["knowledge", "nowhere"]
         self.open()
         # The rail keeps the core and "+"; nothing is pinned on a guess.
-        self.assertEqual(self.rail_labels(), ["Chat", "Search", "Model Store", "Store", "Settings", "Dashboards"])
+        self.assertEqual(self.rail_labels(), ["New chat", "Search", "Model Store", "Store", "Settings"])
         menu = self.open_dashboards()
         expect(menu.get_by_role("alert")).to_contain_text("could not be loaded")
         expect(menu.locator(".dashboard-pin")).to_have_count(5)
@@ -286,7 +290,7 @@ class SidebarWorkspaceTests(unittest.TestCase):
 
     def test_the_dashboard_list_works_from_the_keyboard(self):
         self.open()
-        plus = self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True)
+        plus = self.page.get_by_role("button", name="Add a dashboard", exact=True)
         plus.focus()
         self.page.keyboard.press("Enter")
         menu = self.page.get_by_role("dialog", name="Dashboards", exact=True)
@@ -297,7 +301,7 @@ class SidebarWorkspaceTests(unittest.TestCase):
         # A click outside closes it too.
         plus.click()
         expect(menu).to_be_visible()
-        self.page.locator(".chats-sidebar-heading").click()
+        self.page.locator("#dashboardNavLabel").click()
         expect(menu).to_have_count(0)
         self.assertEqual(self.errors, [])
 
@@ -313,7 +317,7 @@ class SidebarWorkspaceTests(unittest.TestCase):
                 self.assertLessEqual(box["x"] + box["width"], size["width"])
                 self.assertLessEqual(box["y"] + box["height"], size["height"])
                 # It opens beside the "+" button, level with it.
-                plus = self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True).bounding_box()
+                plus = self.page.get_by_role("button", name="Add a dashboard", exact=True).bounding_box()
                 self.assertGreaterEqual(box["x"], plus["x"] + plus["width"])
                 self.assertLessEqual(box["x"], plus["x"] + plus["width"] + 24)
                 self.assertLessEqual(box["y"], plus["y"] + plus["height"])

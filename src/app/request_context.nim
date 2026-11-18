@@ -237,6 +237,7 @@ proc clearOperations*(state: AppState) =
   state.pinnedViews = @[]
   state.pinsKnown = false
   state.gladiators = true
+  state.sidebarCollapsed = false
   state.dashboardsOpen = false
   state.pinError = ""
 

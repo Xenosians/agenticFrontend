@@ -157,7 +157,7 @@ class EngineeringTests(navigation.ChatNavigationTests):
 
     def test_the_dashboard_list_opens_the_same_view(self):
         self.open_first_chat()
-        self.page.get_by_role("button", name="Add a dashboard to the rail", exact=True).click()
+        self.page.get_by_role("button", name="Add a dashboard", exact=True).click()
         entry = self.page.get_by_role("dialog", name="Dashboards").get_by_role("button", name="Topology & PCB", exact=True)
         expect(entry).to_be_visible()
         entry.click()

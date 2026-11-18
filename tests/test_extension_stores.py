@@ -83,7 +83,7 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
 
     def open_store(self, section="Tools"):
         self.open_first_chat()
-        self.page.locator(".rail-navigation").get_by_role("button", name="Store", exact=True).click()
+        self.page.locator(".sidebar-nav").get_by_role("button", name="Store", exact=True).click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Store")
         self.page.get_by_role("tablist", name="Store sections").get_by_role("tab", name=section, exact=True).click()
         expect(self.page.get_by_role("tab", name=section, exact=True)).to_have_attribute("aria-selected", "true")
@@ -99,7 +99,7 @@ class ExtensionStoreViewTests(navigation.ChatNavigationTests):
 
     def test_one_store_page_holds_tools_skills_and_plugins_as_sections(self):
         self.open_first_chat()
-        rail = self.page.locator(".rail-navigation")
+        rail = self.page.locator(".sidebar-nav")
         for old in ("MCP Tool Store", "Lua Plugin Store", "Skill Store"):
             expect(rail.get_by_role("button", name=old, exact=True)).to_have_count(0)
         rail.get_by_role("button", name="Store", exact=True).click()

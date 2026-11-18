@@ -28,6 +28,7 @@ proc applySavedPreferences(state: AppState, saved: NotificationPreferences) =
   state.pinnedViews = saved.pinnedViews
   state.pinsKnown = saved.pinsKnown
   state.gladiators = saved.gladiators
+  state.sidebarCollapsed = saved.sidebarCollapsed
   state.preferencesLoaded = true
   applyAppearance(state)
 
@@ -125,6 +126,18 @@ proc saveGladiators*(state: AppState, shown: bool) {.async.} =
   await saveSetting(state, %*{"gladiators": shown},
     (if shown: "The gladiators are shown." else: "The gladiators are hidden."),
     proc() = state.gladiators = saved)
+
+proc saveSidebarCollapsed*(state: AppState, collapsed: bool) {.async.} =
+  ## The sidebar follows the click at once; the owner's choice is kept on the server (per account,
+  ## never in the browser) and reverts if the server does not confirm it.
+  if collapsed == state.sidebarCollapsed or not canSaveSettings(state):
+    state.sidebarCollapsed = collapsed
+    return
+  let saved = state.sidebarCollapsed
+  state.sidebarCollapsed = collapsed
+  await saveSetting(state, %*{"sidebar_collapsed": collapsed},
+    (if collapsed: "The sidebar is collapsed." else: "The sidebar is shown."),
+    proc() = state.sidebarCollapsed = saved)
 
 proc saveCompletionMail*(state: AppState, enabled: bool) {.async.} =
   if enabled == state.completionMail or not canSaveSettings(state): return

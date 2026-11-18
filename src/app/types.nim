@@ -359,6 +359,8 @@ type
     pinsKnown*: bool
     ## Whether the agents' gladiators are shown, as saved; shown by default.
     gladiators*: bool
+    ## Whether the sidebar is collapsed to its icon rail, as saved; open by default.
+    sidebarCollapsed*: bool
     dashboardsOpen*: bool
     pinError*: string
     nextMessageId*: int

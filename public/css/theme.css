@@ -147,8 +147,8 @@
 :root[data-theme="light"][data-accent="rose"] { --accent: #be123c; --accent-hover: #9f1239; --on-accent: #ffffff; }
 :root[data-theme="light"][data-accent="violet"] { --accent: #6d28d9; --accent-hover: #5b21b6; --on-accent: #ffffff; }
 
-/* A chosen accent also marks where you are: the active rail item. */
-:root[data-accent]:not([data-accent="mono"]) .rail-navigation .nav-item.active {
+/* A chosen accent also marks where you are: the active place in the sidebar. */
+:root[data-accent]:not([data-accent="mono"]) .sidebar .nav-item.active {
   box-shadow: inset 2px 0 0 var(--accent);
 }
 

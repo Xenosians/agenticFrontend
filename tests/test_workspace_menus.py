@@ -80,7 +80,9 @@ class WorkspaceMenuTests(ChatNavigationTests):
     def test_outside_click_and_tab_dismiss_and_mobile_menus_fit(self):
         self.open_first_chat()
         self.menu("File").click()
-        self.page.locator(".workspace-title h1").click()
+        # An empty spot of the status bar: outside the menu, and nothing there acts on a click.
+        bar = self.page.locator(".statusbar").bounding_box()
+        self.page.mouse.click(bar["x"] + bar["width"] - 20, bar["y"] + bar["height"] / 2)
         expect(self.page.get_by_role("menu", name="File", exact=True)).to_have_count(0)
         self.menu("View").click()
         self.page.keyboard.press("Tab")
@@ -89,6 +91,9 @@ class WorkspaceMenuTests(ChatNavigationTests):
         for name in ("File", "Edit", "View", "Help"):
             self.menu(name).click()
             box = self.page.get_by_role("menu", name=name, exact=True).bounding_box()
+            # Below the title bar, never over it.
+            title = self.page.locator(".titlebar").bounding_box()
+            self.assertGreaterEqual(box["y"], title["y"] + title["height"])
             self.assertGreaterEqual(box["x"], 0)
             self.assertLessEqual(box["x"] + box["width"], 390)
             self.assertFalse(self.page.evaluate("document.documentElement.scrollWidth > innerWidth + 1"))

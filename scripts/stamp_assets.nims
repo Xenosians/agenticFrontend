@@ -7,7 +7,8 @@ let publicDir = currentSourcePath().parentDir.parentDir / "public"
 const pages = [
   ("index.html", @["config.js", "js/job_socket.js", "js/vendor/three.room.min.js", "js/room3d_models.js",
                   "js/room3d.js", "js/app.js", "css/theme.css", "css/app.css", "css/polish.css",
-                   "css/desktop-ui.css", "css/workspace.css", "css/workspace-menu.css", "css/design.css", "css/gladiators.css"]),
+                   "css/desktop-ui.css", "css/workspace.css", "css/workspace-menu.css", "css/design.css", "css/layout.css",
+                   "css/gladiators.css"]),
   ("docs.html", @["config.js", "js/docs.js", "css/theme.css", "css/app.css", "css/polish.css",
                   "css/desktop-ui.css", "css/design.css"])]
 for (page, assets) in pages:
