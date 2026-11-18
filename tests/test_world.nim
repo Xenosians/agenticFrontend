@@ -1,4 +1,4 @@
-import std/unittest
+import std/[options, unittest]
 import ../src/app/world
 
 ## The virtual world's floor (owner decision, 18 November): desks on a grid of tiles in the
@@ -60,3 +60,64 @@ suite "the world's floor":
     check not blocked(floor, toDesk[^1])
     # Outside the floor: no walk.
     check walkTo(floor, (x: 1, y: 3), (x: 50, y: 50)).len == 0
+
+suite "the world page's state":
+  test "a key moves the owner one tile; arrows and WASD both work, other keys do nothing":
+    check worldKeyDirection("ArrowUp") == some(wdUp)
+    check worldKeyDirection("w") == some(wdUp)
+    check worldKeyDirection("A") == some(wdLeft)
+    check worldKeyDirection("ArrowRight") == some(wdRight)
+    check worldKeyDirection("s") == some(wdDown)
+    check worldKeyDirection("Enter").isNone
+    check worldKeyDirection("x").isNone
+
+  test "walking up to a desk opens that agent's card; moving away closes it":
+    var walk = newWorldWalk(worldFloor(@["hub", "proxmox-specialist"], columns = 4))
+    check walk.tile == ownerStart(walk.floor)
+    check walk.card == ""
+    # From the front aisle up the column left of the hub's desk, then right to face him.
+    walk.goTo((x: 0, y: 1))
+    while walk.advance(): discard
+    check walk.tile == (x: 0, y: 1)
+    check walk.card == "hub"
+    walk.press(wdDown)
+    check walk.tile == (x: 0, y: 2)
+    check walk.card == ""
+
+  test "clicking a desk walks there one tile per step and opens the card on arrival":
+    var walk = newWorldWalk(worldFloor(@["hub", "proxmox-specialist"], columns = 4))
+    walk.goTo((x: 4, y: 1))
+    check walk.walking
+    check walk.card == ""
+    var steps = 0
+    while walk.advance(): inc steps
+    check steps > 1
+    check not walk.walking
+    check walk.card == "proxmox-specialist"
+    check not blocked(walk.floor, walk.tile)
+
+  test "a key press stops a walk in progress; a blocked press leaves the owner where he is":
+    var walk = newWorldWalk(worldFloor(@["hub"], columns = 4))
+    walk.goTo((x: 0, y: 0))
+    discard walk.advance()
+    let before = walk.tile
+    walk.press(wdUp)
+    check not walk.walking
+    check walk.tile == step(walk.floor, before, wdUp)
+    # Against the left wall another press leaves him where he is.
+    for _ in 0 ..< walk.floor.width: walk.press(wdLeft)
+    let atWall = walk.tile
+    check atWall.x == 0 or blocked(walk.floor, (x: atWall.x - 1, y: atWall.y))
+    walk.press(wdLeft)
+    check walk.tile == atWall
+
+  test "choosing an agent opens his card without moving; the floor follows a new roster":
+    var walk = newWorldWalk(worldFloor(@["hub", "proxmox-specialist"], columns = 4))
+    let start = walk.tile
+    walk.choose("proxmox-specialist")
+    check walk.card == "proxmox-specialist" and walk.tile == start
+    walk.reseat(worldFloor(@["hub", "networking-specialist", "proxmox-specialist"], columns = 4))
+    check walk.floor.desks.len == 3
+    check not blocked(walk.floor, walk.tile)
+    walk.choose("nobody")
+    check walk.card == ""

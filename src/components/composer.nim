@@ -18,7 +18,7 @@ proc resizeComposerInput() {.
 
 proc isComposing(event: Event): bool {.importjs: "Boolean(#.isComposing)".}
 
-proc backendJobBusy(
+proc backendJobBusy*(
   state: AppState
 ): bool =
 
@@ -91,9 +91,10 @@ proc composerStatusText(
       "Ready · Enter to send · Shift+Enter for a new line"
 
 
-proc submitDraft(
+proc submitDraft*(
   state: AppState
 ) =
+  ## Send the composer's draft to the current chat (the chat view and the world's docked chat).
 
   if state.auth.loading:
     showToast(state, "Wait for your workspace to finish loading before sending.")

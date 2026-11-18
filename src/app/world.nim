@@ -2,7 +2,7 @@
 ## in the same order and columns as the agents' room, and the aisles the owner's own gladiator
 ## walks. Pure display state: nothing here is sent to the server or changes any agent.
 
-import std/[deques, tables]
+import std/[deques, options, strutils, tables]
 
 type
   Tile* = tuple[x, y: int]
@@ -96,3 +96,61 @@ proc walkTo*(floor: WorldFloor, start, goal: Tile): seq[Tile] =
           back = came[back]
         return path
       queue.addLast next
+
+type
+  WorldWalk* = object
+    ## The owner's gladiator on the floor: where he stands, the tiles still to walk, and the agent
+    ## whose card is open. Display state only.
+    floor*: WorldFloor
+    tile*: Tile
+    path*: seq[Tile]
+    card*: string
+
+proc worldKeyDirection*(key: string): Option[WorldDirection] =
+  ## Arrow keys and WASD (either case) move the owner; every other key is left alone.
+  case key.toLowerAscii
+  of "arrowup", "w": some(wdUp)
+  of "arrowdown", "s": some(wdDown)
+  of "arrowleft", "a": some(wdLeft)
+  of "arrowright", "d": some(wdRight)
+  else: none(WorldDirection)
+
+proc newWorldWalk*(floor: WorldFloor): WorldWalk =
+  WorldWalk(floor: floor, tile: ownerStart(floor))
+
+proc walking*(walk: WorldWalk): bool = walk.path.len > 0
+
+proc arrive(walk: var WorldWalk) =
+  ## Standing beside a desk opens its agent's card; walking away closes it.
+  walk.card = walk.floor.facing(walk.tile)
+
+proc press*(walk: var WorldWalk, direction: WorldDirection) =
+  ## One tile in the direction (a key press); it stops any walk in progress.
+  walk.path = @[]
+  walk.tile = walk.floor.step(walk.tile, direction)
+  walk.arrive()
+
+proc goTo*(walk: var WorldWalk, goal: Tile) =
+  ## Start walking to a tile or a desk (a click); the walk advances one tile per step.
+  walk.path = walk.floor.walkTo(walk.tile, goal)
+
+proc advance*(walk: var WorldWalk): bool =
+  ## One step of a walk: true while the owner moved, false once there is nothing left to walk.
+  if walk.path.len == 0: return false
+  walk.tile = walk.path[0]
+  walk.path.delete(0)
+  if walk.path.len == 0: walk.arrive()
+  true
+
+proc choose*(walk: var WorldWalk, agent: string) =
+  ## Clicking an agent opens his card where the owner stands; an unknown agent closes it.
+  walk.card = ""
+  for desk in walk.floor.desks:
+    if desk.agent == agent: walk.card = agent
+
+proc reseat*(walk: var WorldWalk, floor: WorldFloor) =
+  ## The roster changed: the new floor, and the owner back at the start if his tile is taken.
+  walk.floor = floor
+  walk.path = @[]
+  if floor.blocked(walk.tile): walk.tile = ownerStart(floor)
+  if walk.card.len > 0: walk.choose(walk.card)

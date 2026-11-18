@@ -99,7 +99,11 @@
       }
     }
 
-    let layout = models.layout([], 4);
+    // The room lays desks out in its own grid; the world puts them on the floor tiles the owner walks.
+    const world = Boolean(options && options.world);
+    const arrange = world ? models.worldLayout : models.layout;
+    let layout = arrange([], 4);
+    let you = null;
     let started = 0;
     let shown = "";
     let running = false;
@@ -128,8 +132,10 @@
       addVoxels(furniture, models.scene(layout, 0).filter(object => object.kind !== "gladiator"));
     }
 
+    const moving = object => object.kind === "gladiator" || object.kind === "owner" || object.kind === "mark";
+
     function drawFigures(time) {
-      const objects = models.scene(layout, frameAt(time)).filter(object => object.kind === "gladiator");
+      const objects = models.scene(layout, frameAt(time), you).filter(moving);
       // Redraw only when a pose changed: most frames, nothing moves.
       const signature = objects.map(object => object.voxels.map(voxel => voxel.slice(0, 3).join(",")).join(";"))
         .join("|");
@@ -174,6 +180,37 @@
 
     function render() {
       renderer.render(scene, camera);
+      if (world) placeHotspots();
+    }
+
+    function screenOf(x, y, z) {
+      // A room point in canvas pixels (the canvas is the host's size).
+      const point = new THREE.Vector3(x, y, z).project(camera);
+      return {left: (point.x + 1) / 2 * host.clientWidth, top: (1 - point.y) / 2 * host.clientHeight};
+    }
+
+    function placeHotspots() {
+      // Each desk button (and the owner's marker) sits over its drawing, so a click, a hover or the
+      // keyboard focus lands on what the eye sees. The floor layer is the host's next sibling.
+      const layer = host.parentElement && host.parentElement.querySelector(".world-floor");
+      if (!layer || !layout.tiles) return;
+      const tile = models.TILE;
+      const place = (node, x, z) => {
+        const corners = [screenOf(x, 0, z), screenOf(x + tile, 0, z), screenOf(x, 0, z + tile),
+                         screenOf(x + tile, 0, z + tile), screenOf(x + tile / 2, 16, z + tile / 2)];
+        const left = Math.min(...corners.map(c => c.left)), right = Math.max(...corners.map(c => c.left));
+        const top = Math.min(...corners.map(c => c.top)), bottom = Math.max(...corners.map(c => c.top));
+        node.style.setProperty("--hotspot-left", left.toFixed(1) + "px");
+        node.style.setProperty("--hotspot-top", top.toFixed(1) + "px");
+        node.style.setProperty("--hotspot-width", (right - left).toFixed(1) + "px");
+        node.style.setProperty("--hotspot-height", (bottom - top).toFixed(1) + "px");
+      };
+      for (const desk of layout.desks) {
+        const node = layer.querySelector(`.world-desk[data-agent="${CSS.escape(desk.agent)}"]`);
+        if (node) place(node, desk.tile.x * tile, desk.tile.y * tile);
+      }
+      const mine = layer.querySelector(".world-owner");
+      if (mine && you) place(mine, you.tile.x * tile, you.tile.y * tile);
     }
 
     const now = () => (root.performance ? root.performance.now() : 0);
@@ -196,13 +233,39 @@
     const observer = typeof root.ResizeObserver === "function" ? new root.ResizeObserver(() => redraw()) : null;
     if (observer) observer.observe(host);
 
+    function tileAtPoint(clientX, clientY) {
+      // The floor tile under a point of the canvas, or null: a click on the world walks there.
+      if (!layout.tiles) return null;
+      const box = renderer.domElement.getBoundingClientRect();
+      if (!box.width || !box.height) return null;
+      const ndc = new THREE.Vector3(((clientX - box.left) / box.width) * 2 - 1,
+                                    -((clientY - box.top) / box.height) * 2 + 1, -1);
+      const origin = ndc.clone().unproject(camera);
+      const direction = new THREE.Vector3();
+      camera.getWorldDirection(direction);
+      if (Math.abs(direction.y) < 1e-6) return null;
+      const distance = -origin.y / direction.y;
+      const point = origin.add(direction.multiplyScalar(distance));
+      return models.tileAt(layout, point.x, point.z);
+    }
+
     return {
-      update(seats, columns, label) {
-        layout = models.layout(Array.isArray(seats) ? seats : [], columns || 4);
+      update(seats, columns, label, owner) {
+        layout = arrange(Array.isArray(seats) ? seats : [], columns || 4);
+        you = world && owner && owner.tile ? owner : null;
+        host.dataset.open = you && you.open ? you.open : "";
         renderer.domElement.setAttribute("aria-label", label || "The agents' room");
         if (!started) started = now();
         redraw();
       },
+      moveOwner(owner) {
+        // Only the figures change when the owner steps or a card opens: no need to rebuild the room.
+        you = world && owner && owner.tile ? owner : null;
+        host.dataset.open = you && you.open ? you.open : "";
+        shown = "";
+        if (drawFigures(now())) render();
+      },
+      tileAtPoint,
       animate(on) {
         if (on && !running) {
           running = true;
@@ -211,6 +274,7 @@
           running = false;
           root.cancelAnimationFrame(raf);
         }
+        host.__room3dRunning = running;
       },
       destroy() {
         running = false;

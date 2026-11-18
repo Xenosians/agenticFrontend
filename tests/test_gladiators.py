@@ -116,7 +116,7 @@ class GladiatorTests(navigation.ChatNavigationTests):
                 self.assertEqual(self.errors, [])
 
     def preview(self):
-        return self.page.get_by_role("button", name="Open the agents' room", exact=True)
+        return self.page.get_by_role("button", name="Open the agents' world", exact=True)
 
     def test_the_agents_room_sits_at_the_bottom_of_the_chat_list(self):
         """Owner decision, 18 November: the room moves to the empty bottom of the chat list."""
@@ -182,9 +182,9 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.open_first_chat()
         preview = self.preview()
         preview.click()
-        dialog = self.page.get_by_role("dialog", name="Agents' room", exact=True)
+        dialog = self.page.get_by_role("dialog", name="Agents' world", exact=True)
         expect(dialog).to_be_visible()
-        self.assertEqual(dialog.locator(".room-desk").evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
+        self.assertEqual(dialog.locator(".world-desk").evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
                          ["hub", "networking-specialist", "proxmox-specialist"])
         self.page.keyboard.press("Escape")
         expect(dialog).to_have_count(0)
@@ -282,56 +282,46 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.assertEqual(self.errors, [])
 
     def open_room(self):
-        """The agents' room opens large from the agents at the bottom of the chat list."""
+        """The agents open their world large from the bottom of the chat list (owner decision, 18 November)."""
         self.page.set_viewport_size({"width": 1440, "height": 900})
         self.open_first_chat()
         self.preview().click()
-        dialog = self.page.get_by_role("dialog", name="Agents' room", exact=True)
+        dialog = self.page.get_by_role("dialog", name="Agents' world", exact=True)
         expect(dialog).to_be_visible()
         return dialog
 
     def test_the_agents_room_seats_every_agent_at_his_own_desk(self):
         dialog = self.open_room()
-        office = dialog.get_by_role("group", name="Agents' room", exact=True)
-        desks = office.locator(".room-desk")
+        desks = dialog.locator(".world-desk")
         # One desk per agent the catalog names, the hub's first; nothing is invented.
         self.assertEqual(desks.evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
                          ["hub", "networking-specialist", "proxmox-specialist"])
-        hub = office.locator('.room-desk[data-agent="hub"]')
-        specialist = office.locator('.room-desk[data-agent="proxmox-specialist"]')
-        expect(hub).to_have_attribute("data-pose", "idle")
-        expect(specialist).to_have_attribute("data-pose", "dozing")
-        expect(specialist).to_have_attribute("data-screen", "off")
+        specialist = dialog.locator('.world-desk[data-agent="proxmox-specialist"]')
         # Each desk says whose it is and what he is doing, for people who cannot see the art.
         expect(specialist).to_have_attribute("aria-label", "Proxmox specialist, asleep")
         # The top bar: no request yet, nothing counted but those asleep.
         bar = dialog.locator(".room-topbar")
         expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "0")
         expect(bar.locator('.room-counter[data-counter="busy"]')).to_contain_text("0")
-        # Whole-pixel scale: a workstation is 80 x 40 art pixels times a whole step, 2x or more here.
-        box = hub.bounding_box()
-        self.assertEqual(round(box["width"]) % 80, 0)
-        self.assertEqual(round(box["height"]) * 2, round(box["width"]))
-        self.assertGreaterEqual(round(box["width"]), 160)
-        # The whole room fits the window without scrolling.
-        self.assertFalse(dialog.locator(".room-dialog-body").evaluate(
-            "node => node.scrollWidth > node.clientWidth || node.scrollHeight > node.clientHeight"))
+        # The world fills the window without scrolling the page.
         self.assertFalse(self.page.evaluate("() => document.documentElement.scrollWidth > window.innerWidth"))
         # Choosing a desk says who works there and what he is doing.
         specialist.click()
-        expect(dialog.locator(".room-focus")).to_have_text("Proxmox specialist is asleep.")
-        # Escape closes the room and focus returns to the agents in the chat list.
+        expect(dialog.get_by_role("region", name="Proxmox specialist", exact=True)).to_contain_text(
+            "Proxmox specialist is asleep.")
+        # Escape closes the world and focus returns to the agents in the chat list.
         self.page.keyboard.press("Escape")
         expect(dialog).to_have_count(0)
         expect(self.preview()).to_be_focused()
-        # Escape works at once, while focus is still on the opener; the close button works too.
+        # Escape works at once, while focus is still on the opener; the menu's Back to chat works too.
         self.preview().click()
         expect(dialog).to_be_visible()
         self.preview().focus()
         self.page.keyboard.press("Escape")
         expect(dialog).to_have_count(0)
         self.preview().click()
-        dialog.get_by_role("button", name="Close the agents' room", exact=True).click()
+        dialog.get_by_role("button", name="World settings", exact=True).click()
+        dialog.get_by_role("menuitem", name="Back to chat", exact=True).click()
         expect(dialog).to_have_count(0)
         expect(self.preview()).to_be_focused()
         self.assertEqual(self.errors, [])
@@ -343,9 +333,10 @@ class GladiatorTests(navigation.ChatNavigationTests):
         expect(canvas).to_have_count(1)
         # The canvas names the room for screen readers; the desks stay as the accessible layer.
         expect(canvas).to_have_attribute("role", "img")
-        expect(canvas).to_have_attribute("aria-label", "Agents' room: Janus (hub), walking about; "
-                                                       "Networking specialist, asleep; Proxmox specialist, asleep")
-        self.assertEqual(dialog.locator(".room-desk").evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
+        expect(canvas).to_have_attribute("aria-label", "Agents' world: Janus (hub), walking about; "
+                                                       "Networking specialist, asleep; Proxmox specialist, asleep; "
+                                                       "you are on tile 4, 3")
+        self.assertEqual(dialog.locator(".world-desk").evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
                          ["hub", "networking-specialist", "proxmox-specialist"])
         # The seats the 3D room draws are exactly the app's own: same agents, order and states.
         seats = self.page.evaluate("() => globalThis.__room3dSeats")
@@ -367,9 +358,9 @@ class GladiatorTests(navigation.ChatNavigationTests):
     def test_without_webgl_the_expanded_room_stays_2d(self):
         self.page.add_init_script("""HTMLCanvasElement.prototype.getContext = function () { return null; };""")
         dialog = self.open_room()
-        expect(dialog.locator(".room-desk")).to_have_count(3)
+        expect(dialog.locator(".world-desk")).to_have_count(3)
         expect(dialog.locator("canvas.room3d-canvas")).to_have_count(0)
-        expect(dialog.locator(".agents-room")).not_to_have_class(re.compile("room3d-active"))
+        expect(dialog.locator(".world-stage")).not_to_have_class(re.compile("room3d-on"))
         self.assertEqual(self.errors, [])
 
     def test_in_the_room_the_hub_walks_to_the_specialists_desk_and_the_bar_follows_the_job(self):
@@ -384,30 +375,31 @@ class GladiatorTests(navigation.ChatNavigationTests):
             self.page.wait_for_timeout(100)
             deadline -= 1
         self.assertIsNotNone(self.job_socket, "the job socket never joined")
-        # The owner opens the room while the request runs; it follows the job live.
+        # The owner opens the world while the request runs; it follows the job live.
         self.preview().click()
-        dialog = self.page.get_by_role("dialog", name="Agents' room", exact=True)
-        office = dialog.get_by_role("group", name="Agents' room", exact=True)
-        expect(office).to_be_visible()
-        hub = office.locator('.room-desk[data-agent="hub"]')
-        specialist = office.locator('.room-desk[data-agent="proxmox-specialist"]')
+        dialog = self.page.get_by_role("dialog", name="Agents' world", exact=True)
+        expect(dialog).to_be_visible()
+        hub = dialog.locator('.world-desk[data-agent="hub"]')
+        specialist = dialog.locator('.world-desk[data-agent="proxmox-specialist"]')
         bar = dialog.locator(".room-topbar")
+        seats = "() => (globalThis.__room3dSeats || []).map(s => [s.agent, s.state, s.screen, s.visiting].join('|'))"
         self.push_progress("routing", "hub")
-        expect(hub).to_have_attribute("data-pose", "pondering")
+        expect(hub).to_have_attribute("aria-label", "Janus (hub), thinking")
         expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "1")
         self.push_progress("executing", "proxmox-specialist")
-        # The hub's seat is empty and he stands at the proxmox specialist's desk, who types.
-        expect(hub).to_have_attribute("data-pose", "away")
-        expect(specialist).to_have_attribute("data-pose", "typing")
-        expect(specialist).to_have_attribute("data-screen", "working")
-        expect(specialist.locator('.room-visitor[data-agent="hub"]')).to_have_count(1)
+        # The hub leaves his seat and stands at the proxmox specialist's desk, who types at a working screen.
+        expect(hub).to_have_attribute("aria-label", "Janus (hub), at the proxmox specialist's desk")
+        expect(specialist).to_have_attribute("aria-label", "Proxmox specialist, working")
+        self.page.wait_for_function(seats + ".includes('proxmox-specialist|working|working|')")
+        # The hub, still thinking, stands at that desk (the 3D seats say whom he visits).
+        self.assertIn("hub|thinking|on|proxmox-specialist", self.page.evaluate(seats))
         expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "3")
         expect(bar.locator(".room-counter[data-counter=\"busy\"]")).to_contain_text("2")
         # The bar names the request by its chat.
         expect(bar.locator(".room-title")).to_have_text("First fixture chat")
         self.push_progress("synthesizing", "hub")
-        expect(hub).to_have_attribute("data-pose", "typing")
-        expect(specialist.locator(".room-visitor")).to_have_count(0)
+        expect(hub).to_have_attribute("aria-label", "Janus (hub), working")
+        self.page.wait_for_function(seats + ".every(s => !s.endsWith('|proxmox-specialist'))")
         expect(bar.locator(".room-step")).to_have_attribute("aria-valuenow", "4")
         self.assertEqual(self.errors, [])
 

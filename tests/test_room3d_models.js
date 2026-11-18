@@ -222,3 +222,115 @@ test("unknown states and screens fall back to quiet ones instead of failing", ()
   assert.deepEqual(voxelsOf(room.desk("rainbow")), voxelsOf(room.desk("on")));
   assert.deepEqual(room.layout([], 4).desks, []);
 });
+
+// The virtual world (owner decision, 18 November): the same voxel models on the walkable floor of
+// src/app/world.nim (desk tiles at (1 + 3 column, 1 + 3 row), aisles between), and the owner's own
+// gladiator, who walks the aisles. Pure placement; the browser suite checks the drawing.
+
+function worldSeats(visiting) {
+  const seats = [{agent: "hub", state: visiting ? "walking" : "thinking", screen: "on",
+                  visiting: visiting ? "agent-working" : ""}];
+  for (const state of STATES) seats.push({agent: `agent-${state}`, state, screen: "on", visiting: ""});
+  return seats;
+}
+
+test("the world puts each desk on the floor tile world.nim gives it, and the floor matches its size", () => {
+  const seats = worldSeats(false);
+  const world = room.worldLayout(seats, 4);
+  assert.deepEqual(world.desks.map(desk => desk.agent), seats.map(seat => seat.agent));
+  assert.deepEqual(world.desks.slice(0, 6).map(desk => [desk.tile.x, desk.tile.y]),
+                   [[1, 1], [4, 1], [7, 1], [10, 1], [1, 4], [4, 4]]);
+  // world.nim: width 3 x columns, height 1 + 3 x rows (9 agents on 4 columns: 3 rows).
+  assert.deepEqual(world.tiles, {width: 12, height: 10});
+  assert.deepEqual(world.floor, {width: 12 * room.TILE, depth: 10 * room.TILE});
+  // A desk and everything at it stays inside its own tile.
+  for (const object of room.scene(world, 0)) {
+    const desk = world.desks.find(item => item.agent === (object.visiting || object.agent));
+    for (const [x, , z] of object.voxels) {
+      assert.ok(Math.floor(x / room.TILE) === desk.tile.x && Math.floor(z / room.TILE) === desk.tile.y,
+                `${object.kind} of ${object.agent} leaves its desk tile at ${x},${z}`);
+    }
+  }
+});
+
+test("the owner's gladiator is his own: monochrome, whole, no plume, and unlike every agent", () => {
+  for (const walking of [false, true]) {
+    for (let frame = 0; frame < 4; frame++) {
+      const owner = room.owner(frame, walking);
+      assert.equal(owner.dropped, 0);
+      assert.ok(owner.parts.includes("cape"));
+      assert.ok(!owner.parts.includes("plume"));
+      for (const [x, y, z, tone] of owner.voxels) {
+        assert.ok(room.TONES.includes(tone));
+        assert.ok(x >= 0 && y >= 0 && z >= 0 && x < owner.size[0] && y < owner.size[1] && z < owner.size[2]);
+      }
+      const mine = voxelsOf(owner).join(";");
+      for (const state of STATES) {
+        for (const hub of [false, true]) assert.notEqual(mine, voxelsOf(room.gladiator(state, frame, hub)).join(";"));
+      }
+    }
+  }
+  assert.notDeepEqual(voxelsOf(room.owner(0, true)), voxelsOf(room.owner(1, true)));
+});
+
+test("on every free tile the owner shares no cell with anything and stays on the floor", () => {
+  for (const visiting of [false, true]) {
+    const world = room.worldLayout(worldSeats(visiting), 4);
+    const desks = new Set(world.desks.map(desk => `${desk.tile.x},${desk.tile.y}`));
+    for (let y = 0; y < world.tiles.height; y++) {
+      for (let x = 0; x < world.tiles.width; x++) {
+        if (desks.has(`${x},${y}`)) continue;
+        for (let frame = 0; frame < 4; frame++) {
+          const objects = room.scene(world, frame, {tile: {x, y}, walking: frame % 2 === 1});
+          const mine = objects.find(object => object.kind === "owner");
+          assert.ok(mine, `no owner drawn on ${x},${y}`);
+          const taken = new Set();
+          for (const object of objects) if (object !== mine) for (const cell of cellsOf(object)) taken.add(cell);
+          for (const cell of cellsOf(mine)) assert.ok(!taken.has(cell), `owner on ${x},${y} overlaps at ${cell}`);
+          for (const [vx, , vz] of mine.voxels) {
+            assert.ok(vx >= 0 && vz >= 0 && vx < world.floor.width && vz < world.floor.depth);
+            assert.ok(Math.floor(vx / room.TILE) === x && Math.floor(vz / room.TILE) === y,
+                      `owner on ${x},${y} leaves his tile`);
+          }
+        }
+      }
+    }
+  }
+});
+
+test("a point on the floor names its tile, and anything outside the floor names none", () => {
+  const world = room.worldLayout(worldSeats(false), 4);
+  assert.deepEqual(room.tileAt(world, 0, 0), {x: 0, y: 0});
+  assert.deepEqual(room.tileAt(world, room.TILE * 4 + 3, room.TILE + 19), {x: 4, y: 1});
+  assert.equal(room.tileAt(world, -1, 5), null);
+  assert.equal(room.tileAt(world, world.floor.width, 5), null);
+  assert.equal(room.tileAt(world, 5, world.floor.depth), null);
+});
+
+test("a light ring on the floor marks the owner's tile, so he is found at a glance", () => {
+  const world = room.worldLayout(worldSeats(false), 3);
+  const mine = room.scene(world, 0, {tile: {x: 4, y: 3}, walking: false}).find(object => object.kind === "owner");
+  const ring = mine.voxels.filter(([, , , , part]) => part === "ring");
+  assert.ok(ring.length >= 40);
+  assert.ok(ring.every(([x, y, z, tone]) => y === 0 && tone === room.TONES[4] &&
+                       Math.floor(x / room.TILE) === 4 && Math.floor(z / room.TILE) === 3));
+  assert.ok(room.UNLIT_PARTS.includes("ring"));
+});
+
+test("the open agent's desk is marked by a dashed ring on its tile, apart from the owner's solid one", () => {
+  const world = room.worldLayout(worldSeats(false), 3);
+  const objects = room.scene(world, 0, {tile: {x: 0, y: 3}, walking: false, open: "agent-working"});
+  const mark = objects.find(object => object.kind === "mark");
+  assert.ok(mark, "no mark for the open desk");
+  const desk = world.desks.find(item => item.agent === "agent-working");
+  assert.ok(mark.voxels.length >= 20);
+  assert.ok(mark.voxels.every(([x, y, z, , part]) => y === 0 && part === "ring" &&
+                              Math.floor(x / room.TILE) === desk.tile.x && Math.floor(z / room.TILE) === desk.tile.y));
+  // Dashed: no two neighbouring edge voxels both drawn along the ring.
+  const cells = new Set(mark.voxels.map(([x, , z]) => `${x},${z}`));
+  assert.ok(mark.voxels.some(([x, , z]) => !cells.has(`${x + 1},${z}`) && !cells.has(`${x},${z + 1}`)));
+  const taken = new Set();
+  for (const object of objects) if (object !== mark) for (const [x, y, z] of object.voxels) taken.add(`${x},${y},${z}`);
+  for (const [x, y, z] of mark.voxels) assert.ok(!taken.has(`${x},${y},${z}`), `mark overlaps at ${x},${z}`);
+  assert.equal(room.scene(world, 0, {tile: {x: 0, y: 3}, walking: false}).filter(o => o.kind === "mark").length, 0);
+});

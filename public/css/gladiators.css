@@ -593,3 +593,480 @@
     animation: none;
   }
 }
+
+/* =========================================================
+   THE AGENTS' WORLD (owner decisions, 18 November)
+   =========================================================
+   A full page over the workspace: the three.js voxel world fills it, the floor's
+   accessible layer (one button per desk and the owner's marker, placed on their
+   tiles by data-x/data-y over a grid of the floor's size) sits over the drawing,
+   the request bar and the settings menu along the top, an agent's card on the
+   right and the chat docked bottom-left. Monochrome; the drawing follows the
+   theme. */
+
+.world {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  overflow: hidden;
+
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* The drawing starts below the request bar, so the room is never tucked under it. */
+.world-stage {
+  position: absolute;
+  inset: 72px 0 0;
+}
+
+.world-stage .room3d-host {
+  position: absolute;
+  inset: 0;
+}
+
+/* The floor layer: one grid cell per tile (its size from world.nim, as columns-N rows-M), centred in
+ * the stage. Without WebGL it is the world itself: tinted tiles, desks and the owner. */
+.world-floor {
+  --columns: 6;
+  --rows: 4;
+  /* Wider than the open desk's 4px ring, so a marked desk never touches the owner beside it. */
+  --gap: 8px;
+  --tile: min(calc((100vw - 32px) / var(--columns) - var(--gap)), calc((100vh - 220px) / var(--rows) - var(--gap)), 84px);
+
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+
+  display: grid;
+  grid-template-columns: repeat(var(--columns), var(--tile));
+  grid-template-rows: repeat(var(--rows), var(--tile));
+  gap: var(--gap);
+  padding: var(--gap);
+
+  /* The aisles show as a faint chequer of floor tiles. */
+  background:
+    conic-gradient(var(--surface-1) 25%, var(--surface-3) 0 50%, var(--surface-1) 0 75%, var(--surface-3) 0)
+    0 0 / calc(2 * (var(--tile) + var(--gap))) calc(2 * (var(--tile) + var(--gap)));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  outline: none;
+}
+
+/* Keyboard focus on the floor is shown by a hint of its keys, not by a ring around the world. */
+.world-floor:focus-visible::after {
+  content: "Arrow keys or W A S D move you · Esc leaves";
+  position: absolute;
+  left: 50%;
+  bottom: calc(-1 * var(--gap) - 30px);
+  transform: translateX(-50%);
+  padding: 3px 10px;
+
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 12px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.room3d-on .world-floor:focus-visible::after {
+  bottom: 12px;
+}
+
+.world-floor.columns-3 { --columns: 3; }
+.world-floor.columns-6 { --columns: 6; }
+.world-floor.columns-9 { --columns: 9; }
+.world-floor.columns-12 { --columns: 12; }
+.world-floor.rows-4 { --rows: 4; }
+.world-floor.rows-7 { --rows: 7; }
+.world-floor.rows-10 { --rows: 10; }
+.world-floor.rows-13 { --rows: 13; }
+.world-floor.rows-16 { --rows: 16; }
+
+/* Over the 3D drawing the floor layer is transparent: the desks stay clickable and focusable. */
+.room3d-on .world-floor {
+  inset: 0;
+  left: 0;
+  top: 0;
+  transform: none;
+  display: block;
+  padding: 0;
+  background: none;
+  border: 0;
+}
+
+.world-desk,
+.world-owner {
+  grid-column: calc(var(--x) + 1);
+  grid-row: calc(var(--y) + 1);
+
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 2px;
+
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--text);
+  border-radius: 6px;
+}
+
+.world-desk {
+  gap: 2px;
+  border: 2px solid var(--border-max);
+  background: var(--panel);
+}
+
+.world-desk[data-hub="true"] {
+  border-width: 3px;
+}
+
+/* The desk whose card is open. */
+.world-desk[data-open="true"] {
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--text);
+}
+
+.world-desk-state {
+  color: var(--text-soft);
+  font-size: 10px;
+}
+
+.world-desk:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+.world-owner {
+  border: 2px dashed var(--text);
+  background: var(--bg);
+  font-weight: 600;
+  pointer-events: none;
+}
+
+/* Over the drawing each desk is a clear hit area placed over its voxels (room3d.js sets the
+ * --hotspot-* properties from the camera after every frame); the drawing shows the desk, so only the
+ * outline of the hovered or focused one is drawn. The owner's marker follows him the same way. */
+.room3d-on .world-desk,
+.room3d-on .world-owner {
+  position: absolute;
+  left: var(--hotspot-left, -9999px);
+  top: var(--hotspot-top, -9999px);
+  width: var(--hotspot-width, 1px);
+  height: var(--hotspot-height, 1px);
+  padding: 0;
+  border: 2px solid transparent;
+  background: none;
+  color: transparent;
+}
+
+/* The drawing marks the open desk on its floor; the button outlines only on hover or keyboard focus. */
+.room3d-on .world-desk:hover,
+.room3d-on .world-desk:focus-visible {
+  border-color: var(--text);
+  outline: none;
+}
+
+.room3d-on .world-desk[data-open="true"] {
+  box-shadow: none;
+}
+
+.room3d-on .world-desk-state {
+  display: none;
+}
+
+.room3d-on .world-owner {
+  border: 0;
+}
+
+.world-desk-name {
+  overflow-wrap: anywhere;
+}
+
+/* x/y positions, 0-13 (the floor is at most 12 wide; rows beyond 13 wrap onto the grid's auto rows). */
+.world-desk[data-x="0"], .world-owner[data-x="0"] { --x: 0; }
+.world-desk[data-x="1"], .world-owner[data-x="1"] { --x: 1; }
+.world-desk[data-x="2"], .world-owner[data-x="2"] { --x: 2; }
+.world-desk[data-x="3"], .world-owner[data-x="3"] { --x: 3; }
+.world-desk[data-x="4"], .world-owner[data-x="4"] { --x: 4; }
+.world-desk[data-x="5"], .world-owner[data-x="5"] { --x: 5; }
+.world-desk[data-x="6"], .world-owner[data-x="6"] { --x: 6; }
+.world-desk[data-x="7"], .world-owner[data-x="7"] { --x: 7; }
+.world-desk[data-x="8"], .world-owner[data-x="8"] { --x: 8; }
+.world-desk[data-x="9"], .world-owner[data-x="9"] { --x: 9; }
+.world-desk[data-x="10"], .world-owner[data-x="10"] { --x: 10; }
+.world-desk[data-x="11"], .world-owner[data-x="11"] { --x: 11; }
+.world-desk[data-y="0"], .world-owner[data-y="0"] { --y: 0; }
+.world-desk[data-y="1"], .world-owner[data-y="1"] { --y: 1; }
+.world-desk[data-y="2"], .world-owner[data-y="2"] { --y: 2; }
+.world-desk[data-y="3"], .world-owner[data-y="3"] { --y: 3; }
+.world-desk[data-y="4"], .world-owner[data-y="4"] { --y: 4; }
+.world-desk[data-y="5"], .world-owner[data-y="5"] { --y: 5; }
+.world-desk[data-y="6"], .world-owner[data-y="6"] { --y: 6; }
+.world-desk[data-y="7"], .world-owner[data-y="7"] { --y: 7; }
+.world-desk[data-y="8"], .world-owner[data-y="8"] { --y: 8; }
+.world-desk[data-y="9"], .world-owner[data-y="9"] { --y: 9; }
+.world-desk[data-y="10"], .world-owner[data-y="10"] { --y: 10; }
+.world-desk[data-y="11"], .world-owner[data-y="11"] { --y: 11; }
+.world-desk[data-y="12"], .world-owner[data-y="12"] { --y: 12; }
+.world-desk[data-y="13"], .world-owner[data-y="13"] { --y: 13; }
+
+/* The loading screen covers the stage until the first frame is drawn. */
+.world-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+
+  display: grid;
+  place-items: center;
+
+  background: var(--bg);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+}
+
+/* The request bar along the top, clear of the settings button. */
+.world .room-topbar {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 64px;
+  z-index: 2;
+
+  padding: 8px 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+}
+
+.world-settings {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+}
+
+.world-settings-button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.world-settings-button {
+  width: 40px;
+  height: 40px;
+
+  border: 1px solid var(--border-max);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  color: var(--text);
+  font-size: 18px;
+}
+
+.world-menu {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  min-width: 180px;
+
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+
+  border: 1px solid var(--border-max);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+.world-menu-item {
+  min-height: 36px;
+  padding: 6px 10px;
+
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+}
+
+.world-menu-item:hover,
+.world-menu-item:focus-visible {
+  background: var(--surface-2);
+}
+
+.world-menu-item[role="menuitemcheckbox"]::before {
+  content: "☐\00a0" / "";
+}
+
+.world-menu-item[aria-checked="true"]::before {
+  content: "☑\00a0" / "";
+}
+
+/* An agent's card, on the right. */
+.world-card {
+  position: absolute;
+  top: 76px;
+  right: 12px;
+  z-index: 2;
+  width: min(300px, calc(100vw - 24px));
+
+  padding: 12px;
+  border: 1px solid var(--border-max);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+}
+
+.world-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.world-card-close,
+.world-chat-hide {
+  width: 28px;
+  height: 28px;
+
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.world-card p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.world-card-note {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.world-card-ask {
+  margin-top: 4px;
+  color: var(--text);
+}
+
+/* The chat docked bottom-left. */
+.world-chat {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(46vh, 420px);
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+
+  border: 1px solid var(--border-max);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+}
+
+.world-chat-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.world-chat-messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.world-message {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 12px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.world-message.mine {
+  align-self: flex-end;
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+
+.world-chat-composer {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.world-chat-send {
+  flex: 0 0 40px;
+  align-self: stretch;
+}
+
+.world-chat-input {
+  flex: 1 1 auto;
+  min-height: 40px;
+  max-height: 120px;
+  resize: none;
+  padding: 8px 10px;
+
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.world-chat-show {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  z-index: 2;
+  color: var(--text);
+}
+
+/* A phone: the request bar wraps, the card and chat take the width. */
+@media (max-width: 720px) {
+  .world .room-topbar {
+    right: 60px;
+  }
+
+  .world .room-counters {
+    display: none;
+  }
+
+  /* The card takes the space under the bar; the chat stays at the bottom, so they never overlap. */
+  .world-card {
+    top: 76px;
+    left: 12px;
+    right: 12px;
+    width: auto;
+  }
+
+  .world-chat {
+    max-height: 36vh;
+  }
+
+  .world-floor {
+    --tile: min(calc((100vw - 24px) / var(--columns) - var(--gap)), 64px);
+  }
+}

@@ -19,7 +19,7 @@
   const STATES = Object.keys(FRAMES);
   const SCREENS = ["off", "on", "working", "training", "done", "error"];
   // Parts that give light rather than take it: a lit screen, thought dots, sleep marks.
-  const UNLIT_PARTS = ["screen", "thought", "zed"];
+  const UNLIT_PARTS = ["screen", "thought", "zed", "ring"];
   // A desk with its gladiator beside it is under 20 wide and 12 deep; the rest is aisle.
   const DESK_SPACING = 22;
   const BACK_AISLE = 10;
@@ -233,12 +233,92 @@
     return {...object, voxels: model.voxels.map(([vx, vy, vz, tone, part]) => [vx + x, vy, vz + z, tone, part])};
   }
 
+  /* The virtual world (owner decision, 18 November): the same desks on the walkable floor of
+   * src/app/world.nim. A desk stands on its own tile (1 + 3 column, 1 + 3 row); the tiles between
+   * are aisles the owner walks. A tile is TILE voxels square, so a desk with its gladiator fits on
+   * one, and the owner on any other. */
+  const TILE = 20;
+  const DESK_PITCH = 3;
+  const WORLD_MARGIN = 1;
+
+  function worldLayout(seats, columns) {
+    const width = Math.max(1, columns);
+    // Each desk sits at the back-left of its tile; its gladiator, stool and visitor stay on it.
+    const desks = seats.map((seat, index) => {
+      const column = index % width, row = Math.floor(index / width);
+      const tile = {x: WORLD_MARGIN + column * DESK_PITCH, y: WORLD_MARGIN + row * DESK_PITCH};
+      return {agent: seat.agent, state: seat.state, screen: seat.screen, column, row, tile,
+              x: tile.x * TILE, z: tile.y * TILE + 8, occupied: !seat.visiting};
+    });
+    let visitor = null;
+    for (const seat of seats) {
+      if (!seat.visiting) continue;
+      const target = desks.find(item => item.agent === seat.visiting);
+      // Behind the desk, inside its tile: he never hides the specialist or the screen.
+      if (target) visitor = {agent: seat.agent, atDesk: target.agent, state: seat.state, standing: true,
+                             x: target.x + 1, z: target.z - 8};
+    }
+    const rows = Math.max(1, Math.ceil(seats.length / width));
+    // world.nim's floor: one free tile left of the first desk and right of the last, two between.
+    const tiles = {width: WORLD_MARGIN + (width - 1) * DESK_PITCH + 1 + WORLD_MARGIN,
+                   height: WORLD_MARGIN + rows * DESK_PITCH};
+    return {desks, visitor, tiles, floor: {width: tiles.width * TILE, depth: tiles.height * TILE}};
+  }
+
+  function tileAt(world, x, z) {
+    // The tile under a point on the floor, or null off the floor (a click outside walks nowhere).
+    if (!(x >= 0 && z >= 0 && x < world.floor.width && z < world.floor.depth)) return null;
+    return {x: Math.floor(x / TILE), y: Math.floor(z / TILE)};
+  }
+
+  /* The owner's own gladiator: no crest (only the hub wears one), a dark cape down his back and a
+   * light band on his helmet, so he is never mistaken for an agent. He stands, or walks. */
+  function owner(frame, walking) {
+    const body = gladiator(walking ? "walking" : "waiting", walking ? frame % FRAMES.walking : 0, false, true);
+    const b = builder(GLADIATOR_SIZE);
+    for (const [x, y, z, tone, part] of body.voxels) b.put(x, y, z, tone, part);
+    const helmet = body.voxels.filter(([, , , , part]) => part === "helmet");
+    const torso = body.voxels.filter(([, , , , part]) => part === "torso");
+    const top = Math.max(...helmet.map(([, y]) => y));
+    const back = Math.min(...torso.map(([, , z]) => z));
+    const shoulder = Math.max(...torso.map(([, y]) => y));
+    // The cape hangs behind him, from the shoulders down; it sways as he walks.
+    const sway = walking ? frame % 2 : 0;
+    b.box(2, Math.max(1, shoulder - 5) + sway, back - 1, 6, shoulder, back - 1, INK, "cape");
+    // A light band around the top of the helmet.
+    b.box(3, top, Math.min(...helmet.map(([, , z]) => z)), 5, top, Math.max(...helmet.map(([, , z]) => z)), LIGHT,
+          "band");
+    const model = b.done();
+    model.seated = false;
+    return model;
+  }
+
   /* Every object in room coordinates for one moment: desks and stools (furniture) and gladiators.
    * `frame` is a frame number, or a function giving the frame number for a state (so each state
    * keeps its own pace). The renderer draws exactly these voxels. */
-  function scene(roomLayout, frame) {
+  function scene(roomLayout, frame, you) {
     const frameOf = typeof frame === "function" ? frame : () => frame;
     const objects = [];
+    if (you && you.tile && roomLayout.tiles) {
+      const tick = frameOf(you.walking ? "walking" : "waiting");
+      const model = owner(tick, Boolean(you.walking));
+      // In the middle of his tile, facing the camera's side; a whole tile is free around a desk.
+      const x = you.tile.x * TILE + Math.floor((TILE - model.size[0]) / 2);
+      const z = you.tile.y * TILE + Math.floor((TILE - model.size[2]) / 2);
+      const figure = placed(model, x, z, {kind: "owner", agent: "you", tile: you.tile});
+      // A light ring on the floor of his tile (at the floor's own height, under everything else),
+      // so the owner is found at a glance among the agents.
+      const x0 = you.tile.x * TILE + 3, z0 = you.tile.y * TILE + 3, x1 = x0 + TILE - 7, z1 = z0 + TILE - 7;
+      const taken = new Set(figure.voxels.map(([vx, vy, vz]) => `${vx},${vy},${vz}`));
+      for (let rx = x0; rx <= x1; rx++) {
+        for (let rz = z0; rz <= z1; rz++) {
+          const edge = rx === x0 || rx === x1 || rz === z0 || rz === z1;
+          if (edge && !taken.has(`${rx},0,${rz}`)) figure.voxels.push([rx, 0, rz, PALE, "ring"]);
+        }
+      }
+      objects.push(figure);
+    }
+
     for (const item of roomLayout.desks) {
       objects.push(placed(desk(item.screen), item.x, item.z, {kind: "desk", agent: item.agent}));
       const tick = frameOf(item.state);
@@ -264,11 +344,28 @@
       objects.push(placed(gladiator(visitor.state, tick % (FRAMES[visitor.state] || 1), true, true), visitor.x, visitor.z,
                           {kind: "gladiator", agent: visitor.agent, state: visitor.state, visiting: visitor.atDesk}));
     }
+    // Last, so it knows every floor cell the desks, stools and figures use.
+    const open = you && you.open && roomLayout.tiles ? roomLayout.desks.find(item => item.agent === you.open) : null;
+    if (open) {
+      // The open agent's desk: a dashed ring on the floor of its tile (the owner's is solid), drawn
+      // on floor cells nothing else uses.
+      const x0 = open.tile.x * TILE + 1, z0 = open.tile.y * TILE + 1, x1 = x0 + TILE - 3, z1 = z0 + TILE - 3;
+      const taken = new Set();
+      for (const object of objects) for (const [vx, vy, vz] of object.voxels) if (vy === 0) taken.add(`${vx},${vz}`);
+      const ring = [];
+      for (let rx = x0; rx <= x1; rx++) {
+        for (let rz = z0; rz <= z1; rz++) {
+          const edge = rx === x0 || rx === x1 || rz === z0 || rz === z1;
+          if (edge && (rx + rz) % 4 < 2 && !taken.has(`${rx},${rz}`)) ring.push([rx, 0, rz, PALE, "ring"]);
+        }
+      }
+      objects.push({kind: "mark", agent: open.agent, voxels: ring});
+    }
     return objects;
   }
 
-  const api = {TONES, FRAMES, DESK_SPACING, STATES, SCREENS, STATION, UNLIT_PARTS,
-               gladiator, desk, stool, layout, scene, turnToScreen};
+  const api = {TONES, FRAMES, DESK_SPACING, STATES, SCREENS, STATION, UNLIT_PARTS, TILE,
+               gladiator, desk, stool, layout, scene, turnToScreen, worldLayout, tileAt, owner};
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.AgenticRoomModels = api;
 })(typeof globalThis !== "undefined" ? globalThis : this);
