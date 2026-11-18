@@ -43,8 +43,7 @@ type
   InspectorTab* = enum
     tabRun,
     tabEvents,
-    tabRaw,
-    tabLudus
+    tabRaw
 
   ComposerPanel* = enum
     cpNone,

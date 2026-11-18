@@ -793,10 +793,6 @@ proc renderWorkspace(): VNode =
 
     if appState.activeView == viewChat and
        not appState.commandPaletteOpen:
-      if appState.gladiators:
-        renderGladiatorStrip(
-          appState
-        )
       renderComposer(
         appState
       )
@@ -932,6 +928,10 @@ proc renderApp(): VNode =
       proc() =
         runWorkspaceCommand("inspector")
     )
+
+    # The agents' room, large, over the workspace (opened from the agents in the chat list).
+    if appState.gladiators:
+      renderRoomOverlay(appState)
 
 
 setRenderer(

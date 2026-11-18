@@ -171,8 +171,28 @@ proc roomTopBar*(scene: seq[Gladiator], run: RunState): RoomTopBar =
     of apHurt: inc result.failed
     else: discard
 
-proc zoomIn*(zoom: int): int = min(zoom + 1, maxZoom)
-proc zoomOut*(zoom: int): int = max(zoom - 1, minZoom)
+proc presenceWord*(presence: AgentPresence): string =
+  ## What a gladiator is doing, in words people read (labels and captions).
+  const words: array[AgentPresence, string] = ["asleep", "walking about", "thinking", "working",
+                                               "training", "waiting for your approval", "celebrating",
+                                               "hurt"]
+  words[presence]
+
+proc roomCaption*(scene: seq[Gladiator]): string =
+  ## One line for the room preview: everyone awake, the most occupied first (working, waiting,
+  ## training, hurt, thinking, celebrating, walking), then how many others sleep; or that
+  ## everyone is asleep.
+  const order = [apWorking, apWaiting, apTraining, apHurt, apThinking, apCelebrating, apWalking]
+  var parts: seq[string]
+  for presence in order:
+    for gladiator in scene:
+      if gladiator.presence == presence:
+        parts.add gladiatorTitle(gladiator.agent) & " is " & presenceWord(presence)
+  if parts.len == 0: return "Everyone is asleep."
+  let sleepers = scene.len - parts.len
+  if sleepers == 1: parts.add "the other one is asleep"
+  elif sleepers > 1: parts.add "the other " & $sleepers & " are asleep"
+  parts.join("; ") & "."
 
 proc fitZoom*(roomWidth, roomHeight, viewWidth, viewHeight: int): int =
   ## The largest whole-pixel step at which the whole room fits the view (the expanded room).

@@ -128,9 +128,7 @@ suite "the live hand-off: the agent the AI names while it works":
     check scene[0].talkingTo == "proxmox-specialist" and scene[2].presence == apWaiting
 
 suite "zoom steps keep the pixel art crisp":
-  test "whole-pixel steps from 1x to 4x; fit picks the largest step that fits":
-    check zoomIn(1) == 2 and zoomIn(4) == 4
-    check zoomOut(3) == 2 and zoomOut(1) == 1
+  test "the large room takes the largest whole-pixel step (1x to 4x) that fits the window":
     check fitZoom(roomWidth = 320, roomHeight = 180, viewWidth = 700, viewHeight = 400) == 2
     check fitZoom(roomWidth = 320, roomHeight = 180, viewWidth = 300, viewHeight = 400) == 1
     check fitZoom(roomWidth = 320, roomHeight = 180, viewWidth = 5000, viewHeight = 5000) == 4
@@ -248,3 +246,21 @@ suite "the room's top bar: the request, its step and four counters":
                                          @[LearningRun(id: "r", state: "running", role: "specialist")],
                                          idleSeconds = 0), RunState())
     check training.training == 2 and training.busy == 0
+
+suite "the room preview in the chat list says who is doing what":
+  let roster = @["hub", "networking-specialist", "proxmox-specialist"]
+
+  test "one line names the busiest agents first, counts the sleepers, and says when all sleep":
+    check roomCaption(ludusScene(roster, RunState(), ready(), @[], idleSeconds = 30)) ==
+      "Janus (hub) is walking about; the other 2 are asleep."
+    let asleep = ludusScene(roster, RunState(), SystemState(), @[], idleSeconds = 30)
+    check roomCaption(asleep) == "Everyone is asleep."
+    let run = running("processing", "executing", "proxmox-specialist")
+    check roomCaption(ludusScene(roster, run, ready(), @[], idleSeconds = 0)) ==
+      "Proxmox specialist is working; Janus (hub) is thinking; the other one is asleep."
+    let waiting = running("waiting_approval", agent = "proxmox-specialist")
+    check roomCaption(ludusScene(roster, waiting, ready(), @[], idleSeconds = 0)) ==
+      "Proxmox specialist is waiting for your approval; Janus (hub) is thinking; the other one is asleep."
+    # With nobody asleep the line names everyone and adds nothing.
+    check roomCaption(ludusScene(@["hub"], RunState(), ready(), @[], idleSeconds = 30)) ==
+      "Janus (hub) is walking about."

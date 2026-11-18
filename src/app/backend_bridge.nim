@@ -508,9 +508,7 @@ proc submitBackendJob*(
     )
 
   state.runEvents.setLen(0)
-  # A new request shows its run, unless the owner is watching the agents' room, which follows it live.
-  if state.inspectorTab != tabLudus:
-    state.inspectorTab = tabRun
+  state.inspectorTab = tabRun
   inc state.jobObservationEpoch
   let submissionEpoch = state.jobObservationEpoch
   let submissionSession = state.auth.sessionId

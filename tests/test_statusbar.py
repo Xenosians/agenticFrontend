@@ -189,7 +189,7 @@ class StatusbarTests(navigation.ChatNavigationTests):
         self.open_first_chat()
         self.bar().get_by_role("button", name="Run inspector", exact=True).click()
         tabs = self.page.locator(".inspector-tabs button")
-        expect(tabs).to_have_text(["Run", "Events", "Raw", "Ludus"])
+        expect(tabs).to_have_text(["Run", "Events", "Raw"])
         expect(self.page.locator(".tool-inspector-row")).to_have_count(0)
         self.assertEqual(self.errors, [])
 

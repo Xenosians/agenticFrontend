@@ -58,7 +58,7 @@ proc renderAppearance(state: AppState): VNode =
           discard saveGladiators(state, not state.gladiators)
       span:
         strong: text "Show the agents' gladiators"
-        small: text "Each agent is a gladiator that acts out what it is doing."
+        small: text "Each agent is a gladiator that acts out what it is doing, below your chats."
   settingsSection("Appearance", "Saved to your account, so it follows you to any browser.", body)
 
 proc renderNotifications(state: AppState): VNode =

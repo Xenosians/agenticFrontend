@@ -5,6 +5,7 @@ import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge, account
   operations_bridge, review_bridge, request_context, engineering_bridge, backend_bridge,
   knowledge_bridge, learning_bridge, workflow_bridge]
 import brand
+import gladiators
 
 proc currentCalendarDay(): cstring {.importjs: "(() => {const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');})()".}
 proc eventKey(event: Event): cstring {.importjs: "#.key".}
@@ -281,3 +282,6 @@ proc renderSidebar*(state: AppState): VNode =
           tdiv(class = "chat-date-group"):
             span(class = "section-label"): text group.title
             for chat in group.chats: renderSavedChat(state, chat)
+      # The agents' room (owner decision, 18 November): who is doing what, below the chats.
+      if state.gladiators:
+        renderRoomPreview(state)
