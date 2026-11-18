@@ -1,5 +1,5 @@
 include karax/prelude
-import std/asyncjs
+import std/[asyncjs, json]
 import ../api/operations
 import ../api/client
 import ../api/proxmox_requests
@@ -210,8 +210,11 @@ proc confirmingAction*(state: AppState): ProxmoxAction =
   for action in state.proxmoxActions:
     if action.actionId == state.proxmoxConfirming: return action
 
-proc proposeGuestAction*(state: AppState, guest: ProxmoxGuest, action: string) {.async.} =
-  ## Prepare one action for this exact guest; the confirmation decides it.
+var changeDraftDone* = false  ## set when a prepared change left the dialog; the dialog clears its draft
+
+proc proposeGuestAction*(state: AppState, guest: ProxmoxGuest, action: string,
+                         fields: JsonNode = nil) {.async.} =
+  ## Prepare one action or change for this exact guest; the confirmation decides it.
   if not state.auth.authenticated or state.proxmoxActionBusy or state.proxmoxConfirming.len > 0: return
   let request = beginProxmoxActionRequest(state)
   state.proxmoxActionBusy = true
@@ -219,11 +222,17 @@ proc proposeGuestAction*(state: AppState, guest: ProxmoxGuest, action: string) {
   redraw(kxi)
   try:
     let proposed = await proposeProxmoxAction(state.auth.csrfToken, guest.node, guest.vmid, action,
-                                              $randomUuid())
+                                              $randomUuid(), fields)
     if not matchesProxmoxActionRequest(state, request): return
     state.proxmoxActions = mergeProxmoxAction(state.proxmoxActions, proposed)
+    # The change dialog has done its job: the confirmation now shows the exact frozen change.
+    state.proxmoxChangeGuest = 0
+    state.proxmoxChangeNode = ""
+    state.proxmoxChangeAction = ""
+    changeDraftDone = true
     if proposed.status == "waiting_approval":
       state.proxmoxConfirming = proposed.actionId
+      state.proxmoxConfirmName = ""
       pendingProxmoxFocus = "proxmoxConfirmCancel"
   except CatchableError as exc:
     if matchesProxmoxActionRequest(state, request): state.proxmoxActionError = exc.msg
@@ -240,7 +249,8 @@ proc decideGuestAction*(state: AppState, actionId: string, approve: bool) {.asyn
   redraw(kxi)
   var reread = false
   try:
-    let decided = await decideProxmoxAction(state.auth.csrfToken, actionId, approve)
+    let decided = await decideProxmoxAction(state.auth.csrfToken, actionId, approve,
+                                            (if approve: state.proxmoxConfirmName else: ""))
     if not matchesProxmoxActionRequest(state, request): return
     state.proxmoxActions = mergeProxmoxAction(state.proxmoxActions, decided)
     # The guest changed state: show it now instead of at the next refresh.
@@ -254,6 +264,7 @@ proc decideGuestAction*(state: AppState, actionId: string, approve: bool) {.asyn
       state.proxmoxActionBusy = false
       if state.proxmoxConfirming == actionId:
         state.proxmoxConfirming = ""
+        state.proxmoxConfirmName = ""
         pendingProxmoxFocus = "proxmoxActionsTitle"
     redraw(kxi)
   # The saved outcome is the truth; read it back instead of guessing.
@@ -263,7 +274,27 @@ proc reviewGuestAction*(state: AppState, actionId: string) =
   if state.proxmoxActionBusy: return
   state.proxmoxActionError = ""
   state.proxmoxConfirming = actionId
+  state.proxmoxConfirmName = ""
   pendingProxmoxFocus = "proxmoxConfirmCancel"
+  redraw(kxi)
+
+proc openGuestChanges*(state: AppState, guest: ProxmoxGuest) =
+  ## Open the change dialog for this exact guest; nothing is sent until a change is prepared.
+  if state.proxmoxActionBusy or state.proxmoxConfirming.len > 0: return
+  state.proxmoxActionError = ""
+  state.proxmoxChangeGuest = guest.vmid
+  state.proxmoxChangeNode = guest.node
+  state.proxmoxChangeAction = ""
+  changeDraftDone = true  # a newly opened dialog starts empty
+  pendingProxmoxFocus = "proxmoxChangeClose"
+  redraw(kxi)
+
+proc closeGuestChanges*(state: AppState) =
+  let vmid = state.proxmoxChangeGuest
+  state.proxmoxChangeGuest = 0
+  state.proxmoxChangeNode = ""
+  state.proxmoxChangeAction = ""
+  pendingProxmoxFocus = "proxmoxChange" & $vmid
   redraw(kxi)
 
 proc askAboutGuest*(state: AppState, guest: ProxmoxGuest) =

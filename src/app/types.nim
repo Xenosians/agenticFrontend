@@ -193,6 +193,10 @@ type
     proxmoxActionBusy*: bool
     proxmoxActionError*, proxmoxActionsError*: string  ## a refused action; an unread recent list
     proxmoxConfirming*: string  ## the action id whose confirmation is open
+    proxmoxChangeGuest*: int  ## the VMID whose change dialog is open (0 = closed)
+    proxmoxChangeNode*: string
+    proxmoxChangeAction*: string  ## the change chosen in that dialog
+    proxmoxConfirmName*: string  ## the guest name typed for a destructive approval
     proxmoxActionEpoch*: int
     tailnet*: TailnetSnapshot
     tailnetBusy*, tailnetLoaded*: bool

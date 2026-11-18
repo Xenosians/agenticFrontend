@@ -103,6 +103,10 @@ proc clearOperations*(state: AppState) =
   state.proxmoxActionError = ""
   state.proxmoxActionsError = ""
   state.proxmoxConfirming = ""
+  state.proxmoxChangeGuest = 0
+  state.proxmoxChangeNode = ""
+  state.proxmoxChangeAction = ""
+  state.proxmoxConfirmName = ""
   inc state.tailnetEpoch
   state.tailnet = TailnetSnapshot()
   state.tailnetLoaded = false

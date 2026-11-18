@@ -2474,6 +2474,30 @@ body {
 .proxmox-confirm-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
 .proxmox-confirm-actions .secondary-action { color: var(--text); }
 .proxmox-confirm-actions .proxmox-confirm-danger { font-weight: 700; }
+.proxmox-change { width: min(520px, 100%); }
+.proxmox-change > .operation-note { margin: -6px 0 14px; color: var(--text-soft); }
+.proxmox-change-group { margin: 0 0 12px; }
+.proxmox-change-group.destructive { padding: 10px 10px 4px; border: 2px solid var(--border-max); border-radius: var(--radius-md); }
+.proxmox-change-group-title { display: block; margin: 0 0 6px; color: var(--text-soft); font-size: 12px; font-weight: 600; }
+.proxmox-change-group.destructive .proxmox-change-group-title { color: var(--text); text-transform: uppercase; letter-spacing: 0.04em; }
+.proxmox-change-choices { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 6px; }
+.proxmox-change-choice { min-height: 32px; padding: 4px 10px; font-size: 12px; color: var(--text); }
+/* The chosen change is outlined and marked, never filled like the Prepare button. */
+.proxmox-change-choice[aria-pressed="true"] { border: 2px solid var(--text); color: var(--text-bright); font-weight: 700; }
+.proxmox-change-choice[aria-pressed="true"]::before { content: "✓\00a0" / ""; }
+.proxmox-confirm-name code { padding: 1px 6px; border: 1px solid var(--border-strong); border-radius: 4px; background: var(--bg); font-size: 13px; }
+.proxmox-confirm-name-hint { margin: -10px 0 14px; color: var(--text-soft); font-size: 12px; }
+.proxmox-confirm .primary-action:disabled, .proxmox-change .primary-action:disabled { opacity: 0.45; cursor: not-allowed; }
+.proxmox-confirm-warning strong { text-transform: uppercase; letter-spacing: 0.04em; }
+.proxmox-change-form { display: grid; gap: 12px; margin: 0 0 16px; }
+.proxmox-change-field { display: grid; gap: 4px; }
+.proxmox-change-field label, .proxmox-confirm-name { color: var(--text); font-size: 13px; font-weight: 600; }
+.proxmox-change-field .operation-note { color: var(--text-soft); font-size: 12px; }
+.proxmox-change-lead { margin: 0; color: var(--text-soft); font-size: 12px; }
+.proxmox-change-input { width: 100%; min-height: 36px; padding: 6px 10px; border: 1px solid var(--border-strong); border-radius: var(--radius-md); background: var(--bg); color: var(--text); font: inherit; font-size: 14px; }
+.proxmox-change-input:focus-visible { outline: 2px solid var(--text); outline-offset: 1px; }
+.proxmox-confirm-name { display: block; margin: 0 0 6px; }
+.proxmox-confirm > .proxmox-change-input { margin: 0 0 16px; }
 .tailnet-device-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); align-items: start; gap: 10px; margin: 14px 0 0; padding: 0; list-style: none; }
 .tailnet-device { min-width: 0; padding: 12px 12px 12px 13px; border: 1px solid var(--border); border-radius: var(--radius-md); }
 .tailnet-device[data-attention="warning"] { border-left: 3px solid var(--border-max); padding-left: 11px; }

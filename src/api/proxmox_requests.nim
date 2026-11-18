@@ -41,8 +41,11 @@ proc fetchProxmoxActions*(): Future[seq[ProxmoxAction]] {.async.} =
   return parseProxmoxActions(decodeJson(reply.body))
 
 proc proposeProxmoxAction*(csrfToken, node: string, vmid: int,
-                           action, submissionId: string): Future[ProxmoxAction] {.async.} =
-  let payload = proxmoxActionPayload(node, vmid, action, submissionId)
+                           action, submissionId: string, fields: JsonNode = nil): Future[ProxmoxAction] {.async.} =
+  ## A power action, or a change with exactly its typed fields (checked before sending).
+  let payload = if action in powerActions: proxmoxActionPayload(node, vmid, action, submissionId)
+                else: proxmoxChangePayload(node, vmid, action, submissionId,
+                                           (if fields.isNil: newJObject() else: fields))
   let reply = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/proxmox/actions",
     writeOptions(csrfToken, payload))
   if not reply.ok:
@@ -52,10 +55,13 @@ proc proposeProxmoxAction*(csrfToken, node: string, vmid: int,
     raise newException(ValueError, "The prepared action did not match the chosen guest.")
   return proposed
 
-proc decideProxmoxAction*(csrfToken, actionId: string, approve: bool): Future[ProxmoxAction] {.async.} =
+proc decideProxmoxAction*(csrfToken, actionId: string, approve: bool,
+                          confirmName = ""): Future[ProxmoxAction] {.async.} =
+  ## A destructive approval carries the guest's name as the owner typed it; the server compares it.
   let decision = if approve: "approve" else: "reject"
   let path = "/api/v1/proxmox/actions/" & encodeUrl(actionId, usePlus = false) & "/" & decision
-  let reply = await sendRequest(frontendConfig.backendBaseUrl & path, writeOptions(csrfToken, newJObject()))
+  let reply = await sendRequest(frontendConfig.backendBaseUrl & path,
+    writeOptions(csrfToken, proxmoxDecisionPayload(approve, confirmName)))
   if not reply.ok:
     raise refusal(reply, "The decision was not recorded.")
   let decided = parseProxmoxAction(decodeJson(reply.body))

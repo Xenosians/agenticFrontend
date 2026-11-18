@@ -83,15 +83,33 @@ def database_inventory():
             "label_hint": None}
 
 
-def proxmox_action(action, vmid, node):
+CHANGE_TEXT = {
+    "set_resources": "Set {label} {vmid} ({name}) on Proxmox node {node} to {cores} CPU core(s).",
+    "snapshot_create": "Take snapshot '{snapshot}' of {label} {vmid} ({name}) on Proxmox node {node}.",
+    "delete": "Delete {label} {vmid} ({name}) on Proxmox node {node} and purge its disks. The guest and its data "
+              "cannot be recovered.",
+}
+DESTRUCTIVE = {"delete", "snapshot_delete", "snapshot_rollback", "backup_restore"}
+
+
+def proxmox_action(action, vmid, node, fields=None):
     # Mirrors the AI's approval wording: the frozen type and the effect of this action.
+    kind = "qemu" if vmid == 101 else "lxc"
+    label = "VM" if kind == "qemu" else "LXC"
+    if action in CHANGE_TEXT:
+        name = "janus-lab"
+        approval = CHANGE_TEXT[action].format(label=label, vmid=vmid, name=name, node=node, **(fields or {})) + \
+            " Janus refuses the change if the guest no longer matches this approval, follows Proxmox's task and " \
+            "reads the result back."
+        return {"action_id": "f" * 32, "action": action, "node": node, "vmid": vmid, "type": kind, "name": name,
+                "risk": "high" if action in DESTRUCTIVE else "medium", "status": "waiting_approval",
+                "destructive": action in DESTRUCTIVE, "approval_text": approval,
+                "created_at": "2026-11-16T03:00:00Z", "decided_at": None, "error": None}
     text = {"start": "Start", "shutdown": "Shut down", "reboot": "Reboot", "force_stop": "Force stop"}[action]
     effect = {"start": "It boots the guest.",
               "shutdown": "The guest's own operating system is asked to shut down cleanly (up to 60 seconds).",
               "reboot": "The guest's own operating system is asked to restart cleanly (up to 60 seconds).",
               "force_stop": "The guest is cut off immediately like pulling its power; unsaved data inside it is lost."}
-    kind = "qemu" if vmid == 101 else "lxc"
-    label = "VM" if kind == "qemu" else "LXC"
     return {"action_id": "f" * 32, "action": action, "node": node, "vmid": vmid, "type": kind, "name": None,
             "risk": "high" if action == "force_stop" else "medium", "status": "waiting_approval",
             "approval_text": f"{text} {label} {vmid} on Proxmox node {node}. {effect[action]} "
@@ -216,6 +234,7 @@ class OperationsTests(navigation.ChatNavigationTests):
         self.health_body = None
         self.action_posts = []
         self.action_decisions = []
+        self.decision_bodies = []
         self.actions = []
         self.action_refusal = None
         self.tailnet_requests = []
@@ -292,14 +311,23 @@ class OperationsTests(navigation.ChatNavigationTests):
                 if self.action_refusal:
                     route.fulfill(status=409, json=self.action_refusal)
                     return
-                action = proxmox_action(body["action"], body["vmid"], body["node"])
+                fields = {key: value for key, value in body.items()
+                          if key not in ("node", "vmid", "action", "submission_id")}
+                action = proxmox_action(body["action"], body["vmid"], body["node"], fields)
                 self.actions.insert(0, action)
                 route.fulfill(status=201, json=action)
                 return
             if path.startswith("/api/v1/proxmox/actions/"):
                 action_id, decision = path.split("/")[-2:]
+                body = request.post_data_json if request.post_data else {}
                 self.action_decisions.append((action_id, decision, request.headers.get("x-csrf-token")))
+                self.decision_bodies.append(body)
                 action = next(item for item in self.actions if item["action_id"] == action_id)
+                if decision == "approve" and action.get("destructive") and body.get("confirm_name") != action["name"]:
+                    # Phoenix refuses a destructive approval without the exact name; nothing runs.
+                    route.fulfill(status=409, json={"error": "confirmation_mismatch",
+                                                    "message": "Type the guest's name exactly to approve."})
+                    return
                 if decision == "approve":
                     action.update(status="succeeded", observed_status="running", verification_ok=True,
                                   upid="UPID:pve-b:0001:0002:0003:vzstart:102:janus@pve!dashboard:")
@@ -957,6 +985,123 @@ class OperationsTests(navigation.ChatNavigationTests):
         expect(self.page.locator(".proxmox-dashboard").get_by_role("alert")).to_contain_text("locked (backup)")
         expect(self.page.get_by_role("dialog", name="Confirm Proxmox action")).to_have_count(0)
         self.assertEqual(self.action_decisions, [])
+
+    def open_changes(self, vmid):
+        self.open_operations()
+        guest = self.page.locator(f'.proxmox-guest-row[data-vmid="{vmid}"]')
+        guest.get_by_role("button", name=f"Change {vmid}", exact=True).click()
+        return self.page.get_by_role("dialog", name=f"Change guest {vmid}")
+
+    def test_each_guest_offers_the_changes_its_state_allows(self):
+        self.open_operations()
+        running = self.page.locator('.proxmox-guest-row[data-vmid="101"]')
+        stopped = self.page.locator('.proxmox-guest-row[data-vmid="102"]')
+        expect(running.get_by_role("button", name="Change 101", exact=True)).to_be_visible()
+        dialog = self.open_changes(102)
+        choices = dialog.locator(".proxmox-change-choice")
+        self.assertEqual(choices.all_inner_texts(), ["CPU and memory", "Grow disk", "Tags and boot", "Snapshot",
+                                                     "Back up now", "Clone", "Roll back", "Delete snapshot",
+                                                     "Delete guest"])
+        # Changes that cannot be undone are grouped apart, under their own heading (vision review).
+        destructive = dialog.locator(".proxmox-change-group.destructive")
+        expect(destructive).to_contain_text("Cannot be undone")
+        self.assertEqual(destructive.locator(".proxmox-change-choice").all_inner_texts(),
+                         ["Roll back", "Delete snapshot", "Delete guest"])
+        # The chosen change is marked, not styled like the Prepare button.
+        dialog.get_by_role("button", name="Snapshot", exact=True).click()
+        expect(dialog.get_by_role("button", name="Snapshot", exact=True)).to_have_attribute("aria-pressed", "true")
+        chosen = dialog.get_by_role("button", name="Snapshot", exact=True).evaluate(
+            "(node) => getComputedStyle(node).backgroundColor")
+        prepare = dialog.get_by_role("button", name="Prepare", exact=True).evaluate(
+            "(node) => getComputedStyle(node).backgroundColor")
+        self.assertNotEqual(chosen, prepare)
+        dialog.get_by_role("button", name="Close", exact=True).click()
+        expect(dialog).to_have_count(0)
+        # A running guest is shut down before it can be deleted: no Delete for it.
+        running.get_by_role("button", name="Change 101", exact=True).click()
+        dialog = self.page.get_by_role("dialog", name="Change guest 101")
+        expect(dialog.get_by_role("button", name="Delete guest", exact=True)).to_have_count(0)
+        expect(dialog.get_by_role("button", name="Snapshot", exact=True)).to_be_visible()
+        self.assertEqual(self.action_posts, [])
+        self.assertEqual(self.errors, [])
+
+    def test_a_change_sends_only_its_typed_fields_and_waits_for_confirmation(self):
+        dialog = self.open_changes(102)
+        dialog.get_by_role("button", name="CPU and memory", exact=True).click()
+        # Each field says what it currently holds, so an empty field visibly means "keep".
+        expect(dialog.get_by_label("Memory (MiB)", exact=True)).to_have_attribute("placeholder", "Keep the current value")
+        dialog.get_by_label("CPU cores", exact=True).fill("2")
+        dialog.get_by_role("button", name="Prepare", exact=True).click()
+        confirm = self.page.get_by_role("dialog", name="Confirm Proxmox action")
+        expect(confirm).to_contain_text("Set LXC 102 (janus-lab) on Proxmox node pve-b to 2 CPU core(s).")
+        body, csrf = self.action_posts[0]
+        self.assertEqual({key: value for key, value in body.items() if key != "submission_id"},
+                         {"node": "pve-b", "vmid": 102, "action": "set_resources", "cores": 2})
+        self.assertEqual(csrf, "fixture-csrf")
+        self.assertEqual(self.action_decisions, [])
+        confirm.get_by_role("button", name="Apply change", exact=True).click()
+        expect(self.page.locator(".proxmox-actions")).to_contain_text("Succeeded")
+        expect(self.page.locator(".proxmox-actions")).to_contain_text("CPU and memory")
+        self.assertEqual(self.decision_bodies, [{}])
+        self.assertEqual(self.errors, [])
+
+    def test_an_empty_or_invalid_change_is_not_sent(self):
+        dialog = self.open_changes(102)
+        dialog.get_by_role("button", name="CPU and memory", exact=True).click()
+        prepare = dialog.get_by_role("button", name="Prepare", exact=True)
+        expect(prepare).to_be_disabled()
+        dialog.get_by_label("CPU cores", exact=True).fill("0")
+        expect(prepare).to_be_disabled()
+        dialog.get_by_role("button", name="Snapshot", exact=True).click()
+        dialog.get_by_label("Snapshot name", exact=True).fill("bad name")
+        expect(prepare).to_be_disabled()
+        dialog.get_by_label("Snapshot name", exact=True).fill("before-upgrade")
+        expect(prepare).to_be_enabled()
+        self.assertEqual(self.action_posts, [])
+
+    def test_a_refused_change_says_why_inside_the_dialog_and_keeps_the_values(self):
+        self.action_refusal = {"error": "proxmox_action_refused", "message": "LXC 102 is locked (backup)."}
+        dialog = self.open_changes(102)
+        dialog.get_by_role("button", name="Snapshot", exact=True).click()
+        dialog.get_by_label("Snapshot name", exact=True).fill("before-upgrade")
+        dialog.get_by_role("button", name="Prepare", exact=True).click()
+        # The reason is shown where the owner is looking, not behind the dialog.
+        expect(dialog.get_by_role("alert")).to_contain_text("locked (backup)")
+        expect(dialog.get_by_label("Snapshot name", exact=True)).to_have_value("before-upgrade")
+        expect(self.page.get_by_role("dialog", name="Confirm Proxmox action")).to_have_count(0)
+        self.assertEqual(len(self.action_posts), 1)
+        # The owner can try again once the lock is gone; nothing was resent on its own.
+        self.action_refusal = None
+        dialog.get_by_role("button", name="Prepare", exact=True).click()
+        expect(self.page.get_by_role("dialog", name="Confirm Proxmox action")).to_contain_text("before-upgrade")
+        self.assertEqual(len(self.action_posts), 2)
+        self.assertEqual(self.errors, [])
+
+    def test_deleting_a_guest_needs_its_exact_name_typed(self):
+        dialog = self.open_changes(102)
+        dialog.get_by_role("button", name="Delete guest", exact=True).click()
+        dialog.get_by_role("button", name="Prepare", exact=True).click()
+        confirm = self.page.get_by_role("dialog", name="Confirm Proxmox action")
+        expect(confirm).to_contain_text("cannot be recovered")
+        expect(confirm).to_contain_text("Type janus-lab to confirm")
+        # The exact text to type stands apart from the sentence around it.
+        self.assertEqual(confirm.locator(".proxmox-confirm-name code").inner_text(), "janus-lab")
+        apply = confirm.get_by_role("button", name="Delete guest", exact=True)
+        expect(apply).to_be_disabled()
+        # A disabled approval must look disabled, never like the call to action (vision review).
+        self.assertLess(float(apply.evaluate("(node) => getComputedStyle(node).opacity")), 0.7)
+        typed = confirm.get_by_label("Guest name", exact=True)
+        typed.fill("Janus-lab")
+        expect(apply).to_be_disabled()
+        expect(confirm.locator("#proxmoxConfirmNameHint")).to_have_text("The name does not match yet.")
+        typed.fill("janus-lab")
+        expect(apply).to_be_enabled()
+        apply.click()
+        expect(self.page.locator(".proxmox-actions")).to_contain_text("Succeeded")
+        self.assertEqual(self.decision_bodies, [{"confirm_name": "janus-lab"}])
+        # Cancel never needs the name.
+        self.assertEqual([decision[1] for decision in self.action_decisions], ["approve"])
+        self.assertEqual(self.errors, [])
 
     def test_ask_in_chat_prefills_an_exact_request_without_sending_it(self):
         self.open_operations()
