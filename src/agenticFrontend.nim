@@ -812,9 +812,8 @@ proc runWorkspaceCommand(action: string) =
     setActiveView(appState, viewStore)
     discard refreshExtensions(appState)
   of "settings":
-    setActiveView(appState, viewSettings)
-    discard loadAuthSessions(appState)
-    discard refreshSystemStatus(appState)
+    # Settings opens at the section the owner last chose.
+    openSettingsSection(appState, appState.settingsSection)
   of "operations": openOperations(appState)
   of "review": openReview(appState)
   of "knowledge": openKnowledge(appState)
@@ -887,6 +886,9 @@ proc renderApp(): VNode =
       proc(view: AppView) =
         if view == viewJobs: openOperations(appState)
         else: setActiveView(appState, view)
+        redraw(kxi),
+      proc() =
+        openSettingsSection(appState, settingsServices)
         redraw(kxi)
     )
 

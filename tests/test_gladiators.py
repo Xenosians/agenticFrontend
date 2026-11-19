@@ -424,6 +424,8 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.open_first_chat()
         expect(self.preview()).to_be_visible()
         self.page.locator(".sidebar-nav").get_by_role("button", name="Settings", exact=True).click()
+        self.page.get_by_role("navigation", name="Settings sections", exact=True).get_by_role(
+            "link", name="Appearance", exact=True).click()
         switch = self.page.get_by_role("switch", name="Show the agents' gladiators", exact=True)
         expect(switch).to_be_checked()
         switch.click()

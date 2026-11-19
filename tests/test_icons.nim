@@ -8,7 +8,7 @@ suite "Lucide icons (owner decision of 18 November: real icons instead of text g
     for name in ["chat", "search", "model-store", "store", "settings", "review", "plus", "automation",
                  "topology", "knowledge", "operations", "learning", "pin", "unpin", "rename", "close",
                  "more", "refresh", "chevron-right", "chevron-down", "send", "back", "check", "enter",
-                 "new-chat", "panel-left", "panel"]:
+                 "new-chat", "panel-left", "panel", "user", "palette", "bell", "devices", "server"]:
       check name in names
       check icon(name).len > 0
 
@@ -26,3 +26,23 @@ suite "Lucide icons (owner decision of 18 November: real icons instead of text g
 
   test "an unknown name draws nothing instead of failing":
     check icon("no-such-icon").len == 0
+
+  test "every shape is drawn with its own geometry (a line without coordinates draws nothing)":
+    for name in iconNames():
+      let node = icon(name)
+      for index in 0 ..< node.len:
+        let shape = node[index]
+        case shape.kind
+        of VNodeKind.line:
+          check shape.getAttr("x1").len > 0 and shape.getAttr("y2").len > 0
+        of VNodeKind.path:
+          check shape.getAttr("d").len > 0
+        of VNodeKind.circle:
+          check shape.getAttr("r").len > 0
+        of VNodeKind.rect:
+          check shape.getAttr("width").len > 0
+        of VNodeKind.polyline:
+          check shape.getAttr("points").len > 0
+        else: discard
+    # The exclamation mark of the error icon: its two strokes.
+    check icon("error")[1].getAttr("y1") == "8"

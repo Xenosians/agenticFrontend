@@ -6,6 +6,7 @@ import ../app/[types, state, extension_bridge, auth_bridge, chat_bridge, account
   knowledge_bridge, learning_bridge, workflow_bridge]
 import icons
 import gladiators
+import settings
 
 proc currentCalendarDay(): cstring {.importjs: "(() => {const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');})()".}
 proc eventKey(event: Event): cstring {.importjs: "#.key".}
@@ -59,8 +60,7 @@ proc renderViewButton(state: AppState, iconName, label: string, target: AppView)
         discard refreshExtensions(state)
       elif target == viewReview: discard refreshReview(state)
       elif target == viewSettings:
-        discard loadAuthSessions(state)
-        discard refreshSystemStatus(state)
+        openSettingsSection(state, state.settingsSection)
 
 proc dashboardView(dashboard: Dashboard): AppView =
   case dashboard
@@ -295,6 +295,5 @@ proc renderSidebar*(state: AppState, newChatKeys: string): VNode =
         if state.auth.displayName.len > 0 and state.auth.email.len > 0:
           span(class = "sidebar-account-email"): text state.auth.email
       proc onclick(event: Event, node: VNode) =
-        setActiveView(state, viewSettings)
-        discard loadAuthSessions(state)
-        discard refreshSystemStatus(state)
+        # The account row opens the owner's profile (ChatGPT, Hermes).
+        openSettingsSection(state, settingsProfile)

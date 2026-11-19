@@ -238,6 +238,7 @@ proc clearOperations*(state: AppState) =
   state.pinsKnown = false
   state.gladiators = true
   state.sidebarCollapsed = false
+  state.settingsSection = settingsProfile
   state.dashboardsOpen = false
   state.pinError = ""
 

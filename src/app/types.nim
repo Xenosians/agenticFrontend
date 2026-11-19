@@ -40,6 +40,10 @@ type
     ## The three sections of the one Store page.
     storeTools, storeSkills, storePlugins
 
+  SettingsSection* = enum
+    ## The sections of the Settings page, in the order of its section list.
+    settingsProfile, settingsAppearance, settingsNotifications, settingsDevices, settingsServices
+
   InspectorTab* = enum
     tabRun,
     tabEvents,
@@ -266,6 +270,7 @@ type
     pluginSearchDraft*: string
     toolStoreSearch*, pluginStoreSearch*: string
     storeSection*: StoreSection
+    settingsSection*: SettingsSection
     openToolPackages*: seq[string]  ## Packages the owner opened; kept across catalog reloads.
     extensionBusy*: bool
     extensionError*: string

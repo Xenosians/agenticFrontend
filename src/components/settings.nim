@@ -1,14 +1,43 @@
-## Settings: appearance, notifications, signed-in devices, service status and profile.
+## Settings: profile, appearance, notifications, signed-in devices and service status.
 ##
-## One place for everything the owner can change about their own workspace.
+## One full page (owner decision, 19 November 03:15 WIB, the Hermes look): a section list on the
+## left, a breadcrumb naming the open section, and flat rows with the label and its description on
+## the left and the control on the right. On a phone the section list is a row above the page.
 ## Every saved choice comes from the server; nothing is kept in the browser.
 include karax/prelude
+import karax/kdom
 import ../app/[types, auth_bridge, account_bridge, backend_bridge]
 import brand
+import icons
+
+proc sectionName*(section: SettingsSection): string =
+  case section
+  of settingsProfile: "Profile"
+  of settingsAppearance: "Appearance"
+  of settingsNotifications: "Notifications"
+  of settingsDevices: "Signed-in devices"
+  of settingsServices: "Services"
+
+proc sectionIcon(section: SettingsSection): string =
+  case section
+  of settingsProfile: "user"
+  of settingsAppearance: "palette"
+  of settingsNotifications: "bell"
+  of settingsDevices: "devices"
+  of settingsServices: "server"
+
+proc openSettingsSection*(state: AppState, section: SettingsSection) =
+  ## Opens Settings at one section and loads what the page shows.
+  state.settingsSection = section
+  state.activeView = viewSettings
+  state.headerMenuOpen = false
+  state.commandPaletteOpen = false
+  discard loadAuthSessions(state)
+  discard refreshSystemStatus(state)
 
 proc settingsSection(title, summary: string, body: VNode, action: VNode = nil): VNode =
-  ## Every section: a title, one line saying what it is for, an optional
-  ## action on the right, then its controls.
+  ## The open section: its title, one line saying what it is for, an optional
+  ## action on the right, then its rows.
   result = buildHtml(section(class = "settings-section", `aria-label` = cstring(title))):
     tdiv(class = "settings-section-heading"):
       tdiv:
@@ -16,6 +45,15 @@ proc settingsSection(title, summary: string, body: VNode, action: VNode = nil): 
         p: text summary
       if action != nil: action
     body
+
+proc settingsItem(label, description: string, control: VNode): VNode =
+  ## One flat row: the label and its description on the left, the control on the right.
+  result = buildHtml(tdiv(class = "settings-item")):
+    tdiv(class = "settings-item-copy"):
+      strong: text label
+      if description.len > 0:
+        span: text description
+    tdiv(class = "settings-item-control"): control
 
 proc renderChoice[T](name: string, value, selected: T, disabled: bool,
                      label: proc(value: T): string, swatch: bool, choose: proc(value: T)): VNode =
@@ -45,17 +83,15 @@ proc renderAppearance(state: AppState): VNode =
   var accents: seq[Accent]
   for accent in Accent: accents.add accent
   let body = buildHtml(tdiv(class = "settings-body")):
-    tdiv(class = "settings-field"):
-      span(class = "settings-field-label"): text "Theme"
+    settingsItem("Theme", "Light, dark, or whatever your system uses.",
       renderChoiceGroup("Theme", themes, state.themeMode, disabled, themeLabel, false,
-        proc(mode: ThemeMode) = discard saveThemeMode(state, mode))
-    tdiv(class = "settings-field"):
-      span(class = "settings-field-label"): text "Accent"
+        proc(mode: ThemeMode) = discard saveThemeMode(state, mode)))
+    settingsItem("Accent", "The colour of selections and primary actions.",
       renderChoiceGroup("Accent", accents, state.accent, disabled, accentLabel, true,
-        proc(accent: Accent) = discard saveAccent(state, accent))
+        proc(accent: Accent) = discard saveAccent(state, accent)))
     # A switch applies at once (Linear, Vercel): the label and its description on the left, the control on the right.
-    label(class = "settings-toggle"):
-      span:
+    label(class = "settings-toggle settings-item"):
+      span(class = "settings-item-copy"):
         strong(id = "gladiatorsLabel"): text "Show the agents' gladiators"
         small(id = "gladiatorsHelp"): text "Each agent is a gladiator that acts out what it is doing, below your chats."
       input(`type` = "checkbox", role = "switch", checked = state.gladiators, disabled = disabled,
@@ -67,8 +103,8 @@ proc renderAppearance(state: AppState): VNode =
 proc renderNotifications(state: AppState): VNode =
   let body = buildHtml(tdiv(class = "settings-body")):
     if state.preferencesLoaded:
-      label(class = "settings-toggle"):
-        span:
+      label(class = "settings-toggle settings-item"):
+        span(class = "settings-item-copy"):
           strong(id = "completionMailLabel"): text "Task completion emails"
           small(id = "completionMailHelp"): text "For tasks that finish from now on."
         input(`type` = "checkbox", role = "switch", checked = state.completionMailDraft,
@@ -169,6 +205,26 @@ proc renderProfile(state: AppState): VNode =
     proc onclick(event: Event, node: VNode) = discard logoutApplication(state)
   settingsSection("Profile", "Your account as Janus knows it.", body, action)
 
+proc renderSectionLink(state: AppState, section: SettingsSection): VNode =
+  ## One entry of the section list: its icon and its name, a link to the section.
+  let current = state.settingsSection == section
+  result = buildHtml(a(class = (if current: cstring"settings-nav-item active" else: cstring"settings-nav-item"),
+                       href = cstring("#settings-" & $section),
+                       `aria-current` = (if current: cstring"page" else: cstring"false"))):
+    span(class = "nav-icon", `aria-hidden` = "true"): icon(sectionIcon(section), 16)
+    span: text sectionName(section)
+    proc onclick(event: Event, node: VNode) =
+      event.preventDefault()
+      state.settingsSection = section
+
+proc renderOpenSection(state: AppState): VNode =
+  case state.settingsSection
+  of settingsProfile: renderProfile(state)
+  of settingsAppearance: renderAppearance(state)
+  of settingsNotifications: renderNotifications(state)
+  of settingsDevices: renderSessions(state)
+  of settingsServices: renderServices(state)
+
 proc renderSettingsView*(state: AppState): VNode =
   result = buildHtml(section(class = "conversation")):
     tdiv(class = "settings-view account-view"):
@@ -176,21 +232,30 @@ proc renderSettingsView*(state: AppState): VNode =
         tdiv:
           h2(class = "page-title"): text "Settings"
           p(class = "page-description"): text "Your profile, how " & productName & " looks, its emails and your signed-in devices."
-      if state.auth.error.len > 0:
-        p(class = "settings-error", role = "alert"): text state.auth.error
-      if state.preferencesError.len > 0:
-        tdiv(class = "settings-banner", role = "alert"):
-          p(class = "settings-error"): text state.preferencesError
-          button(class = "secondary-action", disabled = state.preferencesBusy or state.preferencesSaving):
-            text (if state.preferencesBusy: "Loading settings…" else: "Reload settings")
-            proc onclick(event: Event, node: VNode) = discard loadAccountPreferences(state)
-      elif not state.preferencesLoaded:
-        p(class = "settings-help"):
-          text (if state.preferencesBusy: "Loading your settings…" else: "Your settings are not loaded yet.")
-      if state.preferencesNotice.len > 0:
-        p(class = "settings-notice", role = "status"): text state.preferencesNotice
-      renderAppearance(state)
-      renderNotifications(state)
-      renderSessions(state)
-      renderServices(state)
-      renderProfile(state)
+      tdiv(class = "settings-layout"):
+        nav(class = "settings-nav", `aria-label` = "Settings sections"):
+          for section in SettingsSection:
+            renderSectionLink(state, section)
+        tdiv(class = "settings-page"):
+          nav(class = "settings-breadcrumb", `aria-label` = "Breadcrumb"):
+            a(href = "#settings", class = "settings-breadcrumb-root"):
+              text "Settings"
+              proc onclick(event: Event, node: VNode) =
+                event.preventDefault()
+                state.settingsSection = SettingsSection.low
+            span(class = "settings-breadcrumb-separator", `aria-hidden` = "true"): text "›"
+            span(`aria-current` = "page"): text sectionName(state.settingsSection)
+          if state.auth.error.len > 0:
+            p(class = "settings-error", role = "alert"): text state.auth.error
+          if state.preferencesError.len > 0:
+            tdiv(class = "settings-banner", role = "alert"):
+              p(class = "settings-error"): text state.preferencesError
+              button(class = "secondary-action", disabled = state.preferencesBusy or state.preferencesSaving):
+                text (if state.preferencesBusy: "Loading settings…" else: "Reload settings")
+                proc onclick(event: Event, node: VNode) = discard loadAccountPreferences(state)
+          elif not state.preferencesLoaded:
+            p(class = "settings-help"):
+              text (if state.preferencesBusy: "Loading your settings…" else: "Your settings are not loaded yet.")
+          if state.preferencesNotice.len > 0:
+            p(class = "settings-notice", role = "status"): text state.preferencesNotice
+          renderOpenSection(state)

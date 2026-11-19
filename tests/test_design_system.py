@@ -152,6 +152,8 @@ class DesignSystemTests(plain.PlainLanguageTests):
     def test_on_off_settings_are_switches_with_the_control_on_the_right(self):
         self.open_first_chat()
         self.open_view("Settings")
+        self.page.get_by_role("navigation", name="Settings sections", exact=True).get_by_role(
+            "link", name="Notifications", exact=True).click()
         switch = self.page.get_by_role("switch", name="Task completion emails", exact=True)
         expect(switch).to_be_visible()
         expect(switch).to_be_checked()

@@ -102,11 +102,19 @@ class SettingsTests(navigation.ChatNavigationTests):
                 return
         super().route(route)
 
-    def open_settings(self):
+    def open_settings(self, section=None):
         self.open_first_chat()
         self.page.locator(".sidebar-nav").get_by_role("button", name="Settings", exact=True).click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Settings")
-        expect(self.page.locator(".account-session-row")).to_have_count(2)
+        if section:
+            self.open_section(section)
+
+    def open_section(self, name):
+        self.page.get_by_role("navigation", name="Settings sections", exact=True).get_by_role(
+            "link", name=name, exact=True).click()
+        expect(self.page.get_by_role("region", name=name)).to_be_visible()
+        if name == "Signed-in devices":
+            expect(self.page.locator(".account-session-row")).to_have_count(2)
 
     def root(self):
         return self.page.evaluate("[document.documentElement.dataset.theme, document.documentElement.dataset.accent]")
@@ -133,7 +141,7 @@ class SettingsTests(navigation.ChatNavigationTests):
         self.assert_safe()
 
     def test_theme_and_accent_save_only_what_changed(self):
-        self.open_settings()
+        self.open_settings("Appearance")
         self.assertEqual(self.root(), ["dark", "mono"])
         self.radio("Theme", "Light").check()
         expect(self.page.get_by_text("Theme saved.", exact=True)).to_be_visible()
@@ -148,7 +156,7 @@ class SettingsTests(navigation.ChatNavigationTests):
 
     def test_match_system_follows_the_operating_system(self):
         self.page.emulate_media(color_scheme="light")
-        self.open_settings()
+        self.open_settings("Appearance")
         self.radio("Theme", "Match system").check()
         expect(self.page.get_by_text("Theme saved.", exact=True)).to_be_visible()
         self.assertEqual(self.root()[0], "light")
@@ -158,7 +166,7 @@ class SettingsTests(navigation.ChatNavigationTests):
 
     def test_an_unconfirmed_theme_reverts_and_requires_a_reload(self):
         self.save_status = 503
-        self.open_settings()
+        self.open_settings("Appearance")
         # click, not check(): the refused save reverts the choice, which check() would retry against.
         self.radio("Theme", "Light").click()
         expect(self.page.locator(".settings-banner .settings-error")).to_contain_text("not confirmed")
@@ -172,12 +180,13 @@ class SettingsTests(navigation.ChatNavigationTests):
         self.assert_safe()
 
     def test_saved_preference_and_revocation_receipt_are_used(self):
-        self.open_settings()
+        self.open_settings("Notifications")
         choice = self.page.get_by_role("switch", name="Task completion emails", exact=True)
         expect(choice).to_be_checked()
         choice.uncheck()
         expect(self.page.get_by_text("Notification setting saved.", exact=True)).to_be_visible()
         self.assertEqual(self.writes, [{"payload": {"task_completed": False}, "csrf": "fixture-csrf"}])
+        self.open_section("Signed-in devices")
         self.page.get_by_role("button", name="Sign out other devices", exact=True).click()
         expect(self.page.get_by_text("1 other session(s) revoked. This session stays signed in.", exact=True)).to_be_visible()
         expect(self.page.locator(".account-session-row").filter(has_text="Other fixture browser")).to_contain_text("Revoked")
@@ -189,16 +198,17 @@ class SettingsTests(navigation.ChatNavigationTests):
 
     def test_unknown_preference_never_shows_a_default_choice(self):
         self.preferences = {"preferences": {"task_completed": "false", "theme": "dark", "accent": "mono"}}
-        self.open_settings()
+        self.open_settings("Notifications")
         expect(self.page.locator(".settings-banner .settings-error")).to_contain_text("could not be loaded")
         expect(self.page.get_by_role("switch", name="Task completion emails", exact=True)).to_have_count(0)
+        self.open_section("Appearance")
         expect(self.radio("Theme", "Dark")).to_be_disabled()
         self.assertEqual(self.writes, [])
         self.assert_safe()
 
     def test_pending_save_cannot_be_duplicated(self):
         self.hold_write = True
-        self.open_settings()
+        self.open_settings("Appearance")
         self.radio("Accent", "Teal").check()
         expect(self.radio("Accent", "Rose")).to_be_disabled()
         self.radio("Accent", "Rose").dispatch_event("click")
@@ -210,7 +220,7 @@ class SettingsTests(navigation.ChatNavigationTests):
 
     def test_wrong_save_receipt_requires_readback_and_does_not_resend(self):
         self.save_receipt = {"preferences": {"task_completed": True, "theme": "dark", "accent": "mono"}}
-        self.open_settings()
+        self.open_settings("Appearance")
         # click, not check(): the mismatched receipt reverts the choice.
         self.radio("Theme", "Light").click()
         expect(self.page.locator(".settings-banner .settings-error")).to_contain_text("did not match")
@@ -223,7 +233,7 @@ class SettingsTests(navigation.ChatNavigationTests):
 
     def test_unconfirmed_bulk_revoke_requires_refresh_before_another_decision(self):
         self.revoke_receipt = {"status": "accepted", "revoked_count": 1}
-        self.open_settings()
+        self.open_settings("Signed-in devices")
         self.page.get_by_role("button", name="Sign out other devices", exact=True).click()
         expect(self.page.locator(".account-session-panel .settings-error")).to_contain_text("not confirmed")
         expect(self.page.get_by_role("button", name="Sign out other devices", exact=True)).to_be_disabled()
@@ -235,7 +245,7 @@ class SettingsTests(navigation.ChatNavigationTests):
         self.assert_safe()
 
     def test_wrong_single_session_receipt_does_not_claim_revoked(self):
-        self.open_settings()
+        self.open_settings("Signed-in devices")
         other = self.page.locator(".account-session-row").filter(has_text="Other fixture browser")
         other.get_by_role("button", name="Sign out Other fixture browser", exact=True).click()
         expect(self.page.locator(".account-session-panel .settings-error")).to_contain_text("not confirmed")
@@ -267,18 +277,116 @@ class SettingsTests(navigation.ChatNavigationTests):
         self.assert_safe()
 
     def test_settings_text_contrast_and_mobile_layout_in_both_themes(self):
-        self.open_settings()
+        self.open_settings("Appearance")
+        texts = {"Profile": (".settings-section-heading p", ".settings-profile dt", ".settings-breadcrumb a",
+                             ".settings-nav-item:not(.active)"),
+                 "Appearance": (".settings-item-copy span", ".settings-choice span", ".settings-toggle small"),
+                 "Notifications": (".settings-toggle small",),
+                 "Signed-in devices": (".settings-row-copy span", ".settings-badge"),
+                 "Services": (".settings-row-copy span", ".settings-badge")}
+        # Contrast is read once colours have settled, not mid theme transition.
+        self.page.emulate_media(reduced_motion="reduce")
         for theme in ("Dark", "Light"):
+            self.open_section("Appearance")
             self.radio("Theme", theme).check()
             self.expect_root(theme.lower())
             for width in (1440, 390):
                 self.page.set_viewport_size({"width": width, "height": 900})
-                for selector in (".settings-section-heading p", ".settings-toggle small", ".settings-row-copy span",
-                                 ".settings-badge", ".settings-choice span", ".settings-profile dt"):
-                    self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5, (theme, width, selector))
-                self.assertFalse(self.page.evaluate(
-                    "document.documentElement.scrollWidth > document.documentElement.clientWidth"), (theme, width))
+                for section, selectors in texts.items():
+                    self.open_section(section)
+                    for selector in selectors:
+                        self.assertGreaterEqual(self.page.evaluate(CONTRAST, selector), 4.5,
+                                                (theme, width, section, selector))
+                    self.assertFalse(self.page.evaluate(
+                        "document.documentElement.scrollWidth > document.documentElement.clientWidth"),
+                        (theme, width, section))
         self.assert_safe()
+
+
+    # Settings as a full page (owner decision, 19 November 03:15 WIB): a section list on the left, a
+    # breadcrumb, and flat label/description rows with the control on the right (the Hermes look).
+    SECTIONS = ["Profile", "Appearance", "Notifications", "Signed-in devices", "Services"]
+
+    def section_list(self):
+        return self.page.get_by_role("navigation", name="Settings sections", exact=True)
+
+    def test_settings_is_a_page_with_a_section_list_and_a_breadcrumb(self):
+        self.open_settings()
+        sections = self.section_list()
+        expect(sections).to_be_visible()
+        links = sections.get_by_role("link")
+        self.assertEqual([text.strip() for text in links.all_inner_texts()], self.SECTIONS)
+        # Every entry is a Lucide icon and a name; the first is the current one.
+        expect(sections.locator("svg.icon")).to_have_count(len(self.SECTIONS))
+        expect(links.first).to_have_attribute("aria-current", "page")
+        breadcrumb = self.page.get_by_role("navigation", name="Breadcrumb", exact=True)
+        expect(breadcrumb).to_have_text("Settings›Profile")
+        expect(self.page.get_by_role("region", name="Profile")).to_be_visible()
+        # The list sits to the left of the page, top-aligned with it.
+        nav, page = sections.bounding_box(), self.page.locator(".settings-page").bounding_box()
+        self.assertLessEqual(nav["x"] + nav["width"], page["x"] + 1)
+        self.assertLess(abs(nav["y"] - page["y"]), 4)
+        self.assertEqual(self.errors, [])
+
+    def test_choosing_a_section_shows_it_alone_and_names_it_in_the_breadcrumb(self):
+        self.open_settings()
+        self.section_list().get_by_role("link", name="Signed-in devices", exact=True).click()
+        expect(self.page.get_by_role("navigation", name="Breadcrumb", exact=True)).to_have_text(
+            "Settings›Signed-in devices")
+        expect(self.page.get_by_role("region", name="Signed-in devices")).to_be_visible()
+        expect(self.page.get_by_role("region", name="Profile")).to_have_count(0)
+        expect(self.page.get_by_role("radiogroup", name="Theme", exact=True)).to_have_count(0)
+        expect(self.section_list().get_by_role("link", name="Signed-in devices", exact=True)).to_have_attribute(
+            "aria-current", "page")
+        expect(self.section_list().get_by_role("link", name="Profile", exact=True)).not_to_have_attribute(
+            "aria-current", "page")
+        # The breadcrumb's first step goes back to the first section.
+        self.page.get_by_role("navigation", name="Breadcrumb", exact=True).get_by_role(
+            "link", name="Settings", exact=True).click()
+        expect(self.page.get_by_role("region", name="Profile")).to_be_visible()
+        self.assertEqual(self.errors, [])
+
+    def test_a_section_is_flat_rows_with_the_control_on_the_right(self):
+        self.open_settings()
+        self.section_list().get_by_role("link", name="Appearance", exact=True).click()
+        section = self.page.get_by_role("region", name="Appearance")
+        # Flat: no card around the section (Hermes separates rows by space and hairlines).
+        self.assertEqual(section.evaluate("el => getComputedStyle(el).borderTopWidth"), "0px")
+        for name in ("Theme", "Accent"):
+            row = section.locator(".settings-item").filter(
+                has=self.page.get_by_role("radiogroup", name=name, exact=True))
+            label = row.locator(".settings-item-copy strong").bounding_box()
+            control = row.get_by_role("radiogroup", name=name, exact=True).bounding_box()
+            self.assertGreater(control["x"], label["x"] + label["width"], name)
+            self.assertAlmostEqual(control["x"] + control["width"], section.bounding_box()["x"]
+                                   + section.bounding_box()["width"], delta=2)
+        self.assertEqual(self.errors, [])
+
+    def test_the_service_status_link_opens_the_services_section(self):
+        self.open_first_chat()
+        self.page.locator(".statusbar").get_by_role("button", name="Services ready", exact=True).click()
+        expect(self.page.get_by_role("region", name="Services")).to_be_visible()
+        expect(self.section_list().get_by_role("link", name="Services", exact=True)).to_have_attribute(
+            "aria-current", "page")
+        self.assertEqual(self.errors, [])
+
+    def test_the_account_row_opens_the_profile(self):
+        self.open_settings("Services")
+        self.page.get_by_role("button", name="Account settings", exact=True).click()
+        expect(self.page.get_by_role("region", name="Profile")).to_be_visible()
+        # The Settings row reopens the section the owner chose last.
+        self.open_section("Notifications")
+        self.page.locator(".sidebar-nav").get_by_role("button", name="Settings", exact=True).click()
+        expect(self.page.get_by_role("region", name="Notifications")).to_be_visible()
+        self.assertEqual(self.errors, [])
+
+    def test_on_a_phone_the_sections_are_a_row_above_the_page(self):
+        self.page.set_viewport_size({"width": 390, "height": 844})
+        self.open_settings()
+        sections, page = self.section_list().bounding_box(), self.page.locator(".settings-page").bounding_box()
+        self.assertLessEqual(sections["y"] + sections["height"], page["y"] + 1)
+        self.assertFalse(self.page.evaluate("document.documentElement.scrollWidth > innerWidth"))
+        self.assertEqual(self.errors, [])
 
 
 def load_tests(loader, _tests, _pattern):

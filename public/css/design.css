@@ -776,7 +776,6 @@ input[type="radio"] {
    CARDS AND SECTIONS (shadcn Card: rounded-xl, border, p-6, title 16/600, description 14 muted)
    ========================================================= */
 
-.settings-section,
 .developer-card,
 .operation-card,
 .proxmox-dashboard,
@@ -794,7 +793,6 @@ input[type="radio"] {
 }
 
 .settings-section {
-  padding: var(--space-6);
   display: grid;
   gap: var(--space-5);
 }
@@ -804,6 +802,14 @@ input[type="radio"] {
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-4);
+}
+
+.settings-section-heading > div {
+  min-width: 0;
+}
+
+.settings-section-heading .secondary-action {
+  flex: none;
 }
 
 .settings-section-heading h3,
@@ -826,39 +832,186 @@ input[type="radio"] {
 
 .settings-body {
   display: grid;
-  gap: var(--space-4);
+  gap: 0;
 }
 
+/* Rows of a section: label and description on the left, the control on the right, hairlines between. */
+.settings-item,
 .settings-row {
+  box-sizing: border-box;
+  min-height: var(--control-h);
+  padding: var(--space-4) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
-  min-height: var(--control-h);
+  gap: var(--space-6);
+  border-top: 1px solid var(--border-subtle);
 }
 
+.settings-body > :first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.settings-item-copy,
 .settings-row-copy {
+  min-width: 0;
   display: grid;
   gap: 2px;
-  min-width: 0;
 }
 
+.settings-item-copy strong,
 .settings-row-copy strong {
+  color: var(--text);
   font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  overflow-wrap: anywhere;
+}
+
+.settings-item-copy span,
+.settings-item-copy small,
+.settings-row-copy span,
+.settings-help {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  overflow-wrap: anywhere;
+}
+
+.settings-help {
+  margin: 0;
+}
+
+.settings-item-control {
+  flex: none;
+  max-width: 62%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings-list > .settings-error,
+.settings-list > .settings-notice,
+.settings-list > .settings-help {
+  margin-bottom: var(--space-3);
+}
+
+.settings-list-footer {
+  padding-top: var(--space-3);
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Signing out is consequential: a danger outline, never a fill, so it stays quiet until needed. */
+.account-session-panel .secondary-action:not(:disabled) {
+  border-color: var(--danger-line);
+  color: var(--danger);
+}
+
+.account-session-panel .secondary-action:not(:disabled):hover {
+  background: var(--danger-surface);
+}
+
+.settings-profile {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+.settings-profile dt {
+  color: var(--muted);
+  font-size: var(--text-xs);
+}
+
+.settings-profile dd {
+  margin: 2px 0 0;
+  color: var(--text);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+/* The page: a section list on the left and the open section beside it (Hermes Settings). */
+.settings-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-8);
+}
+
+.settings-nav {
+  position: sticky;
+  top: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.settings-nav-item {
+  box-sizing: border-box;
+  height: var(--control-h-sm);
+  padding: 0 var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-radius: var(--radius-control-sm);
+  color: var(--text-soft);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.settings-nav-item:hover {
+  background: var(--panel-hover);
+  color: var(--text);
+}
+
+.settings-nav-item.active {
+  background: var(--panel-active);
+  color: var(--text);
   font-weight: var(--weight-medium);
 }
 
-.settings-row-copy span,
-.settings-help {
-  font-size: var(--text-xs);
-  line-height: var(--leading-xs);
-  color: var(--muted);
+.settings-nav-item .nav-icon {
+  display: inline-flex;
+  flex: none;
 }
 
-/* Lists inside a card are separated by hairlines, not more cards. */
-.settings-list > .settings-row + .settings-row {
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--border-subtle);
+.settings-page {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-5);
+}
+
+.settings-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+/* The first step is a link: at least 24px tall, a pointer target (WCAG 2.2 SC 2.5.8). */
+.settings-breadcrumb a {
+  min-height: 24px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.settings-breadcrumb a:hover {
+  color: var(--text);
+}
+
+.settings-breadcrumb [aria-current="page"] {
+  color: var(--text);
+  font-weight: var(--weight-medium);
 }
 
 
@@ -909,8 +1062,28 @@ input[type="radio"] {
 }
 
 .settings-choice:hover {
+  background: var(--panel-hover);
   color: var(--text);
 }
+
+.settings-choice input:disabled {
+  cursor: progress;
+}
+
+.settings-swatch {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--border-max);
+  border-radius: 50%;
+}
+
+.settings-swatch.accent-mono { background: var(--text); }
+.settings-swatch.accent-blue { background: #3b82f6; }
+.settings-swatch.accent-teal { background: #14b8a6; }
+.settings-swatch.accent-green { background: #22c55e; }
+.settings-swatch.accent-amber { background: #f59e0b; }
+.settings-swatch.accent-rose { background: #f43f5e; }
+.settings-swatch.accent-violet { background: #8b5cf6; }
 
 .settings-choice.selected {
   border-color: var(--border-strong);
@@ -965,6 +1138,21 @@ input[type="radio"] {
   white-space: nowrap;
 }
 
+.settings-badge {
+  flex: none;
+  color: var(--muted);
+}
+
+.settings-badge.active {
+  border-color: var(--success-line);
+  color: var(--success);
+}
+
+.settings-badge.attention {
+  border-color: var(--warning-line);
+  color: var(--warning);
+}
+
 
 /* =========================================================
    ALERTS (shadcn Alert): one shape per severity, at the top of what they explain
@@ -988,12 +1176,14 @@ input[type="radio"] {
 
 .settings-banner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
 }
 
 .settings-banner .settings-error {
+  flex: 1 1 260px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -1006,6 +1196,16 @@ input[type="radio"] {
   color: var(--muted);
   font-size: var(--text-sm);
   line-height: var(--leading-sm);
+}
+
+/* A saved-setting confirmation is a quiet bordered line, not an alert. */
+.settings-notice {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface-1);
+  color: var(--text-soft);
 }
 
 /* An empty state: a quiet dashed box with one line, the way Linear and GitHub show "nothing yet". */
@@ -1259,7 +1459,33 @@ kbd {
     padding: 0 var(--space-3);
   }
 
-  .settings-section {
-    padding: var(--space-4);
+  /* On a phone the section list is a scrolling row above the open section. */
+  .settings-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .settings-nav {
+    position: static;
+    display: flex;
+    gap: var(--space-1);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .settings-section-heading {
+    flex-direction: column;
+  }
+
+  .settings-item,
+  .settings-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+  }
+
+  .settings-item-control {
+    max-width: none;
+    justify-content: flex-start;
   }
 }

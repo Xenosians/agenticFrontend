@@ -43,7 +43,7 @@ proc observedJob*(run: RunState): bool =
   run.active and run.jobId.len > 0 and run.observationMode.len > 0
 
 
-proc renderStatusbar*(state: AppState, openView: proc(view: AppView)): VNode =
+proc renderStatusbar*(state: AppState, openView: proc(view: AppView), openServices: proc()): VNode =
   result = buildHtml(footer(class = "statusbar", `aria-label` = "Status")):
     tdiv(class = "statusbar-group"):
       button(class = healthClass(state.system), title = "Open service status in Settings"):
@@ -51,7 +51,7 @@ proc renderStatusbar*(state: AppState, openView: proc(view: AppView)): VNode =
           text ""
         text healthLabel(state.system)
         proc onclick(event: Event, node: VNode) =
-          openView(viewSettings)
+          openServices()
 
       if observedJob(state.run):
         button(class = "statusbar-item statusbar-job", title = "Open the current task"):
