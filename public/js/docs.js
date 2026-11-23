@@ -4378,19 +4378,19 @@ function field__appZcapability95catalog_u18(node_p0, key_p1) {
 
 }
 
-function served__appZcapability95catalog_u206(item_p0) {
+function served__appZcapability95catalog_u190(item_p0) {
         var Temporary3;
 
-  var result_2466250960 = false;
+  var result_2466250944 = false;
 
   BeforeRet: {
     if ((!(hasKey__pureZjson_u3195(item_p0, [97,103,101,110,116,95,110,97,109,101,115])) || !((HEX5BHEX5D__pureZjson_u3082(item_p0, [97,103,101,110,116,95,110,97,109,101,115]).kind == 6)))) {
-    result_2466250960 = false;
+    result_2466250944 = false;
     break BeforeRet;
     }
     
     Label1: {
-      var owner_2466250965 = null;
+      var owner_2466250949 = null;
       var colontmp__603980745 = null;
       colontmp__603980745 = HEX5BHEX5D__pureZjson_u3082(item_p0, [97,103,101,110,116,95,110,97,109,101,115]);
       if (!((colontmp__603980745.kind == 6))) {
@@ -4409,9 +4409,9 @@ function served__appZcapability95catalog_u206(item_p0) {
             Label5: while (true) {
             if (!(i_603980749 < L_603980750)) break Label5;
               i_603980747 = colontmp__603980748[chckIndx(i_603980749, 0, (colontmp__603980748).length - 1)];
-              owner_2466250965 = i_603980747;
-              if (((owner_2466250965.kind == 4) && (0 < (getStr__pureZjson_u241(owner_2466250965, [])).length))) {
-              result_2466250960 = true;
+              owner_2466250949 = i_603980747;
+              if (((owner_2466250949.kind == 4) && (0 < (getStr__pureZjson_u241(owner_2466250949, [])).length))) {
+              result_2466250944 = true;
               break BeforeRet;
               }
               
@@ -4426,7 +4426,7 @@ function served__appZcapability95catalog_u206(item_p0) {
     };
   };
 
-  return result_2466250960;
+  return result_2466250944;
 
 }
 
@@ -4748,52 +4748,52 @@ function words__appZcapability95catalog_u30(identifier_p0) {
 
 }
 
-function operationName__appZcapability95catalog_u92(id_p0) {
-  var result_2466250846 = [];
+function operationName__appZcapability95catalog_u76(id_p0) {
+  var result_2466250830 = [];
 
-    result_2466250846 = nimCopy(null, words__appZcapability95catalog_u30(id_p0), NTI33554449);
+    result_2466250830 = nimCopy(null, words__appZcapability95catalog_u30(id_p0), NTI33554449);
 
-  return result_2466250846;
+  return result_2466250830;
 
 }
 
-function find__appZcapability95catalog_u170(a_p0, item_p1) {
-  var result_2466250927 = 0;
+function find__appZcapability95catalog_u154(a_p0, item_p1) {
+  var result_2466250911 = 0;
 
   BeforeRet: {
-    result_2466250927 = 0;
+    result_2466250911 = 0;
     Label1: {
-      var i_2466250931 = 0;
+      var i_2466250915 = 0;
       var i_603980795 = 0;
       Label2: {
           Label3: while (true) {
           if (!(i_603980795 < (a_p0).length)) break Label3;
-            i_2466250931 = a_p0[chckIndx(i_603980795, 0, (a_p0).length - 1)];
-            if ((i_2466250931 == item_p1)) {
+            i_2466250915 = a_p0[chckIndx(i_603980795, 0, (a_p0).length - 1)];
+            if ((i_2466250915 == item_p1)) {
             break BeforeRet;
             }
             
-            result_2466250927 = addInt(result_2466250927, 1);
+            result_2466250911 = addInt(result_2466250911, 1);
             i_603980795 += 1;
           }
       };
     };
-    result_2466250927 = (-1);
+    result_2466250911 = (-1);
   };
 
-  return result_2466250927;
+  return result_2466250911;
 
 }
 
-function contains__appZcapability95catalog_u165(a_p0, item_p1) {
-  var result_2466250921 = false;
+function contains__appZcapability95catalog_u149(a_p0, item_p1) {
+  var result_2466250905 = false;
 
   BeforeRet: {
-    result_2466250921 = (0 <= find__appZcapability95catalog_u170(a_p0, item_p1));
+    result_2466250905 = (0 <= find__appZcapability95catalog_u154(a_p0, item_p1));
     break BeforeRet;
   };
 
-  return result_2466250921;
+  return result_2466250905;
 
 }
 
@@ -4829,30 +4829,30 @@ function HEX2EHEX2E__stdZstrbasics_u48(a_p0, b_p1) {
 
 }
 
-function firstSentence__appZcapability95catalog_u131(text_p0) {
+function firstSentence__appZcapability95catalog_u115(text_p0) {
               var Temporary4;
               var Temporary5;
 
-  var result_2466250885 = [];
+  var result_2466250869 = [];
 
   BeforeRet: {
-    var wordStart_2466250886 = 0;
+    var wordStart_2466250870 = 0;
     Label1: {
-      var index_2466250887 = 0;
-      var character_2466250888 = 0;
+      var index_2466250871 = 0;
+      var character_2466250872 = 0;
       var i_603980790 = 0;
       var L_603980791 = (text_p0).length;
       Label2: {
           Label3: while (true) {
           if (!(i_603980790 < L_603980791)) break Label3;
-            index_2466250887 = i_603980790;
-            character_2466250888 = text_p0[chckIndx(i_603980790, 0, (text_p0).length - 1)];
-            if ((character_2466250888 == 32)) {
-            wordStart_2466250886 = addInt(index_2466250887, 1);
+            index_2466250871 = i_603980790;
+            character_2466250872 = text_p0[chckIndx(i_603980790, 0, (text_p0).length - 1)];
+            if ((character_2466250872 == 32)) {
+            wordStart_2466250870 = addInt(index_2466250871, 1);
             }
             else {
-              if (!(((character_2466250888 == 46) && (addInt(index_2466250887, 2) < (text_p0).length)) && (text_p0[chckIndx(addInt(index_2466250887, 1), 0, (text_p0).length - 1)] == 32))) Temporary5 = false; else {                Temporary5 = (ConstSet32[text_p0[chckIndx(addInt(index_2466250887, 2), 0, (text_p0).length - 1)]] != undefined);              }              if (!Temporary5) Temporary4 = false; else {                Temporary4 = !(contains__appZcapability95catalog_u165(HEX5BHEX5D__pureZstrutils_u1280(text_p0, HEX2EHEX2E__stdZstrbasics_u48(wordStart_2466250886, subInt(index_2466250887, 1))), 46));              }            if (Temporary4) {
-            result_2466250885 = nimCopy(null, HEX5BHEX5D__pureZstrutils_u1280(text_p0, HEX2EHEX2E__stdZstrbasics_u48(0, index_2466250887)), NTI33554449);
+              if (!(((character_2466250872 == 46) && (addInt(index_2466250871, 2) < (text_p0).length)) && (text_p0[chckIndx(addInt(index_2466250871, 1), 0, (text_p0).length - 1)] == 32))) Temporary5 = false; else {                Temporary5 = (ConstSet32[text_p0[chckIndx(addInt(index_2466250871, 2), 0, (text_p0).length - 1)]] != undefined);              }              if (!Temporary5) Temporary4 = false; else {                Temporary4 = !(contains__appZcapability95catalog_u149(HEX5BHEX5D__pureZstrutils_u1280(text_p0, HEX2EHEX2E__stdZstrbasics_u48(wordStart_2466250870, subInt(index_2466250871, 1))), 46));              }            if (Temporary4) {
+            result_2466250869 = nimCopy(null, HEX5BHEX5D__pureZstrutils_u1280(text_p0, HEX2EHEX2E__stdZstrbasics_u48(0, index_2466250871)), NTI33554449);
             break BeforeRet;
             }
             }
@@ -4864,10 +4864,10 @@ function firstSentence__appZcapability95catalog_u131(text_p0) {
           }
       };
     };
-    result_2466250885 = nimCopy(null, text_p0, NTI33554449);
+    result_2466250869 = nimCopy(null, text_p0, NTI33554449);
   };
 
-  return result_2466250885;
+  return result_2466250869;
 
 }
 
@@ -4931,25 +4931,25 @@ function HEX5BHEX5D__pureZstrutils_u1308(s_p0, x_p1) {
 
 }
 
-function withoutReadOnlyLead__appZcapability95catalog_u98(text_p0) {
+function withoutReadOnlyLead__appZcapability95catalog_u82(text_p0) {
             var Temporary4;
 
-  var result_2466250852 = [];
+  var result_2466250836 = [];
 
   BeforeRet: {
-    var lowered_2466250853 = nsuToLowerAsciiStr(text_p0);
+    var lowered_2466250837 = nsuToLowerAsciiStr(text_p0);
     Label1: {
-      var lead_2466250858 = [];
+      var lead_2466250842 = [];
       var i_603980802 = 0;
       Label2: {
           Label3: while (true) {
           if (!true) break Label3;
-            lead_2466250858 = (Temporary4 = [[114,101,97,100,32,111,110,108,121], [114,101,97,100,45,111,110,108,121]], Temporary4)[chckIndx(i_603980802, 0, (Temporary4).length - 1)];
-            if (((nsuStartsWith(lowered_2466250853, lead_2466250858) && ((lead_2466250858).length < (text_p0).length)) && (ConstSet33[text_p0[chckIndx((lead_2466250858).length, 0, (text_p0).length - 1)]] != undefined))) {
-            var stop_2466250863 = nsuFindCharSet(text_p0, ConstSet34, chckRange((lead_2466250858).length, 0, 2147483647), (-1));
-            var rest_2466250882 = nsuStrip(HEX5BHEX5D__pureZstrutils_u1308(text_p0, HEX2EHEX2E__stdZenumutils_u105(addInt(stop_2466250863, 1), 1)), true, true, ConstSet35);
-            if ((0 < (rest_2466250882).length)) {
-            result_2466250852 = nimCopy(null, rest_2466250882, NTI33554449);
+            lead_2466250842 = (Temporary4 = [[114,101,97,100,32,111,110,108,121], [114,101,97,100,45,111,110,108,121]], Temporary4)[chckIndx(i_603980802, 0, (Temporary4).length - 1)];
+            if (((nsuStartsWith(lowered_2466250837, lead_2466250842) && ((lead_2466250842).length < (text_p0).length)) && (ConstSet33[text_p0[chckIndx((lead_2466250842).length, 0, (text_p0).length - 1)]] != undefined))) {
+            var stop_2466250847 = nsuFindCharSet(text_p0, ConstSet34, chckRange((lead_2466250842).length, 0, 2147483647), (-1));
+            var rest_2466250866 = nsuStrip(HEX5BHEX5D__pureZstrutils_u1308(text_p0, HEX2EHEX2E__stdZenumutils_u105(addInt(stop_2466250847, 1), 1)), true, true, ConstSet35);
+            if ((0 < (rest_2466250866).length)) {
+            result_2466250836 = nimCopy(null, rest_2466250866, NTI33554449);
             break BeforeRet;
             }
             
@@ -4963,23 +4963,23 @@ function withoutReadOnlyLead__appZcapability95catalog_u98(text_p0) {
           }
       };
     };
-    result_2466250852 = nimCopy(null, text_p0, NTI33554449);
+    result_2466250836 = nimCopy(null, text_p0, NTI33554449);
   };
 
-  return result_2466250852;
+  return result_2466250836;
 
 }
 
-function operationSummary__appZcapability95catalog_u203(description_p0) {
-  var result_2466250957 = [];
+function operationSummary__appZcapability95catalog_u187(description_p0) {
+  var result_2466250941 = [];
 
-    result_2466250957 = nimCopy(null, firstSentence__appZcapability95catalog_u131(withoutReadOnlyLead__appZcapability95catalog_u98(nsuStrip(description_p0, true, true, ConstSet36))), NTI33554449);
-    if ((0 < (result_2466250957).length)) {
-    result_2466250957[chckIndx(0, 0, (result_2466250957).length - 1)] = nsuToUpperAsciiChar(result_2466250957[chckIndx(0, 0, (result_2466250957).length - 1)]);
+    result_2466250941 = nimCopy(null, firstSentence__appZcapability95catalog_u115(withoutReadOnlyLead__appZcapability95catalog_u82(nsuStrip(description_p0, true, true, ConstSet36))), NTI33554449);
+    if ((0 < (result_2466250941).length)) {
+    result_2466250941[chckIndx(0, 0, (result_2466250941).length - 1)] = nsuToUpperAsciiChar(result_2466250941[chckIndx(0, 0, (result_2466250941).length - 1)]);
     }
     
 
-  return result_2466250957;
+  return result_2466250941;
 
 }
 
@@ -5006,11 +5006,11 @@ function getBool__pureZjson_u282(n_p0, default_p1) {
 
 }
 
-function newSeq__appZcapability95catalog_u290(len_p0) {
-  var result_2466251046 = [];
+function newSeq__appZcapability95catalog_u274(len_p0) {
+  var result_2466251030 = [];
 
-    result_2466251046 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2466251046[i] = ({id: [], name: [], summary: [], provider: [], change: false, approval: false}); }
-  return result_2466251046;
+    result_2466251030 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2466251030[i] = ({id: [], name: [], summary: [], provider: [], change: false, approval: false}); }
+  return result_2466251030;
 
 }
 
@@ -5024,49 +5024,49 @@ function HEX2A__pureZalgorithm_u8(x_p0, order_p1) {
 
 }
 
-function mergeAlt__appZcapability95catalog_u339(a_p0, b_p1, lo_p2, m_p3, hi_p4, cmp_p5, order_p6) {
+function mergeAlt__appZcapability95catalog_u323(a_p0, b_p1, lo_p2, m_p3, hi_p4, cmp_p5, order_p6) {
   BeforeRet: {
     if ((HEX2A__pureZalgorithm_u8(cmp_p5(a_p0[chckIndx(m_p3, 0, (a_p0).length - 1)], a_p0[chckIndx(addInt(m_p3, 1), 0, (a_p0).length - 1)]), order_p6) <= 0)) {
     break BeforeRet;
     }
     
-    var j_2466251102 = lo_p2;
-    if (!((j_2466251102 <= m_p3))) {
+    var j_2466251086 = lo_p2;
+    if (!((j_2466251086 <= m_p3))) {
     failedAssertImpl__stdZassertions_u86([97,108,103,111,114,105,116,104,109,46,110,105,109,40,51,51,56,44,32,51,41,32,96,106,32,60,61,32,109,96,32]);
     }
     
-    var bb_2466251108 = 0;
+    var bb_2466251092 = 0;
     Label1: {
         Label2: while (true) {
-        if (!(j_2466251102 <= m_p3)) break Label2;
-          b_p1[chckIndx(bb_2466251108, 0, (b_p1).length - 1)] = nimCopy(b_p1[chckIndx(bb_2466251108, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251102, 0, (a_p0).length - 1)], NTI2466250755);
-          bb_2466251108 = addInt(bb_2466251108, 1);
-          j_2466251102 = addInt(j_2466251102, 1);
+        if (!(j_2466251086 <= m_p3)) break Label2;
+          b_p1[chckIndx(bb_2466251092, 0, (b_p1).length - 1)] = nimCopy(b_p1[chckIndx(bb_2466251092, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251086, 0, (a_p0).length - 1)], NTI2466250755);
+          bb_2466251092 = addInt(bb_2466251092, 1);
+          j_2466251086 = addInt(j_2466251086, 1);
         }
     };
-    var i_2466251119 = 0;
-    var k_2466251120 = lo_p2;
+    var i_2466251103 = 0;
+    var k_2466251104 = lo_p2;
     Label3: {
         Label4: while (true) {
-        if (!((k_2466251120 < j_2466251102) && (j_2466251102 <= hi_p4))) break Label4;
-          if ((HEX2A__pureZalgorithm_u8(cmp_p5(b_p1[chckIndx(i_2466251119, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251102, 0, (a_p0).length - 1)]), order_p6) <= 0)) {
-          a_p0[chckIndx(k_2466251120, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251120, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251119, 0, (b_p1).length - 1)], NTI2466250755);
-          i_2466251119 = addInt(i_2466251119, 1);
+        if (!((k_2466251104 < j_2466251086) && (j_2466251086 <= hi_p4))) break Label4;
+          if ((HEX2A__pureZalgorithm_u8(cmp_p5(b_p1[chckIndx(i_2466251103, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251086, 0, (a_p0).length - 1)]), order_p6) <= 0)) {
+          a_p0[chckIndx(k_2466251104, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251104, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251103, 0, (b_p1).length - 1)], NTI2466250755);
+          i_2466251103 = addInt(i_2466251103, 1);
           }
           else {
-            a_p0[chckIndx(k_2466251120, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251120, 0, (a_p0).length - 1)], a_p0[chckIndx(j_2466251102, 0, (a_p0).length - 1)], NTI2466250755);
-            j_2466251102 = addInt(j_2466251102, 1);
+            a_p0[chckIndx(k_2466251104, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251104, 0, (a_p0).length - 1)], a_p0[chckIndx(j_2466251086, 0, (a_p0).length - 1)], NTI2466250755);
+            j_2466251086 = addInt(j_2466251086, 1);
           }
           
-          k_2466251120 = addInt(k_2466251120, 1);
+          k_2466251104 = addInt(k_2466251104, 1);
         }
     };
     Label5: {
         Label6: while (true) {
-        if (!(k_2466251120 < j_2466251102)) break Label6;
-          a_p0[chckIndx(k_2466251120, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251120, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251119, 0, (b_p1).length - 1)], NTI2466250755);
-          k_2466251120 = addInt(k_2466251120, 1);
-          i_2466251119 = addInt(i_2466251119, 1);
+        if (!(k_2466251104 < j_2466251086)) break Label6;
+          a_p0[chckIndx(k_2466251104, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251104, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251103, 0, (b_p1).length - 1)], NTI2466250755);
+          k_2466251104 = addInt(k_2466251104, 1);
+          i_2466251103 = addInt(i_2466251103, 1);
         }
     };
   };
@@ -5074,22 +5074,22 @@ function mergeAlt__appZcapability95catalog_u339(a_p0, b_p1, lo_p2, m_p3, hi_p4, 
   
 }
 
-function sort__appZcapability95catalog_u249(a_p0, cmp_p1, order_p2) {
-    var n_2466251013 = (a_p0).length;
-    var b_2466251088 = newSeq__appZcapability95catalog_u290(chckRange(divInt(n_2466251013, 2), 0, 2147483647));
-    var s_2466251089 = 1;
+function sort__appZcapability95catalog_u233(a_p0, cmp_p1, order_p2) {
+    var n_2466250997 = (a_p0).length;
+    var b_2466251072 = newSeq__appZcapability95catalog_u274(chckRange(divInt(n_2466250997, 2), 0, 2147483647));
+    var s_2466251073 = 1;
     Label1: {
         Label2: while (true) {
-        if (!(s_2466251089 < n_2466251013)) break Label2;
-          var m_2466251090 = subInt(subInt(n_2466251013, 1), s_2466251089);
+        if (!(s_2466251073 < n_2466250997)) break Label2;
+          var m_2466251074 = subInt(subInt(n_2466250997, 1), s_2466251073);
           Label3: {
               Label4: while (true) {
-              if (!(0 <= m_2466251090)) break Label4;
-                mergeAlt__appZcapability95catalog_u339(a_p0, b_2466251088, nimMax(addInt(subInt(m_2466251090, s_2466251089), 1), 0), m_2466251090, addInt(m_2466251090, s_2466251089), cmp_p1, order_p2);
-                m_2466251090 = subInt(m_2466251090, mulInt(s_2466251089, 2));
+              if (!(0 <= m_2466251074)) break Label4;
+                mergeAlt__appZcapability95catalog_u323(a_p0, b_2466251072, nimMax(addInt(subInt(m_2466251074, s_2466251073), 1), 0), m_2466251074, addInt(m_2466251074, s_2466251073), cmp_p1, order_p2);
+                m_2466251074 = subInt(m_2466251074, mulInt(s_2466251073, 2));
               }
           };
-          s_2466251089 = mulInt(s_2466251089, 2);
+          s_2466251073 = mulInt(s_2466251073, 2);
         }
     };
 
@@ -5119,20 +5119,20 @@ function cmp__system_u1456(x_p0, y_p1) {
 
 }
 
-function catalogOperations__appZcapability95catalog_u218(catalog_p0) {
+function catalogOperations__appZcapability95catalog_u202(catalog_p0) {
         var Temporary3;
     var Temporary7;
 
-function HEX3Aanonymous__appZcapability95catalog_u243(a_p0, b_p1) {
-  var result_2466250998 = 0;
+function HEX3Aanonymous__appZcapability95catalog_u227(a_p0, b_p1) {
+  var result_2466250982 = 0;
 
-    result_2466250998 = cmp__system_u1456(a_p0.id, b_p1.id);
+    result_2466250982 = cmp__system_u1456(a_p0.id, b_p1.id);
 
-  return result_2466250998;
+  return result_2466250982;
 
 }
 
-  var result_2466250972 = [];
+  var result_2466250956 = [];
 
   BeforeRet: {
     if ((((HEX3DHEX3D__pureZjson_u2104(catalog_p0, null) || !((catalog_p0.kind == 5))) || !(hasKey__pureZjson_u3195(catalog_p0, [99,97,112,97,98,105,108,105,116,105,101,115]))) || !((HEX5BHEX5D__pureZjson_u3082(catalog_p0, [99,97,112,97,98,105,108,105,116,105,101,115]).kind == 6)))) {
@@ -5140,7 +5140,7 @@ function HEX3Aanonymous__appZcapability95catalog_u243(a_p0, b_p1) {
     }
     
     Label1: {
-      var item_2466250981 = null;
+      var item_2466250965 = null;
       var colontmp__603980716 = null;
       colontmp__603980716 = HEX5BHEX5D__pureZjson_u3082(catalog_p0, [99,97,112,97,98,105,108,105,116,105,101,115]);
       if (!((colontmp__603980716.kind == 6))) {
@@ -5159,14 +5159,14 @@ function HEX3Aanonymous__appZcapability95catalog_u243(a_p0, b_p1) {
             Label5: while (true) {
             if (!(i_603980726 < L_603980727)) break Label5;
               i_603980724 = colontmp__603980725[chckIndx(i_603980726, 0, (colontmp__603980725).length - 1)];
-              item_2466250981 = i_603980724;
+              item_2466250965 = i_603980724;
               Label6: {
-                if (((!((item_2466250981.kind == 5)) || ((field__appZcapability95catalog_u18(item_2466250981, [105,100])).length == 0)) || !(served__appZcapability95catalog_u206(item_2466250981)))) {
+                if (((!((item_2466250965.kind == 5)) || ((field__appZcapability95catalog_u18(item_2466250965, [105,100])).length == 0)) || !(served__appZcapability95catalog_u190(item_2466250965)))) {
                 break Label6;
                 }
                 
-                var id_2466250986 = field__appZcapability95catalog_u18(item_2466250981, [105,100]);
-                result_2466250972.push({id: nimCopy(null, id_2466250986, NTI33554449), name: operationName__appZcapability95catalog_u92(id_2466250986), summary: operationSummary__appZcapability95catalog_u203(field__appZcapability95catalog_u18(item_2466250981, [100,101,115,99,114,105,112,116,105,111,110])), provider: field__appZcapability95catalog_u18(item_2466250981, [112,114,111,118,105,100,101,114]), change: eqStrings(field__appZcapability95catalog_u18(item_2466250981, [101,102,102,101,99,116]), [109,117,116,97,116,105,111,110]), approval: ((hasKey__pureZjson_u3195(item_2466250981, [114,101,113,117,105,114,101,115,95,97,112,112,114,111,118,97,108]) && (HEX5BHEX5D__pureZjson_u3082(item_2466250981, [114,101,113,117,105,114,101,115,95,97,112,112,114,111,118,97,108]).kind == 1)) && getBool__pureZjson_u282(HEX5BHEX5D__pureZjson_u3082(item_2466250981, [114,101,113,117,105,114,101,115,95,97,112,112,114,111,118,97,108]), false))});;
+                var id_2466250970 = field__appZcapability95catalog_u18(item_2466250965, [105,100]);
+                result_2466250956.push({id: nimCopy(null, id_2466250970, NTI33554449), name: operationName__appZcapability95catalog_u76(id_2466250970), summary: operationSummary__appZcapability95catalog_u187(field__appZcapability95catalog_u18(item_2466250965, [100,101,115,99,114,105,112,116,105,111,110])), provider: field__appZcapability95catalog_u18(item_2466250965, [112,114,111,118,105,100,101,114]), change: eqStrings(field__appZcapability95catalog_u18(item_2466250965, [101,102,102,101,99,116]), [109,117,116,97,116,105,111,110]), approval: ((hasKey__pureZjson_u3195(item_2466250965, [114,101,113,117,105,114,101,115,95,97,112,112,114,111,118,97,108]) && (HEX5BHEX5D__pureZjson_u3082(item_2466250965, [114,101,113,117,105,114,101,115,95,97,112,112,114,111,118,97,108]).kind == 1)) && getBool__pureZjson_u282(HEX5BHEX5D__pureZjson_u3082(item_2466250965, [114,101,113,117,105,114,101,115,95,97,112,112,114,111,118,97,108]), false))});;
               };
               i_603980726 += 1;
               if (!(((colontmp__603980725).length == L_603980727))) {
@@ -5177,18 +5177,18 @@ function HEX3Aanonymous__appZcapability95catalog_u243(a_p0, b_p1) {
         };
       };
     };
-    Temporary7 = HEX3Aanonymous__appZcapability95catalog_u243.bind(null); Temporary7.ClP_0 = HEX3Aanonymous__appZcapability95catalog_u243; Temporary7.ClE_0 = null;
-    sort__appZcapability95catalog_u249(result_2466250972, Temporary7, 1);
+    Temporary7 = HEX3Aanonymous__appZcapability95catalog_u227.bind(null); Temporary7.ClP_0 = HEX3Aanonymous__appZcapability95catalog_u227; Temporary7.ClE_0 = null;
+    sort__appZcapability95catalog_u233(result_2466250956, Temporary7, 1);
   };
 
-  return result_2466250972;
+  return result_2466250956;
 
 }
 
-function serviceName__appZcapability95catalog_u95(provider_p0) {
+function serviceName__appZcapability95catalog_u79(provider_p0) {
     var Temporary1;
 
-  var result_2466250849 = [];
+  var result_2466250833 = [];
 
     if (((provider_p0).length == 0)) {
     Temporary1 = [79,116,104,101,114];
@@ -5197,63 +5197,63 @@ function serviceName__appZcapability95catalog_u95(provider_p0) {
     Temporary1 = words__appZcapability95catalog_u30(provider_p0);
     }
     
-    result_2466250849 = nimCopy(null, Temporary1, NTI33554449);
+    result_2466250833 = nimCopy(null, Temporary1, NTI33554449);
 
-  return result_2466250849;
-
-}
-
-function newSeq__appZcapability95catalog_u626(len_p0) {
-  var result_2466251382 = [];
-
-    result_2466251382 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2466251382[i] = ({id: [], name: [], setup: ({id: [], name: [], state: [], missing: []}), operations: []}); }
-  return result_2466251382;
+  return result_2466250833;
 
 }
 
-function mergeAlt__appZcapability95catalog_u654(a_p0, b_p1, lo_p2, m_p3, hi_p4, cmp_p5, order_p6) {
+function newSeq__appZcapability95catalog_u610(len_p0) {
+  var result_2466251366 = [];
+
+    result_2466251366 = new Array(len_p0); for (var i = 0 ; i < len_p0 ; ++i) { result_2466251366[i] = ({id: [], name: [], setup: ({id: [], name: [], state: [], missing: []}), operations: []}); }
+  return result_2466251366;
+
+}
+
+function mergeAlt__appZcapability95catalog_u638(a_p0, b_p1, lo_p2, m_p3, hi_p4, cmp_p5, order_p6) {
   BeforeRet: {
     if ((HEX2A__pureZalgorithm_u8(cmp_p5(a_p0[chckIndx(m_p3, 0, (a_p0).length - 1)], a_p0[chckIndx(addInt(m_p3, 1), 0, (a_p0).length - 1)]), order_p6) <= 0)) {
     break BeforeRet;
     }
     
-    var j_2466251417 = lo_p2;
-    if (!((j_2466251417 <= m_p3))) {
+    var j_2466251401 = lo_p2;
+    if (!((j_2466251401 <= m_p3))) {
     failedAssertImpl__stdZassertions_u86([97,108,103,111,114,105,116,104,109,46,110,105,109,40,51,51,56,44,32,51,41,32,96,106,32,60,61,32,109,96,32]);
     }
     
-    var bb_2466251423 = 0;
+    var bb_2466251407 = 0;
     Label1: {
         Label2: while (true) {
-        if (!(j_2466251417 <= m_p3)) break Label2;
-          b_p1[chckIndx(bb_2466251423, 0, (b_p1).length - 1)] = nimCopy(b_p1[chckIndx(bb_2466251423, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251417, 0, (a_p0).length - 1)], NTI2466250756);
-          bb_2466251423 = addInt(bb_2466251423, 1);
-          j_2466251417 = addInt(j_2466251417, 1);
+        if (!(j_2466251401 <= m_p3)) break Label2;
+          b_p1[chckIndx(bb_2466251407, 0, (b_p1).length - 1)] = nimCopy(b_p1[chckIndx(bb_2466251407, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251401, 0, (a_p0).length - 1)], NTI2466250756);
+          bb_2466251407 = addInt(bb_2466251407, 1);
+          j_2466251401 = addInt(j_2466251401, 1);
         }
     };
-    var i_2466251434 = 0;
-    var k_2466251435 = lo_p2;
+    var i_2466251418 = 0;
+    var k_2466251419 = lo_p2;
     Label3: {
         Label4: while (true) {
-        if (!((k_2466251435 < j_2466251417) && (j_2466251417 <= hi_p4))) break Label4;
-          if ((HEX2A__pureZalgorithm_u8(cmp_p5(b_p1[chckIndx(i_2466251434, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251417, 0, (a_p0).length - 1)]), order_p6) <= 0)) {
-          a_p0[chckIndx(k_2466251435, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251435, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251434, 0, (b_p1).length - 1)], NTI2466250756);
-          i_2466251434 = addInt(i_2466251434, 1);
+        if (!((k_2466251419 < j_2466251401) && (j_2466251401 <= hi_p4))) break Label4;
+          if ((HEX2A__pureZalgorithm_u8(cmp_p5(b_p1[chckIndx(i_2466251418, 0, (b_p1).length - 1)], a_p0[chckIndx(j_2466251401, 0, (a_p0).length - 1)]), order_p6) <= 0)) {
+          a_p0[chckIndx(k_2466251419, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251419, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251418, 0, (b_p1).length - 1)], NTI2466250756);
+          i_2466251418 = addInt(i_2466251418, 1);
           }
           else {
-            a_p0[chckIndx(k_2466251435, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251435, 0, (a_p0).length - 1)], a_p0[chckIndx(j_2466251417, 0, (a_p0).length - 1)], NTI2466250756);
-            j_2466251417 = addInt(j_2466251417, 1);
+            a_p0[chckIndx(k_2466251419, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251419, 0, (a_p0).length - 1)], a_p0[chckIndx(j_2466251401, 0, (a_p0).length - 1)], NTI2466250756);
+            j_2466251401 = addInt(j_2466251401, 1);
           }
           
-          k_2466251435 = addInt(k_2466251435, 1);
+          k_2466251419 = addInt(k_2466251419, 1);
         }
     };
     Label5: {
         Label6: while (true) {
-        if (!(k_2466251435 < j_2466251417)) break Label6;
-          a_p0[chckIndx(k_2466251435, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251435, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251434, 0, (b_p1).length - 1)], NTI2466250756);
-          k_2466251435 = addInt(k_2466251435, 1);
-          i_2466251434 = addInt(i_2466251434, 1);
+        if (!(k_2466251419 < j_2466251401)) break Label6;
+          a_p0[chckIndx(k_2466251419, 0, (a_p0).length - 1)] = nimCopy(a_p0[chckIndx(k_2466251419, 0, (a_p0).length - 1)], b_p1[chckIndx(i_2466251418, 0, (b_p1).length - 1)], NTI2466250756);
+          k_2466251419 = addInt(k_2466251419, 1);
+          i_2466251418 = addInt(i_2466251418, 1);
         }
     };
   };
@@ -5261,87 +5261,87 @@ function mergeAlt__appZcapability95catalog_u654(a_p0, b_p1, lo_p2, m_p3, hi_p4, 
   
 }
 
-function sort__appZcapability95catalog_u585(a_p0, cmp_p1, order_p2) {
-    var n_2466251349 = (a_p0).length;
-    var b_2466251403 = newSeq__appZcapability95catalog_u626(chckRange(divInt(n_2466251349, 2), 0, 2147483647));
-    var s_2466251404 = 1;
+function sort__appZcapability95catalog_u569(a_p0, cmp_p1, order_p2) {
+    var n_2466251333 = (a_p0).length;
+    var b_2466251387 = newSeq__appZcapability95catalog_u610(chckRange(divInt(n_2466251333, 2), 0, 2147483647));
+    var s_2466251388 = 1;
     Label1: {
         Label2: while (true) {
-        if (!(s_2466251404 < n_2466251349)) break Label2;
-          var m_2466251405 = subInt(subInt(n_2466251349, 1), s_2466251404);
+        if (!(s_2466251388 < n_2466251333)) break Label2;
+          var m_2466251389 = subInt(subInt(n_2466251333, 1), s_2466251388);
           Label3: {
               Label4: while (true) {
-              if (!(0 <= m_2466251405)) break Label4;
-                mergeAlt__appZcapability95catalog_u654(a_p0, b_2466251403, nimMax(addInt(subInt(m_2466251405, s_2466251404), 1), 0), m_2466251405, addInt(m_2466251405, s_2466251404), cmp_p1, order_p2);
-                m_2466251405 = subInt(m_2466251405, mulInt(s_2466251404, 2));
+              if (!(0 <= m_2466251389)) break Label4;
+                mergeAlt__appZcapability95catalog_u638(a_p0, b_2466251387, nimMax(addInt(subInt(m_2466251389, s_2466251388), 1), 0), m_2466251389, addInt(m_2466251389, s_2466251388), cmp_p1, order_p2);
+                m_2466251389 = subInt(m_2466251389, mulInt(s_2466251388, 2));
               }
           };
-          s_2466251404 = mulInt(s_2466251404, 2);
+          s_2466251388 = mulInt(s_2466251388, 2);
         }
     };
 
   
 }
 
-function serviceGroups__appZcapability95catalog_u445(operations_p0, setup_p1) {
+function serviceGroups__appZcapability95catalog_u429(operations_p0, setup_p1) {
     var Temporary12;
 
-function HEX3Aanonymous__appZcapability95catalog_u579(a_p0, b_p1) {
-  var result_2466251334 = 0;
+function HEX3Aanonymous__appZcapability95catalog_u563(a_p0, b_p1) {
+  var result_2466251318 = 0;
 
-    result_2466251334 = cmp__system_u1456(nsuToLowerAsciiStr(a_p0.name), nsuToLowerAsciiStr(b_p1.name));
+    result_2466251318 = cmp__system_u1456(nsuToLowerAsciiStr(a_p0.name), nsuToLowerAsciiStr(b_p1.name));
 
-  return result_2466251334;
+  return result_2466251318;
 
 }
 
-  var result_2466251200 = [];
+  var result_2466251184 = [];
 
     Label1: {
-      var operation_2466251223 = ({id: [], name: [], summary: [], provider: [], change: false, approval: false});
+      var operation_2466251207 = ({id: [], name: [], summary: [], provider: [], change: false, approval: false});
       var i_603980823 = 0;
       var L_603980824 = (operations_p0).length;
       Label2: {
           Label3: while (true) {
           if (!(i_603980823 < L_603980824)) break Label3;
-            operation_2466251223 = operations_p0[chckIndx(i_603980823, 0, (operations_p0).length - 1)];
-            var index_2466251224 = (-1);
+            operation_2466251207 = operations_p0[chckIndx(i_603980823, 0, (operations_p0).length - 1)];
+            var index_2466251208 = (-1);
             Label4: {
-              var position_2466251294 = 0;
-              var group_2466251295 = ({id: [], name: [], setup: ({id: [], name: [], state: [], missing: []}), operations: []});
+              var position_2466251278 = 0;
+              var group_2466251279 = ({id: [], name: [], setup: ({id: [], name: [], state: [], missing: []}), operations: []});
               var i_603980815 = 0;
-              var L_603980816 = (result_2466251200).length;
+              var L_603980816 = (result_2466251184).length;
               Label5: {
                   Label6: while (true) {
                   if (!(i_603980815 < L_603980816)) break Label6;
-                    position_2466251294 = i_603980815;
-                    group_2466251295 = nimCopy(group_2466251295, result_2466251200[chckIndx(i_603980815, 0, (result_2466251200).length - 1)], NTI2466250756);
-                    if (eqStrings(group_2466251295.id, operation_2466251223.provider)) {
-                    index_2466251224 = position_2466251294;
+                    position_2466251278 = i_603980815;
+                    group_2466251279 = nimCopy(group_2466251279, result_2466251184[chckIndx(i_603980815, 0, (result_2466251184).length - 1)], NTI2466250756);
+                    if (eqStrings(group_2466251279.id, operation_2466251207.provider)) {
+                    index_2466251208 = position_2466251278;
                     break Label4;
                     }
                     
                     i_603980815 += 1;
-                    if (!(((result_2466251200).length == L_603980816))) {
+                    if (!(((result_2466251184).length == L_603980816))) {
                     failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(187, 11) `len(a) == L` the length of the seq changed while iterating over it"));
                     }
                     
                   }
               };
             };
-            if ((index_2466251224 < 0)) {
-            var group_2466251296 = {id: nimCopy(null, operation_2466251223.provider, NTI33554449), name: serviceName__appZcapability95catalog_u95(operation_2466251223.provider), setup: ({id: [], name: [], state: [], missing: []}), operations: []};
+            if ((index_2466251208 < 0)) {
+            var group_2466251280 = {id: nimCopy(null, operation_2466251207.provider, NTI33554449), name: serviceName__appZcapability95catalog_u79(operation_2466251207.provider), setup: ({id: [], name: [], state: [], missing: []}), operations: []};
             Label7: {
-              var row_2466251319 = ({id: [], name: [], state: [], missing: []});
+              var row_2466251303 = ({id: [], name: [], state: [], missing: []});
               var i_603980820 = 0;
               var L_603980821 = (setup_p1).length;
               Label8: {
                   Label9: while (true) {
                   if (!(i_603980820 < L_603980821)) break Label9;
-                    row_2466251319 = setup_p1[chckIndx(i_603980820, 0, (setup_p1).length - 1)];
-                    if (eqStrings(row_2466251319.id, operation_2466251223.provider)) {
-                    group_2466251296.setup = nimCopy(group_2466251296.setup, row_2466251319, NTI2483027971);
-                    group_2466251296.name = nimCopy(null, row_2466251319.name, NTI33554449);
+                    row_2466251303 = setup_p1[chckIndx(i_603980820, 0, (setup_p1).length - 1)];
+                    if (eqStrings(row_2466251303.id, operation_2466251207.provider)) {
+                    group_2466251280.setup = nimCopy(group_2466251280.setup, row_2466251303, NTI2483027971);
+                    group_2466251280.name = nimCopy(null, row_2466251303.name, NTI33554449);
                     }
                     
                     i_603980820 += 1;
@@ -5352,13 +5352,13 @@ function HEX3Aanonymous__appZcapability95catalog_u579(a_p0, b_p1) {
                   }
               };
             };
-            var Temporary10 = nimCopy(null, group_2466251296, NTI2466250756);
-            result_2466251200.push(Temporary10);;
-            index_2466251224 = (result_2466251200).length - 1;
+            var Temporary10 = nimCopy(null, group_2466251280, NTI2466250756);
+            result_2466251184.push(Temporary10);;
+            index_2466251208 = (result_2466251184).length - 1;
             }
             
-            var Temporary11 = nimCopy(null, operation_2466251223, NTI2466250755);
-            result_2466251200[chckIndx(index_2466251224, 0, (result_2466251200).length - 1)].operations.push(Temporary11);;
+            var Temporary11 = nimCopy(null, operation_2466251207, NTI2466250755);
+            result_2466251184[chckIndx(index_2466251208, 0, (result_2466251184).length - 1)].operations.push(Temporary11);;
             i_603980823 += 1;
             if (!(((operations_p0).length == L_603980824))) {
             failedAssertImpl__stdZassertions_u86(makeNimstrLit("iterators.nim(254, 11) `len(a) == L` the length of the seq changed while iterating over it"));
@@ -5367,10 +5367,10 @@ function HEX3Aanonymous__appZcapability95catalog_u579(a_p0, b_p1) {
           }
       };
     };
-    Temporary12 = HEX3Aanonymous__appZcapability95catalog_u579.bind(null); Temporary12.ClP_0 = HEX3Aanonymous__appZcapability95catalog_u579; Temporary12.ClE_0 = null;
-    sort__appZcapability95catalog_u585(result_2466251200, Temporary12, 1);
+    Temporary12 = HEX3Aanonymous__appZcapability95catalog_u563.bind(null); Temporary12.ClP_0 = HEX3Aanonymous__appZcapability95catalog_u563; Temporary12.ClE_0 = null;
+    sort__appZcapability95catalog_u569(result_2466251184, Temporary12, 1);
 
-  return result_2466251200;
+  return result_2466251184;
 
 }
 
@@ -5533,13 +5533,13 @@ function contains__pureZstrutils_u1879(s_p0, sub_p1) {
 
 }
 
-function matches__appZcapability95catalog_u820(operation_p0, service_p1, query_p2) {
-  var result_2466251576 = false;
+function matches__appZcapability95catalog_u804(operation_p0, service_p1, query_p2) {
+  var result_2466251560 = false;
 
-    var needle_2466251577 = nsuToLowerAsciiStr(nsuStrip(query_p2, true, true, ConstSet39));
-    result_2466251576 = ((((((needle_2466251577).length == 0) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(operation_p0.name), needle_2466251577)) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(operation_p0.id), needle_2466251577)) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(operation_p0.summary), needle_2466251577)) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(service_p1), needle_2466251577));
+    var needle_2466251561 = nsuToLowerAsciiStr(nsuStrip(query_p2, true, true, ConstSet39));
+    result_2466251560 = ((((((needle_2466251561).length == 0) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(operation_p0.name), needle_2466251561)) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(operation_p0.id), needle_2466251561)) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(operation_p0.summary), needle_2466251561)) || contains__pureZstrutils_u1879(nsuToLowerAsciiStr(service_p1), needle_2466251561));
 
-  return result_2466251576;
+  return result_2466251560;
 
 }
 
@@ -5608,19 +5608,19 @@ function approvalNote__docs_u31(count_p0) {
 
 }
 
-function approvalCount__appZcapability95catalog_u808(operations_p0) {
-  var result_2466251562 = 0;
+function approvalCount__appZcapability95catalog_u792(operations_p0) {
+  var result_2466251546 = 0;
 
     Label1: {
-      var operation_2466251566 = ({id: [], name: [], summary: [], provider: [], change: false, approval: false});
+      var operation_2466251550 = ({id: [], name: [], summary: [], provider: [], change: false, approval: false});
       var i_603980882 = 0;
       var L_603980883 = (operations_p0).length;
       Label2: {
           Label3: while (true) {
           if (!(i_603980882 < L_603980883)) break Label3;
-            operation_2466251566 = operations_p0[chckIndx(i_603980882, 0, (operations_p0).length - 1)];
-            if (operation_2466251566.approval) {
-            result_2466251562 = addInt(result_2466251562, 1);
+            operation_2466251550 = operations_p0[chckIndx(i_603980882, 0, (operations_p0).length - 1)];
+            if (operation_2466251550.approval) {
+            result_2466251546 = addInt(result_2466251546, 1);
             }
             
             i_603980882 += 1;
@@ -5632,7 +5632,7 @@ function approvalCount__appZcapability95catalog_u808(operations_p0) {
       };
     };
 
-  return result_2466251562;
+  return result_2466251546;
 
 }
 
@@ -6979,7 +6979,7 @@ function renderService__docs_u157(group_p0, operations_p1, searching_p2) {
   var result_603979937 = null;
 
     var missing_603979938 = nimCopy(null, group_p0.setup.missing, NTI2483027972);
-    var approvals_603979939 = approvalCount__appZcapability95catalog_u808(group_p0.operations);
+    var approvals_603979939 = approvalCount__appZcapability95catalog_u792(group_p0.operations);
     var parts_603979947 = [plural__docs_u27((group_p0.operations).length, [111,112,101,114,97,116,105,111,110])];
     if ((0 < approvals_603979939)) {
     parts_603979947.push(approvalNote__docs_u31(approvals_603979939));;
@@ -7082,7 +7082,7 @@ function HEX3Aanonymous__docs_u296(event_p0, node_p1) {
 
   var result_603980020 = null;
 
-    var operations_603980021 = catalogOperations__appZcapability95catalog_u218(docs_603979802[0].catalog);
+    var operations_603980021 = catalogOperations__appZcapability95catalog_u202(docs_603979802[0].catalog);
     var query_603980022 = nsuStrip(docs_603979802[0].query, true, true, ConstSet38);
     var searching_603980023 = (0 < (query_603980022).length);
     var shown_603980024 = [];
@@ -7096,7 +7096,7 @@ function HEX3Aanonymous__docs_u296(event_p0, node_p1) {
       Temporary2 = docs_603979802[0].setup;
       }
       
-      colontmp__603980704 = serviceGroups__appZcapability95catalog_u445(operations_603980021, Temporary2);
+      colontmp__603980704 = serviceGroups__appZcapability95catalog_u429(operations_603980021, Temporary2);
       var i_603980706 = 0;
       var L_603980707 = (colontmp__603980704).length;
       Label3: {
@@ -7112,7 +7112,7 @@ function HEX3Aanonymous__docs_u296(event_p0, node_p1) {
                   Label7: while (true) {
                   if (!(i_603980701 < L_603980702)) break Label7;
                     operation_603980055 = group_603980050.operations[chckIndx(i_603980701, 0, (group_603980050.operations).length - 1)];
-                    if (matches__appZcapability95catalog_u820(operation_603980055, group_603980050.name, query_603980022)) {
+                    if (matches__appZcapability95catalog_u804(operation_603980055, group_603980050.name, query_603980022)) {
                     var Temporary8 = nimCopy(null, operation_603980055, NTI2466250755);
                     visible_603980051.push(Temporary8);;
                     }
@@ -7153,7 +7153,7 @@ function HEX3Aanonymous__docs_u296(event_p0, node_p1) {
     if ((0 < (operations_603980021).length)) {
     var tmp_603980070 = tree__pkgZkaraxZvdom_u969(71, []);
     tmp_603980070.class = "capability-summary";
-    add__pkgZkaraxZvdom_u857(tmp_603980070, text__pkgZkaraxZvdom_u1037((plural__docs_u27((operations_603980021).length, [111,112,101,114,97,116,105,111,110])).concat([32,194,183,32],approvalNote__docs_u31(approvalCount__appZcapability95catalog_u808(operations_603980021)))));
+    add__pkgZkaraxZvdom_u857(tmp_603980070, text__pkgZkaraxZvdom_u1037((plural__docs_u27((operations_603980021).length, [111,112,101,114,97,116,105,111,110])).concat([32,194,183,32],approvalNote__docs_u31(approvalCount__appZcapability95catalog_u792(operations_603980021)))));
     add__pkgZkaraxZvdom_u857(tmp_603980068, tmp_603980070);
     }
     

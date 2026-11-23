@@ -55,6 +55,19 @@ proc proposeProxmoxAction*(csrfToken, node: string, vmid: int,
     raise newException(ValueError, "The prepared action did not match the chosen guest.")
   return proposed
 
+proc proposeProxmoxNewGuest*(csrfToken, node, action, submissionId: string,
+                             fields: JsonNode): Future[ProxmoxAction] {.async.} =
+  ## A guest that does not exist yet; the answer carries the VMID the AI froze for it.
+  let payload = proxmoxNewGuestPayload(node, action, submissionId, fields)
+  let reply = await sendRequest(frontendConfig.backendBaseUrl & "/api/v1/proxmox/actions",
+    writeOptions(csrfToken, payload))
+  if not reply.ok:
+    raise refusal(reply, "The new guest could not be prepared.")
+  let proposed = parseProxmoxAction(decodeJson(reply.body))
+  if proposed.node != node or proposed.vmid < 1 or proposed.action != action:
+    raise newException(ValueError, "The prepared guest did not match the chosen node.")
+  return proposed
+
 proc decideProxmoxAction*(csrfToken, actionId: string, approve: bool,
                           confirmName = ""): Future[ProxmoxAction] {.async.} =
   ## A destructive approval carries the guest's name as the owner typed it; the server compares it.

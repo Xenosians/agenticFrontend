@@ -133,6 +133,15 @@ proc renderGuestActions(state: AppState, guest: ProxmoxGuest): VNode =
       text "Ask in chat"
       proc onclick(event: Event, node: VNode) = askAboutGuest(state, guest)
 
+proc renderNewDatabaseButton(state: AppState, nodeName: string): VNode =
+  ## One proc per node row, so the button keeps its own exact node.
+  result = buildHtml(button(id = cstring("proxmoxNewDatabase-" & nodeName), class = "secondary-action",
+      `aria-label` = cstring("New database on " & nodeName), `aria-haspopup` = "dialog",
+      disabled = state.proxmoxActionBusy or state.proxmoxConfirming.len > 0,
+      title = "Create a PostgreSQL or MariaDB guest on this node")):
+    text "New database"
+    proc onclick(event: Event, node: VNode) = openNewGuest(state, nodeName)
+
 # The change dialog keeps each field's text as typed; the payload is built and checked only on Prepare.
 var changeDraft: seq[(string, string)]
 
@@ -325,11 +334,77 @@ proc renderProxmoxChange(state: AppState): VNode =
           changeDraft = @[]
           closeGuestChanges(state)
 
+proc versionTagOk(text: string): bool =
+  ## A pinned image tag: a digit first (so never "latest"), then letters, digits, ., _ or - (the AI's rule).
+  text.len in 1 .. 64 and text[0] in Digits and text.allCharsInSet(Letters + Digits + {'.', '_', '-'})
+
+proc databaseHostnameOk(text: string): bool =
+  ## A DNS label: a lowercase letter first, a letter or digit last, hyphens between (the AI's rule).
+  text.len in 2 .. 63 and text[0] in LowercaseLetters and text[^1] in LowercaseLetters + Digits and
+    text.allCharsInSet(LowercaseLetters + Digits + {'-'})
+
+proc newDatabaseFields(): Option[JsonNode] =
+  let engine = (if draftValue("engine").len > 0: draftValue("engine") else: databaseEngines[0][0])
+  let version = draftValue("version").strip
+  let hostname = draftValue("hostname").strip
+  var known = false
+  for (value, _) in databaseEngines:
+    if value == engine: known = true
+  if not known or not versionTagOk(version) or not databaseHostnameOk(hostname): return none(JsonNode)
+  some(%*{"engine": engine, "version": version, "hostname": hostname})
+
+proc renderNewDatabase(state: AppState): VNode =
+  ## A database guest on one exact node: the owner names the engine, its pinned tag and a hostname;
+  ## the AI freezes the VMID, address, pool and resources and shows them in the confirmation.
+  if changeDraftDone:
+    changeDraft = @[]
+    changeDraftDone = false
+  let node = state.proxmoxNewGuestNode
+  let fields = newDatabaseFields()
+  let title = "New database on " & node
+  result = buildHtml(tdiv(class = "proxmox-confirm-backdrop")):
+    tdiv(class = "proxmox-confirm proxmox-change", role = "dialog", `aria-modal` = "true",
+         `aria-label` = cstring(title)):
+      h3: text title
+      p(class = "operation-note"):
+        text "Janus creates the guest from the engine's official image in the janus pool, on the " &
+          "tailnet-bridged database subnet, starts it and checks that it answers. The next step shows " &
+          "the exact guest, address and resources before anything runs."
+      if state.proxmoxActionError.len > 0:
+        p(class = "operation-error", role = "alert"): text state.proxmoxActionError
+      tdiv(class = "proxmox-change-form"):
+        renderDraftChoice("engine", "Engine", databaseEngines)
+        renderDraftField("version", "Version tag",
+                         "A pinned tag from the official image, for example 17-alpine or 11.4; never latest.")
+        renderDraftField("hostname", "Hostname", "Lowercase letters, digits and hyphens, for example db-orders.")
+        p(class = "operation-note"):
+          text "The database password is generated when the guest is created, kept encrypted for your " &
+            "account and never shown here or sent to Proxmox."
+      tdiv(class = "proxmox-confirm-actions"):
+        button(id = "proxmoxNewGuestClose", class = "secondary-action", disabled = state.proxmoxActionBusy):
+          text "Close"
+          proc onclick(event: Event, node: VNode) =
+            changeDraft = @[]
+            closeNewGuest(state)
+        button(class = "primary-action", disabled = state.proxmoxActionBusy or fields.isNone):
+          text (if state.proxmoxActionBusy: "Preparing…" else: "Prepare")
+          proc onclick(event: Event, node: VNode) =
+            # The draft stays until the server answers, so a refusal keeps the values for another try.
+            let ready = newDatabaseFields()
+            if ready.isSome:
+              discard proposeNewGuest(state, state.proxmoxNewGuestNode, "database_create", ready.get)
+      proc onkeydown(event: Event, node: VNode) =
+        if eventKey(event) == "Escape" and not state.proxmoxActionBusy:
+          stopEvent(event)
+          changeDraft = @[]
+          closeNewGuest(state)
+
 proc renderProxmoxConfirm(state: AppState): VNode =
   ## The server's own description of the exact target; nothing runs until Confirm.
   let action = confirmingAction(state)
   let isChange = action.action notin powerActions
   let label = if action.action == "delete": "Delete guest"
+              elif action.action in newGuestChanges: changeActionLabel(action.action)
               elif isChange: "Apply change"
               else: powerActionLabel(action.action)
   # A destructive change is approved only with the guest's name typed exactly (the server checks it too).
@@ -404,6 +479,10 @@ proc renderProxmoxAction(state: AppState, action: ProxmoxAction): VNode =
         text "Read back: " & action.observedStatus &
           (if action.verificationOk == some(true): " (as expected)" elif action.expectedStatus.len > 0:
              " (expected " & action.expectedStatus & ")" else: "")
+    if action.health.len > 0:
+      p(class = "operation-note proxmox-database-health", `data-health` = cstring(action.health)):
+        text databaseHealthLabel(action.health) &
+          (if action.address.len > 0 and action.port > 0: " at " & action.address & ":" & $action.port else: "")
     if action.error.len > 0:
       p(class = "operation-note"): text action.error
     if action.status == "outcome_unknown":
@@ -735,9 +814,10 @@ proc renderProxmoxDashboard(state: AppState): VNode =
                 th(scope = "col"): text "Memory"
                 th(scope = "col"): text "Storage"
                 th(scope = "col"): text "Uptime"
+                th(scope = "col"): text "Actions"
             tbody:
               for node in snapshot.nodes:
-                tr:
+                tr(class = "proxmox-node-row", `data-node` = cstring(node.name)):
                   th(scope = "row"): text node.name
                   td:
                     span(class = (if node.status == "online": cstring"proxmox-state online" else: cstring"proxmox-state")):
@@ -746,6 +826,10 @@ proc renderProxmoxDashboard(state: AppState): VNode =
                   td: text formatProxmoxBytes(node.memoryBytes) & " / " & formatProxmoxBytes(node.memoryTotalBytes)
                   td: text formatProxmoxBytes(node.diskBytes) & " / " & formatProxmoxBytes(node.diskTotalBytes)
                   td: text formatProxmoxUptime(node.uptimeSeconds)
+                  td:
+                    # A new guest is made only on a node that is online now; Proxmox re-checks it.
+                    if node.status == "online":
+                      renderNewDatabaseButton(state, node.name)
         if snapshot.nodesTruncated:
           p(class = "operation-note", role = "status"): text "More nodes exist than this dashboard displays."
       tdiv(class = "proxmox-table-section"):
@@ -785,6 +869,8 @@ proc renderProxmoxDashboard(state: AppState): VNode =
       renderProxmoxConfirm(state)
     elif state.proxmoxChangeGuest > 0:
       renderProxmoxChange(state)
+    elif state.proxmoxNewGuestNode.len > 0:
+      renderNewDatabase(state)
 
 proc tailnetFailureTitle(code: string): string =
   case code

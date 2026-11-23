@@ -297,6 +297,45 @@ proc closeGuestChanges*(state: AppState) =
   pendingProxmoxFocus = "proxmoxChange" & $vmid
   redraw(kxi)
 
+proc openNewGuest*(state: AppState, node: string) =
+  ## Open the new-database dialog for this exact node; nothing is sent until it is prepared.
+  if state.proxmoxActionBusy or state.proxmoxConfirming.len > 0 or node.len == 0: return
+  state.proxmoxActionError = ""
+  state.proxmoxChangeGuest = 0
+  state.proxmoxNewGuestNode = node
+  changeDraftDone = true  # a newly opened dialog starts empty
+  pendingProxmoxFocus = "proxmoxNewGuestClose"
+  redraw(kxi)
+
+proc closeNewGuest*(state: AppState) =
+  let node = state.proxmoxNewGuestNode
+  state.proxmoxNewGuestNode = ""
+  pendingProxmoxFocus = "proxmoxNewDatabase-" & node
+  redraw(kxi)
+
+proc proposeNewGuest*(state: AppState, node, action: string, fields: JsonNode) {.async.} =
+  ## Prepare a guest that does not exist yet; the AI freezes its VMID and plan for the confirmation.
+  if not state.auth.authenticated or state.proxmoxActionBusy or state.proxmoxConfirming.len > 0: return
+  let request = beginProxmoxActionRequest(state)
+  state.proxmoxActionBusy = true
+  state.proxmoxActionError = ""
+  redraw(kxi)
+  try:
+    let proposed = await proposeProxmoxNewGuest(state.auth.csrfToken, node, action, $randomUuid(), fields)
+    if not matchesProxmoxActionRequest(state, request): return
+    state.proxmoxActions = mergeProxmoxAction(state.proxmoxActions, proposed)
+    state.proxmoxNewGuestNode = ""
+    changeDraftDone = true
+    if proposed.status == "waiting_approval":
+      state.proxmoxConfirming = proposed.actionId
+      state.proxmoxConfirmName = ""
+      pendingProxmoxFocus = "proxmoxConfirmCancel"
+  except CatchableError as exc:
+    if matchesProxmoxActionRequest(state, request): state.proxmoxActionError = exc.msg
+  finally:
+    if matchesProxmoxActionRequest(state, request): state.proxmoxActionBusy = false
+    redraw(kxi)
+
 proc askAboutGuest*(state: AppState, guest: ProxmoxGuest) =
   ## Prefill an exact read request in chat; the owner sends it.
   setComposerDraft(state, proxmoxAskText(guest.node, guest.vmid))

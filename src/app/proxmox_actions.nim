@@ -15,6 +15,9 @@ type
     approvalText*, createdAt*, decidedAt*, error*: string
     observedStatus*, expectedStatus*, upid*, taskExitStatus*, observedAt*: string
     verificationOk*: Option[bool]
+    ## A database create's own read-back: the engine, where it answers and whether it does.
+    health*, engine*, address*: string
+    port*: int
 
   FieldKind = enum fkInt, fkBool, fkText
 
@@ -28,10 +31,13 @@ const
   guestChanges* = ["set_resources", "resize_disk", "set_options", "snapshot_create", "backup_now", "clone",
                    "snapshot_rollback", "snapshot_delete", "delete"]
   ## Changes the server accepts that make a new guest (no source guest is changed).
-  newGuestChanges* = ["create", "backup_restore"]
+  newGuestChanges* = ["create", "backup_restore", "database_create"]
+  ## Database engines the AI service creates from their official images.
+  databaseEngines* = [("postgresql", "PostgreSQL"), ("mariadb", "MariaDB")]
   destructiveChanges = ["delete", "snapshot_delete", "snapshot_rollback", "backup_restore"]
   actionStatuses = ["waiting_approval", "executing", "rejecting", "succeeded", "failed",
                     "rejected", "outcome_unknown"]
+  databaseHealths = ["accepting_connections", "not_answering"]
 
 proc changeSpec(action: string): ChangeSpec =
   ## The typed fields each change carries beyond its target: the backend's own table
@@ -50,6 +56,9 @@ proc changeSpec(action: string): ChangeSpec =
   of "create": ChangeSpec(required: @[("hostname", fkText), ("template", fkText), ("cores", fkInt),
                                       ("memory_mib", fkInt), ("disk_gib", fkInt), ("storage", fkText)],
                           optional: @[("newid", fkInt), ("pool", fkText), ("description", fkText)])
+  of "database_create": ChangeSpec(required: @[("engine", fkText), ("version", fkText), ("hostname", fkText)],
+                                   optional: @[("newid", fkInt), ("storage", fkText), ("cores", fkInt),
+                                               ("memory_mib", fkInt), ("disk_gib", fkInt), ("data_gib", fkInt)])
   of "delete": ChangeSpec()
   else: raise newException(ValueError, "Choose one action for one exact guest.")
 
@@ -80,8 +89,15 @@ proc changeActionLabel*(action: string): string =
   of "backup_restore": "Restore backup"
   of "clone": "Clone"
   of "create": "Create container"
+  of "database_create": "Create database"
   of "delete": "Delete guest"
   else: action
+
+proc databaseHealthLabel*(health: string): string =
+  case health
+  of "accepting_connections": "Accepting connections"
+  of "not_answering": "Not answering yet"
+  else: health
 
 proc invalid() {.noreturn.} =
   raise newException(ValueError, "The Proxmox action response is invalid.")
@@ -162,6 +178,13 @@ proc parseProxmoxAction*(node: JsonNode): ProxmoxAction =
   let verified = node{"verification_ok"}
   if verified != nil and verified.kind == JBool: result.verificationOk = some(verified.getBool)
   elif verified != nil and verified.kind != JNull: invalid()
+  result.health = text(node, "health", nullable = true, limit = 32)
+  if result.health.len > 0 and result.health notin databaseHealths: invalid()
+  result.engine = text(node, "engine", nullable = true, limit = 32)
+  result.address = text(node, "address", nullable = true, limit = 64)
+  let port = node{"port"}
+  if port != nil and port.kind == JInt and port.getBiggestInt in 1 .. 65535: result.port = int(port.getBiggestInt)
+  elif port != nil and port.kind != JNull: invalid()
 
 proc parseProxmoxActions*(node: JsonNode): seq[ProxmoxAction] =
   let rows = node{"actions"}
@@ -180,17 +203,12 @@ proc proxmoxActionPayload*(node: string, vmid: int, action, submissionId: string
     raise newException(ValueError, "Choose one action for one exact guest.")
   %*{"node": node, "vmid": vmid, "action": action, "submission_id": submissionId}
 
-proc proxmoxChangePayload*(node: string, vmid: int, action, submissionId: string, fields: JsonNode): JsonNode =
-  ## One change for one exact guest with exactly its own typed fields; anything else is refused
-  ## here, before it is sent (the server refuses it too).
-  if action in powerActions or not knownAction(action) or node.len == 0 or vmid < 1 or submissionId.len == 0 or
-     fields.kind != JObject:
-    raise newException(ValueError, "Choose one action for one exact guest.")
+proc addChangeFields(payload: JsonNode, action: string, fields: JsonNode) =
+  ## Exactly the change's own typed fields, each in its own shape; anything else is refused.
   let spec = changeSpec(action)
   var allowed: seq[(string, FieldKind)]
   allowed.add spec.required
   allowed.add spec.optional
-  result = %*{"node": node, "vmid": vmid, "action": action, "submission_id": submissionId}
   var given = 0
   for key, value in fields.pairs:
     var kind = fkText
@@ -205,11 +223,28 @@ proc proxmoxChangePayload*(node: string, vmid: int, action, submissionId: string
       of fkBool: value.kind == JBool
       of fkText: value.kind == JString and value.getStr.len in 1 .. 256
     if not fits: raise newException(ValueError, "The value of " & key & " is not valid.")
-    result[key] = value
+    payload[key] = value
     inc given
   for (name, _) in spec.required:
     if not fields.hasKey(name): raise newException(ValueError, "The change needs " & name & ".")
   if given < spec.minFields: raise newException(ValueError, "Enter at least one value to change.")
+
+proc proxmoxChangePayload*(node: string, vmid: int, action, submissionId: string, fields: JsonNode): JsonNode =
+  ## One change for one exact guest with exactly its own typed fields; anything else is refused
+  ## here, before it is sent (the server refuses it too).
+  if action in powerActions or action in newGuestChanges or not knownAction(action) or node.len == 0 or
+     vmid < 1 or submissionId.len == 0 or fields.kind != JObject:
+    raise newException(ValueError, "Choose one action for one exact guest.")
+  result = %*{"node": node, "vmid": vmid, "action": action, "submission_id": submissionId}
+  addChangeFields(result, action, fields)
+
+proc proxmoxNewGuestPayload*(node, action, submissionId: string, fields: JsonNode): JsonNode =
+  ## A guest that does not exist yet: the node and the change's own fields, never a source VMID
+  ## (the AI asks Proxmox for a free one and freezes it in the approval).
+  if action notin newGuestChanges or node.len == 0 or submissionId.len == 0 or fields.kind != JObject:
+    raise newException(ValueError, "Choose a new guest on one exact node.")
+  result = %*{"node": node, "action": action, "submission_id": submissionId}
+  addChangeFields(result, action, fields)
 
 proc proxmoxDecisionPayload*(approve: bool, confirmName: string): JsonNode =
   ## A destructive approval carries the name the owner typed; a rejection never needs it.

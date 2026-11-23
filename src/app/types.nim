@@ -200,6 +200,7 @@ type
     proxmoxChangeGuest*: int  ## the VMID whose change dialog is open (0 = closed)
     proxmoxChangeNode*: string
     proxmoxChangeAction*: string  ## the change chosen in that dialog
+    proxmoxNewGuestNode*: string  ## the node whose new-guest dialog is open ("" = closed)
     proxmoxConfirmName*: string  ## the guest name typed for a destructive approval
     proxmoxActionEpoch*: int
     tailnet*: TailnetSnapshot

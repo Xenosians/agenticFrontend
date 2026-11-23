@@ -106,6 +106,7 @@ proc clearOperations*(state: AppState) =
   state.proxmoxChangeGuest = 0
   state.proxmoxChangeNode = ""
   state.proxmoxChangeAction = ""
+  state.proxmoxNewGuestNode = ""
   state.proxmoxConfirmName = ""
   inc state.tailnetEpoch
   state.tailnet = TailnetSnapshot()

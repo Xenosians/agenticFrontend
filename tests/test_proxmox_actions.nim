@@ -119,3 +119,52 @@ suite "Proxmox guest changes from the dashboard":
     check proxmoxDecisionPayload(approve = true, confirmName = "janus-lab") == %*{"confirm_name": "janus-lab"}
     check proxmoxDecisionPayload(approve = true, confirmName = "") == newJObject()
     check proxmoxDecisionPayload(approve = false, confirmName = "janus-lab") == newJObject()
+
+suite "New guests from the dashboard (23 Nov 2026: database create was chat-only)":
+  const submission = "6f1c2a4e-1b2c-4d3e-8f9a-0b1c2d3e4f5a"
+
+  test "a new guest names the node, never a source guest, and only its own fields":
+    let database = proxmoxNewGuestPayload("pve-b", "database_create", submission,
+                                          %*{"engine": "postgresql", "version": "17-alpine", "hostname": "db-orders"})
+    check database == %*{"node": "pve-b", "action": "database_create", "submission_id": submission,
+                         "engine": "postgresql", "version": "17-alpine", "hostname": "db-orders"}
+    check not database.hasKey("vmid")
+    let container = proxmoxNewGuestPayload("pve-b", "create", submission,
+                                           %*{"hostname": "lab-3", "template": "local:vztmpl/alpine.tar.xz",
+                                              "cores": 1, "memory_mib": 256, "disk_gib": 2, "storage": "local-lvm"})
+    check container["template"] == %"local:vztmpl/alpine.tar.xz" and not container.hasKey("vmid")
+    check newGuestChanges == ["create", "backup_restore", "database_create"]
+    check changeActionLabel("database_create") == "Create database"
+
+  test "a plan, a password, a missing field or a guest action is refused before it is sent":
+    for (action, fields) in [("database_create", %*{"engine": "postgresql", "version": "17-alpine"}),
+                             ("database_create", %*{"engine": "postgresql", "version": "17-alpine",
+                                                    "hostname": "db", "plan": {"vmid": 1}}),
+                             ("database_create", %*{"engine": "postgresql", "version": "17-alpine",
+                                                    "hostname": "db", "password": "x"}),
+                             ("database_create", %*{"engine": 5, "version": "17-alpine", "hostname": "db"}),
+                             ("start", newJObject()),
+                             ("delete", newJObject())]:
+      expect ValueError:
+        discard proxmoxNewGuestPayload("pve-b", action, submission, fields)
+
+  test "a finished database create reports its health and address":
+    var node = action("succeeded")
+    node["action"] = %"database_create"
+    node["vmid"] = %993
+    node["name"] = %"db-orders"
+    node["health"] = %"accepting_connections"
+    node["address"] = %"10.77.0.21"
+    node["port"] = %5432
+    node["engine"] = %"postgresql"
+    let parsed = parseProxmoxAction(node)
+    check parsed.action == "database_create" and parsed.health == "accepting_connections"
+    check parsed.address == "10.77.0.21" and parsed.port == 5432 and parsed.engine == "postgresql"
+    check proxmoxActionLabel(parsed.action) == "Create database"
+    check databaseHealthLabel("accepting_connections") == "Accepting connections"
+    check databaseHealthLabel("not_answering") == "Not answering yet"
+    for bad in [("health", %"fine"), ("port", %"5432"), ("port", %0), ("address", %5)]:
+      var broken = node.copy
+      broken[bad[0]] = bad[1]
+      expect ValueError:
+        discard parseProxmoxAction(broken)

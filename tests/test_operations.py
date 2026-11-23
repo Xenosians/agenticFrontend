@@ -313,6 +313,20 @@ class OperationsTests(navigation.ChatNavigationTests):
                     return
                 fields = {key: value for key, value in body.items()
                           if key not in ("node", "vmid", "action", "submission_id")}
+                if body["action"] == "database_create":
+                    # The AI freezes the next free VMID and the plan; the request names none (23 Nov 2026).
+                    self.assertNotIn("vmid", body)
+                    action = {"action_id": "d" * 32, "action": "database_create", "node": body["node"], "vmid": 136,
+                              "type": None, "name": fields["hostname"], "risk": "medium",
+                              "status": "waiting_approval", "destructive": False,
+                              "approval_text": f"Create database guest {fields['hostname']} (LXC 136) on Proxmox "
+                                               f"node {body['node']} from the official image "
+                                               f"docker.io/library/postgres:{fields['version']}. Janus then starts "
+                                               "it and checks that the database answers. No password is sent.",
+                              "created_at": "2026-11-23T05:00:00Z", "decided_at": None, "error": None}
+                    self.actions.insert(0, action)
+                    route.fulfill(status=201, json=action)
+                    return
                 action = proxmox_action(body["action"], body["vmid"], body["node"], fields)
                 self.actions.insert(0, action)
                 route.fulfill(status=201, json=action)
@@ -328,7 +342,12 @@ class OperationsTests(navigation.ChatNavigationTests):
                     route.fulfill(status=409, json={"error": "confirmation_mismatch",
                                                     "message": "Type the guest's name exactly to approve."})
                     return
-                if decision == "approve":
+                if decision == "approve" and action["action"] == "database_create":
+                    # The AI's receipt: created, started and answering at its bridged address.
+                    action.update(status="succeeded", type="lxc", observed_status="running", verification_ok=True,
+                                  health="accepting_connections", engine="postgresql", address="10.77.0.21",
+                                  port=5432)
+                elif decision == "approve":
                     action.update(status="succeeded", observed_status="running", verification_ok=True,
                                   upid="UPID:pve-b:0001:0002:0003:vzstart:102:janus@pve!dashboard:")
                 else:
@@ -991,6 +1010,67 @@ class OperationsTests(navigation.ChatNavigationTests):
         guest = self.page.locator(f'.proxmox-guest-row[data-vmid="{vmid}"]')
         guest.get_by_role("button", name=f"Change {vmid}", exact=True).click()
         return self.page.get_by_role("dialog", name=f"Change guest {vmid}")
+
+    def open_new_database(self, node="pve-a"):
+        self.open_operations()
+        self.page.locator(f'.proxmox-node-row[data-node="{node}"]').get_by_role(
+            "button", name=f"New database on {node}", exact=True).click()
+        return self.page.get_by_role("dialog", name=f"New database on {node}")
+
+    def test_a_database_is_created_from_the_dashboard_with_only_what_the_owner_names(self):
+        # 23 Nov 2026: the AI could create a database guest only from chat; the dashboard had no form.
+        dialog = self.open_new_database()
+        # Only an online node offers a new database.
+        expect(self.page.locator('.proxmox-node-row[data-node="pve-b"]').get_by_role(
+            "button", name="New database on pve-b", exact=True)).to_have_count(0)
+        prepare = dialog.get_by_role("button", name="Prepare", exact=True)
+        expect(prepare).to_be_disabled()
+        expect(dialog.get_by_label("Engine", exact=True)).to_have_value("postgresql")
+        dialog.get_by_label("Version tag", exact=True).fill("latest")
+        dialog.get_by_label("Hostname", exact=True).fill("db-orders")
+        # A floating tag is refused here as it is by the AI: the tag must be pinned.
+        expect(prepare).to_be_disabled()
+        dialog.get_by_label("Version tag", exact=True).fill("17-alpine")
+        dialog.get_by_label("Hostname", exact=True).fill("DB Orders")
+        expect(prepare).to_be_disabled()
+        dialog.get_by_label("Hostname", exact=True).fill("db-orders")
+        expect(dialog).to_contain_text("never shown here")
+        self.assertEqual(self.action_posts, [])
+        prepare.click()
+        confirm = self.page.get_by_role("dialog", name="Confirm Proxmox action")
+        expect(confirm).to_contain_text("Create database guest db-orders (LXC 136) on Proxmox node pve-a")
+        body, csrf = self.action_posts[0]
+        self.assertEqual({key: value for key, value in body.items() if key != "submission_id"},
+                         {"node": "pve-a", "action": "database_create", "engine": "postgresql",
+                          "version": "17-alpine", "hostname": "db-orders"})
+        self.assertEqual(csrf, "fixture-csrf")
+        expect(dialog).to_have_count(0)
+        confirm.get_by_role("button", name="Create database", exact=True).click()
+        actions = self.page.locator(".proxmox-actions")
+        expect(actions).to_contain_text("Succeeded")
+        expect(actions).to_contain_text("Create database LXC 136 (db-orders) on pve-a")
+        expect(actions).to_contain_text("Accepting connections at 10.77.0.21:5432")
+        self.assertEqual(self.decision_bodies, [{}])
+        self.assertEqual(self.errors, [])
+
+    def test_a_refused_database_says_why_in_its_dialog_and_keeps_the_values(self):
+        self.action_refusal = {"error": "proxmox_action_refused",
+                               "message": "No free address is left on the database subnet."}
+        dialog = self.open_new_database()
+        dialog.get_by_label("Engine", exact=True).select_option("mariadb")
+        dialog.get_by_label("Version tag", exact=True).fill("11.4")
+        dialog.get_by_label("Hostname", exact=True).fill("db-wiki")
+        dialog.get_by_role("button", name="Prepare", exact=True).click()
+        expect(dialog.get_by_role("alert")).to_contain_text("No free address")
+        expect(dialog.get_by_label("Hostname", exact=True)).to_have_value("db-wiki")
+        expect(dialog.get_by_label("Engine", exact=True)).to_have_value("mariadb")
+        self.assertEqual(len(self.action_posts), 1)
+        self.assertEqual(self.action_posts[0][0]["engine"], "mariadb")
+        expect(self.page.get_by_role("dialog", name="Confirm Proxmox action")).to_have_count(0)
+        dialog.get_by_role("button", name="Close", exact=True).click()
+        expect(dialog).to_have_count(0)
+        expect(self.page.locator('.proxmox-node-row[data-node="pve-a"]').get_by_role(
+            "button", name="New database on pve-a", exact=True)).to_be_focused()
 
     def test_each_guest_offers_the_changes_its_state_allows(self):
         self.open_operations()
