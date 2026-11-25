@@ -102,6 +102,22 @@ class JobFeedbackTests(navigation.ChatNavigationTests):
         self.assertEqual(self.feedback_requests, [])
         self.assertEqual(self.errors, [])
 
+    def test_the_feedback_icon_opens_the_form_with_its_first_field_focused_and_in_view(self):
+        # The icon sits in the answer's action row, so the form it opens is below it: keyboard and
+        # screen-reader users land in the first field, and a phone scrolls the whole form into view.
+        self.page.set_viewport_size({"width": 390, "height": 760})
+        self.open_answer()
+        self.page.get_by_role("button", name="Give feedback", exact=True).click()
+        note = self.page.get_by_label("What was wrong?", exact=True)
+        expect(note).to_be_focused()
+        expect(self.page.get_by_role("button", name="Send feedback", exact=True)).to_be_in_viewport(ratio=1)
+        expect(self.page.get_by_role("button", name="Cancel", exact=True)).to_be_in_viewport(ratio=1)
+        # Cancel returns focus to the answer's action row.
+        self.page.get_by_role("button", name="Cancel", exact=True).click()
+        expect(self.page.get_by_role("button", name="Give feedback", exact=True)).to_be_focused()
+        self.assertEqual(self.feedback_requests, [])
+        self.assertEqual(self.errors, [])
+
     def test_the_feedback_form_matches_the_answer_it_describes(self):
         for width, height in ((1440, 900), (390, 760)):
             self.page.set_viewport_size({"width": width, "height": height})

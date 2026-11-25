@@ -8,6 +8,7 @@ include karax/prelude
 
 import ../app/types
 import brand
+import icons
 
 proc writeClipboard(text: cstring, done: proc(ok: bool)) {.importjs:
   "((t, cb) => navigator.clipboard.writeText(t).then(() => cb(true), () => cb(false)))(#, #)".}
@@ -23,11 +24,12 @@ proc later(callback: proc(), ms: int) {.importjs: "setTimeout(#, #)".}
 var copied = initTable[int, bool]()  # Message id -> "Copied" shown briefly.
 
 proc renderCopyAnswer*(message: ChatMessage): VNode =
+  ## A small icon button (Hermes): a copy icon, a check once copied; named for assistive technology.
   let id = message.id
   let done = copied.getOrDefault(id)
   result = buildHtml(button(class = "message-action", `aria-label` = cstring(if done: "Copied" else: "Copy answer"),
                             title = "Copy this answer")):
-    text (if done: "Copied" else: "Copy")
+    icon(if done: "check" else: "copy", 14)
     proc onclick(event: Event, node: VNode) =
       writeClipboard(cstring(message.content), proc(ok: bool) =
         if ok:

@@ -2259,31 +2259,15 @@ body {
   .result-card, .composer { transition: none; }
 }
 
-/* Quiet actions under an answer, aligned with its text like the feedback row. */
-.message-actions { display: flex; gap: 12px; margin: 4px 0 0 14px; }
-.message-action {
-  padding: 4px 0;
-  border: 0;
-  background: transparent;
-  color: var(--text-soft);
-  font-size: var(--header-control-size);
-  cursor: pointer;
-}
-.message-action:hover { color: var(--text); }
-/* Feedback on an answer (FR-089): one quiet row under the answer, aligned
-   with the answer's text (the bubble's 14px inset) and set at its 13px size. */
+/* Quiet icon actions under an answer (Hermes): one row of 24px ghost icon buttons (design.css) aligned
+   with the answer's text. */
+.message-actions { display: flex; align-items: center; gap: 2px; margin: 2px 0 0 10px; }
+/* Feedback on an answer (FR-089): the form or the saved status, under the answer, aligned with the
+   answer's text (the bubble's 14px inset) and set at its 13px size. */
 .message-feedback { margin: 4px 0 0 14px; }
+.message-feedback:empty { display: none; }
 /* An open form takes the answer column's full width so a correction has room. */
 .message-column.assistant:has(.message-feedback-form) { width: 100%; }
-.message-feedback-toggle {
-  padding: 4px 0;
-  border: 0;
-  background: transparent;
-  color: var(--text-soft);
-  font-size: var(--header-control-size);
-  cursor: pointer;
-}
-.message-feedback-toggle:hover { color: var(--text); }
 .message-feedback-form {
   display: flex;
   flex-direction: column;

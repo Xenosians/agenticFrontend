@@ -13,6 +13,7 @@ include karax/prelude
 import ../api/client
 import ../app/job_feedback
 import ../app/types
+import icons
 
 type
   FeedbackDraft = object
@@ -20,6 +21,24 @@ type
     identity, note, correction, error: string
 
 var drafts = initTable[string, FeedbackDraft]()
+
+# After a redraw: the opened form's first field, or the action row's button after Cancel. The element
+# is found by the job's own id, so with several answers on screen the right one is focused; the form
+# is scrolled fully into view (a phone shows little below the answer).
+proc focusAfterRedraw(id: cstring, reveal: bool) {.importjs: """((id, reveal) => requestAnimationFrame(() =>
+  requestAnimationFrame(() => {
+    const target = document.getElementById(id);
+    if (!target) return;
+    target.focus({preventScroll: true});
+    const form = reveal ? target.closest('.message-feedback-form') : null;
+    (form || target).scrollIntoView({block: 'nearest'});
+  })))(#, #)""".}
+
+proc feedbackDomId(prefix, jobId: string): string =
+  ## A DOM id from the job id: only letters, digits and dashes.
+  result = prefix
+  for ch in jobId:
+    result.add(if ch in {'a'..'z', 'A'..'Z', '0'..'9', '-'}: ch else: '-')
 
 
 proc sendDraft(state: AppState, jobId: string) {.async.} =
@@ -43,25 +62,40 @@ proc sendDraft(state: AppState, jobId: string) {.async.} =
   redraw(kxi)
 
 
+proc feedbackToggleShown*(jobId: string): bool =
+  ## The action row's feedback button shows until the form opens or the feedback is saved.
+  let draft = drafts.getOrDefault(jobId)
+  not (draft.saved or draft.open)
+
+
+proc renderFeedbackToggle*(jobId: string): VNode =
+  ## The small icon button in the answer's action row (Hermes); the form opens below the answer with
+  ## its first field focused.
+  result = buildHtml(button(id = cstring(feedbackDomId("feedback-toggle-", jobId)),
+                            class = "message-action message-feedback-toggle", `aria-label` = "Give feedback",
+                            title = "Give feedback on this answer")):
+    icon("feedback", 14)
+    proc onclick(event: Event, node: VNode) =
+      var opened = drafts.getOrDefault(jobId)
+      opened.open = true
+      drafts[jobId] = opened
+      focusAfterRedraw(cstring(feedbackDomId("feedback-note-", jobId)), true)
+
+
 proc renderMessageFeedback*(state: AppState, jobId: string): VNode =
+  ## Below the answer: the open form, or the saved note's status. The toggle sits in the action row.
   let draft = drafts.getOrDefault(jobId)
   result = buildHtml(tdiv(class = "message-feedback")):
     if draft.saved:
       p(class = "message-feedback-status", role = "status"):
         text "Feedback saved for review."
-    elif not draft.open:
-      button(class = "message-feedback-toggle"):
-        text "Give feedback"
-        proc onclick(event: Event, node: VNode) =
-          var opened = drafts.getOrDefault(jobId)
-          opened.open = true
-          drafts[jobId] = opened
-    else:
+    elif draft.open:
       tdiv(class = "message-feedback-form"):
         label(class = "message-feedback-field"):
           span:
             text "What was wrong?"
-          textarea(rows = "2", value = cstring(draft.note), disabled = draft.sending):
+          textarea(id = cstring(feedbackDomId("feedback-note-", jobId)), rows = "2", value = cstring(draft.note),
+                   disabled = draft.sending):
             proc oninput(event: Event, node: VNode) =
               var edited = drafts.getOrDefault(jobId)
               edited.note = $node.value
@@ -87,3 +121,4 @@ proc renderMessageFeedback*(state: AppState, jobId: string): VNode =
             text "Cancel"
             proc onclick(event: Event, node: VNode) =
               drafts.del(jobId)
+              focusAfterRedraw(cstring(feedbackDomId("feedback-toggle-", jobId)), false)

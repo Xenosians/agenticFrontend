@@ -28,6 +28,7 @@ const iconShapes: seq[(string, seq[IconShape])] = @[
   ("empty", @[("polyline", @[("points", "22 12 16 12 14 15 10 15 8 12 2 12")]), ("path", @[("d", "M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z")])]),  # lucide inbox
   ("enter", @[("polyline", @[("points", "9 10 4 15 9 20")]), ("path", @[("d", "M20 4v7a4 4 0 0 1-4 4H4")])]),  # lucide corner-down-left
   ("error", @[("circle", @[("cx", "12"), ("cy", "12"), ("r", "10")]), ("line", @[("x1", "12"), ("x2", "12"), ("y1", "8"), ("y2", "12")]), ("line", @[("x1", "12"), ("x2", "12.01"), ("y1", "16"), ("y2", "16")])]),  # lucide circle-alert
+  ("feedback", @[("path", @[("d", "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z")]), ("path", @[("d", "M12 7v2")]), ("path", @[("d", "M12 13h.01")])]),  # lucide message-square-warning
   ("history", @[("path", @[("d", "M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8")]), ("path", @[("d", "M3 3v5h5")]), ("path", @[("d", "M12 7v5l4 2")])]),  # lucide history
   ("info", @[("circle", @[("cx", "12"), ("cy", "12"), ("r", "10")]), ("path", @[("d", "M12 16v-4")]), ("path", @[("d", "M12 8h.01")])]),  # lucide info
   ("knowledge", @[("path", @[("d", "M12 7v14")]), ("path", @[("d", "M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z")])]),  # lucide book-open

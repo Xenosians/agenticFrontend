@@ -350,7 +350,8 @@ small, .caption {
 .chat-delete,
 .world-card-close,
 .inspector-close,
-.credential-handover-close {
+.credential-handover-close,
+.message-action {
   width: var(--control-h-sm);
   min-width: var(--control-h-sm);
   padding: 0;
@@ -377,16 +378,19 @@ small, .caption {
 .chat-delete:hover,
 .world-card-close:hover,
 .inspector-close:hover,
-.credential-handover-close:hover {
+.credential-handover-close:hover,
+.message-action:hover {
   background: var(--panel-hover);
   color: var(--text);
 }
 
-/* Row actions in the chat list stay 24px (the WCAG minimum) so a row keeps its height. */
+/* Row actions in the chat list stay 24px (the WCAG minimum) so a row keeps its height; so do the
+   icon actions under an answer (Hermes). */
 .chat-pin,
 .chat-rename-open,
 .chat-delete,
-.dashboard-pin {
+.dashboard-pin,
+.message-action {
   width: 24px;
   min-width: 24px;
   height: 24px;

@@ -103,6 +103,9 @@ proc renderMessage(
 
           tdiv(class = "message-actions"):
             renderCopyAnswer(message)
+            # Only answers from a saved task can be linked for review (FR-089).
+            if message.jobId.len > 0 and feedbackToggleShown(message.jobId):
+              renderFeedbackToggle(message.jobId)
 
 
         if message.cards.len > 0:

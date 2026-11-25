@@ -52,6 +52,37 @@ class AnswerActionTests(navigation.ChatNavigationTests):
         self.assertEqual(self.mutations, [])
         self.assertEqual(self.errors, [])
 
+    def test_the_answer_actions_are_one_row_of_icon_buttons_like_hermes(self):
+        # Owner request, 26 November ("more Hermes like"): under an answer, one quiet row of small icon
+        # buttons (copy, feedback) instead of words stacked on separate lines. Each keeps its name for
+        # assistive technology and as a tooltip.
+        self.open_answer()
+        copy = self.page.get_by_role("button", name="Copy answer", exact=True)
+        feedback = self.page.get_by_role("button", name="Give feedback", exact=True)
+        expect(copy).to_be_visible()
+        expect(feedback).to_be_visible()
+        for button, tip in ((copy, "Copy this answer"), (feedback, "Give feedback on this answer")):
+            self.assertEqual(button.locator("svg.icon").count(), 1)
+            self.assertEqual(button.inner_text().strip(), "")
+            expect(button).to_have_attribute("title", tip)
+            box = button.bounding_box()
+            # Small but a WCAG 2.2 target: 24 to 28px square.
+            self.assertTrue(24 <= round(box["width"]) <= 28 and 24 <= round(box["height"]) <= 28, box)
+        # Side by side, under the answer's text.
+        a, b = copy.bounding_box(), feedback.bounding_box()
+        self.assertLess(abs(a["y"] - b["y"]), 2)
+        self.assertGreater(b["x"], a["x"] + a["width"] - 1)
+        self.assertLess(b["x"] - (a["x"] + a["width"]), 12)
+        bubble = self.page.locator(".message-bubble.assistant").bounding_box()
+        self.assertGreaterEqual(a["y"], bubble["y"] + bubble["height"] - 1)
+        # Copying swaps the icon for a check, named "Copied".
+        copy.click()
+        copied = self.page.get_by_role("button", name="Copied", exact=True)
+        expect(copied).to_be_visible()
+        self.assertEqual(copied.locator("svg.icon").count(), 1)
+        self.assertEqual(self.mutations, [])
+        self.assertEqual(self.errors, [])
+
     def test_export_downloads_the_open_chat_as_markdown(self):
         self.open_answer()
         with self.page.expect_download() as info:
