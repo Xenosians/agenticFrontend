@@ -1,7 +1,7 @@
 """Saved chat UX against an isolated API. No account, job or tool is dispatched."""
 import unittest
 from datetime import datetime, timezone
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 from playwright.sync_api import expect
 import test_chat_navigation as navigation
@@ -26,6 +26,8 @@ class SidebarWorkspaceTests(unittest.TestCase):
                             "pinned_views": ["knowledge", "operations"]}
         self.preference_writes = []
         self.preference_status = 200
+        self.page_requests = []
+        self.failing_cursor = None
         navigation.ChatNavigationTests.setUp(self)
         self.page.set_default_timeout(5000)
 
@@ -34,7 +36,12 @@ class SidebarWorkspaceTests(unittest.TestCase):
         path = urlparse(request.url).path
         if request.url.startswith(self.base + "/api/"):
             if path == "/api/v1/chats" and request.method == "GET":
-                route.fulfill(json={"chats": self.chats})
+                cursor = parse_qs(urlparse(request.url).query).get("cursor", [None])[0]
+                if cursor is not None and cursor == self.failing_cursor:
+                    self.page_requests.append({"cursor": cursor, "failed": "yes"})
+                    route.fulfill(status=503, json={"error": "chat_lookup_failed"})
+                    return
+                route.fulfill(json=self.chat_page(request.url))
                 return
             if path.startswith("/api/v1/chats/") and request.method == "PATCH":
                 key = path.rsplit("/", 1)[1]
@@ -68,9 +75,33 @@ class SidebarWorkspaceTests(unittest.TestCase):
                 return
         navigation.ChatNavigationTests.route(self, route)
 
+    def chat_page(self, url):
+        """The backend's paged list: pinned first, newest first; `limit`, `cursor` (the index to start at,
+        opaque to the client) and `q` (a literal title filter over every chat). Without them, the whole list."""
+        query = parse_qs(urlparse(url).query)
+        self.page_requests.append({key: values[0] for key, values in query.items()})
+        ordered = sorted(self.chats, key=lambda chat: chat.get("updated_at", ""), reverse=True)
+        ordered = sorted(ordered, key=lambda chat: not chat.get("pinned", False))
+        if not any(key in query for key in ("limit", "cursor", "q")):
+            return {"chats": ordered}
+        needle = query.get("q", [""])[0].strip().lower()
+        if needle:
+            ordered = [chat for chat in ordered if needle in chat["title"].lower()]
+        start = int(query.get("cursor", ["0"])[0].removeprefix("page-"))
+        limit = int(query.get("limit", ["50"])[0])
+        rows = ordered[start:start + limit]
+        more = start + limit < len(ordered)
+        return {"chats": rows, "next_cursor": f"page-{start + limit}" if more else None}
+
     def open(self):
         self.page.goto(self.base + "/", wait_until="networkidle")
-        expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
+        # The server lists pinned chats first, so the pinned third chat opens first; open the first chat
+        # (on a phone the rail hides the chat list, so the pinned chat stays open there).
+        expect(self.page.get_by_text("Third chat history", exact=True)).to_be_visible()
+        first = self.page.locator(".chat-nav-main", has_text="First fixture chat")
+        if first.is_visible():
+            first.click()
+            expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
 
     def row(self, title):
         return self.page.locator(".chat-nav-row").filter(
@@ -185,7 +216,14 @@ class SidebarWorkspaceTests(unittest.TestCase):
         self.assertTrue(account.evaluate("el => { const b=el.getBoundingClientRect(); return b.top>=0 && b.bottom<=innerHeight; }"))
         chat_nav = self.page.locator(".chat-nav-section")
         self.assertTrue(chat_nav.evaluate("el => el.scrollHeight > el.clientHeight"))
-        self.page.locator(".chat-nav-main", has_text="Conversation 59").scroll_into_view_if_needed()
+        # Older chats arrive a page at a time as the list scrolls (owner decision, 26 November).
+        last = self.page.locator(".chat-nav-main", has_text="Conversation 59")
+        for _ in range(5):
+            if last.count():
+                break
+            chat_nav.evaluate("n => { n.scrollTop = n.scrollHeight; }")
+            self.page.wait_for_timeout(300)
+        last.scroll_into_view_if_needed()
         expect(account).to_be_visible()
         self.page.set_viewport_size({"width": 390, "height": 844})
         expect(self.page.locator(".sidebar-nav")).to_be_visible()
@@ -257,7 +295,7 @@ class SidebarWorkspaceTests(unittest.TestCase):
         self.assertEqual(self.preference_writes[-1][0], {"pinned_views": ["operations", "topology"]})
         # A reload shows the saved rail: the pins live on the server, not in the browser.
         self.page.reload(wait_until="networkidle")
-        expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
+        expect(self.page.get_by_text("Third chat history", exact=True)).to_be_visible()
         self.assertEqual(self.rail_labels(), ["New chat", "Search", "Model Store", "Store", "Settings",
                                               "Operations", "Topology & PCB"])
         self.rail().get_by_role("button", name="Topology & PCB", exact=True).click()
@@ -340,6 +378,120 @@ class SidebarWorkspaceTests(unittest.TestCase):
         expect(groups.filter(has=self.page.get_by_text("Today", exact=True))).to_contain_text("First fixture chat")
         expect(groups.filter(has=self.page.get_by_text("Yesterday", exact=True))).to_contain_text("Second fixture chat")
         self.assertEqual(self.submissions, [])
+        self.assertEqual(self.errors, [])
+
+    # ---- The chat history, a page at a time (owner decision, 26 November) ----
+
+    def many_chats(self, count):
+        """`count` more chats, one per hour back from 25 October, so their order is exact."""
+        for index in range(count):
+            hours = index + 1
+            self.chats.append({"chat_id": f"fixture-history-{index:03d}", "title": f"History chat {index:03d}",
+                               "updated_at": f"2026-10-{25 - hours // 24:02d}T{23 - hours % 24:02d}:00:00Z",
+                               "pinned": False})
+
+    def list_rows(self):
+        return self.page.locator(".chat-nav-section .chat-nav-title")
+
+    def scroll_list_to_end(self):
+        self.page.locator(".chat-nav-section").evaluate("n => { n.scrollTop = n.scrollHeight; }")
+
+    def test_the_sidebar_loads_history_a_page_at_a_time_as_it_scrolls(self):
+        self.many_chats(130)  # 133 chats: three pages of 50
+        self.page.set_viewport_size({"width": 1366, "height": 768})
+        self.open()
+        first = [request for request in self.page_requests if "limit" in request]
+        self.assertTrue(first, self.page_requests)
+        self.assertEqual(first[0].get("limit"), "50")
+        self.assertNotIn("cursor", first[0])
+        expect(self.list_rows()).to_have_count(50)
+        # Pinned on top, then newest first, grouped by date.
+        expect(self.page.locator(".chat-date-group").first.locator(".section-label")).to_have_text("Pinned")
+        self.scroll_list_to_end()
+        expect(self.list_rows()).to_have_count(100)
+        self.assertEqual(self.page_requests[-1].get("cursor"), "page-50")
+        self.scroll_list_to_end()
+        expect(self.list_rows()).to_have_count(133)
+        # The end of the history: nothing more is asked for.
+        asked = len(self.page_requests)
+        self.scroll_list_to_end()
+        self.page.wait_for_timeout(400)
+        self.assertEqual(len(self.page_requests), asked)
+        titles = self.list_rows().all_inner_texts()
+        self.assertEqual(len(titles), len(set(titles)))
+        # The oldest chat is reachable and opens like any other.
+        oldest = self.row("History chat 129")
+        oldest.scroll_into_view_if_needed()
+        expect(oldest).to_be_visible()
+        self.assertEqual(self.submissions, [])
+        self.assertEqual(self.errors, [])
+
+    def test_a_tall_window_fills_its_list_without_waiting_for_a_scroll(self):
+        self.many_chats(70)
+        self.page.set_viewport_size({"width": 1920, "height": 2400})
+        self.open()
+        # The first page leaves the list unfilled, so the next page is read at once, without a scroll.
+        expect(self.list_rows()).to_have_count(73)
+        self.assertEqual([request.get("cursor") for request in self.page_requests if "limit" in request],
+                         [None, "page-50"])
+        self.assertEqual(self.errors, [])
+
+    def test_find_a_chat_searches_every_chat_on_the_server(self):
+        self.many_chats(130)
+        self.page.set_viewport_size({"width": 1366, "height": 768})
+        self.open()
+        expect(self.list_rows()).to_have_count(50)
+        # "History chat 120" is on the third page, never loaded: the server finds it by title.
+        self.page.get_by_role("searchbox", name="Filter recent chats", exact=True).fill("chat 12")
+        expect(self.row("History chat 120")).to_be_visible()
+        searched = [request for request in self.page_requests if request.get("q")]
+        self.assertTrue(searched)
+        self.assertEqual(searched[-1]["q"], "chat 12")
+        self.assertNotIn("cursor", searched[-1])
+        expect(self.list_rows()).to_have_count(10)  # History chat 120-129 ("chat 012" does not match)
+        # Only the filter's own pages were read: no unfiltered page was fetched while the search was pending.
+        self.assertEqual([request for request in self.page_requests if "cursor" in request], [])
+        # Clearing the filter brings back the newest page.
+        self.page.get_by_role("searchbox", name="Filter recent chats", exact=True).fill("")
+        expect(self.list_rows()).to_have_count(50)
+        self.assertEqual(self.submissions, [])
+        self.assertEqual(self.errors, [])
+
+    def test_a_failed_page_says_so_and_retries_only_when_asked(self):
+        self.many_chats(130)
+        self.failing_cursor = "page-50"
+        self.page.set_viewport_size({"width": 1366, "height": 768})
+        self.open()
+        self.scroll_list_to_end()
+        alert = self.page.locator(".chat-list-status[role=alert]")
+        expect(alert).to_contain_text("Older chats could not be loaded.")
+        expect(self.list_rows()).to_have_count(50)
+        # Scrolling again does not hammer the server.
+        failures = len([request for request in self.page_requests if request.get("failed")])
+        self.scroll_list_to_end()
+        self.page.wait_for_timeout(400)
+        self.assertEqual(len([request for request in self.page_requests if request.get("failed")]), failures)
+        self.failing_cursor = None
+        alert.get_by_role("button", name="Try again", exact=True).click()
+        expect(self.list_rows()).to_have_count(100)
+        expect(alert).to_have_count(0)
+        self.assertEqual(self.errors, [])
+
+    def test_the_chat_list_shows_many_rows_at_a_laptop_size(self):
+        # Owner request, 26 November: the agents' card took the chat list; at 1366 x 768 the list showed 2 rows
+        # and the card was twice its height. Now the list holds at least 6 whole rows (with 3 date labels in
+        # this fixture) and is many times the agents' row.
+        self.many_chats(130)
+        self.page.set_viewport_size({"width": 1366, "height": 768})
+        self.open()
+        found = self.page.locator(".chat-nav-section").evaluate("""n => {
+            const box = n.getBoundingClientRect();
+            const rows = [...n.querySelectorAll('.chat-nav-main')].filter(r => { const b = r.getBoundingClientRect();
+              return b.top >= box.top && b.bottom <= box.bottom; }).length;
+            const room = document.querySelector('.ludus-preview').getBoundingClientRect().height;
+            return {rows, list: box.height, room}; }""")
+        self.assertGreaterEqual(found["rows"], 6, found)
+        self.assertGreaterEqual(found["list"], 5 * found["room"], found)
         self.assertEqual(self.errors, [])
 
 

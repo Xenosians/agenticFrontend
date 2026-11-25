@@ -38,7 +38,8 @@ class WorkspaceLayoutTests(sidebar.SidebarWorkspaceTests):
         expect(self.page.locator(".chats-sidebar")).to_have_count(0)
         side = self.page.locator(".sidebar")
         box = side.bounding_box()
-        self.assertTrue(248 <= box["width"] <= 288, box)
+        # Narrower since the owner's "scale everything down" (26 November): 240px, as Hermes's 237px.
+        self.assertTrue(224 <= box["width"] <= 256, box)
         # Every row shows its name beside its icon (ChatGPT, Hermes): no icon-only rows.
         rows = self.navigation().locator(".nav-item")
         # Labels, section captions and the filter share one left edge (16px), icons another (16px).
@@ -53,7 +54,7 @@ class WorkspaceLayoutTests(sidebar.SidebarWorkspaceTests):
         for row in rows.all():
             self.assertTrue(row.locator(".nav-label").is_visible())
             self.assertEqual(row.locator("svg.icon").count(), 1)
-            self.assertEqual(round(row.bounding_box()["height"]), 32)
+            self.assertEqual(round(row.bounding_box()["height"]), 28)
         # New chat names its shortcut, as Hermes does.
         expect(rows.first.locator("kbd")).to_have_text("Ctrl+Alt+N")
         # Pinned dashboards follow under their own heading, which carries "+" (ChatGPT's "Projects").
@@ -110,7 +111,7 @@ class WorkspaceLayoutTests(sidebar.SidebarWorkspaceTests):
         expect(search.locator("kbd")).to_have_text("Ctrl+K")
         pill = search.bounding_box()
         self.assertLess(abs(pill["x"] + pill["width"] / 2 - 720), 8)
-        self.assertEqual(round(pill["height"]), 28)
+        self.assertEqual(round(pill["height"]), 26)
         self.assertEqual(search.evaluate("n => getComputedStyle(n).borderTopLeftRadius"), "999px")
         search.click()
         expect(self.page.locator(".workspace-title h1")).to_have_text("Commands")
@@ -151,7 +152,8 @@ class WorkspaceLayoutTests(sidebar.SidebarWorkspaceTests):
         expect(store).to_have_attribute("title", "Store")
         expect(self.page.locator(".chat-nav-section")).to_be_hidden()
         self.page.reload(wait_until="networkidle")
-        expect(self.page.get_by_text("First chat history", exact=True)).to_be_visible()
+        # Pinned chats are listed first, so the pinned third chat opens on a reload.
+        expect(self.page.get_by_text("Third chat history", exact=True)).to_be_visible()
         expect(self.page.locator(".sidebar")).to_have_class(COLLAPSED)
         self.titlebar().get_by_role("button", name="Show sidebar", exact=True).click()
         expect(self.page.locator(".sidebar")).not_to_have_class(COLLAPSED)

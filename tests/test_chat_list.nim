@@ -43,3 +43,22 @@ suite "saved chat metadata":
     check groups[2].chats[0].chatId == "older"
     check groupChats(chats, "2026-10-28", " OLD ")[0].chats[0].chatId == "older"
     check chats[0].chatId == "older" # grouping does not mutate the caller
+
+suite "the sidebar's chat history, a page at a time":
+  test "a page carries its rows and where the next one starts":
+    let page = parseChatPage(%*{"chats": [{"chat_id": "a", "title": "First"}], "next_cursor": "next-1"})
+    check page.chats.len == 1 and page.chats[0].chatId == "a"
+    check page.nextCursor == "next-1"
+    check parseChatPage(%*{"chats": [], "next_cursor": nil}).nextCursor == ""
+  test "a malformed page is refused, never read as the end of the list":
+    for node in [%*{"chats": []}, %*{"chats": [], "next_cursor": 4}, %*{"next_cursor": nil},
+                 %*{"chats": [], "next_cursor": ""},
+                 %*{"chats": [{"chat_id": "a", "title": "A"}, {"chat_id": "a", "title": "B"}], "next_cursor": nil}]:
+      expect ValueError: discard parseChatPage(node)
+  test "a later page adds only chats not already listed, keeping the first copy's place":
+    let loaded = @[ChatItem(chatId: "a", title: "A"), ChatItem(chatId: "b", title: "B")]
+    let merged = appendChatPage(loaded, @[ChatItem(chatId: "b", title: "B moved"), ChatItem(chatId: "c", title: "C")])
+    check merged.len == 3
+    check merged[1].title == "B"
+    check merged[2].chatId == "c"
+    check loaded.len == 2 # the caller's list is not changed

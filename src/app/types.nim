@@ -335,6 +335,10 @@ type
     chatActionId*, chatActionError*: string
     chatsRefreshing*, chatsNeedRefresh*: bool
     chatMetadataEpoch*: int
+    ## The sidebar's history paging (owner decision, 26 November): where the next page starts (empty when
+    ## every chat is loaded), the filter the loaded pages belong to, and whether a page is on its way.
+    chatsNextCursor*, chatsPageQuery*: string
+    chatsPageLoading*, chatsPageFailed*: bool
     toastMessage*: string
     messages*: seq[ChatMessage]
     run*: RunState

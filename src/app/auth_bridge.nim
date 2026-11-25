@@ -258,14 +258,17 @@ proc loadChats*(
     return
 
   let context = navigationContext(state)
-  let remoteChats = await listChats()
+  let firstPage = await listChatPage()
   if not matchesNavigation(state, context):
     return
 
   state.chats.setLen(0)
 
-  for remote in remoteChats:
+  for remote in firstPage.chats:
     state.chats.add(remote)
+  state.chatsNextCursor = firstPage.nextCursor
+  state.chatsPageQuery = ""
+  state.chatsPageFailed = false
 
   if state.currentChatId.len == 0:
     if state.chats.len > 0:

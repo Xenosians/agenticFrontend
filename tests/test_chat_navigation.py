@@ -188,7 +188,10 @@ class ChatNavigationTests(unittest.TestCase):
             data = {"chats": [
                 {"chat_id": "fixture-first", "title": "First fixture chat"},
                 {"chat_id": "fixture-second", "title": "Second fixture chat"},
-            ]}
+            ], "next_cursor": None}
+            # Without page parameters the server answers the whole list, as before (older clients).
+            if not any(key in parse_qs(url.query) for key in ("limit", "cursor", "q")):
+                del data["next_cursor"]
         elif path == "/api/v2/chats/fixture-first/history":
             data = {"messages": [{"role": "user", "content": "First chat history"}]}
         elif path == "/api/v2/chats/fixture-second/history":
@@ -749,12 +752,12 @@ class ChatNavigationTests(unittest.TestCase):
             route.fulfill(json={"chats": [
                 {"chat_id": "fixture-first", "title": "First fixture chat", "working": working},
                 {"chat_id": "fixture-second", "title": "Second fixture chat", "working": False},
-            ]})
+            ], "next_cursor": None})
 
         self.page.route("**/api/v1/jobs", submit)
         self.page.route("**/api/v2/jobs/fixture-running**", job)
         self.page.route("**/api/v2/chats/fixture-first/history**", first_history)
-        self.page.route("**/api/v1/chats", chats)
+        self.page.route(re.compile(r".*/api/v1/chats(\?.*)?$"), chats)
         self.open_first_chat()
         first_row = self.page.locator(".chat-nav-row", has_text="First fixture chat")
         composer = self.page.locator("#messageInput")

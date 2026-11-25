@@ -11,6 +11,10 @@ type
   ChatGroup* = object
     title*: string
     chats*: seq[ChatItem]
+  ## One page of the sidebar's chat history; an empty `nextCursor` means the list is complete.
+  ChatPage* = object
+    chats*: seq[ChatItem]
+    nextCursor*: string
 
 proc textField(node: JsonNode, key: string, required = false): string =
   if not node.hasKey(key):
@@ -47,6 +51,31 @@ proc parseChatList*(data: JsonNode): seq[ChatItem] =
       raise newException(ValueError, "Backend chat list contains a duplicate identity.")
     ids.add(chat.chatId)
     result.add(chat)
+
+proc parseChatPage*(data: JsonNode): ChatPage =
+  ## A page must say where the next one starts (a cursor) or that there is none (null). A missing or
+  ## malformed cursor is refused, so a broken answer is never read as the end of the history.
+  if data.kind != JObject or not data.hasKey("next_cursor"):
+    raise newException(ValueError, "Backend chat page is invalid.")
+  let cursor = data["next_cursor"]
+  if cursor.kind == JNull:
+    result.nextCursor = ""
+  elif cursor.kind == JString and cursor.getStr().len > 0:
+    result.nextCursor = cursor.getStr()
+  else:
+    raise newException(ValueError, "Backend chat page is invalid.")
+  result.chats = parseChatList(data)
+
+proc appendChatPage*(loaded, page: seq[ChatItem]): seq[ChatItem] =
+  ## A later page adds only chats not listed yet: a chat that moved between two reads keeps its first place.
+  result = loaded
+  for chat in page:
+    var known = false
+    for existing in result:
+      if existing.chatId == chat.chatId:
+        known = true
+        break
+    if not known: result.add(chat)
 
 proc validateChatUpdate*(data: JsonNode, chatId: string, patch: JsonNode): ChatItem =
   if data.kind != JObject or not data.hasKey("chat") or data["chat"].kind != JObject or

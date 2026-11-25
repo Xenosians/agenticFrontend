@@ -4,10 +4,10 @@
    rail and sidebar rules no longer apply. Monochrome; separation by fill and whitespace. */
 
 :root {
-  --titlebar-height: 40px;
-  --sidebar-open-width: 264px;
-  --sidebar-rail-width: 56px;
-  --nav-row-height: 32px;
+  --titlebar-height: 36px;
+  --sidebar-open-width: 240px;
+  --sidebar-rail-width: 52px;
+  --nav-row-height: 28px;
 }
 
 /* ---------- The shell: title bar / sidebar + page (+ inspector) / status bar ---------- */
@@ -73,9 +73,9 @@
 }
 
 .titlebar-button {
-  width: 28px;
-  height: 28px;
-  min-width: 28px;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -97,8 +97,8 @@
 .titlebar-search {
   box-sizing: border-box;
   width: min(360px, 34vw);
-  height: 28px;
-  min-height: 28px;
+  height: 26px;
+  min-height: 26px;
   padding: 0 var(--space-1) 0 var(--space-3);
   display: inline-flex;
   align-items: center;
@@ -200,20 +200,21 @@
   white-space: nowrap;
 }
 
+/* Rows touch, as in the Hermes desktop's sidebar: the hover fill alone separates them. */
 .sidebar-nav,
 .dashboard-nav {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 0;
 }
 
 .dashboard-nav {
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
 }
 
 /* "Dashboards" with its "+" at the end of the heading, like ChatGPT's "Projects". */
 .dashboard-nav-header {
-  height: 28px;
+  height: 24px;
   padding: 0 2px 0 var(--space-2);
   display: flex;
   align-items: center;
@@ -225,9 +226,9 @@
 }
 
 .sidebar .dashboard-nav-header .nav-item.dashboard-add {
-  width: 28px;
-  height: 28px;
-  min-height: 28px;
+  width: 24px;
+  height: 24px;
+  min-height: 24px;
   padding: 0;
   justify-content: center;
 }
@@ -330,14 +331,14 @@
 .sidebar-chats {
   flex: 1 0 auto;
   min-height: 160px;
-  margin-top: var(--space-4);
+  margin-top: var(--space-3);
   display: flex;
   flex-direction: column;
 }
 
-/* The filter with the refresh beside it, inset like the rows' text (16px). */
+/* The filter with the refresh beside it, inset like the rows' text. */
 .sidebar .chat-filter {
-  margin: 0 0 var(--space-3) var(--space-2);
+  margin: 0 0 var(--space-2) var(--space-2);
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -351,9 +352,9 @@
 
 .sidebar .chat-refresh {
   flex: none;
-  width: 32px;
-  height: 36px;
-  min-height: 36px;
+  width: 28px;
+  height: var(--control-h);
+  min-height: var(--control-h);
   padding: 0;
   display: inline-flex;
   align-items: center;
@@ -366,13 +367,44 @@
   min-height: 96px;
   margin: 0;
   padding: 0 0 var(--space-2);
+  /* Rows touch, as in the Hermes desktop's sidebar. */
+  gap: 0;
   overflow-x: hidden;
   overflow-y: auto;
   scrollbar-width: thin;
 }
 
 .sidebar .chat-date-group {
-  margin: 0 0 var(--space-3);
+  margin: 0 0 var(--space-1);
+}
+
+/* The end of the loaded history (owner decision, 26 November): loading, or a failed page with a retry. */
+.sidebar .chat-list-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--nav-row-height);
+  padding: 0 var(--space-2);
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+}
+
+.sidebar .chat-list-status .chat-list-retry {
+  height: 24px;
+  min-height: 24px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control-sm);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-xs);
+  cursor: pointer;
+}
+
+.sidebar .chat-list-status .chat-list-retry:hover {
+  background: var(--panel-hover);
 }
 
 .sidebar .chat-nav-main {
@@ -397,9 +429,9 @@
 .sidebar .sidebar-footer {
   box-sizing: border-box;
   width: 100%;
-  min-height: 48px;
+  min-height: 44px;
   margin: var(--space-1) 0 0;
-  padding: var(--space-2);
+  padding: var(--space-1) var(--space-2);
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -473,9 +505,9 @@
 }
 
 .sidebar.collapsed .nav-item {
-  width: 40px;
-  height: 36px;
-  min-height: 36px;
+  width: 36px;
+  height: 32px;
+  min-height: 32px;
   padding: 0;
   justify-content: center;
 }
@@ -495,9 +527,9 @@
 }
 
 .sidebar.collapsed .dashboard-nav-header .nav-item.dashboard-add {
-  width: 40px;
-  height: 36px;
-  min-height: 36px;
+  width: 36px;
+  height: 32px;
+  min-height: 32px;
 }
 
 .sidebar.collapsed .sidebar-body {
@@ -505,8 +537,8 @@
 }
 
 .sidebar.collapsed .sidebar-footer {
-  width: 40px;
-  min-height: 40px;
+  width: 36px;
+  min-height: 36px;
   margin-top: auto;
   padding: 0;
   justify-content: center;

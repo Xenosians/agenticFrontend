@@ -29,7 +29,7 @@ class WorkspaceNavigationTests(navigation.ChatNavigationTests):
                 else:
                     route.fulfill(json={"chats": [
                         {"chat_id": "fixture-" + key, "title": key.title() + " fixture chat"}
-                        for key in self.chat_keys]})
+                        for key in self.chat_keys], "next_cursor": None})
                 return
             if path.startswith("/api/v2/chats/") and path.endswith("/history"):
                 key = path.split("/")[-2].removeprefix("fixture-")

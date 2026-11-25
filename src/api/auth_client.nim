@@ -498,6 +498,23 @@ proc listChats*(): Future[seq[ChatSummary]] {.async.} =
   return parseChatList(data)
 
 
+proc listChatPage*(cursor = "", query = "", limit = 50): Future[ChatPage] {.async.} =
+  ## One page of the sidebar's chat history: pinned first, then newest. `query` filters titles over every
+  ## chat on the server; `cursor` (from the previous page) continues the same list.
+  let options = newFetchOptions(
+    metod = HttpGet,
+    mode = fmCors,
+    credentials = fcInclude
+  )
+  var url = frontendConfig.backendBaseUrl & "/api/v1/chats?limit=" & $limit
+  if cursor.len > 0: url.add("&cursor=" & encodeUrl(cursor, usePlus = false))
+  if query.strip().len > 0: url.add("&q=" & encodeUrl(query.strip(), usePlus = false))
+  let response = await sendRequest(url, options)
+  if not response.ok:
+    raise apiError($response.status, response.body)
+  return parseChatPage(decodeJson(response.body))
+
+
 proc searchChats*(query: string): Future[seq[ChatSearchResult]] {.async.} =
   ## The backend searches every saved chat this account owns.
   let options = newFetchOptions(

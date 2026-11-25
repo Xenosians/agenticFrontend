@@ -72,21 +72,23 @@
   to { -webkit-mask-position-x: calc(-32px * var(--gladiator-scale) * 4); mask-position-x: calc(-32px * var(--gladiator-scale) * 4); }
 }
 
-/* The agents at the bottom of the chat list (owner decision, 18 November): every agent as his
-   gladiator acting out his real state, one line saying who is doing what. One button opens the room. */
+/* The agents' world entry at the bottom of the chat list (owner decision, 26 November): one slim row,
+   noticeable but small. Who is awake acts out his state at 1x; one line says who is doing what (the
+   whole sentence is the row's tooltip); a chevron says it opens. One button opens the world. */
 .ludus-preview {
   flex: 0 0 auto;
-  display: grid;
-  justify-items: center;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   width: 100%;
-  margin: 8px 0 0;
-  padding: 10px 8px 8px;
+  min-height: 48px;
+  margin: var(--space-1) 0 0;
+  padding: var(--space-1) var(--space-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--panel-soft);
   color: var(--text);
-  text-align: center;
+  text-align: left;
   cursor: pointer;
 }
 
@@ -99,41 +101,48 @@
   outline-offset: 2px;
 }
 
-/* Who is awake stands at 2x (whole pixels, legible); the sleepers lie at 1x below him. */
-.ludus-preview-awake,
-.ludus-preview-asleep {
+/* The awake agents side by side, legible at 1x (32 x 40px), at most three and then "+N". */
+.ludus-preview-awake {
+  flex: none;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
   align-items: flex-end;
-  gap: 4px;
+  gap: 2px;
 }
 
-.ludus-preview-awake:empty,
-.ludus-preview-asleep:empty {
+.ludus-preview-awake:empty {
   display: none;
 }
 
 .ludus-preview-awake .gladiator {
-  --gladiator-scale: 2;
-}
-
-.ludus-preview-asleep .gladiator {
   --gladiator-scale: 1;
 }
 
-.ludus-preview-caption {
-  max-width: 100%;
-  font-size: 12px;
-  line-height: 1.45;
+.ludus-preview-more {
+  align-self: center;
   color: var(--text-soft);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
 }
 
-/* A short window keeps the chat list first: the awake agents drop to 1x as well. */
-@media (max-height: 760px) {
-  .ludus-preview-awake .gladiator {
-    --gladiator-scale: 1;
-  }
+.ludus-preview-caption {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--text-xs);
+  line-height: var(--leading-xs);
+  color: var(--text-soft);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ludus-preview-open {
+  flex: none;
+  display: inline-flex;
+  color: var(--muted);
+}
+
+.ludus-preview:hover .ludus-preview-open {
+  color: var(--text);
 }
 
 .visually-hidden {

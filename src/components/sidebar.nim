@@ -12,6 +12,11 @@ proc currentCalendarDay(): cstring {.importjs: "(() => {const d = new Date(); re
 proc eventKey(event: Event): cstring {.importjs: "#.key".}
 proc composingOrRepeated(event: Event): bool {.importjs: "((event) => Boolean(event.isComposing || event.repeat || event.keyCode === 229))(#)".}
 proc focusRename() {.importjs: "requestAnimationFrame(() => document.querySelector('.chat-rename-input')?.focus())".}
+proc nearListEnd(node: Node): bool {.importjs: "((n) => n.scrollTop + n.clientHeight >= n.scrollHeight - 160)(#)".}
+proc listUnfilled(): bool {.importjs: """(() => {
+  const list = document.querySelector('.sidebar .chat-nav-section');
+  return Boolean(list && list.clientHeight > 0 && list.scrollHeight <= list.clientHeight + 160);
+})()""".}
 
 proc focusById(id: cstring) {.importjs: "document.getElementById(#)?.focus()".}
 
@@ -37,6 +42,10 @@ proc afterSidebarRender*(state: AppState) =
   if pendingDashboardFocus.len > 0:
     focusById(cstring(pendingDashboardFocus))
     pendingDashboardFocus = ""
+  # A first page shorter than the list's height cannot be scrolled: load the next one at once.
+  if state.chatsNextCursor.len > 0 and not state.chatsPageLoading and not state.chatsPageFailed and
+      not state.sidebarCollapsed and listUnfilled():
+    discard loadMoreChats(state)
 proc installDashboardDismiss(close: proc(focusPlus: bool)) {.importjs: """((close) => {
   document.addEventListener('pointerdown', e => {
     if (!e.target.closest('.dashboard-menu, .dashboard-add')) close(false);
@@ -267,6 +276,8 @@ proc renderSidebar*(state: AppState, newChatKeys: string): VNode =
             value = state.chatFilter):
             proc oninput(event: Event, node: VNode) =
               state.chatFilter = $node.getInputText
+              # The loaded rows filter at once; the server then searches every chat by title.
+              scheduleChatFilter(state)
               redraw(kxi)
           button(class = "chat-refresh", title = "Refresh chats", `aria-label` = "Refresh chats",
             disabled = state.chatsRefreshing or state.chatActionId.len > 0):
@@ -274,16 +285,32 @@ proc renderSidebar*(state: AppState, newChatKeys: string): VNode =
             proc onclick(event: Event, node: VNode) = discard refreshChatMetadata(state)
         if state.chatActionError.len > 0:
           p(class = "chat-metadata-error", role = "alert"): text state.chatActionError
-        nav(class = "nav-section chat-nav-section", `aria-label` = "Recent chats"):
+        nav(class = "nav-section chat-nav-section", `aria-label` = "Recent chats",
+            `aria-busy` = (if state.chatsPageLoading or state.chatsRefreshing: cstring"true" else: cstring"false")):
           let groups = groupChats(state.chats, $currentCalendarDay(), state.chatFilter)
-          if groups.len == 0:
+          let searching = state.chatFilter.strip() != state.chatsPageQuery
+          if groups.len == 0 and not searching and not state.chatsRefreshing:
             span(class = "sidebar-empty"):
               text (if state.chatFilter.len > 0: "No matching chats" else: "No chats yet")
           for group in groups:
             tdiv(class = "chat-date-group"):
               span(class = "section-label"): text group.title
               for chat in group.chats: renderSavedChat(state, chat)
-        # The agents' room (owner decision, 18 November): who is doing what, below the chats.
+          # The end of the loaded history: more is loading, a page failed, or every chat is shown.
+          if state.chatsPageLoading or (searching and state.chatsRefreshing):
+            span(class = "chat-list-status", role = "status"):
+              icon("refresh", 14, "spinning")
+              text "Loading chats…"
+          elif state.chatsPageFailed:
+            tdiv(class = "chat-list-status", role = "alert"):
+              span: text "Older chats could not be loaded."
+              button(class = "chat-list-retry"):
+                text "Try again"
+                proc onclick(event: Event, node: VNode) = discard retryChatPage(state)
+          proc onscroll(event: Event, node: VNode) =
+            if state.chatsNextCursor.len > 0 and nearListEnd(event.target):
+              discard loadMoreChats(state)
+        # The agents' world (owner decision, 26 November): one slim row below the chats.
         if state.gladiators:
           renderRoomPreview(state)
     let ownerName = if state.auth.displayName.len > 0: state.auth.displayName else: state.auth.email

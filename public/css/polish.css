@@ -745,7 +745,7 @@ body {
   box-sizing: border-box;
   width: min(100%, 920px);
   margin: 0 auto;
-  padding: 12px 28px 16px;
+  padding: 8px 24px 10px;
 }
 
 .composer {
@@ -757,20 +757,21 @@ body {
 
 .composer-input {
   box-sizing: border-box;
-  min-height: 50px;
+  /* The Hermes desktop's composer density (owner decision, 26 November): one line until typed into. */
+  min-height: 36px;
   max-height: 180px;
-  padding: 14px 14px 8px;
+  padding: 8px 10px 4px;
   line-height: 1.5;
 }
 
 .composer-footer {
-  padding: 6px 8px 8px;
+  padding: 2px 6px 6px;
 }
 
 .send-button {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
 }
 
 .composer-hint {

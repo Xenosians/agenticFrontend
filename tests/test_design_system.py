@@ -1,9 +1,10 @@
-"""The design system (owner decisions of 18 November): one industry-standard look on every page except
-the agents' world. Modelled on shadcn/ui (the Linear/Vercel look): Inter bundled with the app, a
-fixed type scale, three weights, 36px controls (32px small), 8px control corners, 12px cards, a
-4px spacing grid, Lucide line icons instead of text glyphs, switches for on/off settings, one page
-header per page, and WCAG 2.2 target sizes and focus rings. Every check measures what the page
-renders, on every main view, at desktop and phone width, dark and light.
+"""The design system (owner decisions of 18 November, scaled down on 26 November): one industry-standard look
+on every page except the agents' world. Modelled on shadcn/ui (the Linear/Vercel look) at the Hermes
+desktop's density: Inter bundled with the app, a fixed type scale (13px body, as Hermes), three weights,
+32px controls (28px small), 8px control corners, 12px cards, a 4px spacing grid, Lucide line icons instead
+of text glyphs, switches for on/off settings, one page header per page, and WCAG 2.2 target sizes and
+focus rings. Every check measures what the page renders, on every main view, at desktop and phone width,
+dark and light.
 
 Isolated HTTP fixtures only. Run after rebuilding: python tests/test_design_system.py
 """
@@ -14,8 +15,11 @@ from playwright.sync_api import expect
 import test_plain_language as plain
 
 VIEWS = ("Chat", "Search", "Model Store", "Store", "Knowledge", "Operations", "Settings")
-TYPE_SCALE = {12, 14, 16, 18, 20, 24}
+# Owner decision, 26 November: "scale everything down", like Hermes (13px body text).
+TYPE_SCALE = {12, 13, 15, 16, 18, 22}
 WEIGHTS = {"400", "500", "600"}
+CONTROL_HEIGHTS = (28, 32)
+FIELD_HEIGHT = 32
 BUTTONS = (".primary-action, .secondary-action, .plugin-primary, .plugin-secondary, .plugin-action-button, "
            ".auth-primary, .approval-action-button, .rejection-action-button, .approval-recovery-button, "
            ".command-back-button, .plugin-add-button, .plugin-back-button, .proxmox-power, .proxmox-ask, "
@@ -98,25 +102,43 @@ class DesignSystemTests(plain.PlainLanguageTests):
 
     def test_buttons_and_fields_have_the_standard_heights_and_corners(self):
         def check(view, found):
-            bad = [c for c in found["controls"] if c["h"] not in (32, 36) or c["r"] not in ("8px", "6px")]
-            self.assertEqual(bad, [], f"{view}: buttons not 32/36px with 6-8px corners")
-            bad = [c for c in found["inputs"] if c["h"] != 36 or c["r"] != "8px"]
-            self.assertEqual(bad, [], f"{view}: fields not 36px with 8px corners")
+            bad = [c for c in found["controls"] if c["h"] not in CONTROL_HEIGHTS or c["r"] not in ("8px", "6px")]
+            self.assertEqual(bad, [], f"{view}: buttons not 28/32px with 6-8px corners")
+            bad = [c for c in found["inputs"] if c["h"] != FIELD_HEIGHT or c["r"] != "8px"]
+            self.assertEqual(bad, [], f"{view}: fields not 32px with 8px corners")
         self.each_view(check)
         self.assertEqual(self.errors, [])
 
     def test_the_application_menu_bar_uses_compact_desktop_items(self):
-        # A desktop menu bar (VS Code, Linear desktop): 28px items in body text, 6px corners, above 24px;
-        # the title bar's icon buttons share the 28px height.
+        # A desktop menu bar (VS Code, Hermes desktop): 24px items in body text, 6px corners; the title
+        # bar's icon buttons share the 24px height (the WCAG minimum target).
         self.open_first_chat()
         items = self.page.evaluate("""() => [...document.querySelectorAll('.workspace-menu-trigger, .titlebar-button')]
             .filter(n => n.getBoundingClientRect().width > 0).map(n => {
             const s = getComputedStyle(n); return [Math.round(n.getBoundingClientRect().height), s.borderTopLeftRadius]; })""")
         self.assertTrue(items)
-        self.assertEqual({tuple(item) for item in items}, {(28, "6px")})
+        self.assertEqual({tuple(item) for item in items}, {(24, "6px")})
         sizes = self.page.evaluate("""() => [...document.querySelectorAll('.workspace-menu-trigger')]
             .map(n => getComputedStyle(n).fontSize)""")
-        self.assertEqual(set(sizes), {"14px"})
+        self.assertEqual(set(sizes), {"13px"})
+        self.assertEqual(self.errors, [])
+
+    def test_the_workspace_is_as_dense_as_the_hermes_desktop(self):
+        # Owner decision, 26 November: "scale everything down" like Hermes: 13px body, 28px sidebar rows,
+        # a narrower sidebar, a 36px title bar.
+        self.page.set_viewport_size({"width": 1366, "height": 768})
+        self.open_first_chat()
+        sizes = self.page.evaluate("""() => {
+          const box = s => { const n = document.querySelector(s); return n ? n.getBoundingClientRect() : null; };
+          return {body: parseFloat(getComputedStyle(document.body).fontSize),
+                  sidebar: Math.round(box('.sidebar').width), titlebar: Math.round(box('.titlebar').height),
+                  row: Math.round(box('.sidebar .nav-item').height),
+                  chatRow: Math.round(box('.sidebar .chat-nav-main').height)}; }""")
+        self.assertEqual(sizes["body"], 13, sizes)
+        self.assertEqual(sizes["row"], 28, sizes)
+        self.assertEqual(sizes["chatRow"], 28, sizes)
+        self.assertLessEqual(sizes["sidebar"], 240, sizes)
+        self.assertEqual(sizes["titlebar"], 36, sizes)
         self.assertEqual(self.errors, [])
 
     def test_every_control_is_a_large_enough_target_and_uses_icons_not_glyphs(self):
@@ -177,8 +199,8 @@ class DesignSystemTests(plain.PlainLanguageTests):
                 expect(header.locator(".page-description")).to_have_count(1)
                 sizes = self.page.evaluate("""() => [document.querySelector('.workspace-title h1'),
                     document.querySelector('.page-header .page-title')].map(n => parseFloat(getComputedStyle(n).fontSize))""")
-                # The top bar names the place (14px); the page title is the one heading that stands out (24px).
-                self.assertEqual(sizes, [14, 24], name)
+                # The top bar names the place (13px); the page title is the one heading that stands out (22px).
+                self.assertEqual(sizes, [13, 22], name)
         self.assertEqual(self.errors, [])
 
 

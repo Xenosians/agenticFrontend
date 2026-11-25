@@ -125,18 +125,31 @@ class GladiatorTests(navigation.ChatNavigationTests):
             {"id": "fixture_new_tool", "agent_names": ["fixture-new-specialist"], "grounded_arguments": []}]}
         self.page.route("**/api/v1/extensions", lambda route: route.fulfill(json=catalog))
         self.page.set_viewport_size({"width": 1440, "height": 900})
+        self.job_status = "processing"
+        self.serve_job_socket()
         self.open_first_chat()
+        # The slim row draws who is awake (26 November): the newcomer takes up the work, live.
+        self.page.locator("#messageInput").fill("Check node hummingbird")
+        self.page.locator("#messageInput").press("Enter")
+        deadline = 50
+        while self.job_socket is None and deadline:
+            self.page.wait_for_timeout(100)
+            deadline -= 1
+        self.assertIsNotNone(self.job_socket, "the job socket never joined")
+        self.push_progress("executing", "fixture-new-specialist")
         newcomer = self.preview().locator('.gladiator[data-agent="fixture-new-specialist"]')
         expect(newcomer).to_have_count(1)
         masks = newcomer.evaluate("n => [getComputedStyle(n).webkitMaskImage, getComputedStyle(n).maskImage]")
         self.assertTrue(any("assets/gladiators/" in mask for mask in masks), masks)
-        own = self.preview().locator('.gladiator[data-agent="proxmox-specialist"]').evaluate(
+        self.assertIn("service-desk-specialist.png", masks[0])
+        hub = self.preview().locator('.gladiator[data-agent="hub"]').evaluate(
             "n => getComputedStyle(n).webkitMaskImage")
-        self.assertIn("proxmox-specialist.png", own)
+        self.assertIn("hub.png", hub)
         self.assertEqual(self.errors, [])
 
     def test_the_agents_room_sits_at_the_bottom_of_the_chat_list(self):
-        """Owner decision, 18 November: the room moves to the empty bottom of the chat list."""
+        """Owner decisions: 18 November, the room moves to the bottom of the chat list; 26 November, it is one
+        slim row there ("not so small the user can't notice but not taking the entire chat sides")."""
         for width in (1440, 1100):
             with self.subTest(width=width):
                 self.page.set_viewport_size({"width": width, "height": 900})
@@ -151,23 +164,24 @@ class GladiatorTests(navigation.ChatNavigationTests):
                 self.assertLessEqual(box["x"] + box["width"], chats["x"] + chats["width"] + 1)
                 self.assertGreaterEqual(box["y"], listed["y"] + listed["height"] - 1)
                 self.assertLessEqual(box["y"] + box["height"], chats["y"] + chats["height"] + 1)
-                # Every agent the catalog names is in it, in roster order, acting out his state: who is
-                # awake large (2x, legible), the sleepers small below.
+                # One slim row: noticeable (at least a full sprite tall) but small (at most 52px).
+                self.assertGreaterEqual(box["height"], 40)
+                self.assertLessEqual(box["height"], 52)
+                # Who is awake acts out his state at 1x, legible; the sleepers are only counted in the line.
                 awake = preview.locator(".ludus-preview-awake .gladiator")
-                asleep = preview.locator(".ludus-preview-asleep .gladiator")
                 self.assertEqual(awake.evaluate_all("nodes => nodes.map(n => n.dataset.agent + ':' + n.dataset.state)"),
                                  ["hub:walking"])
-                self.assertEqual(asleep.evaluate_all("nodes => nodes.map(n => n.dataset.agent)"),
-                                 ["networking-specialist", "proxmox-specialist"])
                 hub = awake.first.bounding_box()
-                self.assertEqual((round(hub["width"]), round(hub["height"])), (64, 80))
-                sleeper = asleep.first.bounding_box()
-                self.assertEqual((round(sleeper["width"]), round(sleeper["height"])), (32, 40))
-                # Centred in the box, not bunched at its left edge.
-                middle = hub["x"] + hub["width"] / 2
-                self.assertLess(abs(middle - (box["x"] + box["width"] / 2)), 4)
+                self.assertEqual((round(hub["width"]), round(hub["height"])), (32, 40))
                 expect(preview.locator(".ludus-preview-caption")).to_have_text(
                     "Janus (hub) is walking about; the other 2 are asleep.")
+                # The line is one line, cut with an ellipsis; the whole sentence is the row's tooltip.
+                caption = preview.locator(".ludus-preview-caption")
+                self.assertEqual(caption.evaluate("n => getComputedStyle(n).whiteSpace"), "nowrap")
+                self.assertEqual(caption.evaluate("n => getComputedStyle(n).textOverflow"), "ellipsis")
+                expect(preview).to_have_attribute("title", "Janus (hub) is walking about; the other 2 are asleep.")
+                # It says it opens: a chevron at its end.
+                expect(preview.locator(".ludus-preview-open svg")).to_have_count(1)
                 # One control: the agents inside are pictures, not separate tab stops.
                 self.assertEqual(preview.locator("button, a, input, [tabindex]").count(), 0)
                 # Nothing in the list scrolls sideways because of it.
@@ -178,7 +192,8 @@ class GladiatorTests(navigation.ChatNavigationTests):
     def test_many_chats_scroll_above_the_room_and_never_run_under_it(self):
         many = [{"chat_id": "fixture-first", "title": "First fixture chat"}] + [
             {"chat_id": f"fixture-many-{index}", "title": f"Fixture chat {index}"} for index in range(40)]
-        self.page.route("**/api/v1/chats", lambda route: route.fulfill(json={"chats": many}))
+        self.page.route(re.compile(r".*/api/v1/chats(\?.*)?$"),
+                        lambda route: route.fulfill(json={"chats": many, "next_cursor": None}))
         self.page.set_viewport_size({"width": 1440, "height": 800})
         self.open_first_chat()
         listed = self.page.locator(".chat-nav-section")
@@ -265,7 +280,8 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.assertIsNotNone(self.job_socket, "the job socket never joined")
         self.push_progress("routing", "hub")
         expect(hub).to_have_attribute("data-state", "thinking")
-        expect(specialist).to_have_attribute("data-state", "sleeping")
+        # A sleeping agent is not drawn in the slim row (26 November); the line counts him.
+        expect(specialist).to_have_count(0)
         self.push_progress("planning", "proxmox-specialist")
         expect(specialist).to_have_attribute("data-state", "thinking")
         expect(hub).to_have_attribute("data-talking-to", "proxmox-specialist")
@@ -275,10 +291,11 @@ class GladiatorTests(navigation.ChatNavigationTests):
         self.push_progress("synthesizing", "hub")
         expect(hub).to_have_attribute("data-state", "working")
         expect(hub).to_have_attribute("data-talking-to", "")
-        expect(specialist).to_have_attribute("data-state", "sleeping")
-        # A name that is not a plain agent name is never shown: still only the catalog's agents.
+        expect(specialist).to_have_count(0)
+        # A name that is not a plain agent name is never shown: still only the catalog's awake agents.
         self.push_progress("planning", "<img src=x>")
-        expect(self.page.locator('.ludus-preview .gladiator')).to_have_count(3)
+        expect(self.page.locator('.ludus-preview .gladiator')).to_have_count(1)
+        expect(self.page.locator('.ludus-preview .gladiator[data-agent="hub"]')).to_have_count(1)
         self.assertEqual(self.errors, [])
 
     def test_the_inspector_shows_the_run_and_the_room_lives_in_the_chat_list(self):
