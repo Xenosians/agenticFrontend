@@ -96,26 +96,28 @@ proc openRoom() =
 
 proc renderRoomPreview*(state: AppState): VNode =
   ## The agents' world entry at the bottom of the chat list (owner decision, 26 November): one slim row,
-  ## noticeable but small. The awake agents act out their real state at 1x (at most three, then "+N"),
-  ## one line says who is doing what (the whole sentence on hover), and a chevron says it opens. The
-  ## whole row is one button that opens the world. Display only.
+  ## noticeable but small. The awake agents act out their real state at 1x, the busiest first (at most
+  ## two, then "+N"), one line says what they are doing (the whole sentence on hover and for screen
+  ## readers), and a chevron says it opens. The whole row is one button that opens the world.
   let scene = currentScene(state)
   let caption = roomCaption(scene)
-  var awake: seq[Gladiator]
-  for gladiator in scene:
-    if gladiator.presence != apSleeping: awake.add gladiator
+  let awake = busiestFirst(scene)
   result = buildHtml(button(class = "ludus-preview", `aria-label` = "Open the agents' world",
                             title = cstring(caption))):
     span(class = "ludus-preview-awake", `aria-hidden` = "true"):
+      # The busiest first, so the one-line status describes the first sprite.
       for index, gladiator in awake:
-        if index < 3: renderGladiator(gladiator)
-      if awake.len > 3:
-        span(class = "ludus-preview-more"): text "+" & $(awake.len - 3)
+        if index < roomRowSprites: renderGladiator(gladiator)
+      if awake.len > roomRowSprites:
+        span(class = "ludus-preview-more"): text "+" & $(awake.len - roomRowSprites)
       if awake.len == 0:
         # Everyone asleep: the hub dozes in the row, so the entry is still recognisable.
         for gladiator in scene:
           if gladiator.agent == hubAgent: renderGladiator(gladiator)
-    span(class = "ludus-preview-caption", `aria-live` = "polite"):
+    # A line that fits in full; the whole sentence is the tooltip and what is announced.
+    span(class = "ludus-preview-caption", `aria-hidden` = "true"):
+      text roomRowLine(scene)
+    span(class = "visually-hidden", `aria-live` = "polite"):
       text caption
     span(class = "ludus-preview-open", `aria-hidden` = "true"): icon("chevron-right", 14)
     proc onclick(event: Event, node: VNode) = openRoom()

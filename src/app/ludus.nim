@@ -194,6 +194,41 @@ proc roomCaption*(scene: seq[Gladiator]): string =
   elif sleepers > 1: parts.add "the other " & $sleepers & " are asleep"
   parts.join("; ") & "."
 
+proc shortPresenceWord*(presence: AgentPresence): string =
+  ## The few words the slim row has room for (the full words are in presenceWord).
+  const words: array[AgentPresence, string] = ["asleep", "walking", "thinking", "working", "training",
+                                               "needs you", "done", "hurt"]
+  words[presence]
+
+proc shortAgentName(agent: string): string =
+  ## "Janus" for the hub, else the specialist's first word: "proxmox-specialist" -> "Proxmox".
+  if agent == hubAgent: return "Janus"
+  result = agent.split('-')[0]
+  if result.len > 0: result[0] = result[0].toUpperAscii
+
+const roomRowSprites* = 2  ## awake agents drawn in the slim row; the rest are "+N"
+
+proc busiestFirst*(scene: seq[Gladiator]): seq[Gladiator] =
+  ## The awake agents, the most occupied first (the order roomCaption names them).
+  const order = [apWorking, apWaiting, apTraining, apHurt, apThinking, apCelebrating, apWalking]
+  for presence in order:
+    for gladiator in scene:
+      if gladiator.presence == presence: result.add gladiator
+
+proc roomRowLine*(scene: seq[Gladiator]): string =
+  ## The slim row's one-line status (owner decision, 26 November), short enough to show in full at
+  ## 12px beside its sprites (measured: 143px beside one, 111px beside two). With one agent awake it
+  ## says who and what ("Proxmox is working"); with more, the busiest one's state ("Working"), whose
+  ## sprite is drawn first. The full sentence (roomCaption) is the tooltip and what is announced.
+  let awake = busiestFirst(scene)
+  if awake.len == 0: return "All asleep"
+  let first = awake[0]
+  let name = shortAgentName(first.agent)
+  if awake.len == 1 and name.len <= 10:
+    return name & (if first.presence == apWaiting: " " else: " is ") & shortPresenceWord(first.presence)
+  result = shortPresenceWord(first.presence)
+  result[0] = result[0].toUpperAscii
+
 proc fitZoom*(roomWidth, roomHeight, viewWidth, viewHeight: int): int =
   ## The largest whole-pixel step at which the whole room fits the view (the expanded room).
   result = minZoom

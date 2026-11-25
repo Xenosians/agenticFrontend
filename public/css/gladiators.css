@@ -101,7 +101,7 @@
   outline-offset: 2px;
 }
 
-/* The awake agents side by side, legible at 1x (32 x 40px), at most three and then "+N". */
+/* The awake agents side by side, legible at 1x (32 x 40px), the busiest first, at most two and then "+N". */
 .ludus-preview-awake {
   flex: none;
   display: flex;

@@ -173,13 +173,16 @@ class GladiatorTests(navigation.ChatNavigationTests):
                                  ["hub:walking"])
                 hub = awake.first.bounding_box()
                 self.assertEqual((round(hub["width"]), round(hub["height"])), (32, 40))
-                expect(preview.locator(".ludus-preview-caption")).to_have_text(
-                    "Janus (hub) is walking about; the other 2 are asleep.")
-                # The line is one line, cut with an ellipsis; the whole sentence is the row's tooltip.
+                expect(preview.locator(".ludus-preview-caption")).to_have_text("Janus is walking")
+                # The short line shows in full (no ellipsis cut mid-word); the whole sentence is the
+                # row's tooltip and is announced to screen readers.
                 caption = preview.locator(".ludus-preview-caption")
                 self.assertEqual(caption.evaluate("n => getComputedStyle(n).whiteSpace"), "nowrap")
                 self.assertEqual(caption.evaluate("n => getComputedStyle(n).textOverflow"), "ellipsis")
+                self.assertLessEqual(caption.evaluate("n => n.scrollWidth - n.clientWidth"), 0)
                 expect(preview).to_have_attribute("title", "Janus (hub) is walking about; the other 2 are asleep.")
+                expect(preview.locator(".visually-hidden[aria-live=polite]")).to_have_text(
+                    "Janus (hub) is walking about; the other 2 are asleep.")
                 # It says it opens: a chevron at its end.
                 expect(preview.locator(".ludus-preview-open svg")).to_have_count(1)
                 # One control: the agents inside are pictures, not separate tab stops.
@@ -240,10 +243,14 @@ class GladiatorTests(navigation.ChatNavigationTests):
         specialist = preview.locator('.gladiator[data-agent="proxmox-specialist"]')
         expect(specialist).to_have_attribute("data-state", "working")
         expect(specialist).to_have_count(1)
+        # The busiest is drawn first and the line says what he is doing, in full.
         self.assertEqual(preview.locator(".ludus-preview-awake .gladiator").evaluate_all(
-            "nodes => nodes.map(n => n.dataset.agent)"), ["hub", "proxmox-specialist"])
-        expect(preview.locator(".ludus-preview-caption")).to_have_text(
-            "Proxmox specialist is working; Janus (hub) is thinking; the other one is asleep.")
+            "nodes => nodes.map(n => n.dataset.agent)"), ["proxmox-specialist", "hub"])
+        expect(preview.locator(".ludus-preview-caption")).to_have_text("Working")
+        self.assertLessEqual(preview.locator(".ludus-preview-caption").evaluate(
+            "n => n.scrollWidth - n.clientWidth"), 0)
+        expect(preview).to_have_attribute(
+            "title", "Proxmox specialist is working; Janus (hub) is thinking; the other one is asleep.")
         self.assertEqual(self.errors, [])
 
     def test_the_hub_acts_out_the_job_and_names_what_he_is_doing(self):

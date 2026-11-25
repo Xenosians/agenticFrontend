@@ -265,6 +265,31 @@ suite "the room preview in the chat list says who is doing what":
     check roomCaption(ludusScene(@["hub"], RunState(), ready(), @[], idleSeconds = 30)) ==
       "Janus (hub) is walking about."
 
+  test "the slim row's one line fits beside its sprites: who and what for one, the busiest state for more":
+    # The full sentence stays the row's tooltip and spoken text; the row shows a line that fits in full
+    # instead of cutting the sentence mid-word (owner decision, 26 November: a slim, readable row).
+    check roomRowLine(ludusScene(roster, RunState(), ready(), @[], idleSeconds = 30)) == "Janus is walking"
+    check roomRowLine(ludusScene(roster, RunState(), SystemState(), @[], idleSeconds = 30)) == "All asleep"
+    let run = running("processing", "executing", "proxmox-specialist")
+    let busy = ludusScene(roster, run, ready(), @[], idleSeconds = 0)
+    check roomRowLine(busy) == "Working"
+    # The busiest agent is drawn first, so the line describes the first sprite.
+    var order: seq[string]
+    for gladiator in busiestFirst(busy): order.add gladiator.agent
+    check order == @["proxmox-specialist", "hub"]
+    let waiting = running("waiting_approval", agent = "proxmox-specialist")
+    check roomRowLine(ludusScene(roster, waiting, ready(), @[], idleSeconds = 0)) == "Needs you"
+    check roomRowLine(ludusScene(@["hub", "proxmox-specialist"], waiting, ready(), @[], idleSeconds = 0)) ==
+      "Needs you"
+    # Short enough: each state's word, and one agent with the longest name a roster has.
+    for presence in AgentPresence:
+      if presence != apSleeping:
+        check shortPresenceWord(presence).len <= 10
+    check roomRowLine(@[Gladiator(agent: "networking-specialist", presence: apWaiting)]) == "Networking needs you"
+    # A longer name than the row has room for gives the state alone.
+    check roomRowLine(@[Gladiator(agent: "infrastructure-specialist", presence: apWorking)]) == "Working"
+    check roomRowSprites == 2
+
 suite "each agent's recent steps (world decision 3: a card shows what he did)":
   proc step(stage, agent: string, status = "processing"): RunState =
     RunState(active: true, jobId: "j1", status: status, progressStage: stage, progressAgent: agent)
